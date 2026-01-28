@@ -10,6 +10,8 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ title, children }: MainLayoutProps) {
+ 
+
   return (
     <>
       <Head title={title} />
@@ -20,7 +22,7 @@ export default function MainLayout({ title, children }: MainLayoutProps) {
             <BottomHeader />
           </div>
           <div className="flex flex-grow overflow-hidden">
-            <MainMenu className="flex-shrink-0 hidden w-56 p-12 overflow-y-auto bg-indigo-800 md:block" />
+            <MainMenu className="menu-navbar flex-shrink-0 hidden w-56 py-4 overflow-y-auto bg-indigo-800 md:block" />
             {/**
              * We need to scroll the content of the page, not the whole page.
              * So we need to add `scroll-region="true"` to the div below.

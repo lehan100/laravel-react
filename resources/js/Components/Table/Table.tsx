@@ -67,7 +67,7 @@ export default function Table<T>({
                     </td>
                   );
                 })}
-                <td className="w-px border-t">
+                <td className={"w-px border-t"}>
                   <Link
                     href={getRowDetailsUrl?.(row)!}
                     className="flex items-center px-4 focus:outline-none"

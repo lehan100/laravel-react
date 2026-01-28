@@ -48,7 +48,6 @@ class ContactsController extends Controller
         Auth::user()->account->contacts()->create(
             $request->validated()
         );
-
         return Redirect::route('contacts')->with('success', 'Contact created.');
     }
 

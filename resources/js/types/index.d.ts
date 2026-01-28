@@ -1,13 +1,27 @@
 import { Config } from 'ziggy-js';
-
+export interface Roles {
+  id: number;
+  name: string;
+  guard_name: string;
+}
+export interface Permissions {
+  id: number;
+  name: string;
+  guard_name: string;
+}
+export interface rolePermissions {
+  name: string;
+}
 export interface User {
   id: number;
   name: string;
   first_name: string;
   last_name: string;
   email: string;
+  group: string;
   owner: string;
   photo: string;
+  status: string;
   deleted_at: string;
   account: Account;
 }

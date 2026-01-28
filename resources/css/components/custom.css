@@ -1,0 +1,76 @@
+.btn-fade-group {
+    .btn-fade {
+        text-decoration: none;
+
+        &:hover,
+        &.is-open {
+            color: #fff;
+            box-shadow: rgba(0, 0, 0, 0.25) 0 1px 0, inset rgba(255, 255, 255, 0.16) 0 1px 0;
+            border-radius: 0;
+        }
+    }
+
+    .menu-narbar-item {
+        display: none;
+        transition: ease-in 0.35s;
+
+        &.show {
+            display: block;
+        }
+
+        ul {
+            li {
+                position: relative;
+
+                a {
+                    font-size: 12pt;
+                }
+
+                &:before {
+                    background-color: #425668;
+                    bottom: auto;
+                    content: "";
+                    height: 8px;
+                    left: -24px;
+                    margin-top: 15px;
+                    position: absolute;
+                    right: auto;
+                    width: 8px;
+                    z-index: 1;
+                    border-radius: 50%;
+                }
+
+                &:after {
+                    border-left: 1px solid #425668;
+                    bottom: 0;
+                    content: "";
+                    left: -20px;
+                    position: absolute;
+                    top: 0;
+                }
+            }
+        }
+    }
+
+    &.is-open {
+        border-right: 7px solid #191e38;
+    }
+}
+
+.form-check {
+    .form-check-label {
+        padding-top: 2px;
+    }
+}
+
+@keyframes fade_in_show {
+    0% {
+        opacity: 0;
+        transform: scale(0)
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1)
+    }
+}

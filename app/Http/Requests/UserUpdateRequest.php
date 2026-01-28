@@ -26,6 +26,8 @@ class UserUpdateRequest extends FormRequest
             'password' => ['nullable'],
             'owner' => ['required', 'boolean'],
             'photo' => ['nullable', 'image'],
+            'group' => ['required'],
+            'status' => ['required'],
         ];
     }
 }

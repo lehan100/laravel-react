@@ -21,10 +21,10 @@ export default function MainMenuItem({ icon, link, text }: MainMenuItemProps) {
   });
 
   return (
-    <div className="mb-4">
+    <div className="mb-0">
       <Link
         href={route(link)}
-        className="flex items-center group py-3 space-x-3"
+        className="flex items-center group py-2 space-x-2"
       >
         <div className={iconClasses}>{icon}</div>
         <div className={textClasses}>{text}</div>

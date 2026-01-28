@@ -37,7 +37,7 @@ export default function Alert({
 
   return (
     <div
-      className={`${backGroundColor} px-4 mb-8 flex items-center justify-between rounded max-w-3xl`}
+      className={`${backGroundColor} px-4 mb-8 flex items-center justify-between rounded w-full`}
     >
       <div className="flex items-center space-x-2">
         {icon || iconComponent}

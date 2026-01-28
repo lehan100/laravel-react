@@ -35,6 +35,7 @@ export default function FilterBar() {
     if (prevValues) {
       const query = Object.keys(pickBy(values)).length ? pickBy(values) : {};
 
+
       router.get(route(route().current() as string), query, {
         replace: true,
         preserveState: true

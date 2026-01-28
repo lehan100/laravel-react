@@ -13,7 +13,7 @@ export default function Pagination({ links = [] }: PaginationProps) {
   if (links.length === 3) return null;
 
   return (
-    <div className="flex flex-wrap mt-6 -mb-1">
+    <div className="flex flex-wrap mb-4 mt-5 px-3 justify-center">
       {links?.map(link => {
         return link?.url === null ? (
           <PageInactive key={link.label} label={link.label} />

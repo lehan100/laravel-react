@@ -8,7 +8,6 @@ use App\Http\Controllers\OrganizationsController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,53 +20,77 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Auth
+$prefixAdmin = config('configs.prefix.admin');
+Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Admin'], function () {
+    Route::get('/', function () {
+        return redirect()->route('auth/login');
+    });
+    /* -----------LOGIN--------------- */
+    $prefix = 'auth';
+    $controllerName = 'auth';
+    Route::group(['prefix' => $prefix], function () use ($controllerName) {
+        $controller = ucfirst($controllerName) . 'Controller@';
+        Route::get('/login', ['as' => $controllerName . '/login', 'uses' => $controller . 'login']);
+        Route::post('/post-login', ['as' => $controllerName . "/post-login", 'uses' => $controller . 'postlogin']);
+        Route::get('/logout', ['as' => $controllerName . '/logout', 'uses' => $controller . 'logout']);
+    });
+    /* -----------Dashboard--------------- */
+    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('auth');
+    /* -----------Role--------------- */
+    Route::resource('roles', App\Http\Controllers\Admin\RolesController::class)->middleware('auth');
+    Route::delete('/roles-destroy-many', [App\Http\Controllers\Admin\RolesController::class, 'destroyMany'])->name('roles.destroyMany')->middleware('auth');
+    Route::get('/roles-permissions/{id}', [App\Http\Controllers\Admin\RolesController::class, 'permissions'])->where('id', '[0-9]+')->name('roles.permissions')->middleware('auth');
+    /* -----------User--------------- */
+    Route::resource('users', App\Http\Controllers\Admin\UsersController::class)->middleware('auth');
+});
+// Route::get('login', [LoginController::class, 'create'])
+//     ->name('login')
+//     ->middleware('guest');
 
-Route::get('login', [LoginController::class, 'create'])
-    ->name('login')
-    ->middleware('guest');
+// Route::post('login', [LoginController::class, 'store'])
+//     ->name('login.store')
+//     ->middleware('guest');
 
-Route::post('login', [LoginController::class, 'store'])
-    ->name('login.store')
-    ->middleware('guest');
-
-Route::delete('logout', [LoginController::class, 'destroy'])
-    ->name('logout');
+// Route::delete('logout', [LoginController::class, 'destroy'])
+//     ->name('logout');
 
 // Dashboard
 
-Route::get('/', [DashboardController::class, 'index'])
-    ->name('dashboard')
-    ->middleware('auth');
+// Route::get('/', [DashboardController::class, 'index'])
+//     ->name('dashboard')
+//     ->middleware('auth');
 
 // Users
 
-Route::get('users', [UsersController::class, 'index'])
-    ->name('users')
-    ->middleware('auth');
+// Route::get('users', [UsersController::class, 'index'])
+//     ->name('users')
+//     ->middleware('auth');
 
-Route::get('users/create', [UsersController::class, 'create'])
-    ->name('users.create')
-    ->middleware('auth');
+// Route::get('users/create', [UsersController::class, 'create'])
+//     ->name('users.create')
+//     ->middleware('auth');
 
-Route::post('users', [UsersController::class, 'store'])
-    ->name('users.store')
-    ->middleware('auth');
+// Route::post('users', [UsersController::class, 'store'])
+//     ->name('users.store')
+//     ->middleware('auth');
 
-Route::get('users/{user}/edit', [UsersController::class, 'edit'])
-    ->name('users.edit')
-    ->middleware('auth');
+// Route::get('users/{user}/edit', [UsersController::class, 'edit'])
+//     ->name('users.edit')
+//     ->middleware('auth');
 
-Route::put('users/{user}', [UsersController::class, 'update'])
-    ->name('users.update')
-    ->middleware('auth');
+// Route::put('users/{user}', [UsersController::class, 'update'])
+//     ->name('users.update')
+//     ->middleware('auth');
 
-Route::delete('users/{user}', [UsersController::class, 'destroy'])
-    ->name('users.destroy')
-    ->middleware('auth');
+// Route::delete('users/{user}', [UsersController::class, 'destroy'])
+//     ->name('users.destroy')
+//     ->middleware('auth');
 
-Route::put('users/{user}/restore', [UsersController::class, 'restore'])
-    ->name('users.restore')
-    ->middleware('auth');
+// Route::put('users/{user}/restore', [UsersController::class, 'restore'])
+//     ->name('users.restore')
+//     ->middleware('auth');
 
 // Organizations
 

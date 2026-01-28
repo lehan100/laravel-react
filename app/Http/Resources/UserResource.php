@@ -21,6 +21,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'owner' => $this->owner,
+            'group' => $this->group,
+            'status' => $this->status,
             'photo' => $this->photo ? url()->route('image', ['path' => $this->photo, 'w' => 60, 'h' => 60, 'fit' => 'crop']) : null,
             'deleted_at' => $this->deleted_at,
             'account' => $this->whenLoaded('account'),
