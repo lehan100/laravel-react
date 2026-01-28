@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Spatie\Permission\Models\Role;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Repositories\User\UserRepositoryInterface as RepositoryInterface;
@@ -22,9 +23,11 @@ class UsersController extends MainController
     protected $controllerView = 'Admin/Users/';
     protected $controllerName = 'users';
     protected $mainModel;
+    private $USER_GROUP;
     public function __construct(RepositoryInterface $repository)
     {
         $this->mainModel = $repository;
+        $this->USER_GROUP = config('configs.user_group_name');
     }
     public function index(): Response
     {
@@ -46,7 +49,8 @@ class UsersController extends MainController
         $user = Auth::user()->account->users()->create(
             $request->validated()
         );
-
+        $role = Role::firstOrCreate(['name' => $this->USER_GROUP[$request->group]]);
+        $user->assignRole([$role->id]);
         if ($request->hasFile('photo')) {
             $user->update([
                 'photo' => $request->file('photo')->store('users'),
@@ -68,7 +72,8 @@ class UsersController extends MainController
         $user->update(
             $request->validated()
         );
-
+        $role = Role::firstOrCreate(['name' => $this->USER_GROUP[$request->group]]);
+        $user->assignRole([$role->id]);
         if ($request->hasFile('photo')) {
             $user->update([
                 'photo' => $request->file('photo')->store('users'),

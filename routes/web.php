@@ -1,12 +1,9 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactsController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\OrganizationsController;
 use App\Http\Controllers\ReportsController;
-use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +34,7 @@ Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Adm
     /* -----------Dashboard--------------- */
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
         ->name('dashboard')
-        ->middleware('auth');
+        ->middleware(['auth', 'permission']);
     /* -----------Role--------------- */
     Route::resource('roles', App\Http\Controllers\Admin\RolesController::class)->middleware('auth');
     Route::delete('/roles-destroy-many', [App\Http\Controllers\Admin\RolesController::class, 'destroyMany'])->name('roles.destroyMany')->middleware('auth');

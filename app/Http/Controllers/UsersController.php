@@ -8,6 +8,7 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -17,6 +18,7 @@ use Inertia\Response;
 
 class UsersController extends Controller
 {
+    
     public function index(): Response
     {
         return Inertia::render('Users/Index', [
@@ -41,7 +43,7 @@ class UsersController extends Controller
         $user = Auth::user()->account->users()->create(
             $request->validated()
         );
-
+        
         if ($request->hasFile('photo')) {
             $user->update([
                 'photo' => $request->file('photo')->store('users'),
@@ -63,7 +65,7 @@ class UsersController extends Controller
         $user->update(
             $request->validated()
         );
-
+      
         if ($request->hasFile('photo')) {
             $user->update([
                 'photo' => $request->file('photo')->store('users'),

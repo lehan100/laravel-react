@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Spatie\Permission\Models\Role;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,9 +36,10 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            'auth' => function () {
+            'auth' => function () use ($request) {
                 return [
                     'user' => auth()->check() ? new UserResource(auth()->user()->load('account')) : null,
+                    'permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : [],
                 ];
             },
             'flash' => function () use ($request) {

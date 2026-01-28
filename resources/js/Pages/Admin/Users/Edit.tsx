@@ -208,7 +208,7 @@ function EditPage() {
                   <Col sm>
                     <Form.Select aria-label="0" required defaultValue={item.group} onChange={e => setData('group', e.target.value)}>
                       <option value="0">Not Access</option>
-                      <option value="1">Administrator</option>
+                      <option value="1">Administrators</option>
                       <option value="2">Admin</option>
                     </Form.Select>
                   </Col>

@@ -118,7 +118,7 @@ export default function FilterBar() {
           options={[
             { value: '', label: 'Users Group' },
             { value: '0', label: 'Not Access' },
-            { value: '1', label: 'Administrator' },
+            { value: '1', label: 'Administrators' },
             { value: '2', label: 'Admin' }
           ]}
         />

@@ -24,7 +24,7 @@ function UsersPage() {
     },
     '1': {
       'bg': 'success',
-      'text': 'Administrator'
+      'text': 'Administrators'
     },
     '2': {
       'bg': 'warning',

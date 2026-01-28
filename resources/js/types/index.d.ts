@@ -96,6 +96,7 @@ export type PageProps<
 > = T & {
   auth: {
     user: User;
+    permissions: any;
   };
   flash: {
     success: string | null;

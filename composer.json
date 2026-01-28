@@ -20,10 +20,11 @@
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
         "league/glide-symfony": "^2.0",
-        "spatie/laravel-permission": "^6.24",
+        "spatie/laravel-permission": "^6.7",
         "tightenco/ziggy": "^2.2"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.6",
         "brianium/paratest": "^7.4",
         "laravel/pint": "^1.24",
         "laravel/sail": "^1.41",
