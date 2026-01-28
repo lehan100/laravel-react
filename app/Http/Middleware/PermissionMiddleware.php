@@ -18,7 +18,7 @@ class PermissionMiddleware
      */
     public function handle($request, Closure $next, $permission = null, ...$permissions)
     {
-        $authGuard = Auth::guard();
+        $authGuard = Auth::user();
         if ($authGuard->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
