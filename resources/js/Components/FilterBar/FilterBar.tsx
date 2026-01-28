@@ -9,7 +9,7 @@ import TextInput from '@/Components/Form/TextInput';
 
 export default function FilterBar() {
   const { filters } = usePage<{
-    filters: { role?: string; search?: string; trashed?: string };
+    filters: { role?: string; search?: string; trashed?: string; group?: string };
   }>().props;
 
   const [opened, setOpened] = useState(false);
@@ -17,7 +17,8 @@ export default function FilterBar() {
   const [values, setValues] = useState({
     role: filters.role || '', // role is used only on users page
     search: filters.search || '',
-    trashed: filters.trashed || ''
+    trashed: filters.trashed || '',
+    group: filters.group || ''
   });
 
   const prevValues = usePrevious(values);
@@ -26,7 +27,8 @@ export default function FilterBar() {
     setValues({
       role: '',
       search: '',
-      trashed: ''
+      trashed: '',
+      group: ''
     });
   }
 
@@ -42,7 +44,6 @@ export default function FilterBar() {
       });
     }
   }, [values]);
-
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
@@ -58,8 +59,8 @@ export default function FilterBar() {
   }
 
   return (
-    <div className="flex items-center w-full max-w-md mr-4">
-      <div className="relative flex bg-white rounded shadow">
+    <div className="flex items-center w-full max-w-md mr-4 mb-3">
+      <div className="relative flex bg-white rounded">
         <div
           style={{ top: '100%' }}
           className={`absolute ${opened ? '' : 'hidden'}`}
@@ -83,36 +84,51 @@ export default function FilterBar() {
                 />
               </FieldGroup>
             )}
-            <FieldGroup label="Trashed" name="trashed">
-              <SelectInput
-                name="trashed"
-                value={values.trashed}
-                onChange={handleChange}
-                options={[
-                  { value: '', label: '' },
-                  { value: 'with', label: 'With Trashed' },
-                  { value: 'only', label: 'Only Trashed' }
-                ]}
-              />
-            </FieldGroup>
+            {filters.hasOwnProperty('trashed') && (
+              <FieldGroup label="Trashed" name="trashed">
+                <SelectInput
+                  name="trashed"
+                  value={values.trashed}
+                  onChange={handleChange}
+                  options={[
+                    { value: '', label: '' },
+                    { value: 'with', label: 'With Trashed' },
+                    { value: 'only', label: 'Only Trashed' }
+                  ]}
+                />
+              </FieldGroup>
+            )}
           </div>
         </div>
-        <button
-          onClick={() => setOpened(true)}
-          className="px-4 border-r rounded-l md:px-6 hover:bg-gray-100 focus:outline-none focus:border-white focus:ring-2 focus:ring-indigo-400 focus:z-10"
-        >
-          <div className="flex items-center">
-            <span className="hidden text-gray-700 md:inline">Filter</span>
-            <ChevronDown size={14} strokeWidth={3} className="md:ml-2" />
-          </div>
-        </button>
+        {filters.hasOwnProperty('trashed') || filters.hasOwnProperty('role') && (
+          <button
+            onClick={() => setOpened(true)}
+            className="px-4 border-r rounded-l md:px-6 hover:bg-gray-100 focus:outline-none focus:border-white focus:ring-2 focus:ring-indigo-400 focus:z-10"
+          >
+            <div className="flex items-center">
+              <span className="hidden text-gray-700 md:inline">Filter</span>
+              <ChevronDown size={14} strokeWidth={3} className="md:ml-2" />
+            </div>
+          </button>
+        )}
+        <SelectInput
+          name="group"
+          value={values.group}
+          onChange={handleChange}
+          options={[
+            { value: '', label: 'Users Group' },
+            { value: '0', label: 'Not Access' },
+            { value: '1', label: 'Administrator' },
+            { value: '2', label: 'Admin' }
+          ]}
+        />
         <TextInput
           name="search"
           placeholder="Search…"
           autoComplete="off"
           value={values.search}
           onChange={handleChange}
-          className="border-0 rounded-l-none focus:ring-2"
+          className="focus:ring-2 ms-2"
         />
       </div>
       <button

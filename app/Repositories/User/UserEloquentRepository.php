@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class UserEloquentRepository extends EloquentRepository implements UserRepositoryInterface
 {
 
-    private $FIELDSELECT = array('id', 'first_name', 'last_name', 'email',  'status', 'owner', 'photo','group');
+    private $FIELDSELECT = array('id', 'first_name', 'last_name', 'email',  'status', 'owner', 'photo', 'group');
     private $USER_GROUP;
 
     /**
@@ -31,9 +31,16 @@ class UserEloquentRepository extends EloquentRepository implements UserRepositor
     {
         $data = null;
         if ($options['task'] == "admin-list-items") {
-            $query = $this->_model->select($this->FIELDSELECT)
-                ->orderBy('id', 'desc');
-            $data = $query->paginate($params['pagination']['totalItemsPerPage']);
+            $query = $this->_model->select($this->FIELDSELECT);
+            if (isset($params['group']) && $params['group'] != '') {
+                $query->where('group', $params['group']);
+            }
+            if (isset($params['search']) && $params['search'] != '') {
+                $query->where('first_name', 'like', "%{$params['search']}%")
+                    ->orwhere('last_name', 'like', "%{$params['search']}%")
+                    ->orwhere('email', 'like', "%{$params['search']}%");
+            }
+            $data = $query->orderBy('id', 'desc')->paginate($params['pagination']['totalItemsPerPage']);
         }
         return $data;
     }

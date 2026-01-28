@@ -8,7 +8,7 @@ use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -28,8 +28,10 @@ class UsersController extends MainController
     }
     public function index(): Response
     {
+        $this->params = array_merge(Request::all(), $this->params);
         $items =  $this->mainModel->lists($this->params, ['task' => 'admin-list-items']);
         return Inertia::render($this->controllerView . 'Index', [
+            'filters' => Request::all('search', 'group'),
             'items' => new UserCollection($items)
         ]);
     }

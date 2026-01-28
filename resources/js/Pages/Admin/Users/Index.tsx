@@ -8,13 +8,14 @@ import TableView from '@/Components/Table/TableViewAll';
 import DeleteButton from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
 import { useEffect, useMemo, useState } from "react";
+import FilterBar from '@/Components/FilterBar/FilterBar';
 function UsersPage() {
   const { data, setData, errors, post, processing } = useForm({
     name: '',
     user_ids: ''
   });
   const { items } = usePage<{ items: PaginatedData<User>; }>().props;
-  
+
   const { meta: { links } }: any = items;
   const groupClass: any = {
     '0': {
@@ -118,6 +119,7 @@ function UsersPage() {
   };
   return (
     <div>
+
       <Row className="justify-content-center mb-4">
         <Col xs={12} md> <h1 className="text-3xl font-bold">Users</h1></Col>
         <Col xs={12} md={'auto'}>
@@ -137,6 +139,7 @@ function UsersPage() {
           </div>
         </Col>
       </Row>
+      <FilterBar />
       <Card>
         <TableView
           columns={columns}
