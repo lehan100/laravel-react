@@ -51,7 +51,8 @@ class RolesController extends MainController
         if ($params['undo'] == 1) {
             return Redirect::to(route('roles.index'))->with('success', 'Role created successfully.');
         }
-        return Redirect::back()->with('success', 'Role created successfully.');
+        // return Redirect::back()->with('success', 'Role created successfully.');
+        return Redirect::route('roles.edit', $role->id)->with('success', 'Role created successfully.');
     }
     public function destroy(Role $role): RedirectResponse
     {

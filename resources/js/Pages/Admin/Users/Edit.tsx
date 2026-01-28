@@ -97,7 +97,7 @@ function EditPage() {
         <Row>
           <Col xs={12} md={6}>
             <Card>
-              <Card.Header className='py-3 bg-indigo-800 text-white'>Account Infomation</Card.Header>
+              <Card.Header className='py-3 bg-indigo-800 text-white'>Infomation</Card.Header>
               <Card.Body>
                 <Form.Control
                   type="hidden"
@@ -152,7 +152,7 @@ function EditPage() {
           </Col>
           <Col xs={12} md={6}>
             <Card>
-              <Card.Header className='py-3 bg-indigo-800 text-white'>Account Setting</Card.Header>
+              <Card.Header className='py-3 bg-indigo-800 text-white'>Setting</Card.Header>
               <Card.Body>
                 <Form.Group as={Row} className="mb-3" controlId="formEmail">
                   <Form.Label column sm="3">

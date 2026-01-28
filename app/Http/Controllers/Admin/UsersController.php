@@ -8,6 +8,7 @@ use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
+use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,7 @@ class UsersController extends MainController
 
     public function create(): Response
     {
-        return Inertia::render('Users/Create');
+        return Inertia::render($this->controllerView . 'Create');
     }
 
     public function store(UserStoreRequest $request): RedirectResponse
@@ -49,8 +50,7 @@ class UsersController extends MainController
                 'photo' => $request->file('photo')->store('users'),
             ]);
         }
-
-        return Redirect::route('users')->with('success', 'User created successfully.');
+        return Redirect::route('users.edit', $user->id)->with('success', 'User created successfully.');
     }
 
     public function edit(User $user): Response
@@ -88,5 +88,12 @@ class UsersController extends MainController
         $user->restore();
 
         return Redirect::back()->with('success', 'User restored successfully.');
+    }
+    public function destroyMany(Request $request): RedirectResponse
+    {
+        $params = $request->all();
+        $ids = explode(",", $params['ids']);
+        User::whereIn('id', $ids)->delete();
+        return Redirect::route('users.index')->with('success', 'User deleted successfully.');
     }
 }

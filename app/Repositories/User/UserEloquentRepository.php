@@ -32,7 +32,7 @@ class UserEloquentRepository extends EloquentRepository implements UserRepositor
         $data = null;
         if ($options['task'] == "admin-list-items") {
             $query = $this->_model->select($this->FIELDSELECT)
-                ->orderBy('id', 'asc');
+                ->orderBy('id', 'desc');
             $data = $query->paginate($params['pagination']['totalItemsPerPage']);
         }
         return $data;

@@ -1,137 +1,231 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, usePage, useForm, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import LoadingButton from '@/Components/Button/LoadingButton';
-import TextInput from '@/Components/Form/TextInput';
-import SelectInput from '@/Components/Form/SelectInput';
-import FileInput from '@/Components/Form/FileInput';
-import FieldGroup from '@/Components/Form/FieldGroup';
+import { Save, Undo } from 'lucide-react';
+import TableView from '@/Components/Table/TableView';
+import SaveButton from '@/Components/Button/SaveButton';
+import { Row, Col, Card, Form, Alert } from 'react-bootstrap';
+import { Permissions, User, PaginatedData } from '@/types';
+import Pagination from '@/Components/Pagination/Pagination';
+import { useMemo } from "react";
 
-const Create = () => {
+function CreatedPage() {
+
   const { data, setData, errors, post, processing } = useForm({
     first_name: '',
     last_name: '',
     email: '',
+    group: '0',
+    status: '0',
+    owner: 0,
     password: '',
-    owner: '0',
-    photo: ''
+    undo: 0,
   });
+  const [validated, setValidated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [active, setActive]: any = useState(data.status);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [matchError, setMatchError] = useState(false);
+  const handleSubmit = (event: any) => {
+    const form = event.currentTarget;
+    event.preventDefault();
+    event.stopPropagation();
+    // Custom password match validation
+    if (password != confirmPassword) {
+      setMatchError(true);
+    } else {
+      setMatchError(false);
+      if (form.checkValidity() === true) {
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    post(route('users.store'));
+        data.status = active;
+        data.password = password;
+        post(route('users.store'));
+      }
+    }
+
+    // if (form.checkValidity() === true && matchError == false) {
+    //   put(route('users.update', item.id));
+    // }
+    setValidated(true);
+  };
+  // Callback function to receive data
+  const handleChildData = (data: any) => {
+
+  };
+  const [undo, setUndo] = useState(0);
+  const handleUndo = (status: number) => {
+    setUndo(status);
   }
-
+  useEffect(() => {
+    data.undo = undo;
+    if (active != data.status) {
+      data.status = active;
+    }
+  }, [data, undo, active]);
   return (
-    <div>
-      <div>
-        <h1 className="mb-8 text-3xl font-bold">
-          <Link
-            href={route('users')}
-            className="text-indigo-600 hover:text-indigo-700"
-          >
-            Users
-          </Link>
-          <span className="font-medium text-indigo-600"> /</span> Create
-        </h1>
-      </div>
-      <div className="max-w-3xl overflow-hidden bg-white rounded shadow">
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-8 p-8 lg:grid-cols-2">
-            <FieldGroup
-              label="First Name"
-              name="first_name"
-              error={errors.first_name}
-            >
-              <TextInput
-                name="first_name"
-                error={errors.first_name}
-                value={data.first_name}
-                onChange={e => setData('first_name', e.target.value)}
-              />
-            </FieldGroup>
-
-            <FieldGroup
-              label="Last Name"
-              name="last_name"
-              error={errors.last_name}
-            >
-              <TextInput
-                name="last_name"
-                error={errors.last_name}
-                value={data.last_name}
-                onChange={e => setData('last_name', e.target.value)}
-              />
-            </FieldGroup>
-
-            <FieldGroup label="Email" name="email" error={errors.email}>
-              <TextInput
-                name="email"
-                type="email"
-                error={errors.email}
-                value={data.email}
-                onChange={e => setData('email', e.target.value)}
-              />
-            </FieldGroup>
-
-            <FieldGroup
-              label="Password"
-              name="password"
-              error={errors.password}
-            >
-              <TextInput
-                name="password"
-                type="password"
-                error={errors.password}
-                value={data.password}
-                onChange={e => setData('password', e.target.value)}
-              />
-            </FieldGroup>
-
-            <FieldGroup label="Owner" name="owner" error={errors.owner}>
-              <SelectInput
-                name="owner"
-                error={errors.owner}
-                value={data.owner}
-                onChange={e => setData('owner', e.target.value)}
-                options={[
-                  { value: '1', label: 'Yes' },
-                  { value: '0', label: 'No' }
-                ]}
-              />
-            </FieldGroup>
-
-            <FieldGroup label="Photo" name="photo" error={errors.photo}>
-              <FileInput
-                name="photo"
-                accept="image/*"
-                error={errors.photo}
-                value={data.photo}
-                onChange={photo => setData('photo', photo as unknown as string)}
-              />
-            </FieldGroup>
-          </div>
-          <div className="flex items-center justify-end px-8 py-4 bg-gray-100 border-t border-gray-200">
-            <LoadingButton
+    <div className='content'>
+      <Row className="justify-content-center mb-4">
+        <Col xs={12} md> <h1 className="text-3xl font-bold">Created User / <span className='text-info'>{data.first_name + " " + data.last_name}</span></h1></Col>
+        <Col xs={12} md={'auto'}>
+          <div className="d-flex gap-2">
+            <SaveButton
+              children="Save User"
+              variant="success"
               loading={processing}
-              type="submit"
-              className="btn-indigo"
+              undo={0}
+              icon={<Save size={20} />}
+              sendDataStatusUndo={handleUndo}
+              form='my-form'
+            />
+            <Link
+              className="btn btn-secondary py-2"
+              href={route('users.index')}
             >
-              Create User
-            </LoadingButton>
+              <div className="d-flex gap-2 align-items-center">
+                {<Undo size={20} />}
+                <span>Back</span>
+              </div>
+            </Link>
           </div>
-        </form>
-      </div>
+        </Col>
+      </Row>
+      <Form id='my-form' noValidate validated={validated} onSubmit={handleSubmit}>
+        <Row>
+          <Col xs={12} md={6}>
+            <Card>
+              <Card.Header className='py-3 bg-indigo-800 text-white'>Infomation</Card.Header>
+              <Card.Body>
+                <Form.Control
+                  type="hidden"
+                  placeholder="undo"
+                  defaultValue=''
+                  onChange={e => setData('undo', undo)}
+                />
+                <Form.Group as={Row} className="mb-3" controlId="formStatus">
+                  <Form.Label column sm="3">
+                    &nbsp;
+                  </Form.Label>
+                  <Col sm>
+                    <Form.Check
+                      type="switch"
+                      id="custom-switch"
+                      className={active == '1' ? '' : 'text-secondary'}
+                      label={active == '1' ? 'Active' : 'InActive'}
+                      defaultChecked={active == '1' ? true : false}
+                      isValid={active == '1' ? true : false}
+                      value={active}
+                      onChange={e => setActive(active == 1 ? 0 : 1)}
+                    />
+                  </Col>
+                </Form.Group>
+                <Form.Group as={Row} className="mb-3">
+                  <Form.Label column sm="3">
+                    Account Name
+                  </Form.Label>
+                  <Col sm>
+                    <Form.Control type='text' required
+                      onChange={e => setData('first_name', e.target.value)}
+                      placeholder='First Name'
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      The first name field is required.
+                    </Form.Control.Feedback>
+                  </Col>
+                  <Col sm>
+                    <Form.Control type='text' required
+                      onChange={e => setData('last_name', e.target.value)}
+                      placeholder='Last Name'
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      The last name field is required.
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Group>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={12} md={6}>
+            <Card>
+              <Card.Header className='py-3 bg-indigo-800 text-white'>Setting</Card.Header>
+              <Card.Body>
+                <Form.Group as={Row} className="mb-3" controlId="formEmail">
+                  <Form.Label column sm="3">
+                    Email
+                  </Form.Label>
+                  <Col sm>
+                    <Form.Control type='text' required
+                      onChange={e => setData('email', e.target.value)}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      The email field is required.
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3" controlId="formtPassword">
+                  <Form.Label column sm="3">
+                    Password
+                  </Form.Label>
+                  <Col sm>
+                    <Form.Control
+                      type="password"
+                      placeholder="Password"
+                      required
+                      onChange={(e) => setPassword(e.target.value)}
+                      className={matchError ? 'is-invalid' : ''}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      The password field is required.
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Group>
+                <Form.Group as={Row} className="mb-3" controlId="formConfirmPassword">
+                  <Form.Label column sm="3">
+                    Confirm Password
+                  </Form.Label>
+                  <Col sm>
+                    <Form.Control
+                      type="password"
+                      placeholder="Confirm Password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={matchError ? 'is-invalid' : ''}
+                    />
+                    {matchError && (
+                      <Form.Control.Feedback type="invalid" style={{ display: 'block' }}>
+                        Passwords do not match.
+                      </Form.Control.Feedback>
+                    )}
+                    {!matchError && (
+                      <Form.Control.Feedback type="invalid">
+                        The confirm password field is required.
+                      </Form.Control.Feedback>
+                    )}
+                  </Col>
+                </Form.Group>
+                <Form.Group as={Row} className="mb-3" controlId="formAssign">
+                  <Form.Label column sm="3">
+                    Assign Group
+                  </Form.Label>
+                  <Col sm>
+                    <Form.Select aria-label="0" required defaultValue='0' onChange={e => setData('group', e.target.value)}>
+                      <option value="0">Not Access</option>
+                      <option value="1">Administrator</option>
+                      <option value="2">Admin</option>
+                    </Form.Select>
+                  </Col>
+                </Form.Group>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Form>
     </div>
   );
-};
-
-/**
- * Persistent Layout (Inertia.js)
- *
- * [Learn more](https://inertiajs.com/pages#persistent-layouts)
- */
-Create.layout = (page: React.ReactNode) => (
-  <MainLayout title="Create User" children={page} />
+}
+CreatedPage.layout = (page: React.ReactNode) => (
+  <MainLayout title="Edit User" children={page} />
 );
 
-export default Create;
+export default CreatedPage;

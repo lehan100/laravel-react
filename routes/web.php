@@ -44,6 +44,7 @@ Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Adm
     Route::get('/roles-permissions/{id}', [App\Http\Controllers\Admin\RolesController::class, 'permissions'])->where('id', '[0-9]+')->name('roles.permissions')->middleware('auth');
     /* -----------User--------------- */
     Route::resource('users', App\Http\Controllers\Admin\UsersController::class)->middleware('auth');
+    Route::delete('/users-destroy-many', [App\Http\Controllers\Admin\UsersController::class, 'destroyMany'])->name('users.destroyMany')->middleware('auth');
 });
 // Route::get('login', [LoginController::class, 'create'])
 //     ->name('login')
