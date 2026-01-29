@@ -1,10 +1,12 @@
 import { Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
-
+import { useTrans } from '@/Hooks/useTrans';
 function DashboardPage() {
+  const { trans } = useTrans();
   return (
     <div>
       <h1 className="mb-8 text-3xl font-bold">Dashboard</h1>
+      {trans('auth.failed')}
       <p className="mb-12 leading-normal">
         Hey there! Welcome to Ping CRM, a demo app designed to help illustrate
         how

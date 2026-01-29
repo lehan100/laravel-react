@@ -18,16 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn() => route('auth/login'));
         $middleware->redirectUsersTo(fn() => route('dashboard'));
         $middleware->alias([
+            'check.login' => \App\Http\Middleware\CheckLogin::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \App\Http\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
         $middleware->web(\App\Http\Middleware\HandleInertiaRequests::class);
-        // $middleware->append([
-        //     'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-        //     'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-        //     'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-        // ]);
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
         $middleware->throttleApi();
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);

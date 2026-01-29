@@ -27,8 +27,8 @@ Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Adm
     $controllerName = 'auth';
     Route::group(['prefix' => $prefix], function () use ($controllerName) {
         $controller = ucfirst($controllerName) . 'Controller@';
-        Route::get('/login', ['as' => $controllerName . '/login', 'uses' => $controller . 'login']);
-        Route::post('/post-login', ['as' => $controllerName . "/post-login", 'uses' => $controller . 'postlogin']);
+        Route::get('/login', ['as' => $controllerName . '/login', 'uses' => $controller . 'login'])->middleware('check.login');
+        Route::post('/post-login', ['as' => $controllerName . "/post-login", 'uses' => $controller . 'postlogin'])->middleware('check.login');
         Route::get('/logout', ['as' => $controllerName . '/logout', 'uses' => $controller . 'logout']);
     });
     /* -----------Dashboard--------------- */
@@ -43,6 +43,12 @@ Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Adm
     Route::resource('users', App\Http\Controllers\Admin\UsersController::class)->middleware('auth');
     Route::delete('/users-destroy-many', [App\Http\Controllers\Admin\UsersController::class, 'destroyMany'])->name('users.destroyMany')->middleware('auth');
 });
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'vi'])) {
+        session()->put('locale', $locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 // Route::get('login', [LoginController::class, 'create'])
 //     ->name('login')
 //     ->middleware('guest');

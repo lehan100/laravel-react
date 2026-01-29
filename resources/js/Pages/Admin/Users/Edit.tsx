@@ -43,7 +43,21 @@ function EditPage() {
 
         data.status = active;
         data.password = password;
-        put(route('users.update', item.id));
+
+        if (!password) {
+          const { password, ...userWithoutPassword }: any = data;
+          console.log(2222);
+          router.post(route('users.update', item.id), {
+            ...userWithoutPassword,
+            _method: 'put', 
+          });
+          //put(route('users.update', item.id), userWithoutPassword);
+        } else {
+          put(route('users.update', item.id));
+        }
+
+
+
       }
     }
 

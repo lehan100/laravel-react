@@ -25,6 +25,7 @@ class UserCollection extends ResourceCollection
             'status' => $user->status,
             'photo' => $user->photo ? url()->route('image', ['path' => $user->photo, 'w' => 60, 'h' => 60, 'fit' => 'crop']) : null,
             'deleted_at' => $user->deleted_at,
+            'password' => $user->password,
         ]);
     }
 }

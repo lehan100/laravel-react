@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'johndoe@example.com',
             'password' => 'secret',
             'owner' => true,
+            'status' => 1,
+            'group' => 1,
         ]);
 
         User::factory(5)->create(['account_id' => $account->id]);

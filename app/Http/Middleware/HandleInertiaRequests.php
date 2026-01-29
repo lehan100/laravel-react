@@ -36,6 +36,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            'locale' => function () {
+                return app()->getLocale();
+            },
             'auth' => function () use ($request) {
                 return [
                     'user' => Auth::check() ? new UserResource(Auth::user()->load('account')) : null,
