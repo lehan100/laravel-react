@@ -6,6 +6,7 @@ import MainMenuItem from '@/Components/Menu/MainMenuItem';
 import BsFace from '@/Components/Menu/Fade';
 import BsFaceLink from '@/Components/Menu/FadeLink';
 import { usePermission } from '@/Hooks/usePermission';
+import { useTrans } from '@/Hooks/useTrans';
 interface MainMenuProps {
   className?: string;
 }
@@ -28,6 +29,7 @@ export default function MainMenu({ className }: MainMenuProps) {
     'users': ['roles', 'users'],
   }
   const { can } = usePermission();
+  const { trans } = useTrans();
   const [routeIndex, setRouteIndex] = useState(getRoute());
   useEffect(() => {
     setRouteIndex(getRoute());
@@ -35,15 +37,15 @@ export default function MainMenu({ className }: MainMenuProps) {
   return (
     <div className={className}>
       {can("dashboard") &&
-        <BsFaceLink title='Dashboard' href={route('dashboard')} index={routers['dashboard'].indexOf(routeIndex)} icon={<CircleGauge size={20} />} />
+        <BsFaceLink title={trans('hancms.dashboard.main')} href={route('dashboard')} index={routers['dashboard'].indexOf(routeIndex)} icon={<CircleGauge size={20} />} />
       }
       {(can("roles.index") || can("users.index")) &&
-        <BsFace title='Users' id={'menu-1'} index={routers['users'].indexOf(routeIndex)} icon={<Users size={20} />}>
+        <BsFace title={trans('hancms.users.main')} id={'menu-1'} index={routers['users'].indexOf(routeIndex)} icon={<Users size={20} />}>
           <ul>
             {can("roles.index") &&
               <li>
                 <MainMenuItem
-                  text="Roles"
+                  text={trans('hancms.roles.name')}
                   link="roles.index"
                   icon={<UserCog size={20} />}
                 />
@@ -52,7 +54,7 @@ export default function MainMenu({ className }: MainMenuProps) {
             {can("users.index") &&
               <li>
                 <MainMenuItem
-                  text="List Users"
+                  text={trans('hancms.users.admin.name')}
                   link="users.index"
                   icon={<Users size={20} />}
                 />

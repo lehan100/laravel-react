@@ -39,14 +39,11 @@ function EditPage() {
       setMatchError(true);
     } else {
       setMatchError(false);
+      data.password = password;
       if (form.checkValidity() === true) {
-
         data.status = active;
-        data.password = password;
-
         if (!password) {
           const { password, ...userWithoutPassword }: any = data;
-          console.log(2222);
           router.post(route('users.update', item.id), {
             ...userWithoutPassword,
             _method: 'put', 

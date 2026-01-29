@@ -8,14 +8,14 @@ import { Row, Col, Card, Form, Alert } from 'react-bootstrap';
 import { Permissions, Roles, PaginatedData } from '@/types';
 import Pagination from '@/Components/Pagination/Pagination';
 import { useMemo } from "react";
-
+import { useTrans } from '@/Hooks/useTrans';
 function CreateRolesPage() {
     const { permissions, role, rolePermissions } = usePage<{
         permissions: PaginatedData<Permissions>;
         role: Roles;
         rolePermissions: any;
     }>().props;
-
+    const { trans } = useTrans();
     const { data, setData, put, processing } = useForm({
         name: role.name || '',
         guard_name: role.guard_name || 'web',
@@ -35,11 +35,11 @@ function CreateRolesPage() {
                 name: 'id'
             },
             {
-                label: 'Name',
+                label: trans('hancms.column.name'),
                 name: 'name',
             },
             {
-                label: 'Guard',
+                label: trans('hancms.column.guard'),
                 name: 'guard_name'
             },
         ],
@@ -76,11 +76,11 @@ function CreateRolesPage() {
     return (
         <div className='content'>
             <Row className="justify-content-center mb-4">
-                <Col xs={12} md> <h1 className="text-3xl font-bold">Roles / <span className='text-info'>{data.name}</span></h1></Col>
+                <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.roles.name')} / <span className='text-info'>{data.name}</span></h1></Col>
                 <Col xs={12} md={'auto'}>
                     <div className="d-flex gap-2">
                         <SaveButton
-                            children="Save Roles"
+                            children={trans('hancms.button.save')}
                             variant="success"
                             loading={processing}
                             undo={0}
@@ -94,7 +94,7 @@ function CreateRolesPage() {
                         >
                             <div className="d-flex gap-2 align-items-center">
                                 {<Undo size={20} />}
-                                <span>Back</span>
+                                <span>{trans('hancms.button.back')}</span>
                             </div>
                         </Link>
                     </div>
@@ -103,19 +103,19 @@ function CreateRolesPage() {
             <Form id='my-form' noValidate validated={validated} onSubmit={handleSubmit}>
                 <div className="mb-3 alert alert-info p-3">
                     <Form.Group controlId="form_name">
-                        <Form.Label column sm="auto">
-                            Role Name
+                        <Form.Label column sm="auto" className='text-capitalize'>
+                            {trans('hancms.column.name')} {trans('hancms.roles.name')}
                         </Form.Label>
                         <Col>
                             <Form.Control
                                 type="text"
-                                placeholder="Name"
+                                placeholder={trans('hancms.column.name')}
                                 required
                                 defaultValue={data.name}
                                 onChange={e => setData('name', e.target.value)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                The name field is required.
+                               {trans('hancms.message.error.required', { name: trans('hancms.column.name')})}
                             </Form.Control.Feedback>
                         </Col>
                     </Form.Group>
@@ -127,13 +127,13 @@ function CreateRolesPage() {
                     />
                 </div>
                 <Alert variant="danger" show={permissions_alert}>
-                    <Alert.Heading>Assign Permissions Error!</Alert.Heading>
+                    <Alert.Heading>{trans('hancms.assign_permissions.error')}</Alert.Heading>
                     <p>
-                        You haven't selected any permissions.
+                        {trans('hancms.assign_permissions.error.message')}
                     </p>
                 </Alert>
                 <Card>
-                    <Card.Header className='py-3 bg-indigo-800 text-white'>Assign Permissions</Card.Header>
+                    <Card.Header className='py-3 bg-indigo-800 text-white'>{trans('hancms.assign_permissions.name')}</Card.Header>
                     <Card.Body>
                         <TableView
                             columns={columns}
@@ -150,7 +150,7 @@ function CreateRolesPage() {
     );
 }
 CreateRolesPage.layout = (page: React.ReactNode) => (
-    <MainLayout title="Edit Role" children={page} />
+    <MainLayout title="hancms.roles.edit" children={page} />
 );
 
 export default CreateRolesPage;

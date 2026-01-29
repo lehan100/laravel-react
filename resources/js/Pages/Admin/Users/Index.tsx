@@ -9,7 +9,9 @@ import DeleteButton from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
 import { useEffect, useMemo, useState } from "react";
 import FilterBar from '@/Components/FilterBar/FilterBar';
+import { useTrans } from '@/Hooks/useTrans';
 function UsersPage() {
+  const {trans} = useTrans();
   const { data, setData, errors, post, processing } = useForm({
     name: '',
     user_ids: ''
@@ -34,11 +36,11 @@ function UsersPage() {
   const statusClass: any = {
     '0': {
       'bg': 'danger',
-      'text': 'InActive'
+      'text': trans('hancms.status.inactive')
     },
     '1': {
       'bg': 'success',
-      'text': 'Active'
+      'text': trans('hancms.status.active')
     }
   };
   const columns = useMemo(
@@ -48,12 +50,12 @@ function UsersPage() {
         name: 'id'
       },
       {
-        label: 'First Name',
+        label: trans('hancms.column.first_name'),
         name: 'first_name',
       },
 
       {
-        label: 'Last Name',
+        label: trans('hancms.column.last_name'),
         name: 'last_name'
       },
       {
@@ -61,7 +63,7 @@ function UsersPage() {
         name: 'email'
       },
       {
-        label: 'Status',
+        label: trans('hancms.column.status'),
         name: 'status',
         renderCell: (row: any) => (
           <Badge className='fw-normal' bg={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</Badge>
@@ -75,16 +77,16 @@ function UsersPage() {
         )
       },
       {
-        label: 'Action',
+        label: trans('hancms.column.action'),
         name: 'action',
         renderCell: (row: any) => (
           <>
             <div className="d-flex gap-2">
               <EditButton href={route('users.edit', row.id)} className='btn btn-warning btn-sm text-white'>
-                Edit
+                 {trans('hancms.button.edit')}
               </EditButton>
               <DeleteButton className='btn btn-danger btn-sm' size={14} onDelete={() => destroy(row.id)}>
-                Delete
+                 {trans('hancms.button.delete')}
               </DeleteButton>
             </div>
 
@@ -95,7 +97,7 @@ function UsersPage() {
     []
   );
   function destroy(id: any) {
-    if (confirm('Are you sure you want to delete this role?')) {
+     if (confirm(trans('hancms.message.destroy', { name: trans('hancms.users.name').toLowerCase() }))) {
       router.delete(route('users.destroy', id), {
 
         onSuccess: () => {
@@ -105,7 +107,7 @@ function UsersPage() {
     }
   }
   function destroys() {
-    if (confirm('Are you sure you want to delete this roles?')) {
+   if (confirm(trans('hancms.message.destroys'))) {
       let ids = data.user_ids.split(",");
       if (ids.length > 0) {
         router.delete(route('users.destroyMany', { 'ids': data.user_ids }));
@@ -121,7 +123,7 @@ function UsersPage() {
     <div>
 
       <Row className="justify-content-center mb-4">
-        <Col xs={12} md> <h1 className="text-3xl font-bold">Users</h1></Col>
+        <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.users.admin.name')}</h1></Col>
         <Col xs={12} md={'auto'}>
           <div className="d-flex gap-2 align-items-center">
             <Link
@@ -130,11 +132,11 @@ function UsersPage() {
             >
               <div className="d-flex gap-2 align-items-center">
                 {<PlusCircle size={20} />}
-                Created User
+               {trans('hancms.button.created')}
               </div>
             </Link>
             <DeleteButton className='btn btn-danger py-2' size={20} onDelete={() => destroys()}>
-              Delete Items Selected
+              {trans('hancms.button.delete.selected')}
             </DeleteButton>
           </div>
         </Col>
@@ -153,7 +155,7 @@ function UsersPage() {
   );
 }
 UsersPage.layout = (page: React.ReactNode) => (
-  <MainLayout title="Users" children={page} />
+  <MainLayout title="hancms.users.name" children={page} />
 );
 
 export default UsersPage;

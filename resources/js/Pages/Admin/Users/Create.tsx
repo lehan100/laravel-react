@@ -2,15 +2,12 @@ import { Link, usePage, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import { Save, Undo } from 'lucide-react';
-import TableView from '@/Components/Table/TableView';
 import SaveButton from '@/Components/Button/SaveButton';
 import { Row, Col, Card, Form, Alert } from 'react-bootstrap';
-import { Permissions, User, PaginatedData } from '@/types';
-import Pagination from '@/Components/Pagination/Pagination';
-import { useMemo } from "react";
+import { useTrans } from '@/Hooks/useTrans';
 
 function CreatedPage() {
-
+  const { trans } = useTrans();
   const { data, setData, errors, post, processing } = useForm({
     first_name: '',
     last_name: '',
@@ -36,9 +33,9 @@ function CreatedPage() {
     } else {
       setMatchError(false);
       if (form.checkValidity() === true) {
-
-        data.status = active;
         data.password = password;
+        data.status = active;
+        // data.password = password;
         post(route('users.store'));
       }
     }
@@ -65,11 +62,11 @@ function CreatedPage() {
   return (
     <div className='content'>
       <Row className="justify-content-center mb-4">
-        <Col xs={12} md> <h1 className="text-3xl font-bold">Created User / <span className='text-info'>{data.first_name + " " + data.last_name}</span></h1></Col>
+        <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.users.created')}: <span className='text-info'>{data.first_name + " " + data.last_name}</span></h1></Col>
         <Col xs={12} md={'auto'}>
           <div className="d-flex gap-2">
             <SaveButton
-              children="Save User"
+              children={trans('hancms.button.save')}
               variant="success"
               loading={processing}
               undo={0}
@@ -83,7 +80,7 @@ function CreatedPage() {
             >
               <div className="d-flex gap-2 align-items-center">
                 {<Undo size={20} />}
-                <span>Back</span>
+                <span>{trans('hancms.button.back')}</span>
               </div>
             </Link>
           </div>
@@ -93,7 +90,7 @@ function CreatedPage() {
         <Row>
           <Col xs={12} md={6}>
             <Card>
-              <Card.Header className='py-3 bg-indigo-800 text-white'>Infomation</Card.Header>
+              <Card.Header className='py-3 bg-indigo-800 text-white'>{trans('hancms.title.infomation')}</Card.Header>
               <Card.Body>
                 <Form.Control
                   type="hidden"
@@ -110,7 +107,7 @@ function CreatedPage() {
                       type="switch"
                       id="custom-switch"
                       className={active == '1' ? '' : 'text-secondary'}
-                      label={active == '1' ? 'Active' : 'InActive'}
+                      label={active == '1' ? trans('hancms.status.active') : trans('hancms.status.inactive')}
                       defaultChecked={active == '1' ? true : false}
                       isValid={active == '1' ? true : false}
                       value={active}
@@ -120,24 +117,24 @@ function CreatedPage() {
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3">
                   <Form.Label column sm="3">
-                    Account Name
+                    {trans('hancms.column.account_name')}
                   </Form.Label>
                   <Col sm>
                     <Form.Control type='text' required
                       onChange={e => setData('first_name', e.target.value)}
-                      placeholder='First Name'
+                      placeholder={trans('hancms.column.first_name')}
                     />
                     <Form.Control.Feedback type="invalid">
-                      The first name field is required.
+                      {trans('hancms.message.error.required', { name: trans('hancms.column.first_name') })}
                     </Form.Control.Feedback>
                   </Col>
                   <Col sm>
                     <Form.Control type='text' required
                       onChange={e => setData('last_name', e.target.value)}
-                      placeholder='Last Name'
+                      placeholder={trans('hancms.column.last_name')}
                     />
                     <Form.Control.Feedback type="invalid">
-                      The last name field is required.
+                      {trans('hancms.message.error.required', { name: trans('hancms.column.last_name') })}
                     </Form.Control.Feedback>
                   </Col>
                 </Form.Group>
@@ -146,7 +143,7 @@ function CreatedPage() {
           </Col>
           <Col xs={12} md={6}>
             <Card>
-              <Card.Header className='py-3 bg-indigo-800 text-white'>Setting</Card.Header>
+              <Card.Header className='py-3 bg-indigo-800 text-white'>{trans('hancms.title.setting')}</Card.Header>
               <Card.Body>
                 <Form.Group as={Row} className="mb-3" controlId="formEmail">
                   <Form.Label column sm="3">
@@ -157,36 +154,35 @@ function CreatedPage() {
                       onChange={e => setData('email', e.target.value)}
                     />
                     <Form.Control.Feedback type="invalid">
-                      The email field is required.
+                      {trans('hancms.message.error.required', { name: 'Email' })}
                     </Form.Control.Feedback>
                   </Col>
                 </Form.Group>
 
                 <Form.Group as={Row} className="mb-3" controlId="formtPassword">
                   <Form.Label column sm="3">
-                    Password
+                    {trans('hancms.column.password')}
                   </Form.Label>
                   <Col sm>
                     <Form.Control
                       type="password"
-                      placeholder="Password"
+                      placeholder={trans('hancms.column.password')}
                       required
-                      onChange={(e) => setPassword(e.target.value)}
-                      className={matchError ? 'is-invalid' : ''}
+                      onChange={(e) => ()=>{setPassword(e.target.value); setData('password', e.target.value)}}
                     />
                     <Form.Control.Feedback type="invalid">
-                      The password field is required.
+                      {trans('hancms.message.error.required', { name: trans('hancms.column.password') })}
                     </Form.Control.Feedback>
                   </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3" controlId="formConfirmPassword">
                   <Form.Label column sm="3">
-                    Confirm Password
+                    {trans('hancms.column.password_confirm')}
                   </Form.Label>
                   <Col sm>
                     <Form.Control
                       type="password"
-                      placeholder="Confirm Password"
+                      placeholder={trans('hancms.column.password_confirm')}
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -194,19 +190,19 @@ function CreatedPage() {
                     />
                     {matchError && (
                       <Form.Control.Feedback type="invalid" style={{ display: 'block' }}>
-                        Passwords do not match.
+                        {trans('hancms.message.error.password_confirm')}
                       </Form.Control.Feedback>
                     )}
                     {!matchError && (
                       <Form.Control.Feedback type="invalid">
-                        The confirm password field is required.
+                        {trans('hancms.message.error.required', { name: trans('hancms.column.password_confirm') })}
                       </Form.Control.Feedback>
                     )}
                   </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3" controlId="formAssign">
                   <Form.Label column sm="3">
-                    Assign Group
+                    {trans('hancms.column.assign_group')}
                   </Form.Label>
                   <Col sm>
                     <Form.Select aria-label="0" required defaultValue='0' onChange={e => setData('group', e.target.value)}>
@@ -225,7 +221,7 @@ function CreatedPage() {
   );
 }
 CreatedPage.layout = (page: React.ReactNode) => (
-  <MainLayout title="Edit User" children={page} />
+  <MainLayout title="hancms.users.created" children={page} />
 );
 
 export default CreatedPage;

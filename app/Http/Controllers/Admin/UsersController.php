@@ -98,9 +98,13 @@ class UsersController extends MainController
     }
     public function destroyMany(Request $request): RedirectResponse
     {
-        $params = $request->all();
-        $ids = explode(",", $params['ids']);
-        User::whereIn('id', $ids)->delete();
-        return Redirect::route('users.index')->with('success', 'User deleted successfully.');
+        try {
+            $params = $request->all();
+            $ids = explode(",", $params['ids']);
+            User::whereIn('id', $ids)->delete();
+            return Redirect::route('users.index')->with('success', 'User deleted successfully.');
+        } catch (\Throwable $th) {
+            return Redirect::route('users.index')->with('error', 'No data found to delete.');
+        }
     }
 }

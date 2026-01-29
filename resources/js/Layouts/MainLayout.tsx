@@ -3,18 +3,18 @@ import MainMenu from '@/Components/Menu/MainMenu';
 import FlashMessages from '@/Components/Messages/FlashMessages';
 import TopHeader from '@/Components/Header/TopHeader';
 import BottomHeader from '@/Components/Header/BottomHeader';
-
+import { useTrans } from '@/Hooks/useTrans';
 interface MainLayoutProps {
   title?: string;
   children: React.ReactNode;
 }
 
 export default function MainLayout({ title, children }: MainLayoutProps) {
- 
+  const { trans }: any = useTrans();
 
   return (
     <>
-      <Head title={title} />
+      <Head title={trans(title)} />
       <div className="flex flex-col">
         <div className="flex flex-col h-screen">
           <div className="md:flex">

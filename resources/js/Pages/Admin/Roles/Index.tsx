@@ -11,6 +11,7 @@ import ModalTable from '@/Components/Modal/Modal';
 import LoadingSpiner from '@/Components/Loading/LoadingSpinner';
 import { useEffect, useMemo, useState } from "react";
 import axios from 'axios';
+import { useTrans } from '@/Hooks/useTrans';
 function RolesPage() {
   const { data, setData, errors, post, processing } = useForm({
     name: '',
@@ -18,7 +19,7 @@ function RolesPage() {
   });
   const { roles } = usePage<{ roles: PaginatedData<Roles>; }>().props;
   const { meta: { links } } = roles;
-
+  const { trans } = useTrans();
   const columns = useMemo(
     () => [
       {
@@ -26,29 +27,29 @@ function RolesPage() {
         name: 'id'
       },
       {
-        label: 'Name',
+        label: trans('hancms.column.name'),
         name: 'name',
       },
       {
-        label: 'Guard',
+        label: trans('hancms.column.guard'),
         name: 'guard_name'
       },
       {
-        label: 'Action',
+        label: trans('hancms.column.action'),
         name: 'action',
         renderCell: (row: any) => (
           <>
             <div className="d-flex gap-2">
               <EditButton href={route('roles.edit', row.id)} className='btn btn-warning btn-sm text-white'>
-                Edit
+                {trans('hancms.button.edit')}
               </EditButton>
               <DeleteButton className='btn btn-danger btn-sm' size={14} onDelete={() => destroy(row.id)}>
-                Delete
+                {trans('hancms.button.delete')}
               </DeleteButton>
               <Button variant="primary" size='sm' onClick={() => handleShow(row.id)}>
                 <div className="d-flex gap-2 align-items-center">
                   {<Eye size={14} />}
-                  <span>View</span>
+                  <span> {trans('hancms.button.view')}</span>
                 </div>
               </Button>
             </div>
@@ -75,7 +76,7 @@ function RolesPage() {
       .catch(error => console.log(error));
   }
   function destroy(id: any) {
-    if (confirm('Are you sure you want to delete this role?')) {
+    if (confirm(trans('hancms.message.destroy', { name: trans('hancms.roles.name').toLowerCase() }))) {
       router.delete(route('roles.destroy', id), {
 
         onSuccess: () => {
@@ -85,7 +86,7 @@ function RolesPage() {
     }
   }
   function destroys() {
-    if (confirm('Are you sure you want to delete this roles?')) {
+    if (confirm(trans('hancms.message.destroys'))) {
       let ids = data.role_ids.split(",");
       if (ids.length > 0) {
         router.delete(route('roles.destroyMany', { 'ids': data.role_ids }));
@@ -99,26 +100,26 @@ function RolesPage() {
   };
   useEffect(() => {
     if (modalData !== undefined && modalData != null) {
-      setModalTitle(modalData.name + ' / Permissions');
+      setModalTitle(modalData.name + ' / '+trans('hancms.permissions'));
     }
   });
   return (
     <div>
       <Row className="justify-content-center mb-4">
-        <Col xs={12} md> <h1 className="text-3xl font-bold">Roles</h1></Col>
+        <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.roles.name')}</h1></Col>
         <Col xs={12} md={'auto'}>
           <div className="d-flex gap-2 align-items-center">
             <Link
               className="btn btn-success py-2"
               href={route('roles.create')}
             >
-              <div className="d-flex gap-2 align-items-center">
+              <div className="d-flex gap-2 align-items-center;">
                 {<PlusCircle size={20} />}
-                Created Roles
+                {trans('hancms.button.created')}
               </div>
             </Link>
             <DeleteButton className='btn btn-danger py-2' size={20} onDelete={() => destroys()}>
-              Delete Items Selected
+              {trans('hancms.button.delete.selected')}
             </DeleteButton>
           </div>
         </Col>
@@ -137,8 +138,8 @@ function RolesPage() {
           <thead>
             <tr>
               <th className='py-3'>#</th>
-              <th className='py-3'>Name</th>
-              <th className='py-3' style={{ width: '10%' }}>Guard</th>
+              <th className='py-3'>{trans('hancms.column.name')}</th>
+              <th className='py-3'>{trans('hancms.column.guard')}</th>
             </tr>
           </thead>
           <tbody>
@@ -151,7 +152,7 @@ function RolesPage() {
                   <td className='py-3'> {item?.name}</td>
                   <td className='py-3'> {item?.guard_name}</td>
                 </tr>
-                
+
               ))
             ) : (
               <tr>
@@ -166,7 +167,7 @@ function RolesPage() {
   );
 }
 RolesPage.layout = (page: React.ReactNode) => (
-  <MainLayout title="Role" children={page} />
+  <MainLayout title="hancms.roles.name" children={page} />
 );
 
 export default RolesPage;

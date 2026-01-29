@@ -2,10 +2,22 @@ import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { ChevronDown } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { Button } from 'react-bootstrap';
 export default () => {
   const { auth } = usePage<PageProps>().props;
+  const { props } = usePage();
+  const currentLang = props.locale;
   const [menuOpened, setMenuOpened] = useState(false);
   const can = (permission: any) => auth.permissions.includes(permission);
+  const handleSwitchLang = (e: any, locale: any) => {
+    e.preventDefault();
+    router.get(route('lang.switch', locale), {}, {
+      onSuccess: () => {
+        window.location.reload();
+      },
+    });
+  };
   return (
     <div className="flex items-center justify-between w-full p-4 text-sm bg-white border-b md:py-0 md:px-12 d:text-md">
       <div className="mt-1 mr-4">
@@ -51,21 +63,27 @@ export default () => {
               Logout
             </Link>
             <hr />
-            <p className='block px-6 py-2'><strong>Langguages</strong></p>
-            <Link
-              href={route('lang.switch', 'vi')}
-              method="get"
-              className="block w-full px-6 py-2 text-left focus:outline-none hover:bg-indigo-600 hover:text-white"
+            <p className='block px-6 py-2'><strong>Languages</strong></p>
+            <Button
+              type='button'
+              variant='link'
+              onClick={(e) => handleSwitchLang(e, 'vi')}
+              className={`block w-full px-6 py-2 text-left no-underline transition-colors duration-200 focus:outline-none rounded-none
+    ${currentLang === 'vi' ? 'bg-indigo-600 text-white hover:bg-indigo-600' : 'text-gray-800 hover:bg-indigo-600 hover:text-white'}
+  `}
             >
               Tiếng Việt
-            </Link>
-            <Link
-              href={route('lang.switch', 'en')}
-              method="get"
-              className="block w-full px-6 py-2 text-left focus:outline-none hover:bg-indigo-600 hover:text-white"
+            </Button>
+            <Button
+              variant='link'
+              onClick={(e) => handleSwitchLang(e, 'en')}
+              type='button'
+              className={`block w-full px-6 py-2 text-left no-underline transition-colors duration-200 focus:outline-none rounded-none
+    ${currentLang === 'en' ? 'bg-indigo-600 text-white hover:bg-indigo-600' : 'text-gray-800 hover:bg-indigo-600 hover:text-white'}
+  `}
             >
               English
-            </Link>
+            </Button>
           </div>
           <div
             onClick={() => {

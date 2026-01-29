@@ -91,10 +91,15 @@ class RolesController extends MainController
     }
     public function destroyMany(Request $request): RedirectResponse
     {
-        $params = $request->all();
-        $ids = explode(",", $params['ids']);
-        Role::whereIn('id', $ids)->delete();
-        return Redirect::back()->with('success', 'Role deleted successfully.');
+        try {
+            $params = $request->all();
+            $ids = explode(",", $params['ids']);
+            Role::whereIn('id', $ids)->delete();
+            return Redirect::back()->with('success', 'Role deleted successfully.');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Redirect::back()->with('error', 'No data found to delete.');
+        }
     }
     public function permissions(Request $request)
     {
