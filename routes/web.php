@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::post('photo-upload', [App\Http\Controllers\ImageUploadController::class, 'storePhoto'])->name('photo.upload');
 // Auth
 $prefixAdmin = config('configs.prefix.admin');
 Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Admin'], function () {
@@ -42,6 +42,9 @@ Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Adm
     /* -----------User--------------- */
     Route::resource('users', App\Http\Controllers\Admin\UsersController::class)->middleware('auth');
     Route::delete('/users-destroy-many', [App\Http\Controllers\Admin\UsersController::class, 'destroyMany'])->name('users.destroyMany')->middleware('auth');
+    /* -----------Language--------------- */
+    Route::resource('languages', App\Http\Controllers\Admin\LanguageController::class)->middleware('auth');
+    Route::delete('/languages-destroy-many', [App\Http\Controllers\Admin\LanguageController::class, 'destroyMany'])->name('languages.destroyMany')->middleware('auth');
 });
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'vi'])) {

@@ -3,7 +3,16 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { LaravelReactI18nProvider } from 'laravel-react-i18n';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import axios from 'axios';
 
+// Đặt ở đây, bên ngoài function App
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+// Nếu bạn dùng thẻ meta CSRF trong file blade của Laravel
+const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+if (token) {
+  axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+}
 createInertiaApp({
   title: title => `${title} - ${appName}`,
   resolve: name =>

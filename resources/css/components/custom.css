@@ -63,6 +63,45 @@
     }
 }
 
+.square-box {
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    /* Để ảnh không tràn ra ngoài bo góc */
+    position: relative;
+    transition: border-color 0.3s;
+}
+
+.square-box:hover {
+    border-color: #3498db;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Quan trọng: Giữ tỉ lệ ảnh */
+}
+
+.placeholder-photo {
+    text-align: center;
+    color: #888;
+
+    .lucide {
+        display: inline-block;
+    }
+}
+
+.icon {
+    font-size: 24px;
+    display: block;
+}
+
 @keyframes fade_in_show {
     0% {
         opacity: 0;

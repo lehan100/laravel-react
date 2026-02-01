@@ -4,6 +4,7 @@ return [
 
     'dashboard.main' => 'Dashboard',
     'users.main' => 'Users',
+    'settings.main' => 'Settings',
     'roles' => [
         'name' => 'Roles',
         'created' => 'Created Roles',
@@ -21,6 +22,12 @@ return [
         'created' => 'Created Users',
         'edit' => 'Edit Users',
     ],
+     'languages' => [
+        'admin.name'=>'List Languages',
+        'name'=>'Language',
+        'created' => 'Created Language',
+        'edit' => 'Edit Language',
+    ],
     'button' => [
         'created' => 'Add New',
         'delete.selected' => 'Delete Items Selected',
@@ -28,7 +35,8 @@ return [
         'delete' => 'Delete',
         'view' => 'View',
         'save' => 'Save',
-        'back' => 'Back'
+        'back' => 'Back',
+        'choose_image' =>'Choose Image'
     ],
     'column' => [
         'name' => 'Name',
@@ -40,7 +48,8 @@ return [
         'password'=>'Passwword',
         'password_confirm'=>'Password Confirm',
         'account_name'=>'Account Name',
-        'assign_group'=>'Assign Group'
+        'assign_group'=>'Assign Group',
+        'image'=>'Image'
     ],
     'title'=>[
         'infomation'=>'Infomation',

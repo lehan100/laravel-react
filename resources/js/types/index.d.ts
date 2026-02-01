@@ -25,7 +25,13 @@ export interface User {
   deleted_at: string;
   account: Account;
 }
-
+export interface Language {
+  id: number;
+  name: string;
+  code: string;
+  image: string;
+  status: string;
+}
 export interface Account {
   id: number;
   name: string;

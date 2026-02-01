@@ -3,6 +3,7 @@
 return [
     'dashboard.main' => 'Trang tổng quan',
     'users.main' => 'Thành viên',
+    'settings.main' => 'Cài đặt',
     'roles' => [
         'name' => 'Phân quyền',
         'created' => 'Tạo phân quyền',
@@ -20,6 +21,12 @@ return [
         'created' => 'Thêm thành viên',
         'edit' => 'Chỉnh sửa thành viên',
     ],
+    'languages' => [
+        'admin.name' => 'Ngôn ngữ',
+        'name' => 'Ngôn ngữ',
+        'created' => 'Thêm ngôn ngữ',
+        'edit' => 'Chỉnh sửa ngôn ngữ',
+    ],
     'button' => [
         'created' => 'Thêm mới',
         'delete.selected' => 'Xóa các mục đã chọn',
@@ -27,7 +34,8 @@ return [
         'delete' => 'Xóa',
         'view' => 'Xem',
         'save' => 'Lưu',
-        'back' => 'Quay về'
+        'back' => 'Quay về',
+        'choose_image' =>'Chọn ảnh'
     ],
     'column' => [
         'name' => 'Tên',
@@ -39,7 +47,8 @@ return [
         'password' => 'Mật khẩu',
         'password_confirm' => 'Nhập lại mật khẩu',
         'account_name' => 'Họ và tên',
-        'assign_group' => 'Gán quyền'
+        'assign_group' => 'Gán quyền',
+        'image' => 'Hình ảnh'
     ],
     'title' => [
         'infomation' => 'Thông tin',
@@ -55,7 +64,7 @@ return [
         'destroys' => 'Bạn có chắc chắn muốn xóa tất cả các mục đã chọn không?',
         'error' => [
             'required' => ':name không được để trống.',
-            'password_confirm'=>'Mật khẩu không trùng khớp'
+            'password_confirm' => 'Mật khẩu không trùng khớp'
         ]
     ]
 ];

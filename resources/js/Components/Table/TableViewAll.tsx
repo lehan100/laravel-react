@@ -96,7 +96,7 @@ export default function TableViewAll<T>({
           {rows?.length === 0 && (
             <tr>
               <td
-                className="px-6 py-24 border-t text-center"
+                className="p-3 border-t text-center"
                 colSpan={columns.length}
               >
                 No data found.
