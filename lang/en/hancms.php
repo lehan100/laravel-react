@@ -86,5 +86,5 @@ return [
             'restored' => ':name restored successfully.',
         ]
 
-    ]
+    ] 
 ];
