@@ -1,8 +1,16 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
-    
-    # 1. Khởi tạo service MySQL "ảo" trên GitHub
+
+    # Khởi tạo dịch vụ MySQL ảo
     services:
       mysql:
         image: mysql:8.0
@@ -14,15 +22,46 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: pdo_mysql # Đảm bảo có extension này
-          
-      # ... các bước cài đặt composer/npm giữ nguyên ...
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, bcmath, intl
+          coverage: none
 
-      # 2. Cấu hình môi trường Test dùng MySQL vừa tạo
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Build Assets
+        run: npm run prod
+
+      - name: Prepare App Environment
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
+          chmod -R 777 storage bootstrap/cache
+
+      # Chạy Migration và Test trên MySQL ảo
       - name: Run Tests
         env:
           DB_CONNECTION: mysql
@@ -32,5 +71,5 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: password
         run: |
-          php artisan migrate # Tạo bảng trên DB ảo
+          php artisan migrate --force
           php artisan test --parallel
