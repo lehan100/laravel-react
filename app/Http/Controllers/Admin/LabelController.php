@@ -28,7 +28,6 @@ class LabelController  extends MainController
         //
         $languages = $this->languageModel->lists($this->params, ['task' => 'admin-list-items']);
         foreach ($languages as $lang) {
-
             $labels[$lang['code']] = is_array(Lang::get('label', [], $lang['code']))
                 ? Lang::get('label', [], $lang['code'])
                 : Lang::get('label', [], 'en');

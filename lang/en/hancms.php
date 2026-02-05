@@ -56,7 +56,7 @@ return [
         'account_name' => 'Account Name',
         'assign_group' => 'Assign Group',
         'group' => 'Users Group',
-        'image' => 'Image',
+        'image' => 'Photo',
         'email' => 'Email',
         'code' => 'Code'
     ],
