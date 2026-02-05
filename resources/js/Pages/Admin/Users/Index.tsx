@@ -59,7 +59,7 @@ function UsersPage() {
         name: 'last_name'
       },
       {
-        label: 'Email',
+        label: trans('hancms.column.email'),
         name: 'email'
       },
       {
@@ -70,7 +70,7 @@ function UsersPage() {
         )
       },
       {
-        label: 'Group',
+        label: trans('hancms.column.group'),
         name: 'group',
         renderCell: (row: any) => (
           <Badge className='fw-normal' bg={groupClass[row.group]['bg']}>{groupClass[row.group]['text']}</Badge>

@@ -84,6 +84,16 @@ export default () => {
             >
               English
             </Button>
+            <Button
+              variant='link'
+              onClick={(e) => handleSwitchLang(e, 'ja')}
+              type='button'
+              className={`block w-full px-6 py-2 text-left no-underline transition-colors duration-200 focus:outline-none rounded-none
+    ${currentLang === 'ja' ? 'bg-indigo-600 text-white hover:bg-indigo-600' : 'text-gray-800 hover:bg-indigo-600 hover:text-white'}
+  `}
+            >
+              日本
+            </Button>
           </div>
           <div
             onClick={() => {

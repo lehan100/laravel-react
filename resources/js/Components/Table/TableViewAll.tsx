@@ -75,7 +75,7 @@ export default function TableViewAll<T>({
   }
   
   return (
-    <div className="overflow-x-auto bg-white rounded shadow">
+    <div className="overflow-x-auto bg-white">
       <Table striped responsive className='mb-0'>
         <thead>
           <tr className="font-bold text-left">

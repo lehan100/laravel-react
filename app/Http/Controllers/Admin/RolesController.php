@@ -49,15 +49,15 @@ class RolesController extends MainController
         $role = Role::create(['name' => $params['name']]);
         $role->syncPermissions($mapped);
         if ($params['undo'] == 1) {
-            return Redirect::to(route('roles.index'))->with('success', 'Role created successfully.');
+            return Redirect::to(route('roles.index'))->with('success', __('hancms.message.success.created', ['name' => __('hancms.roles.name')]));
         }
         // return Redirect::back()->with('success', 'Role created successfully.');
-        return Redirect::route('roles.edit', $role->id)->with('success', 'Role created successfully.');
+        return Redirect::route('roles.edit', $role->id)->with('success', __('hancms.message.success.created', ['name' => __('hancms.roles.name')]));
     }
     public function destroy(Role $role): RedirectResponse
     {
         $role->delete();
-        return Redirect::back()->with('success', 'Role deleted successfully.');
+        return Redirect::back()->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.roles.name')]));
     }
     public function edit(Role $role): Response
     {
@@ -85,9 +85,9 @@ class RolesController extends MainController
         $role->update($request->only('name'));
         $role->syncPermissions($mapped);
         if ($params['undo'] == 1) {
-            return Redirect::to(route('roles.index'))->with('success', 'Role updated successfully.');
+            return Redirect::to(route('roles.index'))->with('success', __('hancms.message.success.edit', ['name' => __('hancms.roles.name')]));
         }
-        return Redirect::back()->with('success', 'Role updated successfully.');
+        return Redirect::back()->with('success', __('hancms.message.success.edit', ['name' => __('hancms.roles.name')]));
     }
     public function destroyMany(Request $request): RedirectResponse
     {
@@ -95,10 +95,10 @@ class RolesController extends MainController
             $params = $request->all();
             $ids = explode(",", $params['ids']);
             Role::whereIn('id', $ids)->delete();
-            return Redirect::back()->with('success', 'Role deleted successfully.');
+            return Redirect::back()->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.roles.name')]));
         } catch (\Throwable $th) {
             //throw $th;
-            return Redirect::back()->with('error', 'No data found to delete.');
+            return Redirect::back()->with('error', __('hancms.message.error.deleted'));
         }
     }
     public function permissions(Request $request)

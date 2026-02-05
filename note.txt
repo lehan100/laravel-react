@@ -1,0 +1,14 @@
+php artisan lang:add ja
+php artisan lang:publish
+------
+php artisan make:migration create_language_table
+php artisan migrate  
+php artisan migrate:rollback --step=1
+------
+php artisan make:controller Admin\LabelController --resource 
+------
+php artisan permission:create-permission-routes
+------
+git add .
+git commit -m "Cap nhat locale: users:edit"
+git push origin main 

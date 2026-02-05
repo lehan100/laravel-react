@@ -27,12 +27,6 @@ return [
         'created' => 'Thêm ngôn ngữ',
         'edit' => 'Chỉnh sửa ngôn ngữ',
     ],
-    'label' => [
-        'admin.name' => 'Nhãn',
-        'name' => 'Nhãn',
-        'created' => 'Thêm nhãn',
-        'edit' => 'Chỉnh sửa nhãn',
-    ],
     'button' => [
         'created' => 'Thêm mới',
         'delete.selected' => 'Xóa các mục đã chọn',
@@ -41,7 +35,7 @@ return [
         'view' => 'Xem',
         'save' => 'Lưu',
         'back' => 'Quay về',
-        'choose_image' => 'Chọn ảnh'
+        'choose_image' =>'Chọn ảnh'
     ],
     'column' => [
         'name' => 'Tên',
@@ -54,10 +48,8 @@ return [
         'password_confirm' => 'Nhập lại mật khẩu',
         'account_name' => 'Họ và tên',
         'assign_group' => 'Gán quyền',
-        'group' => 'Users Group',
         'image' => 'Hình ảnh',
-        'email' => 'Email',
-        'code' => 'Code'
+        'email'=>'Email'
     ],
     'title' => [
         'infomation' => 'Thông tin',
@@ -73,17 +65,7 @@ return [
         'destroys' => 'Bạn có chắc chắn muốn xóa tất cả các mục đã chọn không?',
         'error' => [
             'required' => ':name không được để trống.',
-            'password_confirm' => 'Mật khẩu không trùng khớp',
-            'created' => ':name tạo thất bại.',
-            'edit' => ':name chỉnh sửa thất bại.',
-            'deleted'=>'Không tìm thấy thông tin để xóa'
-        ],
-        'success' => [
-            'created' => ':name đã được tạo thành công.',
-            'edit' => ':name đã được chỉnh sửa thành công.',
-            'deleted' => ':name đã được xóa thành công.',
-            'restored' => ':name đã phục hồi thành công.',
+            'password_confirm' => 'Mật khẩu không trùng khớp'
         ]
-
     ]
 ];

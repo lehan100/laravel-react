@@ -7,7 +7,9 @@ export default defineConfig({
     plugins: [
         laravel(['resources/js/app.tsx', 'resources/css/app.scss']),
         react(),
-        i18n()
+        i18n({
+           // path: 'resources/lang',
+        }),
     ],
     resolve: {
         alias: {

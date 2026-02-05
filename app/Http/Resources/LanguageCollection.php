@@ -19,7 +19,7 @@ class LanguageCollection extends ResourceCollection
             'name',
             'code',
             'photo',
-            'deleted_at'
+            'status',
         );
     }
 }

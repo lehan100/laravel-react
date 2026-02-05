@@ -1,22 +1,28 @@
 import { useTrans } from "@/Hooks/useTrans";
 import MainLayout from "@/Layouts/MainLayout";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, router, useForm, usePage } from "@inertiajs/react";
 import { Save, Undo, ImagePlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card, Col, Form, Row, Spinner } from "react-bootstrap";
 import SaveButton from '@/Components/Button/SaveButton';
-import FieldGroup from "@/Components/Form/FieldGroup";
-import FileInput from "@/Components/Form/FileInput";
 import axios from "axios";
-function CreatedPage() {
+import { Language } from "@/types";
+function EditPage() {
     const { trans } = useTrans();
-    const { data, setData, errors, post, processing } = useForm({
-        name: '',
-        code: '',
-        photo: '',
-        status: 0,
+    const { item, config_path }: any = usePage<{
+        item: Language;
+
+    }>().props;
+
+    const { data, setData, errors, put, processing } = useForm({
+        id: item.id || null,
+        name: item.name || '',
+        code: item.code || '',
+        photo: item.photo || '',
+        status: item.status || 0,
         undo: 0,
     });
+    console.log(data);
 
     const [validated, setValidated] = useState(false);
     const [active, setActive]: any = useState(data.status);
@@ -32,10 +38,10 @@ function CreatedPage() {
     }, [data, undo, active]);
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        post(route('languages.store'));
+        put(route('languages.update', item.id));
     }
     //Upload Photo
-    const [previewUrl, setPreviewUrl] = useState(null);
+    const [previewUrl, setPreviewUrl]: any = useState(data.photo ? '/' + config_path.path + "/" + data.photo : null);
     const [loading, setLoading] = useState(false);
     const handleFileChange = async (e: any) => {
         const file = e.target.files[0];
@@ -64,7 +70,7 @@ function CreatedPage() {
     return (
         <div>
             <Row className="justify-content-center mb-4">
-                <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.languages.created')} {data.name != '' && (<span className='text-info'>: {data.name}</span>)} </h1></Col>
+                <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.languages.edit')} {data.name != '' && (<span className='text-info'>: {data.name}</span>)} </h1></Col>
                 <Col xs={12} md={'auto'}>
                     <div className="d-flex gap-2">
                         <SaveButton
@@ -124,6 +130,7 @@ function CreatedPage() {
                                     <Col sm>
                                         <Form.Control type='text' required
                                             onChange={e => setData('name', e.target.value)}
+                                            defaultValue={item.name}
                                             isInvalid={!!errors['name']}
                                         />
                                         <Form.Control.Feedback type="invalid">
@@ -138,6 +145,7 @@ function CreatedPage() {
                                     <Col sm>
                                         <Form.Control type='text' required
                                             onChange={e => setData('code', e.target.value)}
+                                            defaultValue={item.code}
                                             isInvalid={!!errors['code']}
                                         />
                                         <Form.Control.Feedback type="invalid">
@@ -185,8 +193,8 @@ function CreatedPage() {
         </div>
     )
 }
-CreatedPage.layout = (page: React.ReactNode) => (
-    <MainLayout title="hancms.languages.created" children={page} />
+EditPage.layout = (page: React.ReactNode) => (
+    <MainLayout title="hancms.languages.edit" children={page} />
 );
 
-export default CreatedPage;
+export default EditPage;

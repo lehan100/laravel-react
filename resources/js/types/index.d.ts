@@ -29,7 +29,7 @@ export interface Language {
   id: number;
   name: string;
   code: string;
-  image: string;
+  photo: string;
   status: string;
 }
 export interface Account {

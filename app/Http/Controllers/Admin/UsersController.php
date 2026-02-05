@@ -56,7 +56,7 @@ class UsersController extends MainController
                 'photo' => $request->file('photo')->store('users'),
             ]);
         }
-        return Redirect::route('users.edit', $user->id)->with('success', 'User created successfully.');
+        return Redirect::route('users.edit', $user->id)->with('success', __('hancms.message.success.created', ['name' => __('hancms.users.name')]));
     }
 
     public function edit(User $user): Response
@@ -80,21 +80,21 @@ class UsersController extends MainController
             ]);
         }
 
-        return Redirect::back()->with('success', 'User updated successfully.');
+        return Redirect::back()->with('success', __('hancms.message.success.edit', ['name' => __('hancms.users.name')]));
     }
 
     public function destroy(User $user, UserDeleteRequest $request): RedirectResponse
     {
         $user->delete();
 
-        return Redirect::back()->with('success', 'User deleted successfully.');
+        return Redirect::back()->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.users.name')]));
     }
 
     public function restore(User $user): RedirectResponse
     {
         $user->restore();
 
-        return Redirect::back()->with('success', 'User restored successfully.');
+        return Redirect::back()->with('success', __('hancms.message.success.restored', ['name' => __('hancms.users.name')]));
     }
     public function destroyMany(Request $request): RedirectResponse
     {
@@ -102,9 +102,9 @@ class UsersController extends MainController
             $params = $request->all();
             $ids = explode(",", $params['ids']);
             User::whereIn('id', $ids)->delete();
-            return Redirect::route('users.index')->with('success', 'User deleted successfully.');
+            return Redirect::route('users.index')->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.users.name')]));
         } catch (\Throwable $th) {
-            return Redirect::route('users.index')->with('error', 'No data found to delete.');
+            return Redirect::route('users.index')->with('error', __('hancms.message.error.deleted'));
         }
     }
 }

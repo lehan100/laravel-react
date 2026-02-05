@@ -3,7 +3,7 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Language, PaginatedData } from '@/types';
 import { useTrans } from '@/Hooks/useTrans';
 import { useMemo } from 'react';
-import { Badge, Row, Col, Card } from 'react-bootstrap';
+import { Badge, Row, Col, Card, Image } from 'react-bootstrap';
 import Pagination from '@/Components/Pagination/Pagination';
 import TableView from '@/Components/Table/TableViewAll';
 import DeleteButton from '@/Components/Button/DeleteButtonView';
@@ -14,8 +14,7 @@ function IndexPage() {
     const { data, setData, errors, post, processing } = useForm({
         data_ids: ''
     });
-    const { items } = usePage<{ items: PaginatedData<Language>; }>().props;
-
+    const { items, config_path }: any = usePage<{ items: PaginatedData<Language>; }>().props;
     const { meta: { links } }: any = items;
     const statusClass: any = {
         '0': {
@@ -35,7 +34,10 @@ function IndexPage() {
             },
             {
                 label: trans('hancms.column.image'),
-                name: 'image'
+                name: 'photo',
+                renderCell: (row: any) => (
+                    row.photo && <Image src={'/' + config_path.path + "/" + row.photo} width={40} />
+                )
             },
             {
                 label: trans('hancms.column.name'),
@@ -43,7 +45,7 @@ function IndexPage() {
             },
 
             {
-                label: "Code",
+                label: trans('hancms.column.code'),
                 name: 'code'
             },
             {
@@ -59,7 +61,7 @@ function IndexPage() {
                 renderCell: (row: any) => (
                     <>
                         <div className="d-flex gap-2">
-                            <EditButton href={route('users.edit', row.id)} className='btn btn-warning btn-sm text-white'>
+                            <EditButton href={route('languages.edit', row.id)} className='btn btn-warning btn-sm text-white'>
                                 {trans('hancms.button.edit')}
                             </EditButton>
                             <DeleteButton className='btn btn-danger btn-sm' size={14} onDelete={() => destroy(row.id)}>
@@ -85,7 +87,7 @@ function IndexPage() {
     }
     function destroys() {
         if (confirm(trans('hancms.message.destroys'))) {
-            let ids = data.data_ids.split(",");
+            let ids = data.data_ids;
             if (ids.length > 0) {
                 router.delete(route('languages.destroyMany', { 'ids': data.data_ids }));
             }

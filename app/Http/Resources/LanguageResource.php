@@ -19,7 +19,7 @@ class LanguageResource extends JsonResource
             'name' => $this->name,
             'code' => $this->code,
             'status' => $this->status,
-            'photo' => $this->photo ? url()->route('photo', ['path' => $this->photo, 'w' => 60, 'h' => 60, 'fit' => 'crop']) : null,
+            'photo' => $this->photo ? $this->photo : null,
         ];
     }
 }
