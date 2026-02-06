@@ -1,17 +1,18 @@
 import { Link, usePage, useForm, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import { PlusCircle } from 'lucide-react';
-import { Badge, Col, Row, Card } from 'react-bootstrap';
 import { User, PaginatedData } from '@/types';
 import Pagination from '@/Components/Pagination/Pagination';
 import TableView from '@/Components/Table/TableViewAll';
-import DeleteButton from '@/Components/Button/DeleteButtonView';
+import DeleteButton from '@/Components/Button/DeleteButton';
+import DeleteButtonView from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
+import CreatedButton from '@/Components/Button/CreatedButton';
 import { useEffect, useMemo, useState } from "react";
 import FilterBar from '@/Components/FilterBar/FilterBar';
 import { useTrans } from '@/Hooks/useTrans';
 function UsersPage() {
-  const {trans} = useTrans();
+  const { trans } = useTrans();
   const { data, setData, errors, post, processing } = useForm({
     name: '',
     user_ids: ''
@@ -21,25 +22,25 @@ function UsersPage() {
   const { meta: { links } }: any = items;
   const groupClass: any = {
     '0': {
-      'bg': 'danger',
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
       'text': 'Not Access'
     },
     '1': {
-      'bg': 'success',
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
       'text': 'Administrators'
     },
     '2': {
-      'bg': 'warning',
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-amber-500 text-white',
       'text': 'Admin'
     }
   };
   const statusClass: any = {
     '0': {
-      'bg': 'danger',
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
       'text': trans('hancms.status.inactive')
     },
     '1': {
-      'bg': 'success',
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
       'text': trans('hancms.status.active')
     }
   };
@@ -66,14 +67,14 @@ function UsersPage() {
         label: trans('hancms.column.status'),
         name: 'status',
         renderCell: (row: any) => (
-          <Badge className='fw-normal' bg={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</Badge>
+          <span className={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</span >
         )
       },
       {
         label: trans('hancms.column.group'),
         name: 'group',
         renderCell: (row: any) => (
-          <Badge className='fw-normal' bg={groupClass[row.group]['bg']}>{groupClass[row.group]['text']}</Badge>
+          <span className={groupClass[row.group]['bg']}>{groupClass[row.group]['text']}</span >
         )
       },
       {
@@ -81,13 +82,13 @@ function UsersPage() {
         name: 'action',
         renderCell: (row: any) => (
           <>
-            <div className="d-flex gap-2">
-              <EditButton href={route('users.edit', row.id)} className='btn btn-warning btn-sm text-white'>
-                 {trans('hancms.button.edit')}
+            <div className="flex gap-2">
+              <EditButton href={route('users.edit', row.id)}>
+                {trans('hancms.button.edit')}
               </EditButton>
-              <DeleteButton className='btn btn-danger btn-sm' size={14} onDelete={() => destroy(row.id)}>
-                 {trans('hancms.button.delete')}
-              </DeleteButton>
+              <DeleteButtonView size_icon={14} onDelete={() => destroy(row.id)}>
+                {trans('hancms.button.delete')}
+              </DeleteButtonView>
             </div>
 
           </>
@@ -97,7 +98,7 @@ function UsersPage() {
     []
   );
   function destroy(id: any) {
-     if (confirm(trans('hancms.message.destroy', { name: trans('hancms.users.name').toLowerCase() }))) {
+    if (confirm(trans('hancms.message.destroy', { name: trans('hancms.users.name').toLowerCase() }))) {
       router.delete(route('users.destroy', id), {
 
         onSuccess: () => {
@@ -107,7 +108,7 @@ function UsersPage() {
     }
   }
   function destroys() {
-   if (confirm(trans('hancms.message.destroys'))) {
+    if (confirm(trans('hancms.message.destroys'))) {
       let ids = data.user_ids.split(",");
       if (ids.length > 0) {
         router.delete(route('users.destroyMany', { 'ids': data.user_ids }));
@@ -121,36 +122,52 @@ function UsersPage() {
   };
   return (
     <div>
+      <div className="flex flex-wrap justify-between items-center mb-6">
+        {/* Tiêu đề trang: text-xl thay vì 3xl để tinh tế hơn */}
+        <div className="w-full md:flex-1 mb-3 md:mb-0 text-left">
+          <h1 className="text-xl font-bold text-gray-800 tracking-tight">
+            {trans('hancms.users.admin.name')}
+          </h1>
+        </div>
 
-      <Row className="justify-content-center mb-4">
-        <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.users.admin.name')}</h1></Col>
-        <Col xs={12} md={'auto'}>
-          <div className="d-flex gap-2 align-items-center">
-            <Link
-              className="btn btn-success py-2"
-              href={route('users.create')}
+        {/* Nhóm nút bấm: text-sm và font-medium */}
+        <div className="w-full md:w-auto">
+          <div className="flex items-center gap-2">
+            {/* Nút Created: Thêm padding và font-size nhỏ */}
+            <CreatedButton
+              href={route("users.create")}
+              className="px-3 py-1.5 text-sm font-medium transition-all active:scale-95 shadow-sm"
             >
-              <div className="d-flex gap-2 align-items-center">
-                {<PlusCircle size={20} />}
-               {trans('hancms.button.created')}
-              </div>
-            </Link>
-            <DeleteButton className='btn btn-danger py-2' size={20} onDelete={() => destroys()}>
+              {trans('hancms.button.created')}
+            </CreatedButton>
+
+            {/* Nút Delete: Bỏ class 'btn btn-danger' của Bootstrap */}
+            <DeleteButton
+              onDelete={() => destroys()}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
+              size={18} // Giảm size icon xuống 18 cho cân đối với text-sm
+            >
               {trans('hancms.button.delete.selected')}
             </DeleteButton>
           </div>
-        </Col>
-      </Row>
+        </div>
+      </div>
       <FilterBar />
-      <Card>
-        <TableView
-          columns={columns}
-          rows={items.data}
-          sendDataSelectItems={handleChildData}
-          getRowDetailsUrl={row => route('roles.edit', row.id)}
-        />
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        {/* Phần TableView bên trong nên dùng text-sm để đồng bộ */}
+        <div className="overflow-x-auto">
+          <TableView
+            columns={columns}
+            rows={items.data}
+            sendDataSelectItems={handleChildData}
+            getRowDetailsUrl={row => route('users.edit', row.id)}
+          />
+        </div>
+
+        {/* Phân trang: Ngăn cách bằng đường kẻ mảnh */}
         <Pagination links={links} />
-      </Card>
+      </div>
+
     </div>
   );
 }

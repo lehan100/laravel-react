@@ -6,8 +6,9 @@ import pickBy from 'lodash/pickBy';
 import { ChevronDown } from 'lucide-react';
 import FieldGroup from '@/Components/Form/FieldGroup';
 import TextInput from '@/Components/Form/TextInput';
-
+import { useTrans } from '@/Hooks/useTrans';
 export default function FilterBar() {
+  const {trans} = useTrans();
   const { filters } = usePage<{
     filters: { role?: string; search?: string; trashed?: string; group?: string };
   }>().props;
@@ -116,7 +117,7 @@ export default function FilterBar() {
           value={values.group}
           onChange={handleChange}
           options={[
-            { value: '', label: 'Users Group' },
+            { value: '', label: trans('hancms.column.group') },
             { value: '0', label: 'Not Access' },
             { value: '1', label: 'Administrators' },
             { value: '2', label: 'Admin' }
@@ -124,7 +125,7 @@ export default function FilterBar() {
         />
         <TextInput
           name="search"
-          placeholder="Search…"
+          placeholder={trans('hancms.filter.search')}
           autoComplete="off"
           value={values.search}
           onChange={handleChange}
@@ -133,10 +134,10 @@ export default function FilterBar() {
       </div>
       <button
         onClick={reset}
-        className="ml-3 text-sm text-gray-600 hover:text-gray-700 focus:text-indigo-700 focus:outline-none"
+        className="ml-3 text-sm text-gray-600 hover:text-gray-700 focus:text-indigo-700 focus:outline-none whitespace-nowrap"
         type="button"
       >
-        Reset
+        {trans('hancms.filter.reset')}
       </button>
     </div>
   );

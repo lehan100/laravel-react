@@ -3,11 +3,12 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Language, PaginatedData } from '@/types';
 import { useTrans } from '@/Hooks/useTrans';
 import { useMemo } from 'react';
-import { Badge, Row, Col, Card, Image } from 'react-bootstrap';
 import Pagination from '@/Components/Pagination/Pagination';
 import TableView from '@/Components/Table/TableViewAll';
-import DeleteButton from '@/Components/Button/DeleteButtonView';
+import DeleteButton from '@/Components/Button/DeleteButton';
+import DeleteButtonView from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
+import CreatedButton from '@/Components/Button/CreatedButton';
 import { PlusCircle } from 'lucide-react';
 function IndexPage() {
     const { trans } = useTrans();
@@ -18,11 +19,11 @@ function IndexPage() {
     const { meta: { links } }: any = items;
     const statusClass: any = {
         '0': {
-            'bg': 'danger',
+            'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
             'text': trans('hancms.status.inactive')
         },
         '1': {
-            'bg': 'success',
+            'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
             'text': trans('hancms.status.active')
         }
     };
@@ -36,7 +37,11 @@ function IndexPage() {
                 label: trans('hancms.column.image'),
                 name: 'photo',
                 renderCell: (row: any) => (
-                    row.photo && <Image src={'/' + config_path.path + "/" + row.photo} width={40} />
+                    row.photo && <img
+                        src={`/${config_path.path}/${row.photo}`}
+                        className="w-10 h-auto object-contain rounded shadow-sm border border-gray-100"
+                        alt={row.name}
+                    />
                 )
             },
             {
@@ -52,7 +57,7 @@ function IndexPage() {
                 label: trans('hancms.column.status'),
                 name: 'status',
                 renderCell: (row: any) => (
-                    <Badge className='fw-normal' bg={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</Badge>
+                    <span className={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</span >
                 )
             },
             {
@@ -60,13 +65,13 @@ function IndexPage() {
                 name: 'action',
                 renderCell: (row: any) => (
                     <>
-                        <div className="d-flex gap-2">
-                            <EditButton href={route('languages.edit', row.id)} className='btn btn-warning btn-sm text-white'>
+                        <div className="flex gap-2">
+                            <EditButton href={route('languages.edit', row.id)}>
                                 {trans('hancms.button.edit')}
                             </EditButton>
-                            <DeleteButton className='btn btn-danger btn-sm' size={14} onDelete={() => destroy(row.id)}>
+                            <DeleteButtonView size_icon={14} onDelete={() => destroy(row.id)}>
                                 {trans('hancms.button.delete')}
-                            </DeleteButton>
+                            </DeleteButtonView>
                         </div>
 
                     </>
@@ -100,34 +105,50 @@ function IndexPage() {
     };
     return (
         <div>
-            <Row className="justify-content-center mb-4">
-                <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.languages.admin.name')}</h1></Col>
-                <Col xs={12} md={'auto'}>
-                    <div className="d-flex gap-2 align-items-center">
-                        <Link
-                            className="btn btn-success py-2"
-                            href={route('languages.create')}
+            <div className="flex flex-wrap justify-between items-center mb-6">
+                {/* Tiêu đề trang: text-xl thay vì 3xl để tinh tế hơn */}
+                <div className="w-full md:flex-1 mb-3 md:mb-0 text-left">
+                    <h1 className="text-xl font-bold text-gray-800 tracking-tight">
+                        {trans('hancms.languages.admin.name')}
+                    </h1>
+                </div>
+
+                {/* Nhóm nút bấm: text-sm và font-medium */}
+                <div className="w-full md:w-auto">
+                    <div className="flex items-center gap-2">
+                        {/* Nút Created: Thêm padding và font-size nhỏ */}
+                        <CreatedButton
+                            href={route("languages.create")}
+                            className="px-3 py-1.5 text-sm font-medium transition-all active:scale-95 shadow-sm"
                         >
-                            <div className="d-flex gap-2 align-items-center">
-                                {<PlusCircle size={20} />}
-                                {trans('hancms.button.created')}
-                            </div>
-                        </Link>
-                        <DeleteButton className='btn btn-danger py-2' size={20} onDelete={() => destroys()}>
+                            {trans('hancms.button.created')}
+                        </CreatedButton>
+
+                        {/* Nút Delete: Bỏ class 'btn btn-danger' của Bootstrap */}
+                        <DeleteButton
+                            onDelete={() => destroys()}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
+                            size={18} // Giảm size icon xuống 18 cho cân đối với text-sm
+                        >
                             {trans('hancms.button.delete.selected')}
                         </DeleteButton>
                     </div>
-                </Col>
-            </Row>
-            <Card>
-                <TableView
-                    columns={columns}
-                    rows={items.data}
-                    sendDataSelectItems={handleChildData}
-                    getRowDetailsUrl={row => route('languages.edit', row.id)}
-                />
+                </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                {/* Phần TableView bên trong nên dùng text-sm để đồng bộ */}
+                <div className="overflow-x-auto">
+                    <TableView
+                        columns={columns}
+                        rows={items.data}
+                        sendDataSelectItems={handleChildData}
+                        getRowDetailsUrl={row => route('languages.edit', row.id)}
+                    />
+                </div>
+
+                {/* Phân trang: Ngăn cách bằng đường kẻ mảnh */}
                 <Pagination links={links} />
-            </Card>
+            </div>
         </div>
     );
 }

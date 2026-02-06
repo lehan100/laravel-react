@@ -3,8 +3,9 @@ import { Link, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { ChevronDown } from 'lucide-react';
 import { router } from '@inertiajs/react';
-import { Button } from 'react-bootstrap';
+import { useTrans } from '@/Hooks/useTrans';
 export default () => {
+  const { trans } = useTrans();
   const { auth } = usePage<PageProps>().props;
   const { props } = usePage();
   const currentLang = props.locale;
@@ -45,14 +46,14 @@ export default () => {
               className="block px-6 py-2 hover:bg-indigo-600 hover:text-white"
               onClick={() => setMenuOpened(false)}
             >
-              My Profile
+              {trans("hancms.users.profile")}
             </Link>
             <Link
               href={route('users.index')}
               className="block px-6 py-2 hover:bg-indigo-600 hover:text-white"
               onClick={() => setMenuOpened(false)}
             >
-              Manage Users
+              {trans("hancms.users.manage")}
             </Link>
             <Link
               as="button"
@@ -60,40 +61,28 @@ export default () => {
               method="get"
               className="block w-full px-6 py-2 text-left focus:outline-none hover:bg-indigo-600 hover:text-white"
             >
-              Logout
+              {trans("hancms.users.logout")}
             </Link>
             <hr />
-            <p className='block px-6 py-2'><strong>Languages</strong></p>
-            <Button
-              type='button'
-              variant='link'
-              onClick={(e) => handleSwitchLang(e, 'vi')}
-              className={`block w-full px-6 py-2 text-left no-underline transition-colors duration-200 focus:outline-none rounded-none
-    ${currentLang === 'vi' ? 'bg-indigo-600 text-white hover:bg-indigo-600' : 'text-gray-800 hover:bg-indigo-600 hover:text-white'}
-  `}
-            >
-              Tiếng Việt
-            </Button>
-            <Button
-              variant='link'
-              onClick={(e) => handleSwitchLang(e, 'en')}
-              type='button'
-              className={`block w-full px-6 py-2 text-left no-underline transition-colors duration-200 focus:outline-none rounded-none
-    ${currentLang === 'en' ? 'bg-indigo-600 text-white hover:bg-indigo-600' : 'text-gray-800 hover:bg-indigo-600 hover:text-white'}
-  `}
-            >
-              English
-            </Button>
-            <Button
-              variant='link'
-              onClick={(e) => handleSwitchLang(e, 'ja')}
-              type='button'
-              className={`block w-full px-6 py-2 text-left no-underline transition-colors duration-200 focus:outline-none rounded-none
-    ${currentLang === 'ja' ? 'bg-indigo-600 text-white hover:bg-indigo-600' : 'text-gray-800 hover:bg-indigo-600 hover:text-white'}
-  `}
-            >
-              日本
-            </Button>
+            <p className='block px-6 py-2'><strong>{trans("hancms.languages.name")}</strong></p>
+            {['vi', 'en', 'ja'].map((langCode) => (
+              <button
+                key={langCode}
+                type="button"
+                onClick={(e) => handleSwitchLang(e, langCode)}
+                className={`
+      block w-full px-6 py-2.5 text-left text-sm font-medium transition-all duration-200 outline-none
+      ${currentLang === langCode
+                    ? 'bg-indigo-600 text-white shadow-inner'
+                    : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                  }
+    `}
+              >
+                {langCode === 'vi' && 'Tiếng Việt'}
+                {langCode === 'en' && 'English'}
+                {langCode === 'ja' && '日本'}
+              </button>
+            ))}
           </div>
           <div
             onClick={() => {

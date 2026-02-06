@@ -1,18 +1,20 @@
 import { ComponentProps } from 'react';
-
+import { Trash2 } from 'lucide-react';
 interface Props extends ComponentProps<'button'> {
   onDelete: () => void;
+  size: number
 }
 
-export default function DeleteButton({ onDelete, children }: Props) {
+export default function DeleteButtonView({ onDelete, className, size, children }: Props) {
   return (
     <button
-      className="text-red-600 focus:outline-none hover:underline"
+      className='inline-flex items-center gap-2 p-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors duration-200 no-underline shadow-sm'
       type="button"
       tabIndex={-1}
       onClick={onDelete}
     >
-      {children}
+      {<Trash2 size={size} />}
+      <span>{children}</span>
     </button>
   );
 }

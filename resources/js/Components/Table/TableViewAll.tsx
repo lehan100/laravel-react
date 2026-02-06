@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-import { Form, Table } from 'react-bootstrap';
 import { useState } from 'react';
 interface TableProps<T> {
   columns: {
@@ -23,26 +22,20 @@ export default function TableViewAll<T>({
       width: '100px',
       verticalAlign: 'middle',
       textAlign: 'center',
-      paddingTop: '1rem',
-      paddingBottom: '1rem',
     },
     auto: {
       verticalAlign: 'middle',
-      paddingTop: '1rem',
-      paddingBottom: '1rem',
     },
     action: {
       width: '180px',
       verticalAlign: 'middle',
-      whiteSpace:'nowrap',
-      paddingTop: '1rem',
-      paddingBottom: '1rem',
+      whiteSpace: 'nowrap',
     },
   };
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const handleChangeAll = (e: any) => {
     const { value, checked } = e.target;
-    const elements = document.querySelectorAll(".check-item .form-check-input") as NodeListOf<HTMLInputElement>;
+    const elements = document.querySelectorAll(".check-item") as NodeListOf<HTMLInputElement>;
     if (checked) {
       elements.forEach((checkbox) => {
         checkbox.checked = true;
@@ -73,20 +66,24 @@ export default function TableViewAll<T>({
     setSelectedItems(updatedList);
     sendDataSelectItems(updatedList.join(","));
   }
-  
+
   return (
     <div className="overflow-x-auto bg-white">
-      <Table striped responsive className='mb-0'>
+      <table className="mb-0 w-full whitespace-nowrap">
         <thead>
-          <tr className="font-bold text-left">
+          <tr className="font-bold text-left bg-indigo-800 text-white">
             {columns?.map(column => (
               <th
                 key={column.label}
                 colSpan={column.colSpan ?? 1}
-                className="pb-3 pt-5"
+                className="pb-3 pt-5 px-3"
                 style={column.name == 'id' ? styles.id : styles.auto}
               >
-                {column.name == 'id' ? <Form.Check  className='check-all-item' type="checkbox" onChange={handleChangeAll} /> : column.label}
+                {column.name == 'id' ? <input
+                  type="checkbox"
+                  onChange={handleChangeAll}
+                  className="check-all-item h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition duration-150"
+                /> : column.label}
               </th>
             ))}
           </tr>
@@ -115,10 +112,15 @@ export default function TableViewAll<T>({
                   return (
                     <td
                       key={column.name}
+                      className='p-3'
                       style={column.name == 'id' ? styles.id : column.name == 'action' ? styles.action : styles.auto}
                     >
                       {column.name == 'id' ?
-                        <Form.Check type="checkbox" className='check-item' value={val} onChange={handleChange}
+                        <input
+                          type="checkbox"
+                          value={val}
+                          onChange={handleChange}
+                          className="check-item h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer transition-colors"
                         /> : column.renderCell?.(row) ??
                         val ??
                         'N/A'}
@@ -129,7 +131,7 @@ export default function TableViewAll<T>({
             );
           })}
         </tbody>
-      </Table>
+      </table>
     </div>
   );
 }

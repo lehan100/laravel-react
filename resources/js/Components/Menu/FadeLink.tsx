@@ -20,11 +20,11 @@ export default function FadeLink({ children, ...props }: any) {
             <Link
                 onClick={() => setOpen(!open)}
                 href={props.href}
-                className={open || openRoute ? 'is-open btn btn-fade w-100 py-2 text-indigo-200' : 'btn btn-fade w-100 py-2 text-indigo-200'}
+                className={`w-full flex items-center justify-between p-2 text-indigo-200 hover:bg-indigo-800 rounded-md transition-colors ${open || openRoute ? 'is-open' : ''}`}
             >
-                <div className="d-flex gap-2 align-items-center">
+                <div className="flex items-center gap-2 p-3">
                     {props.icon}
-                    <span>{props.title}</span>
+                    <span className='font-medium'>{props.title}</span>
                 </div>
             </Link>
         </div>

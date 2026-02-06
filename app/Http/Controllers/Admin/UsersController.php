@@ -68,10 +68,14 @@ class UsersController extends MainController
 
     public function update(User $user, UserUpdateRequest $request): RedirectResponse
     {
-        // echo "<pre>" ;print_r($request->all());die();
-        $user->update(
-            $request->validated()
-        );
+        $params = $request->validated();
+        if (empty($params['password'])) {
+            unset($params['password']);
+        }
+        $user->update($params);
+        // $user->update(
+        //     $request->validated()
+        // );
         $role = Role::firstOrCreate(['name' => $this->USER_GROUP[$request->group]]);
         $user->assignRole([$role->id]);
         if ($request->hasFile('photo')) {

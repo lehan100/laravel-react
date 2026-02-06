@@ -1,9 +1,11 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders()
@@ -15,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->authenticateSessions();
         $middleware->redirectGuestsTo(fn() => route('auth/login'));
         $middleware->redirectUsersTo(fn() => route('dashboard'));
         $middleware->alias([
@@ -26,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(\App\Http\Middleware\HandleInertiaRequests::class);
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
         ]);
         $middleware->throttleApi();
 
@@ -33,4 +37,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            // Nếu là yêu cầu từ trang web (không phải API thuần túy)
+            if (! $request->expectsJson()) {
+                return redirect()->guest(route('auth/login'))
+                    ->with('message', __('hancms.message.security_notice'));
+            }
+        });
     })->create();

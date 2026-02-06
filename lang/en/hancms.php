@@ -21,6 +21,9 @@ return [
         'name' => 'User',
         'created' => 'Created Users',
         'edit' => 'Edit Users',
+        'profile'=>'My Profile',
+        'manage'=>'Manage Users',
+        'logout'=>'Logout'
     ],
     'languages' => [
         'admin.name' => 'List Languages',
@@ -58,7 +61,12 @@ return [
         'group' => 'Users Group',
         'image' => 'Photo',
         'email' => 'Email',
-        'code' => 'Code'
+        'code' => 'Code',
+        'key' =>'Key'
+    ],
+    'filter'=>[
+        'search'=>'Search',
+        'reset'=>'Reset'
     ],
     'title' => [
         'infomation' => 'Infomation',
@@ -72,6 +80,7 @@ return [
         'dashboard.welcome' => 'Your administration system is ready. Everything is set up for you to start managing your data and operations seamlessly.',
         'destroy' => 'Are you sure you want to delete this :name?',
         'destroys' => 'Are you sure you want to delete all selected items?',
+        'security_notice'=>'Your account has been logged in from another device.',
         'error' => [
             'required' => 'The :name field is required.',
             'password_confirm' => 'Passwords do not match.',

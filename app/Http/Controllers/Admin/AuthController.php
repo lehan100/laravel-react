@@ -24,11 +24,11 @@ class AuthController extends Controller
     }
     public function postlogin(LoginRequest $request): RedirectResponse
     {
-       $request->authenticate();
-
+        $request->authenticate();
+        Auth::logoutOtherDevices($request->password);
         $request->session()->regenerate();
 
-        return redirect()->route("dashboard");
+        return redirect()->intended(route('dashboard'));
     }
 
     public function logout(Request $request)

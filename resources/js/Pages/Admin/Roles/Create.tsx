@@ -1,23 +1,23 @@
-import { Link, usePage, useForm } from '@inertiajs/react';
+import { usePage, useForm } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Save, Undo } from 'lucide-react';
+import { Save } from 'lucide-react';
 import TableView from '@/Components/Table/TableView';
 import SaveButton from '@/Components/Button/SaveButton';
-import { Row, Col, Card, Form, Alert } from 'react-bootstrap';
 import { Permissions, PaginatedData } from '@/types';
 import Pagination from '@/Components/Pagination/Pagination';
 import { useMemo } from "react";
 import { useTrans } from '@/Hooks/useTrans';
-function CreateRolesPage() {
-    const { data, setData, post, processing } = useForm({
+import BackButton from '@/Components/Button/BackButton';
+function CreatedPage() {
+    const { data, setData, post, errors, processing } = useForm({
         name: '',
         guard_name: 'web',
         undo: 0,
         permissions: ''
 
     });
-    const {trans} = useTrans();
+    const { trans } = useTrans();
     const [validated, setValidated] = useState(false);
 
     const { permissions, rolePermissions } = usePage<{
@@ -74,84 +74,83 @@ function CreateRolesPage() {
         data.undo = undo;
     }, [data, undo]);
     return (
-        <div className='content'>
-            <Row className="justify-content-center mb-4">
-                <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.roles.created')}</h1></Col>
-                <Col xs={12} md={'auto'}>
-                    <div className="d-flex gap-2">
+        <div className='content p-4'>
+            {/* Header Section */}
+            <div className="flex flex-wrap justify-between items-center mb-6">
+                <div className="w-full md:flex-1 mb-3 md:mb-0">
+                    <h1 className="text-xl font-bold text-gray-800">{trans('hancms.roles.created')}</h1>
+                </div>
+                <div className="w-full md:w-auto">
+                    <div className="flex gap-2">
                         <SaveButton
-                            children={trans('hancms.button.save')}
-                            variant="success"
                             loading={processing}
                             undo={0}
-                            icon={<Save size={20} />}
+                            icon={<Save size={18} />}
                             sendDataStatusUndo={handleUndo}
                             form='my-form'
-                        />
-                        <Link
-                            className="btn btn-secondary py-2"
-                            href={route('roles.index')}
                         >
-                            <div className="d-flex gap-2 align-items-center">
-                                {<Undo size={20} />}
-                                <span>{trans('hancms.button.back')}</span>
-                            </div>
-                        </Link>
+                            {trans('hancms.button.save')}
+                        </SaveButton>
+                        <BackButton href={route('roles.index')} className="text-sm px-3 py-1.5">
+                            {trans('hancms.button.back')}
+                        </BackButton>
                     </div>
-                </Col>
-            </Row>
-            <Form id='my-form' noValidate validated={validated} onSubmit={handleSubmit}>
-                <div className="mb-3 alert alert-info p-3">
-                    <Form.Group controlId="form_name">
-                        <Form.Label column sm="auto">
+                </div>
+            </div>
+
+            <form id='my-form' onSubmit={handleSubmit} noValidate>
+                <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <label htmlFor="form_name" className="block text-sm font-semibold text-gray-600 min-w-[180px]">
                             {trans('hancms.column.name')} {trans('hancms.roles.name')}
-                        </Form.Label>
-                        <Col>
-                            <Form.Control
-                                type="text"
+                        </label>
+                        <div className="flex-1">
+                            <input
+                                className={`block w-full px-3 py-2 text-sm border rounded-md shadow-sm 
+            ${(errors?.name || (validated && !data.name))
+                                        ? 'border-red-500 ring-1 ring-red-500'
+                                        : 'border-gray-300'}`}
                                 placeholder={trans('hancms.column.name')}
-                                required
-                                defaultValue=''
                                 onChange={e => setData('name', e.target.value)}
                             />
 
-                            <Form.Control.Feedback type="invalid">
-                                 {trans('hancms.message.error.required', { name: trans('hancms.column.name')})}
-                            </Form.Control.Feedback>
-                        </Col>
-                    </Form.Group>
-                    <Form.Control
-                        type="hidden"
-                        placeholder="undo"
-                        defaultValue=''
-                        onChange={e => setData('undo', undo)}
-                    />
+                            {(errors?.name || (validated && !data.name)) && (
+                                <p className="mt-2 text-[12px] text-red-600 italic">
+                                    {trans('hancms.message.error.required', { name: trans('hancms.column.name') })}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <input type="hidden" value={undo} onChange={e => setData('undo', undo)} />
                 </div>
-                <Alert variant="danger" show={permissions_alert}>
-                    <Alert.Heading>{trans('hancms.assign_permissions.error')}</Alert.Heading>
-                    <p>
-                        {trans('hancms.assign_permissions.error.message')}
-                    </p>
-                </Alert>
-                <Card>
-                    <Card.Header className='py-3 bg-indigo-800 text-white'>{trans('hancms.assign_permissions.name')}</Card.Header>
-                    <Card.Body>
+
+                {permissions_alert && (
+                    <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-md">
+                        <h4 className="text-sm font-bold mb-2">{trans('hancms.assign_permissions.error')}</h4>
+                        <p className="text-xs">{trans('hancms.assign_permissions.error.message')}</p>
+                    </div>
+                )}
+
+                <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                    <div className="px-4 py-3 bg-indigo-900 text-white text-sm font-bold uppercase tracking-wider">
+                        {trans('hancms.assign_permissions.name')}
+                    </div>
+                    <div className="p-0">
                         <TableView
                             columns={columns}
                             rows={permissions.data}
                             sendDataSelectItems={handleChildData}
                             rolePermissions={rolePermissions}
-                        //getRowDetailsUrl={row => route('contacts.edit', row.id)}
                         />
                         <Pagination links={links} />
-                    </Card.Body>
-                </Card>
-            </Form>
+                    </div>
+                </div>
+            </form>
         </div>
     );
 }
-CreateRolesPage.layout = (page: React.ReactNode) => (
+CreatedPage.layout = (page: React.ReactNode) => (
     <MainLayout title="hancms.roles.created" children={page} />
 );
 
-export default CreateRolesPage;
+export default CreatedPage;

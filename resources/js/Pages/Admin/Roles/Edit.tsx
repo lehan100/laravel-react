@@ -4,11 +4,11 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Save, Undo } from 'lucide-react';
 import TableView from '@/Components/Table/TableView';
 import SaveButton from '@/Components/Button/SaveButton';
-import { Row, Col, Card, Form, Alert } from 'react-bootstrap';
 import { Permissions, Roles, PaginatedData } from '@/types';
 import Pagination from '@/Components/Pagination/Pagination';
 import { useMemo } from "react";
 import { useTrans } from '@/Hooks/useTrans';
+import BackButton from '@/Components/Button/BackButton';
 function CreateRolesPage() {
     const { permissions, role, rolePermissions } = usePage<{
         permissions: PaginatedData<Permissions>;
@@ -16,7 +16,7 @@ function CreateRolesPage() {
         rolePermissions: any;
     }>().props;
     const { trans } = useTrans();
-    const { data, setData, put, processing } = useForm({
+    const { data, setData, put, errors, processing } = useForm({
         name: role.name || '',
         guard_name: role.guard_name || 'web',
         undo: 0,
@@ -74,78 +74,90 @@ function CreateRolesPage() {
         data.undo = undo;
     }, [data, undo]);
     return (
-        <div className='content'>
-            <Row className="justify-content-center mb-4">
-                <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.roles.name')} / <span className='text-info'>{data.name}</span></h1></Col>
-                <Col xs={12} md={'auto'}>
-                    <div className="d-flex gap-2">
+        <div className='content p-4 text-sm'> {/* Font-size nhỏ cho toàn bộ trang */}
+            {/* Header Section */}
+            <div className="flex flex-wrap justify-between items-center mb-6">
+                <div className="w-full md:flex-1 mb-3 md:mb-0">
+                    <h1 className="text-xl font-bold text-gray-800">
+                        {trans('hancms.roles.name')} / <span className='text-blue-600'>{data.name}</span>
+                    </h1>
+                </div>
+                <div className="w-full md:w-auto">
+                    <div className="flex gap-2">
                         <SaveButton
-                            children={trans('hancms.button.save')}
-                            variant="success"
                             loading={processing}
                             undo={0}
-                            icon={<Save size={20} />}
+                            icon={<Save size={18} />}
                             sendDataStatusUndo={handleUndo}
                             form='my-form'
-                        />
-                        <Link
-                            className="btn btn-secondary py-2"
-                            href={route('roles.index')}
                         >
-                            <div className="d-flex gap-2 align-items-center">
-                                {<Undo size={20} />}
-                                <span>{trans('hancms.button.back')}</span>
-                            </div>
-                        </Link>
+                            {trans('hancms.button.save')}
+                        </SaveButton>
+                        <BackButton href={route('roles.index')}>
+                            {trans('hancms.button.back')}
+                        </BackButton>
                     </div>
-                </Col>
-            </Row>
-            <Form id='my-form' noValidate validated={validated} onSubmit={handleSubmit}>
-                <div className="mb-3 alert alert-info p-3">
-                    <Form.Group controlId="form_name">
-                        <Form.Label column sm="auto" className='text-capitalize'>
+                </div>
+            </div>
+
+            <form id='my-form' onSubmit={handleSubmit} noValidate>
+                {/* Info Box (Thay cho alert-info) */}
+                <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <label htmlFor="form_name" className="block text-sm font-semibold text-gray-700 min-w-[150px] capitalize">
                             {trans('hancms.column.name')} {trans('hancms.roles.name')}
-                        </Form.Label>
-                        <Col>
-                            <Form.Control
+                        </label>
+
+                        <div className="flex-1">
+                            <input
+                                id="form_name"
                                 type="text"
                                 placeholder={trans('hancms.column.name')}
+                                value={data.name}
                                 required
-                                defaultValue={data.name}
                                 onChange={e => setData('name', e.target.value)}
+                                className={`block w-full px-3 py-2 text-sm border rounded-md shadow-sm outline-none transition-all
+                                    ${(errors.name || (validated && !data.name))
+                                        ? 'border-red-500 ring-1 ring-red-500 bg-red-50'
+                                        : 'border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500'
+                                    }`}
                             />
-                            <Form.Control.Feedback type="invalid">
-                               {trans('hancms.message.error.required', { name: trans('hancms.column.name')})}
-                            </Form.Control.Feedback>
-                        </Col>
-                    </Form.Group>
-                    <Form.Control
-                        type="hidden"
-                        placeholder="undo"
-                        defaultValue=''
-                        onChange={e => setData('undo', undo)}
-                    />
+
+                            {/* TIN NHẮN LỖI HIỆN Ở ĐÂY */}
+                            {(errors.name || (validated && !data.name)) && (
+                                <p className="mt-1 text-[11px] text-red-600 font-medium italic italic">
+                                    {trans('hancms.message.error.required', { name: trans('hancms.column.name') })}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <input type="hidden" value={undo} onChange={e => setData('undo', undo)} />
                 </div>
-                <Alert variant="danger" show={permissions_alert}>
-                    <Alert.Heading>{trans('hancms.assign_permissions.error')}</Alert.Heading>
-                    <p>
-                        {trans('hancms.assign_permissions.error.message')}
-                    </p>
-                </Alert>
-                <Card>
-                    <Card.Header className='py-3 bg-indigo-800 text-white'>{trans('hancms.assign_permissions.name')}</Card.Header>
-                    <Card.Body>
+
+                {/* Alert Error Permissions */}
+                {permissions_alert && (
+                    <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded shadow-sm">
+                        <h4 className="text-sm font-bold uppercase">{trans('hancms.assign_permissions.error')}</h4>
+                        <p className="text-xs mt-1">{trans('hancms.assign_permissions.error.message')}</p>
+                    </div>
+                )}
+
+                {/* Card Table - Chuyển hoàn toàn sang Tailwind */}
+                <div className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
+                    <div className="px-4 py-3 bg-indigo-800 text-white text-sm font-bold uppercase">
+                        {trans('hancms.assign_permissions.name')}
+                    </div>
+                    <div className="p-4">
                         <TableView
                             columns={columns}
                             rows={permissions.data}
                             sendDataSelectItems={handleChildData}
                             rolePermissions={rolePermissions}
-                        //getRowDetailsUrl={row => route('contacts.edit', row.id)}
                         />
                         <Pagination links={links} />
-                    </Card.Body>
-                </Card>
-            </Form>
+                    </div>
+                </div>
+            </form>
         </div>
     );
 }

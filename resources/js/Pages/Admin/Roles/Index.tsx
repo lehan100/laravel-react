@@ -1,17 +1,19 @@
-import { Link, usePage, useForm, router } from '@inertiajs/react';
+import { usePage, useForm, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
-import { PlusCircle, Eye } from 'lucide-react';
-import { Row, Col, Card, Button, Table, Alert } from 'react-bootstrap';
+import { Eye } from 'lucide-react';
 import { Roles, PaginatedData } from '@/types';
 import Pagination from '@/Components/Pagination/Pagination';
 import TableView from '@/Components/Table/TableViewAll';
-import DeleteButton from '@/Components/Button/DeleteButtonView';
+import DeleteButtonView from '@/Components/Button/DeleteButtonView';
+import DeleteButton from '@/Components/Button/DeleteButton';
 import EditButton from '@/Components/Button/EditButtonView';
+import CreatedButton from '@/Components/Button/CreatedButton';
 import ModalTable from '@/Components/Modal/Modal';
 import LoadingSpiner from '@/Components/Loading/LoadingSpinner';
 import { useEffect, useMemo, useState } from "react";
 import axios from 'axios';
 import { useTrans } from '@/Hooks/useTrans';
+
 function RolesPage() {
   const { data, setData, errors, post, processing } = useForm({
     name: '',
@@ -32,26 +34,31 @@ function RolesPage() {
       },
       {
         label: trans('hancms.column.guard'),
-        name: 'guard_name'
+        name: 'guard_name',
+        renderCell: (row: any) => (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">{row.guard_name}</span>
+        )
       },
       {
         label: trans('hancms.column.action'),
         name: 'action',
         renderCell: (row: any) => (
           <>
-            <div className="d-flex gap-2">
-              <EditButton href={route('roles.edit', row.id)} className='btn btn-warning btn-sm text-white'>
+            <div className="flex gap-2">
+              <EditButton href={route('roles.edit', row.id)}>
                 {trans('hancms.button.edit')}
               </EditButton>
-              <DeleteButton className='btn btn-danger btn-sm' size={14} onDelete={() => destroy(row.id)}>
+              <DeleteButtonView size_icon={14} onDelete={() => destroy(row.id)}>
                 {trans('hancms.button.delete')}
-              </DeleteButton>
-              <Button variant="primary" size='sm' onClick={() => handleShow(row.id)}>
-                <div className="d-flex gap-2 align-items-center">
-                  {<Eye size={14} />}
-                  <span> {trans('hancms.button.view')}</span>
-                </div>
-              </Button>
+              </DeleteButtonView>
+              <button
+                type="button"
+                onClick={() => handleShow(row.id)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-medium rounded shadow-sm transition-all duration-200 active:scale-95 focus:outline-none"
+              >
+                <Eye size={14} className="flex-shrink-0" />
+                <span>{trans('hancms.button.view')}</span>
+              </button>
             </div>
 
           </>
@@ -100,68 +107,92 @@ function RolesPage() {
   };
   useEffect(() => {
     if (modalData !== undefined && modalData != null) {
-      setModalTitle(modalData.name + ' / '+trans('hancms.permissions'));
+      setModalTitle(modalData.name + ' / ' + trans('hancms.permissions'));
     }
   });
   return (
     <div>
-      <Row className="justify-content-center mb-4">
-        <Col xs={12} md> <h1 className="text-3xl font-bold">{trans('hancms.roles.name')}</h1></Col>
-        <Col xs={12} md={'auto'}>
-          <div className="d-flex gap-2 align-items-center">
-            <Link
-              className="btn btn-success py-2"
-              href={route('roles.create')}
+      <div className="flex flex-wrap justify-between items-center mb-6">
+        {/* Tiêu đề trang: text-xl thay vì 3xl để tinh tế hơn */}
+        <div className="w-full md:flex-1 mb-3 md:mb-0 text-left">
+          <h1 className="text-xl font-bold text-gray-800 tracking-tight">
+            {trans('hancms.roles.name')}
+          </h1>
+        </div>
+
+        {/* Nhóm nút bấm: text-sm và font-medium */}
+        <div className="w-full md:w-auto">
+          <div className="flex items-center gap-2">
+            {/* Nút Created: Thêm padding và font-size nhỏ */}
+            <CreatedButton
+              href={route("roles.create")}
+              className="px-3 py-1.5 text-sm font-medium transition-all active:scale-95 shadow-sm"
             >
-              <div className="d-flex gap-2 align-items-center;">
-                {<PlusCircle size={20} />}
-                {trans('hancms.button.created')}
-              </div>
-            </Link>
-            <DeleteButton className='btn btn-danger py-2' size={20} onDelete={() => destroys()}>
+              {trans('hancms.button.created')}
+            </CreatedButton>
+
+            {/* Nút Delete: Bỏ class 'btn btn-danger' của Bootstrap */}
+            <DeleteButton
+              onDelete={() => destroys()}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
+              size={18} // Giảm size icon xuống 18 cho cân đối với text-sm
+            >
               {trans('hancms.button.delete.selected')}
             </DeleteButton>
           </div>
-        </Col>
-      </Row>
-      <Card>
-        <TableView
-          columns={columns}
-          rows={roles.data}
-          sendDataSelectItems={handleChildData}
-          getRowDetailsUrl={row => route('roles.edit', row.id)}
-        />
+        </div>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        {/* Phần TableView bên trong nên dùng text-sm để đồng bộ */}
+        <div className="overflow-x-auto">
+          <TableView
+            columns={columns}
+            rows={roles.data}
+            sendDataSelectItems={handleChildData}
+            getRowDetailsUrl={row => route('roles.edit', row.id)}
+          />
+        </div>
+
+        {/* Phân trang: Ngăn cách bằng đường kẻ mảnh */}
         <Pagination links={links} />
-      </Card>
-      <ModalTable show={modalShow} onHide={() => setModalShow(false)} title={modalTitle} >
-        <Table striped>
-          <thead>
-            <tr>
-              <th className='py-3'>#</th>
-              <th className='py-3'>{trans('hancms.column.name')}</th>
-              <th className='py-3'>{trans('hancms.column.guard')}</th>
-            </tr>
-          </thead>
-          <tbody>
-
-
-            {modalData !== undefined && modalData != null ? (
-              modalData.permissions.map((item: any, index: any) => (
-                <tr key={item.id}>
-                  <td className='py-3'> {item?.id}</td>
-                  <td className='py-3'> {item?.name}</td>
-                  <td className='py-3'> {item?.guard_name}</td>
-                </tr>
-
-              ))
-            ) : (
+      </div>
+      <ModalTable show={modalShow} onHide={() => setModalShow(false)} title={modalTitle}>
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 text-sm text-left">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={3}><Alert variant='warning'> Không có dữ liệu để hiển thị.</Alert></td>
+                <th className="px-4 py-2 font-semibold text-gray-700 uppercase tracking-wider">#</th>
+                <th className="px-4 py-2 font-semibold text-gray-700 uppercase tracking-wider">{trans('hancms.column.name')}</th>
+                <th className="px-4 py-2 font-semibold text-gray-700 uppercase tracking-wider">{trans('hancms.column.guard')}</th>
               </tr>
-            )}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {modalData?.permissions?.length > 0 ? (
+                modalData.permissions.map((item: any, index: any) => (
+                  <tr key={item.id} className="hover:bg-blue-50 transition-colors duration-150 odd:bg-white even:bg-gray-50/50">
+                    <td className="px-4 py-2 text-gray-600 font-medium">{item?.id}</td>
+                    <td className="px-4 py-2 text-gray-800">{item?.name}</td>
+                    <td className="px-4 py-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                        {item?.guard_name}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="px-4 py-8 text-center">
+                    <div className="flex flex-col items-center gap-2 text-amber-600 bg-amber-50 p-4 rounded-md border border-amber-100">
+                      <span className="text-sm font-medium">Không có dữ liệu để hiển thị.</span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </ModalTable>
+
       <LoadingSpiner isLoading={isLoading} variant='warning'></LoadingSpiner>
     </div>
   );

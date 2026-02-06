@@ -43,7 +43,7 @@ export default function MainMenu({ className }: MainMenuProps) {
       }
       {(can("roles.index") || can("users.index")) &&
         <BsFace title={trans('hancms.users.main')} id={'menu-1'} index={routers['users'].indexOf(routeIndex)} icon={<Users size={20} />}>
-          <ul>
+          <ul className='ps-3'>
             {can("roles.index") &&
               <li>
                 <MainMenuItem
@@ -67,7 +67,7 @@ export default function MainMenu({ className }: MainMenuProps) {
       }
       {(can("languages.index") || can("label.index")) &&
         <BsFace title={trans('hancms.settings.main')} id={'menu-1'} index={routers['settings'].indexOf(routeIndex)} icon={<Cog size={20} />}>
-          <ul>
+          <ul className='ps-3'>
             {can("languages.index") &&
               <li>
                 <MainMenuItem

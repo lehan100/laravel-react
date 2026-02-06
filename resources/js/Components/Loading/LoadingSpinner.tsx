@@ -1,14 +1,32 @@
-import Spinner from 'react-bootstrap/Spinner';
+interface LoadingSpinnerProps {
+    isLoading: boolean;
+    children?: React.ReactNode;
+    variant?: string; // Ví dụ: 'blue', 'red', 'white'...
+}
 
-export default function LoadingSpinner({ isLoading, children, ...props }: any) {
+export default function LoadingSpinner({ isLoading, children, variant = 'white' }: LoadingSpinnerProps) {
+    // Map màu sắc linh hoạt (tương tự variant của Bootstrap)
+    const colorMap: Record<string, string> = {
+        primary: 'bg-blue-600',
+        danger: 'bg-red-600',
+        success: 'bg-green-600',
+        white: 'bg-white',
+    };
+
     return (
-        <div>
-            {isLoading &&
-                <div style={{ position: 'fixed', background: 'rgba(0, 0, 0, .7)', backgroundAttachment: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Spinner  {...props} animation="grow" variant={props.variant}
-                    />
+        <div className="relative">
+            {/* Hiển thị nội dung bên dưới khi không load hoặc load xong */}
+            {children}
+
+            {isLoading && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+                    {/* Hiệu ứng "grow" bằng animate-ping của Tailwind */}
+                    <div className={`h-12 w-12 rounded-full animate-ping ${colorMap[variant] || colorMap.white}`}></div>
+
+                    {/* Text loading hỗ trợ Accessibility (ẩn với người dùng thường) */}
+                    <span className="sr-only">Đang tải...</span>
                 </div>
-            }
+            )}
         </div>
     );
 }

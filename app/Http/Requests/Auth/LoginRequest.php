@@ -53,7 +53,7 @@ class LoginRequest extends FormRequest
                 'email' => __('auth.failed'),
             ]);
         }
-
+        Auth::logoutOtherDevices($this->password);
         RateLimiter::clear($this->throttleKey());
     }
 

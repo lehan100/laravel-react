@@ -20,6 +20,9 @@ return [
         'name' => 'Thành viên',
         'created' => 'Thêm thành viên',
         'edit' => 'Chỉnh sửa thành viên',
+        'profile'=>'Hồ sơ của tôi',
+        'manage'=>'Quản lý người dùng',
+        'logout'=>'Đăng xuất'
     ],
     'languages' => [
         'admin.name' => 'Ngôn ngữ',
@@ -28,7 +31,7 @@ return [
         'edit' => 'Chỉnh sửa ngôn ngữ',
     ],
     'label' => [
-        'admin.name' => 'Nhãn',
+        'admin.name' => 'Danh sách nhãn',
         'name' => 'Nhãn',
         'created' => 'Thêm nhãn',
         'edit' => 'Chỉnh sửa nhãn',
@@ -54,10 +57,15 @@ return [
         'password_confirm' => 'Nhập lại mật khẩu',
         'account_name' => 'Họ và tên',
         'assign_group' => 'Gán quyền',
-        'group' => 'Users Group',
+        'group' => 'Nhóm quyền',
         'image' => 'Hình ảnh',
         'email' => 'Email',
-        'code' => 'Code'
+        'code' => 'Code',
+        'key'=>'Định danh'
+    ],
+    'filter'=>[
+        'search'=>'Tìm kiếm...',
+        'reset'=>'Tạo lại'
     ],
     'title' => [
         'infomation' => 'Thông tin',
@@ -71,6 +79,7 @@ return [
         'dashboard.welcome' => 'Chào mừng bạn đến với Admin CMS!. Hệ thống quản trị của bạn đã sẵn sàng.',
         'destroy' => 'Bạn có chắc chắn muốn xóa :name này không?',
         'destroys' => 'Bạn có chắc chắn muốn xóa tất cả các mục đã chọn không?',
+         'security_notice'=>'Tài khoản của bạn đã được đăng nhập từ một thiết bị khác.',
         'error' => [
             'required' => ':name không được để trống.',
             'password_confirm' => 'Mật khẩu không trùng khớp',

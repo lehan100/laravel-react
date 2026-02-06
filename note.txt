@@ -4,10 +4,11 @@ php artisan lang:publish
 php artisan make:migration create_language_table
 php artisan migrate  
 php artisan migrate:rollback --step=1
-php artisan db:seed --class=DatabaseSeeder
+
 ------
 php artisan make:controller Admin\LabelController --resource 
 ------
+php artisan db:seed --class=DatabaseSeeder
 php artisan permission:create-permission-routes
 ------
 git add .

@@ -10,7 +10,7 @@
         }
     }
 
-    .menu-narbar-item {
+    /* .menu-narbar-item {
         display: none;
         transition: ease-in 0.35s;
 
@@ -54,7 +54,7 @@
 
     &.is-open {
         border-right: 7px solid #191e38;
-    }
+    } */
 }
 
 .form-check {

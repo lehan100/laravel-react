@@ -8,19 +8,26 @@ use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
-    use LockedDemoUser;
+    // use LockedDemoUser;
 
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
+    public function authorize()
+    {
+        return true;
+    }
     public function rules()
     {
         return [
             'first_name' => ['required', 'max:50'],
             'last_name' => ['required', 'max:50'],
-            'email' => ['required', 'max:50', 'email',
+            'email' => [
+                'required',
+                'max:50',
+                'email',
                 Rule::unique('users')->ignore($this->route('user')->id),
             ],
             'password' => ['nullable'],

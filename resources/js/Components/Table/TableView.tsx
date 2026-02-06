@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-import { Form } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 interface TableProps<T> {
   columns: {
@@ -67,7 +66,7 @@ export default function TableView<T>({
   }
   useEffect(() => {
     if (rolePermissions.length) {
-      const elements = document.querySelectorAll(".check-item .form-check-input") as NodeListOf<HTMLInputElement>;
+      const elements = document.querySelectorAll(".check-item") as NodeListOf<HTMLInputElement>;
       elements.forEach((checkbox) => {
         let id: any = checkbox.value;
         if (rolePermissions.some(item => item == id) && selectedItems.indexOf(id) == -1) {
@@ -79,17 +78,21 @@ export default function TableView<T>({
   }, []);
   return (
     <div className="overflow-x-auto bg-white rounded shadow">
-      <table className="table table-hover mb-0">
+      <table className="mb-0 w-full whitespace-nowrap">
         <thead>
-          <tr className="font-bold text-left">
+          <tr className="font-bold text-left bg-gray-300">
             {columns?.map(column => (
               <th
                 key={column.label}
                 colSpan={column.colSpan ?? 1}
-                className="p-3"
+                className="pb-3 pt-5 px-3"
                 style={column.name == 'id' ? styles.id : styles.auto}
               >
-                {column.name == 'id' ? <Form.Check type="checkbox" onChange={handleChangeAll} /> : column.label}
+                {column.name == 'id' ? <input
+                  type="checkbox"
+                  onChange={handleChangeAll}
+                  className="w-5 h-5 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500 accent-blue-600"
+                /> : column.label}
               </th>
             ))}
           </tr>
@@ -122,7 +125,11 @@ export default function TableView<T>({
                       className="p-3"
                     >
                       {column.name == 'id' ?
-                        <Form.Check type="checkbox" className='check-item' value={val} onChange={handleChange}
+                        <input
+                          type="checkbox"
+                          value={val}
+                          onChange={handleChange}
+                          className="check-item h-5 w-5 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                         /> : column.renderCell?.(row) ??
                         val ??
                         'N/A'}

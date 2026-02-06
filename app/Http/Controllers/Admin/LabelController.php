@@ -19,6 +19,8 @@ class LabelController  extends MainController
     public function __construct(LanguageRepositoryInterface $languageModel)
     {
         $this->languageModel = $languageModel;
+        $configPath = config('image.path.photo');
+        Inertia::share(['config_path' => $configPath]);
     }
     /**
      * Display a listing of the resource.

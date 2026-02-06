@@ -21,6 +21,9 @@ return [
         'name' => 'ユーザー',
         'created' => 'ユーザーの作成',
         'edit' => 'ユーザーの編集',
+        'profile'=>'私のプロフィール',
+        'manage'=>'ユーザーの管理',
+        'logout'=>'ログアウト'
     ],
     'languages' => [
         'admin.name' => '言語一覧',
@@ -58,11 +61,16 @@ return [
         'group' => 'ユーザーグループ',
         'image' => '画像',
         'email' => '電子メール',
-        'code' => 'コード'
+        'code' => 'コード',
+        'key' => '鍵'
     ],
     'title' => [
         'infomation' => '情報',
         'setting' => '設定'
+    ],
+     'filter'=>[
+        'search'=>'検索...',
+        'reset'=>'リセット'
     ],
     'status' => [
         'active' => '有効',
@@ -72,6 +80,7 @@ return [
         'dashboard.welcome' => '管理システムの準備が整いました。データ管理と運用をスムーズに開始できるよう、すべてセットアップされています。',
         'destroy' => 'この :name を削除してもよろしいですか？',
         'destroys' => '選択したすべての項目を削除してもよろしいですか？',
+         'security_notice'=>'別の端末でログインされています。',
         'error' => [
             'required' => ':name は必須項目です。',
             'password_confirm' => 'パスワードが一致しません。',

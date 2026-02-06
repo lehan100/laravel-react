@@ -6,14 +6,18 @@ import LoadingButton from '@/Components/Button/LoadingButton';
 import TextInput from '@/Components/Form/TextInput';
 import FieldGroup from '@/Components/Form/FieldGroup';
 import { CheckboxInput } from '@/Components/Form/CheckboxInput';
-
+import { usePage } from '@inertiajs/react';
+import { AlertTriangle } from 'lucide-react';
 export default function LoginPage() {
   const { data, setData, errors, post, processing } = useForm({
     email: 'lehan100@gmail.com',
     password: 'secret',
     remember: true
   });
+  const { props } = usePage();
+  const flash = props.flash as any;
 
+  
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -35,6 +39,13 @@ export default function LoginPage() {
           <div className="px-10 py-12">
             <h1 className="text-3xl font-bold text-center">Welcome Back!</h1>
             <div className="w-24 mx-auto mt-6 border-b-2" />
+            {/* Thông báo lỗi khi bị logout từ nơi khác */}
+            {flash?.message && (
+              <div className="mt-6 mb-2 p-3 bg-amber-50 border border-amber-200 text-amber-700 text-[13px] font-medium rounded-md shadow-sm flex items-center gap-2 animate-fade-in">
+                <AlertTriangle size={16} className="text-amber-500 shrink-0" />
+                <span className="leading-tight">{flash.message}</span>
+              </div>
+            )}
             <div className="grid gap-6">
               <FieldGroup label="Email" name="email" error={errors.email}>
                 <TextInput
