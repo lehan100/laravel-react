@@ -7,10 +7,9 @@ export default defineConfig({
     plugins: [
         laravel(['resources/js/app.tsx', 'resources/css/app.scss']),
         react(),
-        i18n({
-           // path: 'resources/lang',
-        }),
+        i18n(),
     ],
+    
     resolve: {
         alias: {
             '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Redirect;
 
 class LabelController  extends MainController
 {
@@ -54,6 +55,31 @@ class LabelController  extends MainController
     public function store(Request $request)
     {
         //
+        try {
+            //code...
+            $labels = $request->labels;
+            foreach ($labels as $lang => $content) {
+                // 1. Xác định đường dẫn thư mục và file
+                $dir = lang_path($lang);
+                $filePath = "$dir/label.php";
+
+                // 2. Kiểm tra và tạo thư mục nếu chưa có (quyền 0755)
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+                // 3. Chuẩn bị nội dung file PHP
+                $content = preg_replace('/^array\s*\(/', '[', $content);
+                $content = preg_replace('/\)$/', ']', $content);
+                $fileContent = "<?php\n\nreturn " . var_export($content, true) . ";\n";
+
+                // 4. Ghi đè vào file label.php
+                File::put(lang_path("$lang/label.php"), $fileContent);
+            }
+            // return Redirect::to(route('label.index'))->with('success',  __('hancms.message.success.edit', ['name' => __('hancms.label.name')]));
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Redirect::to(route('label.index'))->with('error',  __('hancms.message.error.edit', ['name' => __('hancms.label.name')]));
+        }
     }
 
     /**

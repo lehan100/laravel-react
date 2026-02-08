@@ -1,4 +1,5 @@
 <?php
-return [
-    'title' => 'title'
-];
+
+return array (
+  'welcome_msg' => 'Wellcome',
+);

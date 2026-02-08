@@ -1,4 +1,5 @@
 <?php
-return [
-    'title' => 'title vn'
-];
+
+return array (
+  'welcome_msg' => 'Xin Chào',
+);
