@@ -41,6 +41,21 @@ return [
         'confirm_delete_title' => '削除の確認',
         'confirm_delete' => 'このラベルを削除してもよろしいですか？この操作を行うとすべての言語のデータが削除され、保存後は元に戻すことはできません。'
     ],
+    'layout' => [
+        'admin.name' => 'レイアウト設定',
+        'name' => 'レイアウト',
+        'tabs' => [
+            'home'    => 'ホーム',       // Hōmu
+            'general' => '全般設定',     // Zenpan Settei (Cấu hình tổng quát)
+        ],
+        'items' => [
+            'logo' => 'システムロゴ',
+            'favicon' => 'ファビコン',
+            'title' => 'メタタイトル',
+            'keyword' => 'メタキーワード',
+            'description' => 'メタディスクリプション',
+        ]
+    ],
     'button' => [
         'created' => '新規作成',
         'delete.selected' => '選択項目を削除',

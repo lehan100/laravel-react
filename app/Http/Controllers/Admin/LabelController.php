@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\MainController;
 use App\Http\Resources\LanguageCollection;
-use App\Repositories\Language\LanguageRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
@@ -16,10 +14,8 @@ class LabelController  extends MainController
 {
     protected $controllerView = 'Admin/Label/';
     protected $controllerName = 'label';
-    protected $languageModel;
-    public function __construct(LanguageRepositoryInterface $languageModel)
+    public function __construct()
     {
-        $this->languageModel = $languageModel;
         $configPath = config('image.path.photo');
         Inertia::share(['config_path' => $configPath]);
     }
@@ -29,14 +25,14 @@ class LabelController  extends MainController
     public function index()
     {
         //
-        $languages = $this->languageModel->lists($this->params, ['task' => 'admin-list-items']);
+        $sharedLangs = Inertia::getShared('langs');
+        $languages = is_callable($sharedLangs) ? $sharedLangs() : $sharedLangs;
         foreach ($languages as $lang) {
             $labels[$lang['code']] = is_array(Lang::get('label', [], $lang['code']))
                 ? Lang::get('label', [], $lang['code'])
                 : Lang::get('label', [], 'en');
         }
         return Inertia::render($this->controllerView . 'Index', [
-            'lang' => new LanguageCollection($languages),
             'labels' => $labels
         ]);
     }

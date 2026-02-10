@@ -4,9 +4,14 @@ import { PageProps } from '@/types';
 import { ChevronDown } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { useTrans } from '@/Hooks/useTrans';
+import { Language } from '@/types';
 export default () => {
   const { trans } = useTrans();
   const { auth } = usePage<PageProps>().props;
+  const { langs }: any = usePage<{
+    langs: Language;
+
+  }>().props;
   const { props } = usePage();
   const currentLang = props.locale;
   const [menuOpened, setMenuOpened] = useState(false);
@@ -65,24 +70,26 @@ export default () => {
             </Link>
             <hr />
             <p className='block px-6 py-2'><strong>{trans("hancms.languages.name")}</strong></p>
-            {['vi', 'en', 'ja'].map((langCode) => (
-              <button
-                key={langCode}
-                type="button"
-                onClick={(e) => handleSwitchLang(e, langCode)}
-                className={`
+            {langs.data.map((row: any) => {
+              const langCode = row.code;
+              const langName = row.name
+              return (
+                <button
+                  key={langCode}
+                  type="button"
+                  onClick={(e) => handleSwitchLang(e, langCode)}
+                  className={`
       block w-full px-6 py-2.5 text-left text-sm font-medium transition-all duration-200 outline-none
       ${currentLang === langCode
-                    ? 'bg-indigo-600 text-white shadow-inner'
-                    : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
-                  }
+                      ? 'bg-indigo-600 text-white shadow-inner'
+                      : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                    }
     `}
-              >
-                {langCode === 'vi' && 'Tiếng Việt'}
-                {langCode === 'en' && 'English'}
-                {langCode === 'ja' && '日本'}
-              </button>
-            ))}
+                >
+                  {langName}
+                </button>
+              )
+            })}
           </div>
           <div
             onClick={() => {

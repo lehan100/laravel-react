@@ -35,7 +35,10 @@ class LanguageEloquentRepository extends EloquentRepository implements LanguageR
             $query = $this->_model->select($this->FIELDSELECT);
             $data = $query->orderBy('id', 'desc')->paginate($params['pagination']['totalItemsPerPage']);
         }
-
+        if ($options['task'] == "admin-list-items-active") {
+            $query = $this->_model->select($this->FIELDSELECT);
+            $data = $query->where("status", 1)->orderBy('id', 'desc')->paginate(100);
+        }
         return $data;
     }
 
@@ -74,7 +77,7 @@ class LanguageEloquentRepository extends EloquentRepository implements LanguageR
             $row->name = isset($params['name']) ? $params['name'] : '';
             $row->code = isset($params['code']) ? $params['code'] : '';
             $row->photo = isset($params['photo']) ? $params['photo'] : '';
-            $row->status = isset($params['status']) ? 1 : 0;
+            $row->status = isset($params['status']) ? $params['status'] : 0;
             $row->save();
             if ($params['photo']) {
                 $filePathTmp = public_path($this->configPath['temp']);

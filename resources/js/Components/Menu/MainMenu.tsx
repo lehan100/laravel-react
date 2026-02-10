@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { CircleGauge, Users, UserCog, Cog, Languages, FileText } from 'lucide-react';
+import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Settings } from 'lucide-react';
 import classNames from 'classnames';
 import MainMenuItem from '@/Components/Menu/MainMenuItem';
 import BsFace from '@/Components/Menu/Fade';
@@ -27,10 +27,10 @@ export default function MainMenu({ className }: MainMenuProps) {
   const routers: any = {
     'dashboard': ['dashboard'],
     'users': ['roles', 'users'],
-    'settings': ['languages','label'],
+    'settings': ['languages', 'label','layout'],
   }
   const { can } = usePermission();
-  
+
   const { trans } = useTrans();
   const [routeIndex, setRouteIndex] = useState(getRoute());
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function MainMenu({ className }: MainMenuProps) {
           </ul>
         </BsFace>
       }
-      {(can("languages.index") || can("label.index")) &&
+      {(can("languages.index") || can("label.index") || can("layout")) &&
         <BsFace title={trans('hancms.settings.main')} id={'menu-1'} index={routers['settings'].indexOf(routeIndex)} icon={<Cog size={20} />}>
           <ul className='ps-3'>
             {can("languages.index") &&
@@ -83,6 +83,15 @@ export default function MainMenu({ className }: MainMenuProps) {
                   text={trans('hancms.label.name')}
                   link="label.index"
                   icon={<FileText size={20} />}
+                />
+              </li>
+            }
+            {can("layout") &&
+              <li>
+                <MainMenuItem
+                  text={trans('hancms.layout.admin.name')}
+                  link="layout"
+                  icon={<Settings size={20} />}
                 />
               </li>
             }

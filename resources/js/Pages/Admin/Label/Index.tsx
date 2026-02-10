@@ -10,10 +10,11 @@ import { AlertTriangle, X } from "lucide-react";
 function IndexPage() {
 
     const { trans } = useTrans();
-    const { lang, labels, config_path }: any = usePage<{
+    const { langs, labels, config_path}: any = usePage<{
         lang: Language;
 
     }>().props;
+    
     const { data, setData, errors, post, processing } = useForm({
         labels: labels || null,
         undo: 0,
@@ -75,7 +76,7 @@ function IndexPage() {
         }
 
         const updatedLabels = { ...data.labels };
-        lang.data.forEach((row: any) => {
+        langs.data.forEach((row: any) => {
             if (!updatedLabels[row.code]) updatedLabels[row.code] = {};
             updatedLabels[row.code][newKey] = "";
         });
@@ -155,7 +156,7 @@ function IndexPage() {
                             <thead className="bg-gray-50">
                                 <tr className="font-bold text-gray-700">
                                     <th className="px-4 py-3 whitespace-nowrap">{trans('hancms.column.key')}</th>
-                                    {lang.data.map((row: any) => (
+                                    {langs.data.map((row: any) => (
                                         <th key={row.id} className="px-4 py-3">
                                             <div className="flex items-center gap-2 whitespace-nowrap">
                                                 {row.photo && (
@@ -179,7 +180,7 @@ function IndexPage() {
                                         <td className="px-4 py-2 align-middle text-gray-500 font-mono text-xs italic">
                                             label.{key}
                                         </td>
-                                        {lang.data.map((row: any) => {
+                                        {langs.data.map((row: any) => {
                                             const cellValue = data.labels[row.code] ? data.labels[row.code][key] : '';
                                             return (
                                                 <td key={row.id} className="px-4 py-2 align-middle min-w-[200px]">
@@ -221,7 +222,7 @@ function IndexPage() {
                                     </td>
 
                                     {/* Các cột ngôn ngữ để trống hoặc hiển thị nút bấm */}
-                                    <td colSpan={lang.data.length} className="px-4 py-3">
+                                    <td colSpan={langs.data.length} className="px-4 py-3">
                                         {isAdding ? (
                                             <div className="flex gap-2">
                                                 <button

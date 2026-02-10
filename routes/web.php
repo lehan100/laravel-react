@@ -46,8 +46,16 @@ Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Adm
     /* -----------Language--------------- */
     Route::resource('languages', App\Http\Controllers\Admin\LanguageController::class)->middleware('auth');
     Route::delete('/languages-destroy-many', [App\Http\Controllers\Admin\LanguageController::class, 'destroyMany'])->name('languages.destroyMany')->middleware('auth');
-     /* -----------Label--------------- */
+    /* -----------Label--------------- */
     Route::resource('label', App\Http\Controllers\Admin\LabelController::class)->middleware('auth');
+    /* -----------LOGIN--------------- */
+    $prefix = 'layout';
+    $controllerName = 'layout';
+    Route::group(['prefix' => $prefix, 'middleware' => ['auth']], function () use ($controllerName) {
+        $controller = ucfirst($controllerName) . 'Controller@';
+        Route::get('/', ['as' => $controllerName, 'uses' => $controller . 'index']);
+        Route::post('store', ['as' => $controllerName . '.store', 'uses' => $controller . 'store']);
+    });
 });
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'vi', 'ja'])) {

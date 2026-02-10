@@ -6,6 +6,8 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\Language\LanguageRepositoryInterface;
+use App\Http\Resources\LanguageCollection;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -33,9 +35,21 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/shared-data
      */
+    protected $languageModel;
+
+    // Inject model vào đây
+    public function __construct(LanguageRepositoryInterface $languageModel)
+    {
+        $this->languageModel = $languageModel;
+    }
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            'langs' => function () {
+                return new LanguageCollection($this->languageModel->lists(null, [
+                    'task' => 'admin-list-items-active'
+                ]));
+            },
             'locale' => function () {
                 return app()->getLocale();
             },

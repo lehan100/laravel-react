@@ -41,6 +41,21 @@ return [
         'confirm_delete_title' => 'Confirm Label Deletion',
         'confirm_delete' => 'Are you sure you want to delete this label? This action will remove it across all languages and cannot be undone after saving.'
     ],
+    'layout' => [
+        'admin.name' => 'Layout Setting',
+        'name' => 'Layout',
+        'tabs'=>[
+            'home'=>"Home",
+            'general'=>'General'
+        ],
+        'items' => [
+            'logo'=>'Logo',
+            'favicon'=>'Favicon',
+            'title' => 'Meta Title',
+            'keyword' => 'Meta Keyword',
+            'description' => 'Meta Description'
+        ]
+    ],
     'button' => [
         'created' => 'Add New',
         'delete.selected' => 'Delete Selected Items',

@@ -41,6 +41,21 @@ return [
         'confirm_delete_title' => 'Xác nhận xóa nhãn',
         'confirm_delete' => 'Bạn có chắc chắn muốn xóa nhãn này không? Hành động này sẽ xóa dữ liệu ở tất cả ngôn ngữ và không thể hoàn tác sau khi lưu.'
     ],
+    'layout' => [
+        'admin.name' => 'Cấu hình Layout',
+        'name' => 'Giao diện',
+        'tabs' => [
+            'home'    => 'Trang chủ',
+            'general' => 'Cài đặt chung',
+        ],
+        'items' => [
+            'logo' => 'Logo website',
+            'favicon' => 'Biểu tượng (Favicon)',
+            'title' => 'Tiêu đề trang (Meta Title)',
+            'keyword' => 'Từ khóa SEO (Meta Keyword)',
+            'description' => 'Mô tả trang (Meta Description)',
+        ]
+    ],
     'button' => [
         'created' => 'Thêm mới',
         'delete.selected' => 'Xóa mục đã chọn',
