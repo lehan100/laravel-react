@@ -8,8 +8,8 @@ import { InputGroup } from "@/Components/Form/HancmsInput";
 import SaveButton from '@/Components/Button/SaveButton';
 import { ImagePlus, Loader2, Save } from "lucide-react";
 import axios from "axios";
-const HomeTab = ({ langs, data, setData, trans, layout_items }: any) => {
-    const itemEntries = layout_items ? Object.entries(layout_items) : [];
+const HomeTab = ({ langs, data, setData, trans, layout_items_home }: any) => {
+    const itemEntries = layout_items_home ? Object.entries(layout_items_home) : [];
     const [previews, setPreviews] = useState<Record<string, string>>({});
     const [loadingField, setLoadingField] = useState<string | null>(null);
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, fieldKey: string) => {
@@ -23,7 +23,6 @@ const HomeTab = ({ langs, data, setData, trans, layout_items }: any) => {
         try {
             const response = await axios.post(route('photo.upload'), formData);
 
-            // 2. Cập nhật preview riêng cho fieldKey này
             setPreviews(prev => ({ ...prev, [fieldKey]: response.data.url }));
 
             const newValue = response.data.file_name;
@@ -47,11 +46,10 @@ const HomeTab = ({ langs, data, setData, trans, layout_items }: any) => {
     const renderUploadField = (fieldKey: string) => {
         const currentPreview = previews[fieldKey] || data.pages?.[langs.data[0]?.code]?.[fieldKey];
         const isLoading = loadingField === fieldKey;
-
+        const urlReview = currentPreview?.includes('/temp/') ? currentPreview : `/media/photo/${currentPreview}`;
         return (
             <InputGroup label={trans(`hancms.layout.items.${fieldKey}`)} align='center'>
                 <div className="relative group">
-                    {/* ID phải là duy nhất cho mỗi field */}
                     <input
                         type="file"
                         id={`file-${fieldKey}`}
@@ -67,7 +65,7 @@ const HomeTab = ({ langs, data, setData, trans, layout_items }: any) => {
                         {isLoading ? (
                             <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
                         ) : currentPreview ? (
-                            <img src={currentPreview} alt="Preview" className="w-full h-full object-cover" />
+                            <img src={urlReview} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
                             <div className="flex flex-col items-center text-gray-400 group-hover:text-indigo-500">
                                 <ImagePlus size={32} />
@@ -83,6 +81,49 @@ const HomeTab = ({ langs, data, setData, trans, layout_items }: any) => {
         <div className="space-y-4">
             {renderUploadField('logo')}
             {renderUploadField('favicon')}
+            {itemEntries.map(([fieldKey, fieldConfig]: [string, any]) => {
+
+                return (
+                    <InputGroup key={fieldKey} label={trans(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
+                        {langs.data.map((row: any) => {
+                            const langCode = row.code;
+                            const langName = row.name;
+                            const langData = data.pages?.[langCode];
+
+                            const cellValue = (typeof langData === 'object' && langData !== null)
+                                ? (langData[fieldKey] || '')
+                                : '';
+                            return (
+                                <CountryInput
+                                    key={`${langCode}-${fieldKey}`}
+                                    photo={row.photo}
+                                    value={cellValue}
+                                    isTextArea={fieldConfig.is_textarea}
+                                    placeholder={`${trans(`hancms.layout.items.${fieldKey}`)} (${langName})`}
+                                    onChange={(e: any) => {
+                                        const newValue = e.target.value;
+                                        setData('pages', {
+                                            ...data.pages,
+                                            [langCode]: {
+                                                ...(typeof langData === 'object' ? langData : {}),
+                                                [fieldKey]: newValue
+                                            }
+                                        });
+                                    }}
+                                />
+                            );
+                        })}
+                    </InputGroup>
+                )
+            })}
+
+        </div>
+    )
+};
+const GeneralTab = ({ langs, data, setData, trans, layout_items_general }: any) => {
+    const itemEntries = layout_items_general ? Object.entries(layout_items_general) : [];
+    return (
+        <div className="space-y-4">
             {itemEntries.map(([fieldKey, fieldConfig]: [string, any]) => {
                 return (
                     <InputGroup key={fieldKey} label={trans(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
@@ -123,25 +164,63 @@ const HomeTab = ({ langs, data, setData, trans, layout_items }: any) => {
 };
 function IndexPage() {
     const { trans } = useTrans();
+    const { langs, pages, layout_items_home, layout_items_general }: any = usePage().props;
+    const initialPages = useMemo(() => {
+        const basePages = (pages && typeof pages === 'object' && !Array.isArray(pages)) ? pages : {};
+        //const itemKeys = layout_items_home ? Object.keys(layout_items_home) : [];
+        const itemKeys = [
+            ...Object.keys(layout_items_home || {}),
+            ...Object.keys(layout_items_general || {}), // Nếu có thêm tab khác
+            'logo',
+            'favicon'
+        ];
+        const initialized: any = {};
 
+        langs.data.forEach((lang: any) => {
+            const langCode = lang.code;
 
-    const { langs, pages, layout_items }: any = usePage().props;
+            const existingLangData = (basePages[langCode] && typeof basePages[langCode] === 'object')
+                ? basePages[langCode]
+                : {};
+
+            initialized[langCode] = { ...existingLangData };
+
+            itemKeys.forEach(key => {
+                if (initialized[langCode][key] === undefined || initialized[langCode][key] === null) {
+                    initialized[langCode][key] = '';
+                }
+            });
+
+            // Riêng cho logo và favicon
+            // ['logo', 'favicon'].forEach(imgKey => {
+            //     if (initialized[langCode][imgKey] === undefined || initialized[langCode][imgKey] === null) {
+            //         initialized[langCode][imgKey] = '';
+            //     }
+            // });
+        });
+
+        return initialized;
+    }, [pages, langs, layout_items_home, layout_items_general]);
+
+    // 2. Truyền initialPages vào useForm
     const { data, setData, post, processing } = useForm({
-        pages: pages || {},
+        pages: initialPages,
         undo: 0,
     });
+    console.log(data.pages);
+
     const [activeTab, setActiveTab] = useState('home');
     const [undo, setUndo] = useState(0);
     const handleUndo = (status: number) => {
         setUndo(status);
     }
-    // 2. Render Tab Content trực tiếp, không tạo component bên trong thân IndexPage
+
     const renderTabContent = () => {
         switch (activeTab) {
             case 'home':
-                return <HomeTab langs={langs} data={data} layout_items={layout_items} setData={setData} trans={trans} />
+                return <HomeTab langs={langs} data={data} layout_items_home={layout_items_home} setData={setData} trans={trans} />
             case 'general':
-                return <h1>Thông tin cá nhân: Cập nhật ảnh đại diện và tiểu sử.</h1>;
+                return <GeneralTab langs={langs} data={data} layout_items_general={layout_items_general} setData={setData} trans={trans} />
             default:
                 return null;
         }
@@ -149,8 +228,11 @@ function IndexPage() {
     function handleSubmit(e: any) {
         e.preventDefault();
         e.stopPropagation();
-        console.log(data.pages);
-
+        post(route('layout.store'), {
+            onSuccess: () => {
+                alert(trans('hancms.message.success.edit', { name: trans('hancms.layout.name') }));
+            }
+        });
     }
     return (
         <div>
@@ -174,10 +256,11 @@ function IndexPage() {
             </div>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
-                    {/* Tab List (Giữ nguyên phần UI của bạn) */}
+                    {/* Tab List (Giữ nguyên phần UI) */}
                     <div className="flex flex-row md:flex-col w-full md:w-56 overflow-x-auto border-r border-gray-200" role="tablist">
                         {['home', 'general'].map((id) => (
                             <button
+                                type="button"
                                 key={id}
                                 onClick={() => setActiveTab(id)}
                                 className={`p-3 py-5 font-medium transition-all ${activeTab === id ? 'bg-indigo-800 text-white' : 'bg-indigo-50'}`}

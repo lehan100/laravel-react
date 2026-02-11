@@ -51,9 +51,14 @@ return [
         'items' => [
             'logo' => 'Logo website',
             'favicon' => 'Biểu tượng (Favicon)',
-            'title' => 'Tiêu đề trang (Meta Title)',
-            'keyword' => 'Từ khóa SEO (Meta Keyword)',
-            'description' => 'Mô tả trang (Meta Description)',
+            'meta_title' => 'Tiêu đề trang (Meta Title)',
+            'meta_keyword' => 'Từ khóa SEO (Meta Keyword)',
+            'meta_description' => 'Mô tả trang (Meta Description)',
+            'company'   => 'Tên công ty',
+            'phone'     => 'Số điện thoại',
+            'address'   => 'Địa chỉ',
+            'tax'       => 'Mã số thuế',
+            'copyright' => 'Bản quyền',
         ]
     ],
     'button' => [

@@ -51,9 +51,14 @@ return [
         'items' => [
             'logo'=>'Logo',
             'favicon'=>'Favicon',
-            'title' => 'Meta Title',
-            'keyword' => 'Meta Keyword',
-            'description' => 'Meta Description'
+            'meta_title' => 'Meta Title',
+            'meta_keyword' => 'Meta Keyword',
+            'meta_description' => 'Meta Description',
+            'company'=>'Company Name',
+            'phone'=>'Phone Number',
+            'address'=>'Address',
+            'tax'=>'Tax Code',
+            'copyright'=>'Copyright',
         ]
     ],
     'button' => [

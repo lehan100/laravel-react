@@ -37,7 +37,7 @@ class LanguageEloquentRepository extends EloquentRepository implements LanguageR
         }
         if ($options['task'] == "admin-list-items-active") {
             $query = $this->_model->select($this->FIELDSELECT);
-            $data = $query->where("status", 1)->orderBy('id', 'desc')->paginate(100);
+            $data = $query->where("status", 1)->orderBy('id', 'desc')->paginate();
         }
         return $data;
     }

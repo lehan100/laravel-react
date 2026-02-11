@@ -51,9 +51,14 @@ return [
         'items' => [
             'logo' => 'システムロゴ',
             'favicon' => 'ファビコン',
-            'title' => 'メタタイトル',
-            'keyword' => 'メタキーワード',
-            'description' => 'メタディスクリプション',
+            'meta_title' => 'メタタイトル',
+            'meta_keyword' => 'メタキーワード',
+            'meta_description' => 'メタディスクリプション',
+            'company'   => '会社名',
+            'phone'     => '電話番号',
+            'address'   => '住所',
+            'tax'       => '登録番号',
+            'copyright' => '著作権',
         ]
     ],
     'button' => [
