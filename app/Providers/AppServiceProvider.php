@@ -37,6 +37,15 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Language\LanguageRepositoryInterface::class,
             \App\Repositories\Language\LanguageEloquentRepository::class
         );
+        //Media
+        $this->app->singleton(
+            \App\Repositories\Media\MediaBannerRepositoryInterface::class,
+            \App\Repositories\Media\MediaBannerEloquentRepository::class
+        );
+        $this->app->singleton(
+            \App\Repositories\Media\MediaPositionRepositoryInterface::class,
+            \App\Repositories\Media\MediaPositionEloquentRepository::class
+        );
     }
 
     /**

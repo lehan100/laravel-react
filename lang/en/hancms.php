@@ -42,23 +42,23 @@ return [
         'confirm_delete' => 'Are you sure you want to delete this label? This action will remove it across all languages and cannot be undone after saving.'
     ],
     'layout' => [
-        'admin.name' => 'Layout Setting',
-        'name' => 'Layout',
-        'tabs'=>[
-            'home'=>"Home",
-            'general'=>'General'
+        'admin.name' => 'ウェブサイト設定',
+        'name' => 'ウェブサイト',
+        'tabs' => [
+            'home' => "Home",
+            'general' => 'General'
         ],
         'items' => [
-            'logo'=>'Logo',
-            'favicon'=>'Favicon',
+            'logo' => 'Logo',
+            'favicon' => 'Favicon',
             'meta_title' => 'Meta Title',
             'meta_keyword' => 'Meta Keyword',
             'meta_description' => 'Meta Description',
-            'company'=>'Company Name',
-            'phone'=>'Phone Number',
-            'address'=>'Address',
-            'tax'=>'Tax Code',
-            'copyright'=>'Copyright',
+            'company' => 'Company Name',
+            'phone' => 'Phone Number',
+            'address' => 'Address',
+            'tax' => 'Tax Code',
+            'copyright' => 'Copyright',
         ]
     ],
     'button' => [

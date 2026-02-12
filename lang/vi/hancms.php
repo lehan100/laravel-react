@@ -42,7 +42,7 @@ return [
         'confirm_delete' => 'Bạn có chắc chắn muốn xóa nhãn này không? Hành động này sẽ xóa dữ liệu ở tất cả ngôn ngữ và không thể hoàn tác sau khi lưu.'
     ],
     'layout' => [
-        'admin.name' => 'Cấu hình Layout',
+        'admin.name' => 'Cấu hình website',
         'name' => 'Giao diện',
         'tabs' => [
             'home'    => 'Trang chủ',
