@@ -5,7 +5,7 @@ import path from 'path';
 import i18n from 'laravel-react-i18n/vite';
 export default defineConfig({
     plugins: [
-        laravel(['resources/js/app.tsx', 'resources/css/app.scss']),
+        laravel(['resources/js/app.tsx', 'resources/css/app.css']),
         react(),
         i18n(),
     ],
