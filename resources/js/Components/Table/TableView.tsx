@@ -32,7 +32,7 @@ export default function TableView<T>({
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const handleChangeAll = (e: any) => {
     const { value, checked } = e.target;
-    const elements = document.querySelectorAll(".check-item .form-check-input") as NodeListOf<HTMLInputElement>;
+    const elements = document.querySelectorAll(".check-item") as NodeListOf<HTMLInputElement>;
     if (checked) {
       elements.forEach((checkbox) => {
         checkbox.checked = true;

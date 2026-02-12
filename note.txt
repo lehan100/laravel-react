@@ -12,5 +12,5 @@ php artisan db:seed --class=DatabaseSeeder
 php artisan permission:create-permission-routes
 ------
 git add .
-git commit -m "Cật nhật Inertia:share ->langs ; update code module Layout"
+git commit -m "Xây dụng sơ đồ database cho Media Banner"
 git push origin main 

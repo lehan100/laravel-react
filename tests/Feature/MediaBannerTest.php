@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\MediaBanner;
 use App\Models\MediaPosition;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MediaBannerTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     /** @test */
     public function it_can_create_a_banner_with_translations_and_assign_positions()
