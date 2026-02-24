@@ -24,6 +24,24 @@ return [
         'manage' => 'Quản lý người dùng',
         'logout' => 'Đăng xuất'
     ],
+    'media' => [
+        'name' => 'Đa phương tiện',
+        'position' => [
+            'name' => 'Vị trí hiển thị'
+        ],
+        'banner' => [
+            'name' => 'Hình ảnh'
+        ]
+    ],
+    'catalog'=>[
+        'name'=>'Bán hàng',
+        'category'=>[
+            'name'=>'Danh mục'
+        ],
+        'product'=>[
+            'name'=>'Sản phẩm'
+        ]
+    ],
     'languages' => [
         'admin.name' => 'Danh sách ngôn ngữ',
         'name' => 'Ngôn ngữ',
@@ -42,7 +60,7 @@ return [
         'confirm_delete' => 'Bạn có chắc chắn muốn xóa nhãn này không? Hành động này sẽ xóa dữ liệu ở tất cả ngôn ngữ và không thể hoàn tác sau khi lưu.'
     ],
     'layout' => [
-        'admin.name' => 'Cấu hình website',
+        'admin.name' => 'Cấu hình',
         'name' => 'Giao diện',
         'tabs' => [
             'home'    => 'Trang chủ',

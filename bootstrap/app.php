@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->authenticateSessions();
-        $middleware->redirectGuestsTo(fn() => route('auth/login'));
+        $middleware->redirectGuestsTo(fn() => route('auth.login'));
         $middleware->redirectUsersTo(fn() => route('dashboard'));
         $middleware->alias([
             'check.login' => \App\Http\Middleware\CheckLogin::class,
@@ -40,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             // Nếu là yêu cầu từ trang web (không phải API thuần túy)
             if (! $request->expectsJson()) {
-                return redirect()->guest(route('auth/login'))
+                return redirect()->guest(route('auth.login'))
                     ->with('message', __('hancms.message.security_notice'));
             }
         });

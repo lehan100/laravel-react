@@ -1,10 +1,19 @@
 <?php
 
-use App\Http\Controllers\ContactsController;
-use App\Http\Controllers\ImagesController;
-use App\Http\Controllers\OrganizationsController;
-use App\Http\Controllers\ReportsController;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\LabelController;
+use App\Http\Controllers\Admin\LayoutController;
+use App\Http\Controllers\Admin\MediaPositionController;
+use App\Http\Controllers\Admin\MediaBannerController;
+use App\Http\Controllers\Admin\ProductController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,168 +25,56 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::post('photo-upload', [App\Http\Controllers\ImageUploadController::class, 'storePhoto'])->name('photo.upload');
-// Auth
-$prefixAdmin = config('configs.prefix.admin');
-Route::group(['prefix' => $prefixAdmin, 'namespace' => 'App\Http\Controllers\Admin'], function () {
-    Route::get('/', function () {
-        return redirect()->route('auth/login');
-    });
+$prefixAdmin = config('configs.prefix.admin', 'admin');
+Route::prefix($prefixAdmin)->group(function () {
+    Route::get('lang/{locale}', function ($locale) {
+        $sharedLangs = Inertia::getShared('langs');
+        $languages = is_callable($sharedLangs) ? $sharedLangs() : $sharedLangs;
+        $availableCodes = collect($languages)->map(function ($lang) {
+            return $lang->resource->code ?? $lang['code'] ?? null;
+        })->toArray();
+        if (is_array($availableCodes) && in_array($locale, $availableCodes)) {
+            session()->put('locale', $locale);
+        }
+        return redirect()->back();
+    })->name('lang.switch');
+    Route::get('/', fn() => redirect()->route('auth.login'));
     /* -----------LOGIN--------------- */
-    $prefix = 'auth';
-    $controllerName = 'auth';
-    Route::group(['prefix' => $prefix], function () use ($controllerName) {
-        $controller = ucfirst($controllerName) . 'Controller@';
-        Route::get('/login', ['as' => $controllerName . '/login', 'uses' => $controller . 'login'])->middleware('check.login');
-        Route::post('/post-login', ['as' => $controllerName . "/post-login", 'uses' => $controller . 'postlogin'])->middleware('check.login');
-        Route::get('/logout', ['as' => $controllerName . '/logout', 'uses' => $controller . 'logout']);
+    Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
+        Route::get('login', 'login')->name('login')->middleware('check.login');
+        Route::post('post-login', 'postLogin')->name('post-login')->middleware('check.login');
+        Route::get('logout', 'logout')->name('logout');
     });
-    /* -----------Dashboard--------------- */
-    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-        ->name('dashboard')
-        ->middleware(['auth', 'permission']);
-    /* -----------Role--------------- */
-    Route::resource('roles', App\Http\Controllers\Admin\RolesController::class)->middleware('auth');
-    Route::delete('/roles-destroy-many', [App\Http\Controllers\Admin\RolesController::class, 'destroyMany'])->name('roles.destroyMany')->middleware('auth');
-    Route::get('/roles-permissions/{id}', [App\Http\Controllers\Admin\RolesController::class, 'permissions'])->where('id', '[0-9]+')->name('roles.permissions')->middleware('auth');
-    /* -----------User--------------- */
-    Route::resource('users', App\Http\Controllers\Admin\UsersController::class)->middleware('auth');
-    Route::delete('/users-destroy-many', [App\Http\Controllers\Admin\UsersController::class, 'destroyMany'])->name('users.destroyMany')->middleware('auth');
-    /* -----------Language--------------- */
-    Route::resource('languages', App\Http\Controllers\Admin\LanguageController::class)->middleware('auth');
-    Route::delete('/languages-destroy-many', [App\Http\Controllers\Admin\LanguageController::class, 'destroyMany'])->name('languages.destroyMany')->middleware('auth');
-    /* -----------Label--------------- */
-    Route::resource('label', App\Http\Controllers\Admin\LabelController::class)->middleware('auth');
-    /* -----------LOGIN--------------- */
-    $prefix = 'layout';
-    $controllerName = 'layout';
-    Route::group(['prefix' => $prefix, 'middleware' => ['auth']], function () use ($controllerName) {
-        $controller = ucfirst($controllerName) . 'Controller@';
-        Route::get('/', ['as' => $controllerName, 'uses' => $controller . 'index']);
-        Route::post('store', ['as' => $controllerName . '.store', 'uses' => $controller . 'store']);
+
+
+    Route::middleware(['auth', 'permission'])->group(function () {
+        /* ----------- Dashboard ----------- */
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        /* ----------- Roles ----------- */
+        Route::get('roles/permissions/{id}', [RoleController::class, 'permissions'])
+            ->where('id', '[0-9]+')->name('roles.permissions');
+        /* ----------- Layout  ----------- */
+        Route::prefix('layout')->name('layout.')->group(function () {
+            Route::get('/', [LayoutController::class, 'index'])->name('index');
+            Route::post('store', [LayoutController::class, 'store'])->name('store');
+        });
+        // Media & Resource
+        $resources = [
+            'media-position' => MediaPositionController::class,
+            'media-banner'   => MediaBannerController::class,
+            'languages'      => LanguageController::class,
+            'labels'         => LabelController::class,
+            'users'         => UserController::class,
+            'roles'         => RoleController::class,
+            'category'         => CategoryController::class,
+            'product'         => ProductController::class,
+        ];
+
+        foreach ($resources as $uri => $controller) {
+            Route::delete("$uri/destroy-many", [$controller, 'destroyMany'])->name("$uri.destroy-many");
+            Route::resource($uri, $controller);
+        }
     });
 });
-Route::get('lang/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'vi', 'ja'])) {
-        session()->put('locale', $locale);
-    }
-    return redirect()->back();
-})->name('lang.switch');
-// Route::get('login', [LoginController::class, 'create'])
-//     ->name('login')
-//     ->middleware('guest');
-
-// Route::post('login', [LoginController::class, 'store'])
-//     ->name('login.store')
-//     ->middleware('guest');
-
-// Route::delete('logout', [LoginController::class, 'destroy'])
-//     ->name('logout');
-
-// Dashboard
-
-// Route::get('/', [DashboardController::class, 'index'])
-//     ->name('dashboard')
-//     ->middleware('auth');
-
-// Users
-
-// Route::get('users', [UsersController::class, 'index'])
-//     ->name('users')
-//     ->middleware('auth');
-
-// Route::get('users/create', [UsersController::class, 'create'])
-//     ->name('users.create')
-//     ->middleware('auth');
-
-// Route::post('users', [UsersController::class, 'store'])
-//     ->name('users.store')
-//     ->middleware('auth');
-
-// Route::get('users/{user}/edit', [UsersController::class, 'edit'])
-//     ->name('users.edit')
-//     ->middleware('auth');
-
-// Route::put('users/{user}', [UsersController::class, 'update'])
-//     ->name('users.update')
-//     ->middleware('auth');
-
-// Route::delete('users/{user}', [UsersController::class, 'destroy'])
-//     ->name('users.destroy')
-//     ->middleware('auth');
-
-// Route::put('users/{user}/restore', [UsersController::class, 'restore'])
-//     ->name('users.restore')
-//     ->middleware('auth');
-
-// Organizations
-
-Route::get('organizations', [OrganizationsController::class, 'index'])
-    ->name('organizations')
-    ->middleware('auth');
-
-Route::get('organizations/create', [OrganizationsController::class, 'create'])
-    ->name('organizations.create')
-    ->middleware('auth');
-
-Route::post('organizations', [OrganizationsController::class, 'store'])
-    ->name('organizations.store')
-    ->middleware('auth');
-
-Route::get('organizations/{organization}/edit', [OrganizationsController::class, 'edit'])
-    ->name('organizations.edit')
-    ->middleware('auth');
-
-Route::put('organizations/{organization}', [OrganizationsController::class, 'update'])
-    ->name('organizations.update')
-    ->middleware('auth');
-
-Route::delete('organizations/{organization}', [OrganizationsController::class, 'destroy'])
-    ->name('organizations.destroy')
-    ->middleware('auth');
-
-Route::put('organizations/{organization}/restore', [OrganizationsController::class, 'restore'])
-    ->name('organizations.restore')
-    ->middleware('auth');
-
-// Contacts
-
-Route::get('contacts', [ContactsController::class, 'index'])
-    ->name('contacts')
-    ->middleware('auth');
-
-Route::get('contacts/create', [ContactsController::class, 'create'])
-    ->name('contacts.create')
-    ->middleware('auth');
-
-Route::post('contacts', [ContactsController::class, 'store'])
-    ->name('contacts.store')
-    ->middleware('auth');
-
-Route::get('contacts/{contact}/edit', [ContactsController::class, 'edit'])
-    ->name('contacts.edit')
-    ->middleware('auth');
-
-Route::put('contacts/{contact}', [ContactsController::class, 'update'])
-    ->name('contacts.update')
-    ->middleware('auth');
-
-Route::delete('contacts/{contact}', [ContactsController::class, 'destroy'])
-    ->name('contacts.destroy')
-    ->middleware('auth');
-
-Route::put('contacts/{contact}/restore', [ContactsController::class, 'restore'])
-    ->name('contacts.restore')
-    ->middleware('auth');
-
-// Reports
-
-Route::get('reports', [ReportsController::class, 'index'])
-    ->name('reports')
-    ->middleware('auth');
-
-// Images
-
-Route::get('/img/{path}', [ImagesController::class, 'show'])
-    ->where('path', '.*')
-    ->name('image');

@@ -18,7 +18,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Repositories\User\UserRepositoryInterface as RepositoryInterface;
 
-class UsersController extends MainController
+class UserController extends MainController
 {
     protected $controllerView = 'Admin/Users/';
     protected $controllerName = 'users';

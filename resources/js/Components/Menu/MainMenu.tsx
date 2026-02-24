@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Settings } from 'lucide-react';
+import { CircleGauge, Users, UserCog, Cog, Languages, FileText,  Library, LayoutTemplate, Image, LayoutDashboard, LayoutGrid, Store, FolderTree, Package } from 'lucide-react';
 import classNames from 'classnames';
 import MainMenuItem from '@/Components/Menu/MainMenuItem';
 import BsFace from '@/Components/Menu/Fade';
@@ -27,7 +27,9 @@ export default function MainMenu({ className }: MainMenuProps) {
   const routers: any = {
     'dashboard': ['dashboard'],
     'users': ['roles', 'users'],
-    'settings': ['languages', 'label','layout'],
+    'catalog': ['categories', 'product'],
+    'media': ['media-position', 'media-banner'],
+    'settings': ['languages', 'labels', 'layout'],
   }
   const { can } = usePermission();
 
@@ -65,8 +67,56 @@ export default function MainMenu({ className }: MainMenuProps) {
           </ul>
         </BsFace>
       }
-      {(can("languages.index") || can("label.index") || can("layout")) &&
-        <BsFace title={trans('hancms.settings.main')} id={'menu-1'} index={routers['settings'].indexOf(routeIndex)} icon={<Cog size={20} />}>
+       {(can("category.index") || can("product.index")) &&
+        <BsFace title={trans('hancms.catalog.name')} id={'menu-5'} icon={<Store size={20} />}>
+          <ul className='ps-3'>
+            {can("category.index") &&
+              <li>
+                <MainMenuItem
+                  text={trans('hancms.catalog.category.name')}
+                  link="category.index"
+                  icon={<FolderTree size={20} />}
+                />
+              </li>
+            }
+             {can("product.index") &&
+              <li>
+                <MainMenuItem
+                  text={trans('hancms.catalog.product.name')}
+                  link="product.index"
+                  icon={<Package size={20} />}
+                />
+              </li>
+            }
+          </ul>
+        </BsFace>
+      }
+      {(can("media-position.index") || can("media-banner.index")) &&
+        <BsFace title={trans('hancms.media.name')} id={'menu-2'} icon={<Library size={20} />}>
+          <ul className='ps-3'>
+            {can("media-position.index") &&
+              <li>
+                <MainMenuItem
+                  text={trans('hancms.media.position.name')}
+                  link="media-position.index"
+                  icon={<LayoutTemplate size={20} />}
+                />
+              </li>
+            }
+            {can("media-banner.index") &&
+              <li>
+                <MainMenuItem
+                  text={trans('hancms.media.banner.name')}
+                  link="media-banner.index"
+                  icon={<Image size={20} />}
+                />
+              </li>
+            }
+          </ul>
+        </BsFace>
+      }
+      {(can("languages.index") || can("labels.index") || can("layout,index")) &&
+        <BsFace title={trans('hancms.settings.main')} id={'menu-3'} index={routers['settings'].indexOf(routeIndex)} icon={<Cog size={20} />}>
           <ul className='ps-3'>
             {can("languages.index") &&
               <li>
@@ -77,28 +127,28 @@ export default function MainMenu({ className }: MainMenuProps) {
                 />
               </li>
             }
-            {can("label.index") &&
+            {can("labels.index") &&
               <li>
                 <MainMenuItem
                   text={trans('hancms.label.name')}
-                  link="label.index"
+                  link="labels.index"
                   icon={<FileText size={20} />}
                 />
               </li>
             }
-            {can("layout") &&
+            {can("layout.index") &&
               <li>
                 <MainMenuItem
                   text={trans('hancms.layout.admin.name')}
-                  link="layout"
-                  icon={<Settings size={20} />}
+                  link="layout.index"
+                  icon={<LayoutDashboard size={20} />}
                 />
               </li>
             }
           </ul>
         </BsFace>
       }
-      <BsFace title='Test' id={'menu-2'} icon={<CircleGauge size={20} />}>
+      <BsFace title='Test' id={'menu-4'} icon={<CircleGauge size={20} />}>
 
       </BsFace>
     </div>

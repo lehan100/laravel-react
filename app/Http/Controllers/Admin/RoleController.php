@@ -14,7 +14,7 @@ use App\Http\Resources\PermissionCollection;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class RolesController extends MainController
+class RoleController extends MainController
 {
     protected $controllerView = 'Admin/Roles/';
     protected $controllerName = 'roles';

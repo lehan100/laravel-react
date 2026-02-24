@@ -21,7 +21,7 @@ export default function LoginPage() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    post(route('auth/post-login'));
+    post(route('auth.post-login'));
   }
 
   return (

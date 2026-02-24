@@ -24,6 +24,24 @@ return [
         'manage' => 'Manage Users',
         'logout' => 'Logout'
     ],
+    'media' => [
+        'name' => 'Media',
+        'position' => [
+            'name' => 'Positions'
+        ],
+        'banner' => [
+            'name' => 'Banners'
+        ]
+    ],
+    'catalog' => [
+        'name' => 'Catalog',
+        'category' => [
+            'name' => 'Categories'
+        ],
+        'product' => [
+            'name' => 'Products'
+        ]
+    ],
     'languages' => [
         'admin.name' => 'Language List',
         'name' => 'Language',
@@ -42,8 +60,8 @@ return [
         'confirm_delete' => 'Are you sure you want to delete this label? This action will remove it across all languages and cannot be undone after saving.'
     ],
     'layout' => [
-        'admin.name' => 'ウェブサイト設定',
-        'name' => 'ウェブサイト',
+        'admin.name' => 'Layout',
+        'name' => 'Layout',
         'tabs' => [
             'home' => "Home",
             'general' => 'General'

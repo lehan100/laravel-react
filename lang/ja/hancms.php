@@ -24,6 +24,24 @@ return [
         'manage' => 'ユーザー管理',
         'logout' => 'ログアウト'
     ],
+    'media' => [
+        'name' => 'メディア',
+        'position' => [
+            'name' => '掲載位置'
+        ],
+        'banner' => [
+            'name' => 'バナー'
+        ]
+    ],
+    'catalog' => [
+        'name' => 'カタログ管理',
+        'category' => [
+            'name' => 'カテゴリー'
+        ],
+        'product' => [
+            'name' => '商品管理'
+        ]
+    ],
     'languages' => [
         'admin.name' => '言語一覧',
         'name' => '言語',
@@ -42,11 +60,11 @@ return [
         'confirm_delete' => 'このラベルを削除してもよろしいですか？この操作を行うとすべての言語のデータが削除され、保存後は元に戻すことはできません。'
     ],
     'layout' => [
-        'admin.name' => 'レイアウト設定',
+        'admin.name' => 'レイアウト管理',
         'name' => 'レイアウト',
         'tabs' => [
-            'home'    => 'ホーム',       // Hōmu
-            'general' => '全般設定',     // Zenpan Settei (Cấu hình tổng quát)
+            'home'    => 'ホーム',
+            'general' => '基本設定',
         ],
         'items' => [
             'logo' => 'システムロゴ',
@@ -57,8 +75,8 @@ return [
             'company'   => '会社名',
             'phone'     => '電話番号',
             'address'   => '住所',
-            'tax'       => '登録番号',
-            'copyright' => '著作権',
+            'tax'       => '登録番号 / 登録番号',
+            'copyright' => 'コピーライト / 著作権',
         ]
     ],
     'button' => [

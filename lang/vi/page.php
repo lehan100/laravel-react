@@ -4,7 +4,7 @@ return array (
   'meta_title' => '2222',
   'meta_keyword' => '',
   'meta_description' => '',
-  'company' => '',
+  'company' => 'Ukimua',
   'phone' => '',
   'address' => '',
   'tax' => '',
