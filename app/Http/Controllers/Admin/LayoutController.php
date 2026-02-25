@@ -46,45 +46,53 @@ class LayoutController extends MainController
             //code...
             $pages = $request->pages;
             foreach ($pages as $lang => $content) {
-                // 1. Xác định đường dẫn thư mục và file
                 $dir = lang_path($lang);
                 $filePath = "$dir/page.php";
-
-                // 2. Kiểm tra và tạo thư mục nếu chưa có (quyền 0755)
+                $oldContent = file_exists($filePath) ? include($filePath) : [];
                 if (!is_dir($dir)) {
                     mkdir($dir, 0755, true);
                 }
-                // 3. Chuẩn bị nội dung file PHP
                 $content = preg_replace('/^array\s*\(/', '[', $content);
                 $content = preg_replace('/\)$/', ']', $content);
+                //$fileContent = "<?php\n\nreturn " . var_export($content, true) . ";\n";
+                $this->uploadImage($content['logo'], $oldContent['logo'] ?? null);
+                $this->uploadImage($content['favicon'], $oldContent['favicon'] ?? null);
                 $fileContent = "<?php\n\nreturn " . var_export($content, true) . ";\n";
-                // 4. Upload hình vào media
-                self::uploadImage($content['logo']);
-                self::uploadImage($content['favicon']);
-                // 5. Ghi đè vào file label.php
-                File::put(lang_path("$lang/page.php"), $fileContent);
+                File::put($filePath, $fileContent);
+                if (function_exists('opcache_invalidate')) {
+                    opcache_invalidate($filePath, true);
+                }
             }
-            // return Redirect::to(route('label.index'))->with('success',  __('hancms.message.success.edit', ['name' => __('hancms.label.name')]));
+            return Redirect::back()->with('success', __('hancms.message.success.edit', ['name' => __('hancms.layout.name')]));
         } catch (\Throwable $th) {
             //throw $th;
-            return Redirect::to(route('layout'))->with('error',  __('hancms.message.error.edit', ['name' => __('hancms.layout.name')]));
+            return Redirect::to(route('layout'))->with('error', __('hancms.message.error.edit', ['name' => __('hancms.layout.name')]));
         }
     }
 
-    public function uploadImage($photo)
+    public function uploadImage($photo, $oldPhoto = null)
     {
         if ($photo != '') {
             $filePathTmp = public_path($this->configPath['temp']);
             $filePath = public_path($this->configPath['path']);
             $fileName = $photo;
+
             if (!file_exists($filePath)) {
                 mkdir($filePath, 0755, true);
             }
             if (file_exists($filePathTmp . '/' . $fileName)) {
+                if ($oldPhoto && $oldPhoto !== $photo) {
+                    $oldFilePath = $filePath . '/' . $oldPhoto;
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
                 Image::make($filePathTmp . '/' . $fileName)->save($filePath . '/' . $fileName);
+
             }
             if (file_exists($filePathTmp . '/' . $fileName) && file_exists($filePath . '/' . $fileName)) {
                 unlink($filePathTmp . '/' . $fileName);
+
             }
         }
     }

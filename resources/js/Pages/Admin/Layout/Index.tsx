@@ -1,54 +1,58 @@
 import CountryInput from "@/Components/Form/CountryInput";
 import { useTrans } from "@/Hooks/useTrans";
 import MainLayout from "@/Layouts/MainLayout";
-import { usePage, useForm } from "@inertiajs/react";
-import { Language } from '@/types';
+import { usePage, useForm, router } from "@inertiajs/react";
 import React, { useState, useMemo } from 'react';
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import SaveButton from '@/Components/Button/SaveButton';
 import { ImagePlus, Loader2, Save } from "lucide-react";
 import axios from "axios";
-const HomeTab = ({ langs, data, setData, trans, layout_items_home }: any) => {
-    const itemEntries = layout_items_home ? Object.entries(layout_items_home) : [];
+const HomeTab = ({ languages, formData, setFormData, translate, layoutItems }: any) => {
+    const itemEntries = layoutItems ? Object.entries(layoutItems) : [];
     const [previews, setPreviews] = useState<Record<string, string>>({});
     const [loadingField, setLoadingField] = useState<string | null>(null);
+
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, fieldKey: string) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const formData = new FormData();
-        formData.append('photo', file);
+        const uploadData = new FormData();
+        uploadData.append('photo', file);
 
-        setLoadingField(fieldKey); // Chỉ loading đúng ô đang upload
+        setLoadingField(fieldKey);
         try {
-            const response = await axios.post(route('photo.upload'), formData);
+            const response = await axios.post(route('photo.upload'), uploadData);
 
-            setPreviews(prev => ({ ...prev, [fieldKey]: response.data.url }));
+            setPreviews((prev: any) => ({ ...prev, [fieldKey]: response.data.url }));
 
             const newValue = response.data.file_name;
-            const updatedPages = langs.data.reduce((acc: any, row: any) => {
+            const updatedPages = languages.data.reduce((acc: any, row: any) => {
                 const code = row.code;
-                const oldLangData = data.pages?.[code] || {};
+                const oldLangData = formData.pages?.[code] || {};
                 acc[code] = {
                     ...(typeof oldLangData === 'object' ? oldLangData : {}),
                     [fieldKey]: newValue
                 };
                 return acc;
-            }, { ...data.pages });
+            }, { ...formData.pages });
 
-            setData('pages', updatedPages);
+            setFormData('pages', updatedPages);
         } catch (error) {
             console.error("Upload lỗi:", error);
         } finally {
             setLoadingField(null);
         }
     };
+
     const renderUploadField = (fieldKey: string) => {
-        const currentPreview = previews[fieldKey] || data.pages?.[langs.data[0]?.code]?.[fieldKey];
+        const currentPreview = previews?.[fieldKey] || formData.pages?.[languages.data[0]?.code]?.[fieldKey];
         const isLoading = loadingField === fieldKey;
-        const urlReview = currentPreview?.includes('/temp/') ? currentPreview : `/media/photo/${currentPreview}`;
+        const urlReview = currentPreview?.includes('/temp/')
+            ? currentPreview
+            : `/media/photo/${currentPreview}?v=${new Date().getTime()}`;
+
         return (
-            <InputGroup label={trans(`hancms.layout.items.${fieldKey}`)} align='center'>
+            <InputGroup label={translate(`hancms.layout.items.${fieldKey}`)} align='center'>
                 <div className="relative group">
                     <input
                         type="file"
@@ -60,12 +64,12 @@ const HomeTab = ({ langs, data, setData, trans, layout_items_home }: any) => {
                     <label
                         htmlFor={`file-${fieldKey}`}
                         className={`flex flex-col items-center justify-center w-20 h-20 p-1 border-2 border-dashed rounded-lg cursor-pointer transition-all overflow-hidden
-                        ${currentPreview ? 'border-indigo-400' : 'border-gray-300 hover:border-indigo-500 bg-gray-50'}`}
+                        ${currentPreview ? 'bg-gray-100' : 'border-gray-300 hover:border-indigo-500 bg-gray-50'}`}
                     >
                         {isLoading ? (
                             <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
                         ) : currentPreview ? (
-                            <img src={urlReview} alt="Preview" className="w-full h-full object-cover" />
+                            <img src={urlReview} alt="Preview" className="w-full object-cover" />
                         ) : (
                             <div className="flex flex-col items-center text-gray-400 group-hover:text-indigo-500">
                                 <ImagePlus size={32} />
@@ -77,18 +81,18 @@ const HomeTab = ({ langs, data, setData, trans, layout_items_home }: any) => {
             </InputGroup>
         );
     };
+
     return (
         <div className="space-y-4">
             {renderUploadField('logo')}
             {renderUploadField('favicon')}
             {itemEntries.map(([fieldKey, fieldConfig]: [string, any]) => {
-
                 return (
-                    <InputGroup key={fieldKey} label={trans(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
-                        {langs.data.map((row: any) => {
+                    <InputGroup key={fieldKey} label={translate(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
+                        {languages.data.map((row: any) => {
                             const langCode = row.code;
                             const langName = row.name;
-                            const langData = data.pages?.[langCode];
+                            const langData = formData.pages?.[langCode];
 
                             const cellValue = (typeof langData === 'object' && langData !== null)
                                 ? (langData[fieldKey] || '')
@@ -99,11 +103,11 @@ const HomeTab = ({ langs, data, setData, trans, layout_items_home }: any) => {
                                     photo={row.photo}
                                     value={cellValue}
                                     isTextArea={fieldConfig.is_textarea}
-                                    placeholder={`${trans(`hancms.layout.items.${fieldKey}`)} (${langName})`}
+                                    placeholder={`${translate(`hancms.layout.items.${fieldKey}`)} (${langName})`}
                                     onChange={(e: any) => {
                                         const newValue = e.target.value;
-                                        setData('pages', {
-                                            ...data.pages,
+                                        setFormData('pages', {
+                                            ...formData.pages,
                                             [langCode]: {
                                                 ...(typeof langData === 'object' ? langData : {}),
                                                 [fieldKey]: newValue
@@ -116,21 +120,21 @@ const HomeTab = ({ langs, data, setData, trans, layout_items_home }: any) => {
                     </InputGroup>
                 )
             })}
-
         </div>
-    )
+    );
 };
-const GeneralTab = ({ langs, data, setData, trans, layout_items_general }: any) => {
-    const itemEntries = layout_items_general ? Object.entries(layout_items_general) : [];
+
+const GeneralTab = ({ languages, formData, setFormData, translate, layoutItems }: any) => {
+    const itemEntries = layoutItems ? Object.entries(layoutItems) : [];
     return (
         <div className="space-y-4">
             {itemEntries.map(([fieldKey, fieldConfig]: [string, any]) => {
                 return (
-                    <InputGroup key={fieldKey} label={trans(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
-                        {langs.data.map((row: any) => {
+                    <InputGroup key={fieldKey} label={translate(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
+                        {languages.data.map((row: any) => {
                             const langCode = row.code;
                             const langName = row.name;
-                            const langData = data.pages?.[langCode];
+                            const langData = formData.pages?.[langCode];
 
                             const cellValue = (typeof langData === 'object' && langData !== null)
                                 ? (langData[fieldKey] || '')
@@ -141,11 +145,11 @@ const GeneralTab = ({ langs, data, setData, trans, layout_items_general }: any) 
                                     photo={row.photo}
                                     value={cellValue}
                                     isTextArea={fieldConfig.is_textarea}
-                                    placeholder={`${trans(`hancms.layout.items.${fieldKey}`)} (${langName})`}
+                                    placeholder={`${translate(`hancms.layout.items.${fieldKey}`)} (${langName})`}
                                     onChange={(e: any) => {
                                         const newValue = e.target.value;
-                                        setData('pages', {
-                                            ...data.pages,
+                                        setFormData('pages', {
+                                            ...formData.pages,
                                             [langCode]: {
                                                 ...(typeof langData === 'object' ? langData : {}),
                                                 [fieldKey]: newValue
@@ -167,10 +171,9 @@ function IndexPage() {
     const { langs, pages, layout_items_home, layout_items_general }: any = usePage().props;
     const initialPages = useMemo(() => {
         const basePages = (pages && typeof pages === 'object' && !Array.isArray(pages)) ? pages : {};
-        //const itemKeys = layout_items_home ? Object.keys(layout_items_home) : [];
         const itemKeys = [
             ...Object.keys(layout_items_home || {}),
-            ...Object.keys(layout_items_general || {}), // Nếu có thêm tab khác
+            ...Object.keys(layout_items_general || {}),
             'logo',
             'favicon'
         ];
@@ -202,12 +205,10 @@ function IndexPage() {
         return initialized;
     }, [pages, langs, layout_items_home, layout_items_general]);
 
-    // 2. Truyền initialPages vào useForm
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, post, processing, reset } = useForm({
         pages: initialPages,
         undo: 0,
     });
-    console.log(data.pages);
 
     const [activeTab, setActiveTab] = useState('home');
     const [undo, setUndo] = useState(0);
@@ -218,9 +219,9 @@ function IndexPage() {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'home':
-                return <HomeTab langs={langs} data={data} layout_items_home={layout_items_home} setData={setData} trans={trans} />
+                return <HomeTab languages={langs} formData={data} layoutItems={layout_items_home} setFormData={setData} translate={trans} />
             case 'general':
-                return <GeneralTab langs={langs} data={data} layout_items_general={layout_items_general} setData={setData} trans={trans} />
+                return <GeneralTab languages={langs} formData={data} layoutItems={layout_items_general} setFormData={setData} translate={trans} />
             default:
                 return null;
         }
@@ -231,7 +232,7 @@ function IndexPage() {
         post(route('layout.store'), {
             onSuccess: () => {
                 alert(trans('hancms.message.success.edit', { name: trans('hancms.layout.name') }));
-            }
+            },
         });
     }
     return (
@@ -256,7 +257,7 @@ function IndexPage() {
             </div>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
-                    {/* Tab List (Giữ nguyên phần UI) */}
+                    {/* Tab List */}
                     <div className="flex flex-row md:flex-col w-full md:w-56 overflow-x-auto border-r border-gray-200" role="tablist">
                         {['home', 'general'].map((id) => (
                             <button

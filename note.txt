@@ -13,4 +13,49 @@ php artisan permission:create-permission-routes
 ------
 git add .
 git commit -m "Xây dụng sơ đồ database cho Media Banner"
-git push origin main 
+git push origin main
+------
+Setup domain + https
+1. Download mkcert-v1.4.4-windows-amd64.exe
+- https://github.com/filosottile/mkcert/releases
+- PowerShell: cd C:\Users\Admin\Downloads
+- PowerShell: .\mkcert-v1.4.4-windows-amd64.exe -install
+- PowerShell: .\mkcert-v1.4.4-windows-amd64.exe domain.com
+2. update hosts
+- C:\Windows\System32\drivers\etc\hosts
+- Add: 127.0.0.1 domain.com
+3. update compose.yaml
+  ports:
+     - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+   nginx-proxy:
+        image: 'jc21/nginx-proxy-manager:latest'
+        restart: unless-stopped
+        ports:
+            - '80:80'  
+            - '81:81'  
+            - '443:443' # HTTPS
+        volumes:
+            - './docker/nginx/data:/data'
+            - './docker/nginx/letsencrypt:/etc/letsencrypt'
+            - './certs:/etc/nginx/certs' 
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+4. .env
+ - APP_URL=https://domain.com
+5. goto url http://localhost:81/
+    5.1. Add mkcert certificate to Nginx Proxy Manager:
+        - Go to SSL Certificates -> Add SSL Certificate -> Custom.
+        - Name it domain-ssl.
+        - Certificate Key: Select the domain.com-key.pem file.
+        - Certificate: Select the domain.com.pem file.
+        - Click Save.
+5.2. Point the domain domain.com to Laravel:
+    - Go to Hosts -> Proxy Hosts -> Add Proxy Host.
+    - Domain Names: Enter domain.com.
+    - Scheme: Select http.
+    - Forward Hostname / IP: Enter laravel.test.
+    - Forward Port: Enter 80.
+    - Go to the SSL tab: Select the domain-ssl certificate you just created and check Force SSL.
+    - Click Save.

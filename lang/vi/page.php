@@ -9,6 +9,6 @@ return array (
   'address' => '',
   'tax' => '',
   'copyright' => '',
-  'logo' => 'logo-slt-vina-1770781199.webp',
-  'favicon' => 'logo-slt-vina-1770781215.webp',
+  'logo' => 'logo-1772011885.webp',
+  'favicon' => 'favicon-1772011933.webp',
 );

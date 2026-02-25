@@ -222,7 +222,7 @@ function IndexPage() {
                                     </td>
 
                                     {/* Các cột ngôn ngữ để trống hoặc hiển thị nút bấm */}
-                                    <td colSpan={langs.data.length} className="px-4 py-3">
+                                    <td colSpan={langs.data.length + 1} className="px-4 py-3">
                                         {isAdding ? (
                                             <div className="flex gap-2">
                                                 <button

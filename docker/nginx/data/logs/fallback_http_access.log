@@ -1,0 +1,5 @@
+[25/Feb/2026:08:02:18 +0000] 404 - GET http ukimua.com "/admin123/" [Client 172.18.0.1] [Length 183] [Gzip 3.21] "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" "-"
+[25/Feb/2026:08:02:19 +0000] 400 - GET http ukimua.com "/favicon.ico" [Client 127.0.0.1] [Length 230] [Gzip -] "-" "-"
+[25/Feb/2026:08:02:41 +0000] 200 - GET http localhost "/" [Client 172.18.0.1] [Length 568] [Gzip 1.86] "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" "-"
+[25/Feb/2026:08:02:48 +0000] 400 - GET http ukimua.com "/admin/logo.png" [Client 127.0.0.1] [Length 230] [Gzip -] "-" "-"
+[25/Feb/2026:08:02:49 +0000] 404 - GET http ukimua.com "/admin123/auth/login" [Client 172.18.0.1] [Length 183] [Gzip 3.21] "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" "-"
