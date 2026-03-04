@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class LanguageCollection extends ResourceCollection
+class MediaPositionCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -19,7 +19,6 @@ class LanguageCollection extends ResourceCollection
                 'id',
                 'name',
                 'code',
-                'photo',
                 'status',
             ])->all();
     }

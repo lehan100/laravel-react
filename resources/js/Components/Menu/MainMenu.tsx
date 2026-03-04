@@ -12,7 +12,6 @@ interface MainMenuProps {
 }
 function getRoute() {
   const path = window.location.pathname;
-  // Regex này bỏ qua dấu / đầu tiên, bỏ qua phần refix admin123, và lấy cụm chữ tiếp theo
   const regex = /(?<=^\/[^/]+\/)([^/]+)/;
   const match = path.match(regex);
   return match ? match[0] : null;;
@@ -68,7 +67,7 @@ export default function MainMenu({ className }: MainMenuProps) {
         </BsFace>
       }
        {(can("category.index") || can("product.index")) &&
-        <BsFace title={trans('hancms.catalog.name')} id={'menu-5'} icon={<Store size={20} />}>
+        <BsFace title={trans('hancms.catalog.name')} id={'menu-5'} index={routers['catalog'].indexOf(routeIndex)} icon={<Store size={20} />}>
           <ul className='ps-3'>
             {can("category.index") &&
               <li>
@@ -92,7 +91,7 @@ export default function MainMenu({ className }: MainMenuProps) {
         </BsFace>
       }
       {(can("media-position.index") || can("media-banner.index")) &&
-        <BsFace title={trans('hancms.media.name')} id={'menu-2'} icon={<Library size={20} />}>
+        <BsFace title={trans('hancms.media.name')} id={'menu-2'} index={routers['media'].indexOf(routeIndex)} icon={<Library size={20} />}>
           <ul className='ps-3'>
             {can("media-position.index") &&
               <li>

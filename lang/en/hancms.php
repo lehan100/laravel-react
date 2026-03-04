@@ -27,7 +27,9 @@ return [
     'media' => [
         'name' => 'Media',
         'position' => [
-            'name' => 'Positions'
+            'name' => 'Positions',
+            'created' => 'Create position',
+            'edit' => 'Edit position',
         ],
         'banner' => [
             'name' => 'Banners'
@@ -99,12 +101,13 @@ return [
         'first_name' => 'First Name',
         'last_name' => 'Last Name',
         'status' => 'Status',
-        'password' => 'Password', // Sửa lỗi Passwword
+        'password' => 'Password',
         'password_confirm' => 'Confirm Password',
         'account_name' => 'Account Name',
         'assign_group' => 'Assign Group',
         'group' => 'User Group',
         'image' => 'Photo',
+        'image_edit' => 'Update',
         'email' => 'Email',
         'code' => 'Code',
         'key' => 'Key'

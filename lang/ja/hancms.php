@@ -27,7 +27,9 @@ return [
     'media' => [
         'name' => 'メディア',
         'position' => [
-            'name' => '掲載位置'
+            'name' => '掲載位置',
+            'created' => '役職作成',
+            'edit' => '役職編集',
         ],
         'banner' => [
             'name' => 'バナー'
@@ -63,7 +65,7 @@ return [
         'admin.name' => 'レイアウト管理',
         'name' => 'レイアウト',
         'tabs' => [
-            'home'    => 'ホーム',
+            'home' => 'ホーム',
             'general' => '基本設定',
         ],
         'items' => [
@@ -72,10 +74,10 @@ return [
             'meta_title' => 'メタタイトル',
             'meta_keyword' => 'メタキーワード',
             'meta_description' => 'メタディスクリプション',
-            'company'   => '会社名',
-            'phone'     => '電話番号',
-            'address'   => '住所',
-            'tax'       => '登録番号 / 登録番号',
+            'company' => '会社名',
+            'phone' => '電話番号',
+            'address' => '住所',
+            'tax' => '登録番号 / 登録番号',
             'copyright' => 'コピーライト / 著作権',
         ]
     ],
@@ -105,6 +107,7 @@ return [
         'assign_group' => 'グループ割り当て',
         'group' => 'ユーザーグループ',
         'image' => '画像',
+        'image_edit' => '変更',
         'email' => 'メールアドレス',
         'code' => 'コード',
         'key' => 'キー'

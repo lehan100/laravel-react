@@ -7,14 +7,16 @@ import { PlusCircle, Save } from "lucide-react";
 import { Fragment, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { AlertTriangle, X } from "lucide-react";
+import HeaderToolbar from "@/Components/Main/HeaderToolbar";
+import Card from "@/Components/Main/Card";
 function IndexPage() {
 
     const { trans } = useTrans();
-    const { langs, labels, config_path}: any = usePage<{
+    const { langs, labels, config_path }: any = usePage<{
         lang: Language;
 
     }>().props;
-    
+
     const { data, setData, errors, post, processing } = useForm({
         labels: labels || null,
         undo: 0,
@@ -29,7 +31,7 @@ function IndexPage() {
     function handleSubmit(e: any) {
         e.preventDefault();
         e.stopPropagation();
-        post(route('label.store'), {
+        post(route('labels.store'), {
             onSuccess: () => {
                 alert(trans('hancms.message.success.edit', { name: trans('hancms.label.name') }));
             }
@@ -123,140 +125,118 @@ function IndexPage() {
     // };
     return (
         <div>
-            {/* Header Section */}
-            <div className="flex flex-wrap justify-between items-center mb-6">
-                <div className="w-full md:flex-1 mb-3 md:mb-0">
-                    <h1 className="text-xl font-bold text-gray-800">{trans('hancms.label.name')}</h1>
-                </div>
-                <div className="w-full md:w-auto">
-                    <div className="flex gap-2">
-                        <SaveButton
-                            loading={processing}
-                            undo={0}
-                            icon={<Save size={18} />}
-                            sendDataStatusUndo={handleUndo}
-                            form='my-form'
-                        >
-                            {trans('hancms.button.save')}
-                        </SaveButton>
-                    </div>
-                </div>
-            </div>
-
+            <HeaderToolbar title={trans('hancms.label.name')}>
+                <SaveButton
+                    loading={processing}
+                    undo={0}
+                    icon={<Save size={18} />}
+                    sendDataStatusUndo={handleUndo}
+                    form='my-form'
+                >
+                    {trans('hancms.button.save')}
+                </SaveButton>
+            </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                    {/* Card Header phong cách Tailwind */}
-                    <div className="px-4 py-3 bg-indigo-800 text-white font-bold uppercase tracking-wider">
-                        {trans('hancms.label.admin.name')}
-                    </div>
-
-                    {/* Bảng dịch thuật */}
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 text-left">
-                            <thead className="bg-gray-50">
-                                <tr className="font-bold text-gray-700">
-                                    <th className="px-4 py-3 whitespace-nowrap">{trans('hancms.column.key')}</th>
-                                    {langs.data.map((row: any) => (
-                                        <th key={row.id} className="px-4 py-3">
-                                            <div className="flex items-center gap-2 whitespace-nowrap">
-                                                {row.photo && (
-                                                    <img
-                                                        src={'/' + config_path.path + "/" + row.photo}
-                                                        className="w-5 h-4 object-contain shadow-sm rounded-sm"
-                                                        alt={row.name}
-                                                    />
-                                                )}
-                                                <span className="font-medium text-[13px]">{row.name}</span>
-                                            </div>
-                                        </th>
-                                    ))}
-                                    <th className="px-4 py-3 text-center">{trans('hancms.column.action')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 bg-white">
-                                {data.labels.en && Object.entries(data.labels.en).map(([key, value]) => (
-                                    <tr key={key} className="hover:bg-blue-50/50 transition-colors odd:bg-white even:bg-gray-50/30">
-                                        {/* Cột Key: Dùng text-xs để trông kỹ thuật hơn */}
-                                        <td className="px-4 py-2 align-middle text-gray-500 font-mono text-xs italic">
-                                            label.{key}
-                                        </td>
-                                        {langs.data.map((row: any) => {
-                                            const cellValue = data.labels[row.code] ? data.labels[row.code][key] : '';
-                                            return (
-                                                <td key={row.id} className="px-4 py-2 align-middle min-w-[200px]">
-                                                    {/* Truyền row.code (ngôn ngữ) và key (tên nhãn) */}
-                                                    {renderInput(row.code, key, cellValue)}
-                                                </td>
-                                            )
-                                        })}
-                                        <td className="px-4 py-2 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() => openDeleteModal(key)}
-                                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                                                title="Xóa dòng này"
-                                            >
-                                                <svg xmlns="http://www.w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                            <tfoot>
-                                <tr className="bg-gray-100">
-                                    <td className="px-4 py-3">
-                                        {isAdding ? (
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    placeholder={trans('hancms.label.msg_placeholder')}
-                                                    className="border border-indigo-500 rounded px-2 py-1 text-xs w-full focus:ring-1 focus:ring-indigo-500 outline-none"
-                                                    value={newKey}
-                                                    onChange={(e) => setNewKey(e.target.value)}
-                                                    autoFocus
+                <Card title={trans('hancms.label.admin.name')}>
+                    <table className="min-w-full divide-y divide-gray-200 text-left">
+                        <thead className="bg-gray-50">
+                            <tr className="font-bold text-gray-700">
+                                <th className="px-4 py-3 whitespace-nowrap">{trans('hancms.column.key')}</th>
+                                {langs.data.map((row: any) => (
+                                    <th key={row.id} className="px-4 py-3">
+                                        <div className="flex items-center gap-2 whitespace-nowrap">
+                                            {row.photo && (
+                                                <img
+                                                    src={'/' + config_path.path + "/" + row.photo}
+                                                    className="w-5 h-4 object-contain shadow-sm rounded-sm"
+                                                    alt={row.name}
                                                 />
-                                            </div>
-                                        ) : (
-                                            <span className="text-gray-400 italic">{trans('hancms.label.msg_newline')}</span>
-                                        )}
+                                            )}
+                                            <span className="font-medium text-[13px]">{row.name}</span>
+                                        </div>
+                                    </th>
+                                ))}
+                                <th className="px-4 py-3 text-center">{trans('hancms.column.action')}</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 bg-white">
+                            {data.labels.en && Object.entries(data.labels.en).map(([key, value]) => (
+                                <tr key={key} className="hover:bg-blue-50/50 transition-colors odd:bg-white even:bg-gray-50/30">
+                                    <td className="px-4 py-2 align-middle text-gray-500 font-mono text-xs italic">
+                                        label.{key}
                                     </td>
-
-                                    {/* Các cột ngôn ngữ để trống hoặc hiển thị nút bấm */}
-                                    <td colSpan={langs.data.length + 1} className="px-4 py-3">
-                                        {isAdding ? (
-                                            <div className="flex gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={addNewRow}
-                                                    className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
-                                                >
-                                                    {trans('hancms.button.confirm')}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { setIsAdding(false); setNewKey(""); }}
-                                                    className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-400"
-                                                >
-                                                    {trans('hancms.button.cancel')}
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsAdding(true)}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-all shadow-sm active:scale-95"
-                                            >
-                                                <PlusCircle size={18} />
-                                                <span>{trans('hancms.button.new_line')}</span>
-                                            </button>
-                                        )}
+                                    {langs.data.map((row: any) => {
+                                        const cellValue = data.labels[row.code] ? data.labels[row.code][key] : '';
+                                        return (
+                                            <td key={row.id} className="px-4 py-2 align-middle min-w-[200px]">
+                                                {renderInput(row.code, key, cellValue)}
+                                            </td>
+                                        )
+                                    })}
+                                    <td className="px-4 py-2 text-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => openDeleteModal(key)}
+                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                            title="Xóa dòng này"
+                                        >
+                                            <svg xmlns="http://www.w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
+                                        </button>
                                     </td>
                                 </tr>
-                            </tfoot>
-
-                        </table>
-                    </div>
-                </div>
+                            ))}
+                        </tbody>
+                        <tfoot>
+                            <tr className="bg-gray-100">
+                                <td className="px-4 py-3">
+                                    {isAdding ? (
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder={trans('hancms.label.msg_placeholder')}
+                                                className="border border-indigo-500 rounded px-2 py-1 text-xs w-full focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                value={newKey}
+                                                onChange={(e) => setNewKey(e.target.value)}
+                                                autoFocus
+                                            />
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-400 italic">{trans('hancms.label.msg_newline')}</span>
+                                    )}
+                                </td>
+                                <td colSpan={langs.data.length + 1} className="px-4 py-3">
+                                    {isAdding ? (
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={addNewRow}
+                                                className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
+                                            >
+                                                {trans('hancms.button.confirm')}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setIsAdding(false); setNewKey(""); }}
+                                                className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-400"
+                                            >
+                                                {trans('hancms.button.cancel')}
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAdding(true)}
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-all shadow-sm active:scale-95"
+                                        >
+                                            <PlusCircle size={18} />
+                                            <span>{trans('hancms.button.new_line')}</span>
+                                        </button>
+                                    )}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </Card>
             </form>
             {/* 1. Modal Xác Nhận Xóa */}
             <Transition show={isOpen} as={Fragment}>

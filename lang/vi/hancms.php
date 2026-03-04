@@ -27,19 +27,21 @@ return [
     'media' => [
         'name' => 'Đa phương tiện',
         'position' => [
-            'name' => 'Vị trí hiển thị'
+            'name' => 'Vị trí hiển thị',
+            'created' => 'Thêm vị trí hiển thị',
+            'edit' => 'Chỉnh vị trí hiển thị',
         ],
         'banner' => [
             'name' => 'Hình ảnh'
         ]
     ],
-    'catalog'=>[
-        'name'=>'Bán hàng',
-        'category'=>[
-            'name'=>'Danh mục'
+    'catalog' => [
+        'name' => 'Bán hàng',
+        'category' => [
+            'name' => 'Danh mục'
         ],
-        'product'=>[
-            'name'=>'Sản phẩm'
+        'product' => [
+            'name' => 'Sản phẩm'
         ]
     ],
     'languages' => [
@@ -63,7 +65,7 @@ return [
         'admin.name' => 'Cấu hình',
         'name' => 'Giao diện',
         'tabs' => [
-            'home'    => 'Trang chủ',
+            'home' => 'Trang chủ',
             'general' => 'Cài đặt chung',
         ],
         'items' => [
@@ -72,10 +74,10 @@ return [
             'meta_title' => 'Tiêu đề trang (Meta Title)',
             'meta_keyword' => 'Từ khóa SEO (Meta Keyword)',
             'meta_description' => 'Mô tả trang (Meta Description)',
-            'company'   => 'Tên công ty',
-            'phone'     => 'Số điện thoại',
-            'address'   => 'Địa chỉ',
-            'tax'       => 'Mã số thuế',
+            'company' => 'Tên công ty',
+            'phone' => 'Số điện thoại',
+            'address' => 'Địa chỉ',
+            'tax' => 'Mã số thuế',
             'copyright' => 'Bản quyền',
         ]
     ],
@@ -94,7 +96,7 @@ return [
     ],
     'column' => [
         'name' => 'Tên',
-        'guard' => 'Cổng bảo vệ', // Hoặc giữ nguyên 'Guard' nếu dùng Spatie
+        'guard' => 'Cổng bảo vệ',
         'action' => 'Hành động',
         'first_name' => 'Tên',
         'last_name' => 'Họ',
@@ -105,6 +107,7 @@ return [
         'assign_group' => 'Gán nhóm',
         'group' => 'Nhóm người dùng',
         'image' => 'Hình ảnh',
+        'image_edit' => 'Thay đổi',
         'email' => 'Email',
         'code' => 'Mã',
         'key' => 'Khóa (Key)'

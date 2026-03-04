@@ -6,6 +6,8 @@ import { useTrans } from '@/Hooks/useTrans';
 import MainLayout from '@/Layouts/MainLayout';
 import { InputGroup } from '@/Components/Form/HancmsInput';
 import { Checkbox } from '@/Components/Form/HancmsCheckbox';
+import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import Card from '@/Components/Main/Card';
 function CreatedPage() {
   const { trans } = useTrans();
   const { data, setData, errors, post, processing } = useForm({
@@ -64,44 +66,34 @@ function CreatedPage() {
 
   return (
     <div className='content'>
-      {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h1 className="text-3xl font-bold text-gray-800">
-          {trans('hancms.users.created')}:
-          <span className='text-cyan-600 ml-2'>{data.first_name} {data.last_name}</span>
-        </h1>
+      <HeaderToolbar
+        title={
+          <>
+            {trans('hancms.users.created')}
+            {(data.first_name || data.last_name) && <span className='text-cyan-600 ml-2'>: {data.first_name} {data.last_name}</span>}
+          </>
+        }>
+        <SaveButton
+          loading={processing}
+          undo={0}
+          icon={<Save size={20} />}
+          sendDataStatusUndo={handleUndo}
+          form='my-form'
+        >
+          {trans('hancms.button.save')}
+        </SaveButton>
 
-        <div className="flex gap-2">
-          <SaveButton
-            loading={processing}
-            undo={0}
-            icon={<Save size={20} />}
-            sendDataStatusUndo={handleUndo}
-            form='my-form'
-          >
-            {trans('hancms.button.save')}
-          </SaveButton>
-
-          <Link
-            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors shadow-sm"
-            href={route('users.index')}
-          >
-            <Undo size={20} />
-            <span>{trans('hancms.button.back')}</span>
-          </Link>
-        </div>
-      </div>
-
+        <Link
+          className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors shadow-sm"
+          href={route('users.index')}
+        >
+          <Undo size={20} />
+          <span>{trans('hancms.button.back')}</span>
+        </Link>
+      </HeaderToolbar>
       <form id='my-form' noValidate onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* CỘT TRÁI: THÔNG TIN CÁ NHÂN */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div className='py-3 px-4 bg-indigo-800 text-white font-semibold text-lg'>
-            {trans('hancms.title.infomation')}
-          </div>
+        <Card title={trans('hancms.title.infomation')}>
           <div className="p-6 space-y-6">
-
-            {/* Status Switch */}
             <Checkbox>
               <input
                 type="checkbox"
@@ -141,15 +133,9 @@ function CreatedPage() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* CỘT PHẢI: CÀI ĐẶT TÀI KHOẢN */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div className='py-3 px-4 bg-indigo-800 text-white font-semibold text-lg'>
-            {trans('hancms.title.setting')}
-          </div>
+        </Card>
+        <Card title={trans('hancms.title.setting')}>
           <div className="p-6 space-y-6">
-
             {/* Email Row */}
             <InputGroup label={trans('hancms.column.email')}>
               <input
@@ -195,7 +181,7 @@ function CreatedPage() {
               </select>
             </InputGroup>
           </div>
-        </div>
+        </Card>
       </form>
     </div>
   );

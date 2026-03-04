@@ -1,41 +1,23 @@
-import { Link, usePage, useForm, router } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
-import { PlusCircle } from 'lucide-react';
-import { User, PaginatedData } from '@/types';
+import { useTrans } from '@/Hooks/useTrans';
+import { MediaPosition, PaginatedData } from '@/types';
+import { useMemo } from 'react';
 import Pagination from '@/Components/Pagination/Pagination';
 import TableView from '@/Components/Table/TableViewAll';
 import DeleteButton from '@/Components/Button/DeleteButton';
 import DeleteButtonView from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
 import CreatedButton from '@/Components/Button/CreatedButton';
-import { useEffect, useMemo, useState } from "react";
-import FilterBar from '@/Components/FilterBar/FilterBar';
-import { useTrans } from '@/Hooks/useTrans';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import Card from '@/Components/Main/Card';
-function UsersPage() {
+function IndexPage() {
   const { trans } = useTrans();
   const { data, setData, errors, post, processing } = useForm({
-    name: '',
-    user_ids: ''
+    data_ids: ''
   });
-  const { items } = usePage<{ items: PaginatedData<User>; }>().props;
-
+  const { items, config_path }: any = usePage<{ items: PaginatedData<MediaPosition>; }>().props;
   const { meta: { links } }: any = items;
-  const groupClass: any = {
-    '0': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
-      'text': 'Not Access'
-    },
-    '1': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
-      'text': 'Administrators'
-    },
-    '2': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-amber-500 text-white',
-      'text': 'Admin'
-    }
-  };
   const statusClass: any = {
     '0': {
       'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
@@ -53,17 +35,13 @@ function UsersPage() {
         name: 'id'
       },
       {
-        label: trans('hancms.column.first_name'),
-        name: 'first_name',
+        label: trans('hancms.column.name'),
+        name: 'name',
       },
 
       {
-        label: trans('hancms.column.last_name'),
-        name: 'last_name'
-      },
-      {
-        label: trans('hancms.column.email'),
-        name: 'email'
+        label: trans('hancms.column.code'),
+        name: 'code'
       },
       {
         label: trans('hancms.column.status'),
@@ -73,19 +51,12 @@ function UsersPage() {
         )
       },
       {
-        label: trans('hancms.column.group'),
-        name: 'group',
-        renderCell: (row: any) => (
-          <span className={groupClass[row.group]['bg']}>{groupClass[row.group]['text']}</span >
-        )
-      },
-      {
         label: trans('hancms.column.action'),
         name: 'action',
         renderCell: (row: any) => (
           <>
             <div className="flex gap-2">
-              <EditButton href={route('users.edit', row.id)}>
+              <EditButton href={route('languages.edit', row.id)}>
                 {trans('hancms.button.edit')}
               </EditButton>
               <DeleteButtonView size_icon={14} onDelete={() => destroy(row.id)}>
@@ -100,8 +71,8 @@ function UsersPage() {
     []
   );
   function destroy(id: any) {
-    if (confirm(trans('hancms.message.destroy', { name: trans('hancms.users.name').toLowerCase() }))) {
-      router.delete(route('users.destroy', id), {
+    if (confirm(trans('hancms.message.destroy', { name: trans('hancms.media.position.name').toLowerCase() }))) {
+      router.delete(route('media-position.destroy', id), {
 
         onSuccess: () => {
 
@@ -111,26 +82,25 @@ function UsersPage() {
   }
   function destroys() {
     if (confirm(trans('hancms.message.destroys'))) {
-      let ids = data.user_ids.split(",");
+      let ids = data.data_ids;
       if (ids.length > 0) {
-        router.delete(route('users.destroyMany', { 'ids': data.user_ids }));
+        router.delete(route('media-position.destroyMany', { 'ids': data.data_ids }));
       }
 
     }
   }
   // Callback function to receive data
   const handleChildData = (data: any) => {
-    setData('user_ids', data);
+    setData('data_ids', data);
   };
   return (
     <div>
-      <HeaderToolbar title={trans('hancms.users.admin.name')}>
+      <HeaderToolbar title={trans('hancms.media.position.name')}>
         <CreatedButton
-          href={route("users.create")}
+          href={route("media-position.create")}
         >
           {trans('hancms.button.created')}
         </CreatedButton>
-
         <DeleteButton
           onDelete={() => destroys()}
           size={18}
@@ -138,14 +108,13 @@ function UsersPage() {
           {trans('hancms.button.delete.selected')}
         </DeleteButton>
       </HeaderToolbar>
-      <FilterBar />
       <Card>
         <div className="overflow-x-auto">
           <TableView
             columns={columns}
             rows={items.data}
             sendDataSelectItems={handleChildData}
-            getRowDetailsUrl={row => route('users.edit', row.id)}
+            getRowDetailsUrl={row => route('media-position.edit', row.id)}
           />
         </div>
         <Pagination links={links} />
@@ -153,8 +122,9 @@ function UsersPage() {
     </div>
   );
 }
-UsersPage.layout = (page: React.ReactNode) => (
-  <MainLayout title="hancms.users.name" children={page} />
+
+IndexPage.layout = (page: React.ReactNode) => (
+  <MainLayout title="hancms.media.position.name" children={page} />
 );
 
-export default UsersPage;
+export default IndexPage;

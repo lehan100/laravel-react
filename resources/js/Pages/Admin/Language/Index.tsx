@@ -9,7 +9,8 @@ import DeleteButton from '@/Components/Button/DeleteButton';
 import DeleteButtonView from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
 import CreatedButton from '@/Components/Button/CreatedButton';
-import { PlusCircle } from 'lucide-react';
+import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import Card from '@/Components/Main/Card';
 function IndexPage() {
     const { trans } = useTrans();
     const { data, setData, errors, post, processing } = useForm({
@@ -105,38 +106,20 @@ function IndexPage() {
     };
     return (
         <div>
-            <div className="flex flex-wrap justify-between items-center mb-6">
-                {/* Tiêu đề trang: text-xl thay vì 3xl để tinh tế hơn */}
-                <div className="w-full md:flex-1 mb-3 md:mb-0 text-left">
-                    <h1 className="text-xl font-bold text-gray-800 tracking-tight">
-                        {trans('hancms.languages.admin.name')}
-                    </h1>
-                </div>
-
-                {/* Nhóm nút bấm: text-sm và font-medium */}
-                <div className="w-full md:w-auto">
-                    <div className="flex items-center gap-2">
-                        {/* Nút Created: Thêm padding và font-size nhỏ */}
-                        <CreatedButton
-                            href={route("languages.create")}
-                            className="px-3 py-1.5 text-sm font-medium transition-all active:scale-95 shadow-sm"
-                        >
-                            {trans('hancms.button.created')}
-                        </CreatedButton>
-
-                        {/* Nút Delete: Bỏ class 'btn btn-danger' của Bootstrap */}
-                        <DeleteButton
-                            onDelete={() => destroys()}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
-                            size={18} // Giảm size icon xuống 18 cho cân đối với text-sm
-                        >
-                            {trans('hancms.button.delete.selected')}
-                        </DeleteButton>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                {/* Phần TableView bên trong nên dùng text-sm để đồng bộ */}
+            <HeaderToolbar title={trans('hancms.languages.admin.name')}>
+                <CreatedButton
+                    href={route("languages.create")}
+                >
+                    {trans('hancms.button.created')}
+                </CreatedButton>
+                <DeleteButton
+                    onDelete={() => destroys()}
+                    size={18}
+                >
+                    {trans('hancms.button.delete.selected')}
+                </DeleteButton>
+            </HeaderToolbar>
+            <Card>
                 <div className="overflow-x-auto">
                     <TableView
                         columns={columns}
@@ -145,10 +128,8 @@ function IndexPage() {
                         getRowDetailsUrl={row => route('languages.edit', row.id)}
                     />
                 </div>
-
-                {/* Phân trang: Ngăn cách bằng đường kẻ mảnh */}
                 <Pagination links={links} />
-            </div>
+            </Card>
         </div>
     );
 }

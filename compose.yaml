@@ -1,11 +1,12 @@
 services:
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.5'
+            context: ./vendor/laravel/sail/runtimes/8.5
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.5/app'
+                MYSQL_CLIENT: mariadb-client
+        image: sail-8.5/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -21,28 +22,49 @@ services:
         networks:
             - sail
         depends_on:
-            - mysql
-
-    # 2. Nginx Proxy Manager
+            # - mysql
+            - mariadb
     nginx-proxy:
         image: 'jc21/nginx-proxy-manager:latest'
         restart: unless-stopped
         ports:
-            - '80:80'  
-            - '81:81'  
-            - '443:443' # HTTPS
+            - '80:80'
+            - '81:81'
+            - '443:443'
         volumes:
             - './docker/nginx/data:/data'
             - './docker/nginx/letsencrypt:/etc/letsencrypt'
-            - './certs:/etc/nginx/certs' 
+            - './certs:/etc/nginx/certs'
         networks:
             - sail
         depends_on:
             - laravel.test
-
-    # 3. Database MySQL
-    mysql:
-        image: 'mysql:8.4'
+    # mysql:
+    #     image: 'mysql:8.4'
+    #     ports:
+    #         - '${FORWARD_DB_PORT:-3306}:3306'
+    #     environment:
+    #         MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+    #         MYSQL_ROOT_HOST: '%'
+    #         MYSQL_DATABASE: '${DB_DATABASE}'
+    #         MYSQL_USER: '${DB_USERNAME}'
+    #         MYSQL_PASSWORD: '${DB_PASSWORD}'
+    #         MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    #     volumes:
+    #         - 'sail-mysql:/var/lib/mysql'
+    #         - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+    #     networks:
+    #         - sail
+    #     healthcheck:
+    #         test:
+    #             - CMD
+    #             - mysqladmin
+    #             - ping
+    #             - '-p${DB_PASSWORD}'
+    #         retries: 3
+    #         timeout: 5s
+    mariadb:
+        image: 'mariadb:11'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
@@ -51,21 +73,37 @@ services:
             MYSQL_DATABASE: '${DB_DATABASE}'
             MYSQL_USER: '${DB_USERNAME}'
             MYSQL_PASSWORD: '${DB_PASSWORD}'
-            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         volumes:
-            - 'sail-mysql:/var/lib/mysql'
-            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+            - 'sail-mariadb:/var/lib/mysql'
+            - './vendor/laravel/sail/database/mariadb/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
             - sail
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
+            test:
+                - CMD
+                - healthcheck.sh
+                - '--connect'
+                - '--innodb_initialized'
             retries: 3
             timeout: 5s
-
+    phpmyadmin:
+        image: 'phpmyadmin:latest'
+        ports:
+            - '8080:80'
+        environment:
+            PMA_HOST: mariadb 
+            PMA_PORT: 3306
+            UPLOAD_LIMIT: 128M
+        networks:
+            - sail
+        depends_on:
+            - mariadb
 networks:
     sail:
         driver: bridge
-
 volumes:
-    sail-mysql:
+    # sail-mysql:
+    #     driver: local
+    sail-mariadb:
         driver: local

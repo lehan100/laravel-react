@@ -13,6 +13,8 @@ import LoadingSpiner from '@/Components/Loading/LoadingSpinner';
 import { useEffect, useMemo, useState } from "react";
 import axios from 'axios';
 import { useTrans } from '@/Hooks/useTrans';
+import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import Card from '@/Components/Main/Card';
 
 function RolesPage() {
   const { data, setData, errors, post, processing } = useForm({
@@ -112,38 +114,22 @@ function RolesPage() {
   });
   return (
     <div>
-      <div className="flex flex-wrap justify-between items-center mb-6">
-        {/* Tiêu đề trang: text-xl thay vì 3xl để tinh tế hơn */}
-        <div className="w-full md:flex-1 mb-3 md:mb-0 text-left">
-          <h1 className="text-xl font-bold text-gray-800 tracking-tight">
-            {trans('hancms.roles.name')}
-          </h1>
-        </div>
-
-        {/* Nhóm nút bấm: text-sm và font-medium */}
-        <div className="w-full md:w-auto">
-          <div className="flex items-center gap-2">
-            {/* Nút Created: Thêm padding và font-size nhỏ */}
-            <CreatedButton
-              href={route("roles.create")}
-              className="px-3 py-1.5 text-sm font-medium transition-all active:scale-95 shadow-sm"
-            >
-              {trans('hancms.button.created')}
-            </CreatedButton>
-
-            {/* Nút Delete: Bỏ class 'btn btn-danger' của Bootstrap */}
-            <DeleteButton
-              onDelete={() => destroys()}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
-              size={18} // Giảm size icon xuống 18 cho cân đối với text-sm
-            >
-              {trans('hancms.button.delete.selected')}
-            </DeleteButton>
-          </div>
-        </div>
-      </div>
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        {/* Phần TableView bên trong nên dùng text-sm để đồng bộ */}
+      <HeaderToolbar title={trans('hancms.roles.name')}>
+        <CreatedButton
+          href={route("roles.create")}
+          className="px-3 py-1.5 text-sm font-medium transition-all active:scale-95 shadow-sm"
+        >
+          {trans('hancms.button.created')}
+        </CreatedButton>
+        <DeleteButton
+          onDelete={() => destroys()}
+          className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
+          size={18}
+        >
+          {trans('hancms.button.delete.selected')}
+        </DeleteButton>
+      </HeaderToolbar>
+      <Card>
         <div className="overflow-x-auto">
           <TableView
             columns={columns}
@@ -152,10 +138,8 @@ function RolesPage() {
             getRowDetailsUrl={row => route('roles.edit', row.id)}
           />
         </div>
-
-        {/* Phân trang: Ngăn cách bằng đường kẻ mảnh */}
         <Pagination links={links} />
-      </div>
+      </Card>
       <ModalTable show={modalShow} onHide={() => setModalShow(false)} title={modalTitle}>
         <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200 text-sm text-left">

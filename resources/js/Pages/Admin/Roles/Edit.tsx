@@ -9,6 +9,8 @@ import Pagination from '@/Components/Pagination/Pagination';
 import { useMemo } from "react";
 import { useTrans } from '@/Hooks/useTrans';
 import BackButton from '@/Components/Button/BackButton';
+import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import Card from '@/Components/Main/Card';
 function CreateRolesPage() {
     const { permissions, role, rolePermissions } = usePage<{
         permissions: PaginatedData<Permissions>;
@@ -74,32 +76,21 @@ function CreateRolesPage() {
         data.undo = undo;
     }, [data, undo]);
     return (
-        <div className='content p-4 text-sm'> {/* Font-size nhỏ cho toàn bộ trang */}
-            {/* Header Section */}
-            <div className="flex flex-wrap justify-between items-center mb-6">
-                <div className="w-full md:flex-1 mb-3 md:mb-0">
-                    <h1 className="text-xl font-bold text-gray-800">
-                        {trans('hancms.roles.name')} / <span className='text-blue-600'>{data.name}</span>
-                    </h1>
-                </div>
-                <div className="w-full md:w-auto">
-                    <div className="flex gap-2">
-                        <SaveButton
-                            loading={processing}
-                            undo={0}
-                            icon={<Save size={18} />}
-                            sendDataStatusUndo={handleUndo}
-                            form='my-form'
-                        >
-                            {trans('hancms.button.save')}
-                        </SaveButton>
-                        <BackButton href={route('roles.index')}>
-                            {trans('hancms.button.back')}
-                        </BackButton>
-                    </div>
-                </div>
-            </div>
-
+        <div className='content p-4 text-sm'>
+            <HeaderToolbar title={<>{trans('hancms.roles.name')} / <span className='text-blue-600'>{data.name}</span></>}>
+                <SaveButton
+                    loading={processing}
+                    undo={0}
+                    icon={<Save size={18} />}
+                    sendDataStatusUndo={handleUndo}
+                    form='my-form'
+                >
+                    {trans('hancms.button.save')}
+                </SaveButton>
+                <BackButton href={route('roles.index')}>
+                    {trans('hancms.button.back')}
+                </BackButton>
+            </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate>
                 {/* Info Box (Thay cho alert-info) */}
                 <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -141,12 +132,7 @@ function CreateRolesPage() {
                         <p className="text-xs mt-1">{trans('hancms.assign_permissions.error.message')}</p>
                     </div>
                 )}
-
-                {/* Card Table - Chuyển hoàn toàn sang Tailwind */}
-                <div className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
-                    <div className="px-4 py-3 bg-indigo-800 text-white text-sm font-bold uppercase">
-                        {trans('hancms.assign_permissions.name')}
-                    </div>
+                <Card title={trans('hancms.assign_permissions.name')}>
                     <div className="p-4">
                         <TableView
                             columns={columns}
@@ -156,7 +142,7 @@ function CreateRolesPage() {
                         />
                         <Pagination links={links} />
                     </div>
-                </div>
+                </Card>
             </form>
         </div>
     );

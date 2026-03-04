@@ -1,2 +1,3 @@
 2026/02/25 08:02:18 [error] 202#202: *3 "/var/www/html/admin123/index.html" is not found (2: No such file or directory), client: 172.18.0.1, server: localhost-nginx-proxy-manager, request: "GET /admin123/ HTTP/1.1", host: "ukimua.com"
 2026/02/25 08:02:49 [error] 202#202: *3 open() "/var/www/html/admin123/auth/login" failed (2: No such file or directory), client: 172.18.0.1, server: localhost-nginx-proxy-manager, request: "GET /admin123/auth/login HTTP/1.1", host: "ukimua.com"
+2026/02/27 16:07:05 [error] 194#194: *6 "/var/www/html/phpmyadmin5.2.3/index.html" is not found (2: No such file or directory), client: 172.18.0.1, server: localhost-nginx-proxy-manager, request: "GET /phpmyadmin5.2.3/ HTTP/1.1", host: "localhost"

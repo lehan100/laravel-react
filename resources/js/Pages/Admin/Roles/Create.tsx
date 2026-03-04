@@ -9,6 +9,8 @@ import Pagination from '@/Components/Pagination/Pagination';
 import { useMemo } from "react";
 import { useTrans } from '@/Hooks/useTrans';
 import BackButton from '@/Components/Button/BackButton';
+import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import Card from '@/Components/Main/Card';
 function CreatedPage() {
     const { data, setData, post, errors, processing } = useForm({
         name: '',
@@ -75,29 +77,20 @@ function CreatedPage() {
     }, [data, undo]);
     return (
         <div className='content p-4'>
-            {/* Header Section */}
-            <div className="flex flex-wrap justify-between items-center mb-6">
-                <div className="w-full md:flex-1 mb-3 md:mb-0">
-                    <h1 className="text-xl font-bold text-gray-800">{trans('hancms.roles.created')}</h1>
-                </div>
-                <div className="w-full md:w-auto">
-                    <div className="flex gap-2">
-                        <SaveButton
-                            loading={processing}
-                            undo={0}
-                            icon={<Save size={18} />}
-                            sendDataStatusUndo={handleUndo}
-                            form='my-form'
-                        >
-                            {trans('hancms.button.save')}
-                        </SaveButton>
-                        <BackButton href={route('roles.index')} className="text-sm px-3 py-1.5">
-                            {trans('hancms.button.back')}
-                        </BackButton>
-                    </div>
-                </div>
-            </div>
-
+            <HeaderToolbar title={trans('hancms.roles.created')}>
+                <SaveButton
+                    loading={processing}
+                    undo={0}
+                    icon={<Save size={18} />}
+                    sendDataStatusUndo={handleUndo}
+                    form='my-form'
+                >
+                    {trans('hancms.button.save')}
+                </SaveButton>
+                <BackButton href={route('roles.index')} className="text-sm px-3 py-1.5">
+                    {trans('hancms.button.back')}
+                </BackButton>
+            </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate>
                 <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -123,19 +116,14 @@ function CreatedPage() {
                     </div>
                     <input type="hidden" value={undo} onChange={e => setData('undo', undo)} />
                 </div>
-
                 {permissions_alert && (
                     <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-md">
                         <h4 className="text-sm font-bold mb-2">{trans('hancms.assign_permissions.error')}</h4>
                         <p className="text-xs">{trans('hancms.assign_permissions.error.message')}</p>
                     </div>
                 )}
-
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                    <div className="px-4 py-3 bg-indigo-900 text-white text-sm font-bold uppercase tracking-wider">
-                        {trans('hancms.assign_permissions.name')}
-                    </div>
-                    <div className="p-0">
+                <Card title={trans('hancms.assign_permissions.name')}>
+                    <div className="p-4">
                         <TableView
                             columns={columns}
                             rows={permissions.data}
@@ -144,7 +132,7 @@ function CreatedPage() {
                         />
                         <Pagination links={links} />
                     </div>
-                </div>
+                </Card>
             </form>
         </div>
     );

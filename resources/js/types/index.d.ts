@@ -32,6 +32,12 @@ export interface Language {
   photo: string;
   status: string;
 }
+export interface MediaPosition {
+  id: number;
+  name: string;
+  code: string;
+  status: string;
+}
 export interface Account {
   id: number;
   name: string;

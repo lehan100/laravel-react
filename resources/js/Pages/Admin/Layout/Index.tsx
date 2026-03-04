@@ -7,6 +7,7 @@ import { InputGroup } from "@/Components/Form/HancmsInput";
 import SaveButton from '@/Components/Button/SaveButton';
 import { ImagePlus, Loader2, Save } from "lucide-react";
 import axios from "axios";
+import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 const HomeTab = ({ languages, formData, setFormData, translate, layoutItems }: any) => {
     const itemEntries = layoutItems ? Object.entries(layoutItems) : [];
     const [previews, setPreviews] = useState<Record<string, string>>({});
@@ -53,7 +54,7 @@ const HomeTab = ({ languages, formData, setFormData, translate, layoutItems }: a
 
         return (
             <InputGroup label={translate(`hancms.layout.items.${fieldKey}`)} align='center'>
-                <div className="relative group">
+                <div className="relative group inline-block">
                     <input
                         type="file"
                         id={`file-${fieldKey}`}
@@ -77,6 +78,11 @@ const HomeTab = ({ languages, formData, setFormData, translate, layoutItems }: a
                             </div>
                         )}
                     </label>
+                    {urlReview && !isLoading && (
+                        <div className="absolute top-0 left-0 w-20 h-20 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg pointer-events-none">
+                            <span className="text-white text-[10px] font-medium">{translate("hancms.column.image_edit")}</span>
+                        </div>
+                    )}
                 </div>
             </InputGroup>
         );
@@ -237,24 +243,17 @@ function IndexPage() {
     }
     return (
         <div>
-            <div className="flex flex-wrap justify-between items-center mb-6">
-                <div className="w-full md:flex-1 mb-3 md:mb-0">
-                    <h1 className="text-xl font-bold text-gray-800">{trans('hancms.layout.admin.name')}</h1>
-                </div>
-                <div className="w-full md:w-auto">
-                    <div className="flex gap-2">
-                        <SaveButton
-                            loading={processing}
-                            undo={0}
-                            icon={<Save size={18} />}
-                            sendDataStatusUndo={handleUndo}
-                            form='my-form'
-                        >
-                            {trans('hancms.button.save')}
-                        </SaveButton>
-                    </div>
-                </div>
-            </div>
+            <HeaderToolbar title={trans('hancms.layout.admin.name')}>
+                <SaveButton
+                    loading={processing}
+                    undo={0}
+                    icon={<Save size={18} />}
+                    sendDataStatusUndo={handleUndo}
+                    form='my-form'
+                >
+                    {trans('hancms.button.save')}
+                </SaveButton>
+            </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
                     {/* Tab List */}

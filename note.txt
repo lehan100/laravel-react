@@ -7,6 +7,7 @@ php artisan migrate:rollback --step=1
 
 ------
 php artisan make:controller Admin\LabelController --resource 
+php artisan make:model modelName
 ------
 php artisan db:seed --class=DatabaseSeeder
 php artisan permission:create-permission-routes
@@ -14,6 +15,16 @@ php artisan permission:create-permission-routes
 git add .
 git commit -m "Xây dụng sơ đồ database cho Media Banner"
 git push origin main
+------
+Thay đổi ./vendor/bin/sail -> sail
+echo "alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'" >> ~/.bashrc
+alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+
+sail up -d
+sail composer run dev
+------
+docker-compose restart
+docker system prune -a // Clear temp
 ------
 Setup domain + https
 1. Download mkcert-v1.4.4-windows-amd64.exe

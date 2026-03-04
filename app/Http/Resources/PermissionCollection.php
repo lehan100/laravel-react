@@ -14,8 +14,8 @@ class PermissionCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->collection->map->only(
+        return $this->collection->map->only([
             'id', 'name', 'guard_name', 'created_at', 'updated_at'
-        );
+        ])->all();
     }
 }
