@@ -12,9 +12,25 @@ php artisan make:model modelName
 php artisan db:seed --class=DatabaseSeeder
 php artisan permission:create-permission-routes
 ------
-git add .
-git commit -m "Xây dụng sơ đồ database cho Media Banner"
-git push origin main
+git status: Kiểm tra trạng thái hiện tại (file nào đã sửa, file nào đã đưa vào staging).
+git add <file> hoặc git add .: Đưa các thay đổi vào vùng chờ (staging area).
+git commit -m "message": Lưu lại ảnh chụp (snapshot) của các thay đổi vào kho lưu trữ cục bộ.
+git push origin <branch>: Đẩy các commit từ máy cá nhân lên server (GitHub, GitLab...).
+git pull: Cập nhật mã nguồn mới nhất từ server về máy và tự động merge.
+------
+git branch: Liệt kê tất cả các nhánh hiện có.
+git checkout -b <tên-nhánh>: Tạo một nhánh mới và chuyển sang nhánh đó ngay lập tức.
+git switch <tên-nhánh>: Chuyển đổi giữa các nhánh một cách an toàn.
+git merge <tên-nhánh>: Gộp các thay đổi từ nhánh khác vào nhánh hiện tại. 
+------
+feat: Thêm một tính năng mới cho người dùng.
+fix: Sửa một lỗi (bug).
+docs: Thay đổi về tài liệu (như file README).
+style: Thay đổi về định dạng code (khoảng trắng, dấu phẩy...) mà không làm thay đổi logic code.
+refactor: Tái cấu trúc mã nguồn (không sửa lỗi cũng không thêm tính năng).
+perf: Cải thiện hiệu suất.
+test: Thêm hoặc sửa các bài kiểm tra (unit tests).
+chore: Các thay đổi nhỏ nhặt về quá trình build hoặc công cụ hỗ trợ (như cập nhật thư viện).
 ------
 Thay đổi ./vendor/bin/sail -> sail
 echo "alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'" >> ~/.bashrc
