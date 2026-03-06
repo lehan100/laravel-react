@@ -1,5 +1,5 @@
 import { useTrans } from "@/Hooks/useTrans";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import { Save, Undo } from "lucide-react";
 import { useEffect, useState } from "react";
 import SaveButton from '@/Components/Button/SaveButton';
@@ -8,13 +8,18 @@ import { Checkbox } from "@/Components/Form/HancmsCheckbox";
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import Card from "@/Components/Main/Card";
-
-function CreatePage() {
+import { MediaPosition } from "@/types";
+function UpdatePage() {
     const { trans } = useTrans();
-    const { data, setData, errors, post, processing } = useForm({
-        name: '',
-        code: '',
-        status: 0,
+    const { item, config_path }: any = usePage<{
+        item: MediaPosition;
+
+    }>().props;
+    const { data, setData, errors, put, processing } = useForm({
+        id: item.id || null,
+        name: item.name || '',
+        code: item.code || '',
+        status: item.status || 0,
         undo: 0,
     });
 
@@ -27,7 +32,7 @@ function CreatePage() {
     }, [undo, active]);
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        post(route('media-position.store'));
+        put(route('media-position.update', item.id));
     }
     const inputClass = (fieldName: string) => `
         w-full border rounded-md p-2 text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500
@@ -81,6 +86,7 @@ function CreatePage() {
                                 type='text' required
                                 className={inputClass('name')}
                                 onChange={e => setData('name', e.target.value)}
+                                defaultValue={item.name}
                             />
                             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </InputGroup>
@@ -90,6 +96,7 @@ function CreatePage() {
                                 type='text' required
                                 className={inputClass('code')}
                                 onChange={e => setData('code', e.target.value)}
+                                defaultValue={item.code}
                             />
                             {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
                         </InputGroup>
@@ -99,7 +106,7 @@ function CreatePage() {
         </div>
     )
 }
-CreatePage.layout = (page: React.ReactNode) => (
+UpdatePage.layout = (page: React.ReactNode) => (
     <MainLayout title="hancms.media.position.name" children={page} />
 );
-export default CreatePage;
+export default UpdatePage;

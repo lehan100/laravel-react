@@ -95,7 +95,7 @@ function IndexPage() {
         if (confirm(trans('hancms.message.destroys'))) {
             let ids = data.data_ids;
             if (ids.length > 0) {
-                router.delete(route('languages.destroyMany', { 'ids': data.data_ids }));
+                router.delete(route('languages.destroy-many', { 'ids': data.data_ids }));
             }
 
         }

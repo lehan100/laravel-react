@@ -113,7 +113,7 @@ function UsersPage() {
     if (confirm(trans('hancms.message.destroys'))) {
       let ids = data.user_ids.split(",");
       if (ids.length > 0) {
-        router.delete(route('users.destroyMany', { 'ids': data.user_ids }));
+        router.delete(route('users.destroy-many', { 'ids': data.user_ids }));
       }
 
     }

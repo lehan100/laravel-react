@@ -56,7 +56,7 @@ function IndexPage() {
         renderCell: (row: any) => (
           <>
             <div className="flex gap-2">
-              <EditButton href={route('languages.edit', row.id)}>
+              <EditButton href={route('media-position.edit', row.id)}>
                 {trans('hancms.button.edit')}
               </EditButton>
               <DeleteButtonView size_icon={14} onDelete={() => destroy(row.id)}>
@@ -84,7 +84,7 @@ function IndexPage() {
     if (confirm(trans('hancms.message.destroys'))) {
       let ids = data.data_ids;
       if (ids.length > 0) {
-        router.delete(route('media-position.destroyMany', { 'ids': data.data_ids }));
+        router.delete(route('media-position.destroy-many', { 'ids': data.data_ids }));
       }
 
     }

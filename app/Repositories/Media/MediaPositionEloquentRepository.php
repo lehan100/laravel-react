@@ -89,12 +89,6 @@ class MediaPositionEloquentRepository extends EloquentRepository implements Medi
         if ($options['task'] == 'delete-item') {
             $item = $this->_model->find($params['id']);
             if (!$item) return false;
-
-            if (isset($item->picture) && !empty($item->picture)) {
-                $filePath = public_path($this->configPath . '/' . $item->picture);
-                if (File::exists($filePath)) File::delete($filePath);
-            }
-
             return $item->delete();
         }
         if ($options['task'] == 'delete-items') {
