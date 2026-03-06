@@ -26,7 +26,6 @@ function EditPage() {
         status: item.status || 0,
         undo: 0,
     });
-    console.log(data);
 
     const [validated, setValidated] = useState(false);
     const [active, setActive]: any = useState(data.status);

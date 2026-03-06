@@ -98,7 +98,7 @@ function RolesPage() {
     if (confirm(trans('hancms.message.destroys'))) {
       let ids = data.role_ids.split(",");
       if (ids.length > 0) {
-        router.delete(route('roles.destroyMany', { 'ids': data.role_ids }));
+        router.delete(route('roles.destroy-many', { 'ids': data.role_ids }));
       }
 
     }
