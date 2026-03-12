@@ -56,18 +56,18 @@ class MediaBannerController extends MainController
      */
     public function store(MediaBannerRequest $request)
     {
-        //
-        //  try {
+
+        try {
             $params = $request->all();
             $banner = $this->mainModel->save($params, ['task' => 'add-item']);
             if ($params['undo'] == 1) {
                 return Redirect::to(route($this->routeName . 'index'))->with('success', __('hancms.message.success.created', ['name' => __('hancms.media.banner.name')]));
             }
             return Redirect::route($this->routeName . 'edit', $banner->id)->with('success', __('hancms.message.success.created', ['name' => __('hancms.media.banner.name')]));
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        //     return Redirect::back()->with('error',  __('hancms.message.error.created', ['name' => __('hancms.media.banner.name')]));
-        // }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Redirect::back()->with('error',  __('hancms.message.error.created', ['name' => __('hancms.media.banner.name')]));
+        }
     }
 
     /**
