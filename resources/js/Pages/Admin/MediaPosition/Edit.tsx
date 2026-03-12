@@ -9,6 +9,7 @@ import { InputGroup } from "@/Components/Form/HancmsInput";
 import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import Card from "@/Components/Main/Card";
 import { MediaPosition } from "@/types";
+import MessageError from "@/Components/Form/MessageError";
 function UpdatePage() {
     const { trans } = useTrans();
     const { item, config_path }: any = usePage<{
@@ -88,7 +89,7 @@ function UpdatePage() {
                                 onChange={e => setData('name', e.target.value)}
                                 defaultValue={item.name}
                             />
-                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                            {errors.name && <MessageError>{errors.name}</MessageError>}
                         </InputGroup>
                         {/* Code Input */}
                         <InputGroup label={trans('hancms.column.code')}>
@@ -98,7 +99,7 @@ function UpdatePage() {
                                 onChange={e => setData('code', e.target.value)}
                                 defaultValue={item.code}
                             />
-                            {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
+                            {errors.code && <MessageError>{errors.code}</MessageError>}
                         </InputGroup>
                     </div>
                 </Card>

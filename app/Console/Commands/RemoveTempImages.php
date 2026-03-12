@@ -47,7 +47,7 @@ class RemoveTempImages extends Command
 
             $lastModified = Carbon::createFromTimestamp($file->getMTime());
 
-            if ($lastModified->diffInHours(now()) >= 24) {
+            if ($lastModified->diffInHours(now()) >= 1) {
                 File::delete($file->getPathname());
                 $count++;
             }

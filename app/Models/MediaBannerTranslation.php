@@ -16,9 +16,12 @@ class MediaBannerTranslation extends Model
 
 
     protected $fillable = [
-        'locale',
-        'name',
-        'description',
-        'content',
+        'media_banner_id', 
+        'locale',          
+        'name', 
+        'photo', 
+        'alias_link', 
+        'description', 
+        'content'
     ];
 }

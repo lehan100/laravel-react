@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class MediaPositionController extends MainController
 {
     protected $controllerView = 'Admin/MediaPosition/';
-    protected $controllerName = 'label';
     protected $routeName = 'media-position.';
     protected $mainModel;
     /**

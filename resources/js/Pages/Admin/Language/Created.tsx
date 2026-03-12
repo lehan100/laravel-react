@@ -10,6 +10,7 @@ import { InputGroup } from "@/Components/Form/HancmsInput";
 import SingleUpload from "@/Components/ImageUpload/SingleUpload";
 import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import Card from "@/Components/Main/Card";
+import MessageError from "@/Components/Form/MessageError";
 function CreatedPage() {
     const { trans } = useTrans();
     const { data, setData, errors, post, processing } = useForm({
@@ -111,7 +112,7 @@ function CreatedPage() {
                                 className={inputClass('name')}
                                 onChange={e => setData('name', e.target.value)}
                             />
-                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                            {errors.name && <MessageError>{errors.name}</MessageError>}
                         </InputGroup>
                         {/* Code Input */}
                         <InputGroup label={trans('hancms.column.code')}>
@@ -120,7 +121,7 @@ function CreatedPage() {
                                 className={inputClass('code')}
                                 onChange={e => setData('code', e.target.value)}
                             />
-                            {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
+                            {errors.code && <MessageError>{errors.code}</MessageError>}
                         </InputGroup>
 
                         {/* Image Upload Box */}

@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\LayoutController;
 use App\Http\Controllers\Admin\MediaPositionController;
 use App\Http\Controllers\Admin\MediaBannerController;
 use App\Http\Controllers\Admin\ProductController;
-
+use App\Http\Controllers\Admin\TinyMCEController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -50,6 +50,12 @@ Route::prefix($prefixAdmin)->group(function () {
 
 
     Route::middleware(['auth', 'permission'])->group(function () {
+        Route::post('upload-tinymce', [TinyMCEController::class, 'uploadTinyMCE'])->name('media.upload.tinymce'); 
+        Route::get('media-get-images', [TinyMCEController::class, 'getImages'])->name('media.get.images');
+        Route::post('media-create-folder', [TinyMCEController::class, 'createFolder'])->name('media.create.folder');
+        Route::post('media-move-file', [TinyMCEController::class, 'moveFile'])->name('media.move.file');
+         Route::post('media-rename', [TinyMCEController::class, 'rename'])->name('media.rename');
+         Route::post('media-delete', [TinyMCEController::class, 'delete'])->name('media.delete');
         /* ----------- Dashboard ----------- */
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         /* ----------- Roles ----------- */

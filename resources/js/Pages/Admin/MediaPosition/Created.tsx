@@ -8,6 +8,7 @@ import { Checkbox } from "@/Components/Form/HancmsCheckbox";
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import Card from "@/Components/Main/Card";
+import MessageError from "@/Components/Form/MessageError";
 
 function CreatePage() {
     const { trans } = useTrans();
@@ -82,7 +83,7 @@ function CreatePage() {
                                 className={inputClass('name')}
                                 onChange={e => setData('name', e.target.value)}
                             />
-                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                            {errors.name && <MessageError>{errors.name}</MessageError>}
                         </InputGroup>
                         {/* Code Input */}
                         <InputGroup label={trans('hancms.column.code')}>
@@ -91,7 +92,7 @@ function CreatePage() {
                                 className={inputClass('code')}
                                 onChange={e => setData('code', e.target.value)}
                             />
-                            {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
+                            {errors.code && <MessageError>{errors.code}</MessageError>}
                         </InputGroup>
                     </div>
                 </Card>

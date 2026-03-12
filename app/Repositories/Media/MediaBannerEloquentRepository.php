@@ -28,7 +28,7 @@ class MediaBannerEloquentRepository extends EloquentRepository implements MediaB
 
     public function lists($params = null, $options = null)
     {
-        $query = $this->_model->with('translations')->select($this->FIELDSELECT);
+        $query = $this->_model->with(['translations', 'positions'])->select($this->FIELDSELECT);
 
         if ($options['task'] == "admin-list-items") {
             return $query->orderBy('id', 'desc')
@@ -68,29 +68,34 @@ class MediaBannerEloquentRepository extends EloquentRepository implements MediaB
             $locales = collect($languages)->map(function ($lang) {
                 return is_object($lang) ? $lang->code : $lang['code'];
             })->toArray();
-
             config(['translatable.locales' => $locales]);
             $item = ($options['task'] == 'add-item') ? new $this->_model : $this->_model->find($params['id']);
 
             if (!$item) return false;
 
-            $item->alias_link = $params['alias_link'] ?? '';
-            $item->status     = $params['status'] ?? 0;
-            $item->order      = $params['order'] ?? 0;
-            if ($languages) {
-                foreach ($languages as $lang) {
-                    $locale = is_object($lang) ? $lang->code : $lang['code'];
-
-                    if (isset($params[$locale])) {
-                        foreach ($item->translatedAttributes as $attr) {
-                            $item->translateOrNew($locale)->$attr = $params[$locale][$attr] ?? null;
+            $item->status = $params['status'] ?? 0;
+            $item->order  = $params['order'] ?? 0;
+            $translationsData = $params['translations'] ?? [];
+            foreach ($locales as $locale) {
+                if (isset($translationsData[$locale])) {
+                    $data = $translationsData[$locale];
+                    $translation = $item->translateOrNew($locale);
+                    foreach ($item->translatedAttributes as $attr) {
+                        if ($attr !== 'photo') {
+                            $translation->$attr = $data[$attr] ?? null;
                         }
                     }
-                }
-            }
 
-            if (!empty($params['photo'])) {
-                $item->photo = $this->uploadImage($params['photo']);
+                    if (!empty($data['photo'])) {
+                        if ($data['photo'] !== $translation->photo) {
+                            if ($translation->photo) {
+                                $this->removeImage($translation->photo);
+                            }
+                            $translation->photo = $this->uploadImage($data['photo']);
+                        }
+                    }
+                    $translation->locale = $locale;
+                }
             }
 
             $item->save();

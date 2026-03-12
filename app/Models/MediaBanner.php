@@ -16,15 +16,16 @@ class MediaBanner extends Model implements TranslatableContract
     protected $table = 'media_banners';
 
     protected $fillable = [
-        'alias_link',
-        'photo',
         'status',
         'order',
     ];
     public $translatedAttributes = [
         'name',
+        'photo',
+        'alias_link',
         'description',
-        'content'
+        'content',
+        'locale'
     ];
     public function positions(): BelongsToMany
     {

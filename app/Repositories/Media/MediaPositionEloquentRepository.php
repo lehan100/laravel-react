@@ -35,7 +35,7 @@ class MediaPositionEloquentRepository extends EloquentRepository implements Medi
         }
         if ($options['task'] == "admin-list-items-active") {
             $query = $this->_model->select($this->FIELDSELECT);
-            $data = $query->where("status", 1)->orderBy('id', 'desc')->paginate();
+            $data = $query->where("status", 1)->orderBy('id', 'desc')->get();
         }
         return $data;
     }

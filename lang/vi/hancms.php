@@ -67,6 +67,7 @@ return [
         'tabs' => [
             'home' => 'Trang chủ',
             'general' => 'Cài đặt chung',
+            'content' => 'Nội dung'
         ],
         'items' => [
             'logo' => 'Logo website',
@@ -110,7 +111,12 @@ return [
         'image_edit' => 'Thay đổi',
         'email' => 'Email',
         'code' => 'Mã',
-        'key' => 'Khóa (Key)'
+        'key' => 'Khóa (Key)',
+        'content' => 'Nội dung',
+        'upload' => 'Tải lên'
+    ],
+    'placeholder' => [
+        'select' => 'Vui lòng chọn...'
     ],
     'filter' => [
         'search' => 'Tìm kiếm...',
@@ -144,5 +150,32 @@ return [
             'deleted' => 'Đã xóa :name thành công.',
             'restored' => 'Khôi phục :name thành công.',
         ]
+    ],
+    'tinymce' => [
+        'name' => 'Thư viện ảnh',
+        'button' => [
+            'upload_image' => 'Tải ảnh lên',
+            'create_folder' => 'Tạo thư mục',
+            'save' => 'LƯU',
+            'cancel' => 'Hủy',
+            'close' => 'Đóng cửa sổ'
+        ],
+        'label' => [
+            'folder' => 'thư mục',
+            'file' => 'tập tin',
+            'new_name' => 'Nhập tên mới:'
+        ],
+        'message' => [
+            'delete' => 'Xóa :name này?.',
+            'data_warning' => 'Đang xử lý dữ liệu...',
+            'folder_empty' => 'Thư mục trống',
+            'error' => [
+                'move' => 'Không thể di chuyển file!',
+                'create_folder' => 'Lỗi tạo thư mục',
+                'delete' => 'Lỗi khi xóa!',
+                'rename' => 'Lỗi đổi tên!'
+            ]
+        ]
+
     ]
 ];

@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('images:clean-temp')->daily()->timeout(300);
+        $schedule->command('images:clean-temp')->hourly()->timeout(300);
     }
 
     /**

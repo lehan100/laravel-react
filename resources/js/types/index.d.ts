@@ -38,6 +38,24 @@ export interface MediaPosition {
   code: string;
   status: string;
 }
+export interface MediaBannerTranslation {
+  name: string;
+  alias_link: string;
+  description: string;
+  content: string;
+  photo: string;
+  photo_url: string | null;
+}
+
+export interface MediaBanner {
+  id: number;
+  status: number; 
+  order: number;
+  positions: MediaPosition[];
+  translations: Record<string, MediaBannerTranslation>;
+  created_at?: string;
+  updated_at?: string;
+}
 export interface Account {
   id: number;
   name: string;

@@ -16,7 +16,7 @@ function IndexPage() {
   const { data, setData, errors, post, processing } = useForm({
     data_ids: ''
   });
-  const { items, config_path }: any = usePage<{ items: PaginatedData<MediaPosition>; }>().props;
+  const { items }: any = usePage<{ items: PaginatedData<MediaPosition>; }>().props;
   const { meta: { links } }: any = items;
   const statusClass: any = {
     '0': {

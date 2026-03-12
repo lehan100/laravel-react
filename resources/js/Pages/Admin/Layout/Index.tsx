@@ -257,13 +257,13 @@ function IndexPage() {
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
                     {/* Tab List */}
-                    <div className="flex flex-row md:flex-col w-full md:w-56 overflow-x-auto border-r border-gray-200" role="tablist">
+                    <div className="flex flex-row md:flex-col w-full md:w-56 overflow-x-auto border-r border-gray-200 text-base" role="tablist">
                         {['home', 'general'].map((id) => (
                             <button
                                 type="button"
                                 key={id}
                                 onClick={() => setActiveTab(id)}
-                                className={`p-3 py-5 font-medium transition-all ${activeTab === id ? 'bg-indigo-800 text-white' : 'bg-indigo-50'}`}
+                                className={`p-5 font-medium text-left transition-all ${activeTab === id ? 'bg-indigo-800 text-white' : 'bg-indigo-50'}`}
                             >
                                 {trans(`hancms.layout.tabs.${id}`)}
                             </button>
@@ -271,8 +271,8 @@ function IndexPage() {
                     </div>
 
                     {/* Tab Content */}
-                    <div className="w-full flex-1 bg-white min-h-[200px] rounded-lg shadow-sm">
-                        <div className="bg-indigo-800 text-white px-6 py-3 font-bold uppercase">
+                    <div className="w-full flex-1 bg-white min-h-[200px] rounded-lg shadow-sm overflow-hidden">
+                        <div className="bg-indigo-800 text-white px-6 py-3 font-bold uppercase text-base">
                             {trans(`hancms.layout.tabs.${activeTab}`)}
                         </div>
                         <div className="p-6">

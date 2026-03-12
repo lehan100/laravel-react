@@ -67,6 +67,7 @@ return [
         'tabs' => [
             'home' => 'ホーム',
             'general' => '基本設定',
+            'content' => 'コンテンツ'
         ],
         'items' => [
             'logo' => 'システムロゴ',
@@ -110,7 +111,12 @@ return [
         'image_edit' => '変更',
         'email' => 'メールアドレス',
         'code' => 'コード',
-        'key' => 'キー'
+        'key' => 'キー',
+        'content' => 'コンテンツ',
+        'upload' => 'アップロード'
+    ],
+    'placeholder' => [
+        'select' => '選択してください...'
     ],
     'title' => [
         'infomation' => '情報',
@@ -143,6 +149,32 @@ return [
             'edit' => ':name を更新しました。',
             'deleted' => ':name を削除しました。',
             'restored' => ':name を復元しました。',
+        ]
+    ],
+    'tinymce' => [
+        'name' => '画像ライブラリ',
+        'button' => [
+            'upload_image' => '画像をアップロード',
+            'create_folder' => 'フォルダ作成',
+            'save' => '保存',
+            'cancel' => 'キャンセル',
+            'close' => '閉じる'
+        ],
+        'label' => [
+            'folder' => 'フォルダ',
+            'file' => 'ファイル',
+            'new_name' => '新しい名前を入力:'
+        ],
+        'message' => [
+            'delete' => 'この :name を削除しますか？',
+            'data_warning' => 'データを処理中...',
+            'folder_empty' => 'フォルダは空です',
+            'error' => [
+                'move' => 'ファイルを移動できません！',
+                'create_folder' => 'フォルダ作成エラー',
+                'delete' => '削除エラー！',
+                'rename' => '名前変更エラー！'
+            ]
         ]
     ]
 ];

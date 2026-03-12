@@ -66,7 +66,8 @@ return [
         'name' => 'Layout',
         'tabs' => [
             'home' => "Home",
-            'general' => 'General'
+            'general' => 'General',
+            'content' => 'Contents'
         ],
         'items' => [
             'logo' => 'Logo',
@@ -110,7 +111,12 @@ return [
         'image_edit' => 'Update',
         'email' => 'Email',
         'code' => 'Code',
-        'key' => 'Key'
+        'key' => 'Key',
+        'content' => 'Content',
+        'upload' => 'Upload'
+    ],
+    'placeholder' => [
+        'select' => 'Please select...'
     ],
     'filter' => [
         'search' => 'Search',
@@ -143,6 +149,32 @@ return [
             'edit' => ':name updated successfully.', // edit -> updated
             'deleted' => ':name deleted successfully.',
             'restored' => ':name restored successfully.',
+        ]
+    ],
+    'tinymce' => [
+        'name' => 'Image Library',
+        'button' => [
+            'upload_image' => 'Upload Image',
+            'create_folder' => 'Create Folder',
+            'save' => 'SAVE',
+            'cancel' => 'Cancel',
+            'close' => 'Close'
+        ],
+        'label' => [
+            'folder' => 'folder',
+            'file' => 'file',
+            'new_name' => 'Enter new name:'
+        ],
+        'message' => [
+            'delete' => 'Delete this :name?',
+            'data_warning' => 'Processing data...',
+            'folder_empty' => 'Folder is empty',
+            'error' => [
+                'move' => 'Cannot move file!',
+                'create_folder' => 'Error creating folder',
+                'delete' => 'Error while deleting!',
+                'rename' => 'Error renaming!'
+            ]
         ]
     ]
 ];
