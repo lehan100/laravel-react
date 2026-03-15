@@ -18,6 +18,11 @@ git commit -m "message": Lưu lại ảnh chụp (snapshot) của các thay đ�
 git push origin <branch>: Đẩy các commit từ máy cá nhân lên server (GitHub, GitLab...).
 git pull: Cập nhật mã nguồn mới nhất từ server về máy và tự động merge.
 ------
+commmit từng phần:
+
+git add routes/api.php app/Http/Controllers/Api/AuthController.php
+git commit -m "feat: install laravel api and sanctum auth"
+------
 git branch: Liệt kê tất cả các nhánh hiện có.
 git checkout -b <tên-nhánh>: Tạo một nhánh mới và chuyển sang nhánh đó ngay lập tức.
 git switch <tên-nhánh>: Chuyển đổi giữa các nhánh một cách an toàn.
