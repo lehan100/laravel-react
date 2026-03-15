@@ -12,12 +12,9 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
     const [tinyCallback, setTinyCallback] = useState<any>(null);
     const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
     const [previewUrls, setPreviewUrls] = useState<Record<string, string | null>>({});
-
     const { props } = usePage();
     const currentLang = (props.locale as string) || 'vi';
     const langCode = (currentLang === 'vn') ? 'vi' : (currentLang || 'vi');
-    console.log(data);
-
     const updateTranslation = (locale: string, field: string, value: any) => {
         setData((prev: any) => ({
             ...prev,

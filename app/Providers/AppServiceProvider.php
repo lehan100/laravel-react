@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\MediaBanner;
+use App\Models\MediaBannerTranslation;
+use App\Observers\MediaBannerObserver;
+use App\Observers\MediaBannerTranslationObserver;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -53,10 +57,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app->useLangPath(base_path('lang'));
+        // $this->app->useLangPath(base_path('lang'));
+        //$this->app->instance('path.lang', base_path('lang'));
         JsonResource::withoutWrapping();
         Schema::defaultStringLength(535);
         $this->bootRoute();
+        // ------
+        MediaBanner::observe(MediaBannerObserver::class);
+        MediaBannerTranslation::observe(\App\Observers\ImageFileObserver::class);
+        //MediaBannerTranslation::observe(MediaBannerTranslationObserver::class);
+
+        //Login Api
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {
+                $seconds = $headers['Retry-After'] ?? 60;
+                return response()->json([
+                    'status' => 'sweet_error',
+                   'message' => "Too many attempts! Please take a break and try again in {$seconds} seconds. ⏳",
+                    'retry_after' => $headers['Retry-After'] ?? 60
+                ], 429, $headers);
+            });
+        });
     }
 
     public function bootRoute(): void

@@ -14,6 +14,9 @@ class MediaBannerResource extends JsonResource
      */
     public function toArray($request)
     {
+        $configPath = config('image.path.photo');
+        $baseUrl = url('/');
+
         return [
             'id'     => $this->id,
             'status' => $this->status,
@@ -21,18 +24,20 @@ class MediaBannerResource extends JsonResource
             'positions' => $this->positions->map(function ($pos) {
                 return [
                     'id'   => $pos->id,
-                    'name' => $pos->name, 
+                    'name' => $pos->name,
                     'code' => $pos->code,
                 ];
             }),
-            'translations' => $this->translations->mapWithKeys(function ($item) {
+            'translations' => $this->translations->mapWithKeys(function ($item) use ($configPath, $baseUrl) {
+                $path = $configPath['path'] ?? 'uploads';
+
                 return [$item->locale => [
                     'name'        => $item->name ?? '',
                     'alias_link'  => $item->alias_link ?? '',
                     'description' => $item->description ?? '',
                     'content'     => $item->content ?? '',
                     'photo'       => $item->photo ?? '',
-                    'photo_url'   => $item->photo ? url($item->photo) : null,
+                    'photo_url'   => $item->photo ? rtrim($baseUrl, '/') . '/' . trim($path, '/') . '/' . $item->photo : null,
                 ]];
             }),
         ];

@@ -1,6 +1,7 @@
 <?php
 
 use Inertia\Inertia;
+use function Laravel\Ai\agent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -24,7 +25,11 @@ use App\Http\Controllers\Admin\TinyMCEController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+// Begin Test AI
+Route::get('/check-ai', function () {
+    return agent()->prompt('Chào bạn, tôi là Gemini và tôi đã sẵn sàng!');
+});
+// End Test AI
 
 Route::post('photo-upload', [App\Http\Controllers\ImageUploadController::class, 'storePhoto'])->name('photo.upload');
 $prefixAdmin = config('configs.prefix.admin', 'admin');
@@ -44,18 +49,18 @@ Route::prefix($prefixAdmin)->group(function () {
     /* -----------LOGIN--------------- */
     Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
         Route::get('login', 'login')->name('login')->middleware('check.login');
-        Route::post('post-login', 'postLogin')->name('post-login')->middleware('check.login');
+        Route::post('post-login', 'postLogin')->name('post-login')->middleware(['check.login', 'throttle:login']); 
         Route::get('logout', 'logout')->name('logout');
     });
 
 
     Route::middleware(['auth', 'permission'])->group(function () {
-        Route::post('upload-tinymce', [TinyMCEController::class, 'uploadTinyMCE'])->name('media.upload.tinymce'); 
+        Route::post('upload-tinymce', [TinyMCEController::class, 'uploadTinyMCE'])->name('media.upload.tinymce');
         Route::get('media-get-images', [TinyMCEController::class, 'getImages'])->name('media.get.images');
         Route::post('media-create-folder', [TinyMCEController::class, 'createFolder'])->name('media.create.folder');
         Route::post('media-move-file', [TinyMCEController::class, 'moveFile'])->name('media.move.file');
-         Route::post('media-rename', [TinyMCEController::class, 'rename'])->name('media.rename');
-         Route::post('media-delete', [TinyMCEController::class, 'delete'])->name('media.delete');
+        Route::post('media-rename', [TinyMCEController::class, 'rename'])->name('media.rename');
+        Route::post('media-delete', [TinyMCEController::class, 'delete'])->name('media.delete');
         /* ----------- Dashboard ----------- */
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         /* ----------- Roles ----------- */

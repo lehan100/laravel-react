@@ -29,12 +29,13 @@ function CreatedPage() {
         };
         return result;
     }, {});
-    const { data, setData, errors, post, processing } = useForm({
+    const { data, setData, errors, put, processing } = useForm({
         status: item?.status ?? 0,
         undo: item?.undo ?? 0,
         position_ids: item?.positions?.map((p: MediaPosition) => p.id) || [],
         translations: initialTranslations,
     });
+    // console.log(errors);
     const [undo, setUndo] = useState(0);
     const [activeTab, setActiveTab] = useState('general');
     const handleUndo = (status: number) => setUndo(status);
@@ -66,7 +67,7 @@ function CreatedPage() {
     function handleSubmit(e: any) {
         e.preventDefault();
         e.stopPropagation();
-        post(route('media-banner.store'), {
+        put(route('media-banner.update',item.id), {
             onSuccess: () => {
                 //alert(trans('hancms.message.success.edit', { name: trans('hancms.media.banner.name') }));
             },

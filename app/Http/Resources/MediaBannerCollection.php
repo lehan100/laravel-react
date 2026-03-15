@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use App\Http\Resources\MediaBannerResource;
+
 class MediaBannerCollection extends ResourceCollection
 {
     /**
@@ -12,13 +12,10 @@ class MediaBannerCollection extends ResourceCollection
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+     public $collects = MediaBannerResource::class;
+
     public function toArray($request)
     {
-         return [
-            'data' => $this->collection->mapInto(MediaBannerResource::class)->all(),
-            'meta' => [
-                'total' => $this->collection->count(),
-            ]
-        ];
+         return $this->collection->toArray();
     }
 }

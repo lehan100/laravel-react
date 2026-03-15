@@ -63,7 +63,7 @@ class RoleController extends MainController
     {
         $role = $role;
         $rolePermissions = $role->permissions->pluck('id')->toArray();
-        $permissions = Permission::orderBy('name', 'ASC')->paginate(2000);
+        $permissions = Permission::where('guard_name', $role->guard_name)->orderBy('name', 'ASC')->paginate(2000);
         return Inertia::render($this->controllerView . 'Edit', [
             'permissions' => new PermissionCollection($permissions),
             'rolePermissions' => $rolePermissions,

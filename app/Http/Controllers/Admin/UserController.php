@@ -73,11 +73,9 @@ class UserController extends MainController
             unset($params['password']);
         }
         $user->update($params);
-        // $user->update(
-        //     $request->validated()
-        // );
-        $role = Role::firstOrCreate(['name' => $this->USER_GROUP[$request->group]]);
-        $user->assignRole([$role->id]);
+        $guard = ($request->group == 4) ? 'api' : 'web';
+        $role = Role::firstOrCreate(['name' => $this->USER_GROUP[$request->group], 'guard_name' => $guard]);
+        $user->syncRoles([$role]);
         if ($request->hasFile('photo')) {
             $user->update([
                 'photo' => $request->file('photo')->store('users'),

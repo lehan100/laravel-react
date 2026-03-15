@@ -105,7 +105,7 @@ export default function TableViewAll<T>({
             return (
               <tr
                 key={index}
-                className="hover:bg-gray-100 focus-within:bg-gray-100"
+                className="even:bg-gray-100 hover:bg-gray-100 focus-within:bg-gray-100"
               >
                 {columns.map(column => {
                   let val = get(row, column.name);

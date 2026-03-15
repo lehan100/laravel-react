@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+
 /**
  * @property int $id
  * @property int $account_id
@@ -70,7 +71,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use  Authorizable,HasRoles, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use  Authorizable, HasRoles, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -110,7 +111,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
         ];
     }
-
+    public function guardName()
+    {
+        return ['web', 'api'];
+    }
     public function resolveRouteBinding($value, $field = null)
     {
         return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();

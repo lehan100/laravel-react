@@ -11,5 +11,7 @@ return [
         '0' => 'Not Access',
         '1' => 'Aministrators',
         '2' => 'Admin',
+        '3' => 'Moderator',
+        '4' => 'Api',
     ]
 ];

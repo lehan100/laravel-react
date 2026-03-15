@@ -17,12 +17,15 @@ return [
         ]
     ],
     'path' => [
-       
+        'default' => [
+            "temp" => 'var/temp',
+            'path' => 'media/uploads',
+            'size' => 'photo'
+        ],
         'photo' => [
             "temp" => 'var/temp',
             'path' => 'media/photo',
-            'trash' => 'media/trash/photo',
-            'size'=>'photo'
+            'size' => 'photo'
         ]
     ]
 ];

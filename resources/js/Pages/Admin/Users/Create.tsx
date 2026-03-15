@@ -178,6 +178,8 @@ function CreatedPage() {
                 <option value="0">Not Access</option>
                 <option value="1">Administrators</option>
                 <option value="2">Admin</option>
+                <option value="3">Moderator</option>
+                <option value="4">Api</option>
               </select>
             </InputGroup>
           </div>

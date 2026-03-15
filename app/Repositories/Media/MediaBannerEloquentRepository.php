@@ -12,7 +12,7 @@ use Inertia\Inertia;
 class MediaBannerEloquentRepository extends EloquentRepository implements MediaBannerRepositoryInterface
 {
     // Cập nhật 'photo' thay cho 'picture'
-    private $FIELDSELECT = ['id', 'photo', 'alias_link', 'status', 'order'];
+    private $FIELDSELECT = ['id',  'status', 'order'];
     protected $configPath;
 
     public function __construct()
@@ -60,57 +60,51 @@ class MediaBannerEloquentRepository extends EloquentRepository implements MediaB
             $status = ($params['status'] == 0) ? 1 : 0;
             return $this->_model->where('id', $params['id'])->update(['status' => $status]);
         }
-
-        DB::beginTransaction();
-        try {
-            $sharedLangs = Inertia::getShared('langs');
-            $languages = is_callable($sharedLangs) ? $sharedLangs() : $sharedLangs;
-            $locales = collect($languages)->map(function ($lang) {
-                return is_object($lang) ? $lang->code : $lang['code'];
-            })->toArray();
-            config(['translatable.locales' => $locales]);
-            $item = ($options['task'] == 'add-item') ? new $this->_model : $this->_model->find($params['id']);
+        // DB::beginTransaction();
+        // try {
+            $item = ($options['task'] == 'add-item')
+                ? new $this->_model
+                : $this->_model->find($params['id']);
 
             if (!$item) return false;
 
             $item->status = $params['status'] ?? 0;
             $item->order  = $params['order'] ?? 0;
+            $item->save();
             $translationsData = $params['translations'] ?? [];
+            $locales = array_keys($translationsData);
+            config(['translatable.locales' => $locales]);
+
             foreach ($locales as $locale) {
                 if (isset($translationsData[$locale])) {
                     $data = $translationsData[$locale];
                     $translation = $item->translateOrNew($locale);
-                    foreach ($item->translatedAttributes as $attr) {
-                        if ($attr !== 'photo') {
-                            $translation->$attr = $data[$attr] ?? null;
-                        }
-                    }
-
+                    // foreach ($item->translatedAttributes as $attr) {
+                    //     if ($attr !== 'photo') {
+                    //         $translation->$attr = $data[$attr] ?? null;
+                    //     }
+                    // }
+                    $translation->fill(\Illuminate\Support\Arr::except($data, ['photo']));
                     if (!empty($data['photo'])) {
-                        if ($data['photo'] !== $translation->photo) {
-                            if ($translation->photo) {
-                                $this->removeImage($translation->photo);
-                            }
-                            $translation->photo = $this->uploadImage($data['photo']);
-                        }
+                        $translation->photo = $data['photo'];
                     }
                     $translation->locale = $locale;
+                    $translation->media_banner_id = $item->id;
+                    $translation->save();
                 }
             }
 
-            $item->save();
 
             if (isset($params['position_ids'])) {
                 $item->positions()->sync($params['position_ids']);
             }
-
-            DB::commit();
+           // DB::commit();
             return $item;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            logger("Error save MediaBanner: " . $e->getMessage());
-            return false;
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     logger("Error save MediaBanner: " . $e->getMessage());
+        //     return false;
+        // }
     }
 
     public function delete($params = null, $options = null)
@@ -118,46 +112,14 @@ class MediaBannerEloquentRepository extends EloquentRepository implements MediaB
         if ($options['task'] == 'delete-item') {
             $item = $this->_model->find($params['id']);
             if ($item) {
-                $this->removeImage($item->photo);
-                return $item->delete();
+                return $item->forceDelete();
             }
         }
 
         if ($options['task'] == 'delete-items') {
             $ids = is_array($params['ids']) ? $params['ids'] : explode(",", $params['ids']);
-            foreach ($ids as $id) {
-                $this->delete(['id' => $id], ['task' => 'delete-item']);
-            }
-            return true;
+            return $this->_model->whereIn('id', $ids)->get()->each->forceDelete();
         }
         return false;
-    }
-
-    private function uploadImage($fileName)
-    {
-        $pathTmp  = public_path($this->configPath['temp'] . '/' . $fileName);
-        $pathMain = public_path($this->configPath['path']);
-
-        if (File::exists($pathTmp)) {
-            if (!File::exists($pathMain)) {
-                File::makeDirectory($pathMain, 0755, true);
-            }
-
-            Image::make($pathTmp)->save($pathMain . '/' . $fileName);
-            File::delete($pathTmp);
-            return $fileName;
-        }
-
-        return $fileName;
-    }
-
-
-    private function removeImage($fileName)
-    {
-        if (!$fileName) return;
-        $fullPath = public_path($this->configPath['path'] . '/' . $fileName);
-        if (File::exists($fullPath)) {
-            File::delete($fullPath);
-        }
     }
 }

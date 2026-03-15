@@ -34,6 +34,14 @@ function UsersPage() {
     '2': {
       'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-amber-500 text-white',
       'text': 'Admin'
+    },
+    '3': {
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-orange-500 text-white',
+      'text': 'Moderator'
+    },
+    '4': {
+      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-blue-500 text-white',
+      'text': 'Api'
     }
   };
   const statusClass: any = {
