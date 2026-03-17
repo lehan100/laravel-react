@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('slugs', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug', 255)->index();
+            $table->string('locale', 10)->index(); // en,vi,ja,...
+            $table->unsignedBigInteger('sluggable_id'); // ID: Post, Product,...
+            $table->string('sluggable_type'); // Model (App\Models\Post, App\Models\Product...)
+            $table->string('redirect_to')->nullable();
+            $table->tinyInteger('status')->default(1);
+            $table->boolean('is_default')->default(true);
+            $table->timestamps();
+            $table->unique(['slug', 'locale']);
+            $table->index(['sluggable_id', 'sluggable_type', 'locale'], 'sluggable_locale_index');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('slugs');
+    }
+};
