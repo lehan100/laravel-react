@@ -10,13 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
+use App\Traits\HasImageFile;
 
 class Category extends Model implements TranslatableContract
 {
-    use HasFactory, SoftDeletes, Translatable;
+    use HasFactory, SoftDeletes, HasImageFile, Translatable;
 
     protected $table = 'categories';
-
+    protected $imageColumn = 'photo';
     protected $fillable = [
         'status',
         'order',
@@ -30,7 +31,10 @@ class Category extends Model implements TranslatableContract
         'content'
     ];
 
-
+    public function getImagePath()
+    {
+        return config('image.path.category', null);
+    }
     public function slugs(): MorphMany
     {
         return $this->morphMany(Slug::class, 'sluggable');
