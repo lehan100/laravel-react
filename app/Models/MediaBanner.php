@@ -36,12 +36,12 @@ class MediaBanner extends Model implements TranslatableContract
             'position_id'
         )->withTimestamps();
     }
-    // protected static function booted()
-    // {
-    //     static::deleting(function ($model) {
-    //         $model->translations()->get()->each(function ($translation) {
-    //             $translation->forceDelete();
-    //         });
-    //     });
-    // }
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            $model->translations()->get()->each(function ($translation) {
+                $translation->forceDelete();
+            });
+        });
+    }
 }

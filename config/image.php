@@ -7,10 +7,6 @@ return [
             'width' => 80,
             'height' => 'auto'
         ],
-        'product' => [
-            'width' => 800,
-            'height' => 800
-        ],
         'rating' => [
             'width' => 80,
             'height' => 80
@@ -30,11 +26,6 @@ return [
             "temp" => 'var/temp',
             'path' => 'media/photo',
             'size' => 'photo'
-        ],
-        'photo' => [
-            "temp" => 'var/temp',
-            'path' => 'media/product',
-            'size' => 'product'
         ]
     ]
 ];
