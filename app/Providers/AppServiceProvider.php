@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\MediaBanner;
 use App\Models\MediaBannerTranslation;
+use App\Observers\CategoryObserver;
 use App\Observers\MediaBannerObserver;
 use App\Observers\MediaBannerTranslationObserver;
 use Illuminate\Support\Facades\Schema;
@@ -50,6 +52,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Media\MediaPositionRepositoryInterface::class,
             \App\Repositories\Media\MediaPositionEloquentRepository::class
         );
+
+        $this->app->singleton(
+            \App\Repositories\Category\CategoryRepositoryInterface::class,
+            \App\Repositories\Category\CategoryEloquentRepository::class
+        );
     }
 
     /**
@@ -66,14 +73,15 @@ class AppServiceProvider extends ServiceProvider
         MediaBanner::observe(MediaBannerObserver::class);
         MediaBannerTranslation::observe(\App\Observers\ImageFileObserver::class);
         //MediaBannerTranslation::observe(MediaBannerTranslationObserver::class);
-
+        Category::observe(CategoryObserver::class);
+        Category::observe(\App\Observers\ImageFileObserver::class);
         //Login Api
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {
                 $seconds = $headers['Retry-After'] ?? 60;
                 return response()->json([
                     'status' => 'sweet_error',
-                   'message' => "Too many attempts! Please take a break and try again in {$seconds} seconds. ⏳",
+                    'message' => "Too many attempts! Please take a break and try again in {$seconds} seconds. ⏳",
                     'retry_after' => $headers['Retry-After'] ?? 60
                 ], 429, $headers);
             });
