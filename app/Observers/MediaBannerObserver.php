@@ -12,11 +12,39 @@ class MediaBannerObserver
      */
     public function created(MediaBanner $mediaBanner): void
     {
-        //
         $mediaBanner->load('translations');
         Log::info("--- NEW MEDIA BANNER CREATED ---", [
-            'item' => $mediaBanner->toArray()
+            'id' => $mediaBanner->id
         ]);
+    }
+
+    /**
+     * Handle the MediaBanner "deleting" event.
+     * Clean up related translations before deleting the banner.
+     */
+    public function deleting(MediaBanner $mediaBanner): void
+    {
+        if ($mediaBanner->isForceDeleting()) {
+            // Permanently remove all translations from the database
+            $mediaBanner->translations()->get()->each(function ($translation) {
+                $translation->forceDelete();
+            });
+        } else {
+            // Soft delete translations to allow restoration later
+             $mediaBanner->translations()->get()->each(function ($translation) {
+                $translation->delete();
+            });
+        }
+    }
+
+    /**
+     * Handle the MediaBanner "restored" event.
+     * Restore all associated translations.
+     */
+    public function restored(MediaBanner $mediaBanner): void
+    {
+        $mediaBanner->translations()->withTrashed()->get()->each->restore();
+        Log::info("--- MEDIA BANNER RESTORED ---", ['id' => $mediaBanner->id]);
     }
 
     /**
@@ -24,30 +52,6 @@ class MediaBannerObserver
      */
     public function updated(MediaBanner $mediaBanner): void
     {
-        //
-    }
-
-    /**
-     * Handle the MediaBanner "deleted" event.
-     */
-    public function deleted(MediaBanner $mediaBanner): void
-    {
-        //
-    }
-
-    /**
-     * Handle the MediaBanner "restored" event.
-     */
-    public function restored(MediaBanner $mediaBanner): void
-    {
-        //
-    }
-
-    /**
-     * Handle the MediaBanner "force deleted" event.
-     */
-    public function forceDeleted(MediaBanner $mediaBanner): void
-    {
-        //
+        Log::info("--- MEDIA BANNER UPDATED ---", ['id' => $mediaBanner->id]);
     }
 }
