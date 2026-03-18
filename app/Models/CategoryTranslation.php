@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
+
 class CategoryTranslation extends Model
 {
     use HasFactory;
@@ -20,7 +21,10 @@ class CategoryTranslation extends Model
         'locale',
         'name',
         'description',
-        'content'
+        'content',
+        'seo_title',
+        'seo_keyword',
+        'seo_description'
     ];
     public function category()
     {

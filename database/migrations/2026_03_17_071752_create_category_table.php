@@ -31,6 +31,10 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->text('content')->nullable();
+            // SEO Field
+            $table->string('seo_title')->nullable();
+            $table->string('seo_keyword')->nullable();
+            $table->text('seo_description')->nullable();
             $table->unique(['category_id', 'locale'], 'categories_locale_unique');
             $table->timestamps();
         });

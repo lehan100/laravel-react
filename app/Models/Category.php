@@ -28,7 +28,10 @@ class Category extends Model implements TranslatableContract
     public $translatedAttributes = [
         'name',
         'description',
-        'content'
+        'content',
+        'seo_title',   
+        'seo_keyword',   
+        'seo_description' 
     ];
 
     public function getImagePath()
