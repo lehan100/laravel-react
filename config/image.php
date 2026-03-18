@@ -7,9 +7,9 @@ return [
             'width' => 80,
             'height' => 'auto'
         ],
-        'product' => [
-            'width' => 800,
-            'height' => 800
+        'category' => [
+            'width' => 480,
+            'height' => 480
         ],
         'rating' => [
             'width' => 80,
@@ -31,10 +31,10 @@ return [
             'path' => 'media/photo',
             'size' => 'photo'
         ],
-        'photo' => [
+        'category' => [
             "temp" => 'var/temp',
-            'path' => 'media/product',
-            'size' => 'product'
+            'path' => 'media/category',
+            'size' => 'category'
         ]
     ]
 ];
