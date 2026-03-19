@@ -14,7 +14,7 @@ class MediaBannerTest extends TestCase
     /** @test */
     public function it_can_create_a_banner_with_translations_and_assign_positions()
     {
-         config(['translatable.locales' => ['vi', 'en']]);
+        config(['translatable.locales' => ['vi', 'en']]);
         // 1. Prepare: Create a Position
         $position = MediaPosition::create([
             'name' => 'Main Home Slider',
@@ -24,18 +24,23 @@ class MediaBannerTest extends TestCase
 
         // 2. Prepare: Multi-language Banner data
         $bannerData = [
-            'photo'      => 'banner-sample.jpg',
-            'alias_link' => 'https://example.com',
+
             'status'     => 1,
             'order'      => 1,
             // Translation data for Astrotomic/Translatable
             'vi' => [
                 'name'    => 'Chao He 2024',
-                'content' => 'Noi dung tieng Viet'
+                'content' => 'Noi dung tieng Viet',
+                'description' => 'Noi dung tieng Viet',
+                'photo'      => 'banner-sample.jpg',
+                'alias_link' => 'https://example.com',
             ],
             'en' => [
                 'name'    => 'Summer Sale 2024',
-                'content' => 'English content description'
+                'content' => 'English content description',
+                'description' => 'English content description',
+                'photo'      => 'banner-sample.jpg',
+                'alias_link' => 'https://example.com',
             ]
         ];
 
@@ -70,7 +75,7 @@ class MediaBannerTest extends TestCase
     /** @test */
     public function it_retrieves_correct_translation_based_on_app_locale()
     {
-         config(['translatable.locales' => ['vi', 'en']]);
+        config(['translatable.locales' => ['vi', 'en']]);
         $banner = MediaBanner::create([
             'vi' => ['name' => 'Tieng Viet'],
             'en' => ['name' => 'English Name']
