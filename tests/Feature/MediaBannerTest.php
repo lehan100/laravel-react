@@ -4,70 +4,75 @@ namespace Tests\Feature;
 
 use App\Models\MediaBanner;
 use App\Models\MediaPosition;
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MediaBannerTest extends TestCase
 {
-    // use RefreshDatabase;
+    // Bắt buộc dùng RefreshDatabase để làm sạch DB mỗi lần chạy test
+    use RefreshDatabase;
 
     /** @test */
     public function it_can_create_a_banner_with_translations_and_assign_positions()
     {
+        // Thiết lập locales giả lập cho package Translatable
         config(['translatable.locales' => ['vi', 'en']]);
-        // 1. Prepare: Create a Position
+
+        // 1. Prepare: Tạo một Position trước
         $position = MediaPosition::create([
             'name' => 'Main Home Slider',
             'code' => 'home-slider',
             'status' => 1
         ]);
 
-        // 2. Prepare: Multi-language Banner data
+        // 2. Prepare: Dữ liệu Banner đa ngôn ngữ (photo và alias_link nằm trong mảng ngôn ngữ)
         $bannerData = [
-
-            'status'     => 1,
-            'order'      => 1,
-            // Translation data for Astrotomic/Translatable
+            'status' => 1,
+            'order'  => 1,
             'vi' => [
-                'name'    => 'Chao He 2024',
-                'content' => 'Noi dung tieng Viet',
-                'description' => 'Noi dung tieng Viet',
-                'photo'      => 'banner-sample.jpg',
+                'name'       => 'Chào Hè 2024',
+                'content'    => 'Nội dung tiếng Việt',
+                'description'=> 'Mô tả tiếng Việt',
+                'photo'      => 'banner-vi.jpg',
                 'alias_link' => 'https://example.com',
             ],
             'en' => [
-                'name'    => 'Summer Sale 2024',
-                'content' => 'English content description',
-                'description' => 'English content description',
-                'photo'      => 'banner-sample.jpg',
+                'name'       => 'Summer Sale 2024',
+                'content'    => 'English content',
+                'description'=> 'English description',
+                'photo'      => 'banner-en.jpg',
                 'alias_link' => 'https://example.com',
             ]
         ];
 
-        // 3. Act: Create Banner
+        // 3. Act: Tạo Banner và gắn Position (Pivot)
         $banner = MediaBanner::create($bannerData);
-        $banner->positions()->attach($position->id); // Many-to-Many link
+        $banner->positions()->attach($position->id);
 
-        // 4. Assert: Check Main Table
+        // 4. Assert: Kiểm tra bảng chính (Chỉ có status và order)
         $this->assertDatabaseHas('media_banners', [
-            'photo' => 'banner-sample.jpg',
+            'id'     => $banner->id,
+            'status' => 1,
+            'order'  => 1
+        ]);
+
+        // 5. Assert: Kiểm tra bảng Translations (Nơi chứa photo và alias_link)
+        $this->assertDatabaseHas('media_banner_translations', [
+            'media_banner_id' => $banner->id,
+            'locale'     => 'vi',
+            'name'       => 'Chào Hè 2024',
+            'photo'      => 'banner-vi.jpg',
             'alias_link' => 'https://example.com'
         ]);
 
-        // 5. Assert: Check Translation Table
         $this->assertDatabaseHas('media_banner_translations', [
             'media_banner_id' => $banner->id,
-            'locale' => 'vi',
-            'name' => 'Chao He 2024'
+            'locale'     => 'en',
+            'name'       => 'Summer Sale 2024',
+            'photo'      => 'banner-en.jpg'
         ]);
 
-        $this->assertDatabaseHas('media_banner_translations', [
-            'media_banner_id' => $banner->id,
-            'locale' => 'en',
-            'name' => 'Summer Sale 2024'
-        ]);
-
-        // 6. Assert: Check Relationship
+        // 6. Assert: Kiểm tra quan hệ Many-to-Many
         $this->assertEquals(1, $banner->positions()->count());
         $this->assertEquals('home-slider', $banner->positions->first()->code);
     }
@@ -77,15 +82,13 @@ class MediaBannerTest extends TestCase
     {
         config(['translatable.locales' => ['vi', 'en']]);
         $banner = MediaBanner::create([
-            'vi' => ['name' => 'Tieng Viet'],
+            'vi' => ['name' => 'Tiếng Việt'],
             'en' => ['name' => 'English Name']
         ]);
 
-        // Test Vietnamese
         app()->setLocale('vi');
-        $this->assertEquals('Tieng Viet', $banner->name);
+        $this->assertEquals('Tiếng Việt', $banner->name);
 
-        // Test English
         app()->setLocale('en');
         $this->assertEquals('English Name', $banner->name);
     }
@@ -93,18 +96,19 @@ class MediaBannerTest extends TestCase
     /** @test */
     public function it_soft_deletes_the_banner()
     {
-        config(['translatable.locales' => ['vi', 'en']]);
+        config(['translatable.locales' => ['vi']]);
         $banner = MediaBanner::create([
             'vi' => ['name' => 'Temporary Banner']
         ]);
 
         $banner->delete();
 
-        // Assert record is hidden (soft deleted)
-        $this->assertSoftDeleted($banner);
+        // Kiểm tra xóa mềm ở bảng chính
+        $this->assertSoftDeleted('media_banners', ['id' => $banner->id]);
 
-        // Assert the translation record still exists in DB
+        // Kiểm tra bản dịch vẫn còn trong DB (không bị xóa cứng)
         $this->assertDatabaseHas('media_banner_translations', [
+            'media_banner_id' => $banner->id,
             'name' => 'Temporary Banner'
         ]);
     }
