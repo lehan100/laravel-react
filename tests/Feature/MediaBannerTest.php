@@ -82,22 +82,31 @@ class MediaBannerTest extends TestCase
     {
         config(['translatable.locales' => ['vi', 'en']]);
 
+        // 1. Tạo bản ghi chính trước
         $banner = MediaBanner::create([
-            'vi' => ['name' => 'Tiếng Việt'],
-            'en' => ['name' => 'English Name']
+            'status' => 1,
+            'order'  => 1,
         ]);
 
-        // Cách 1: Sử dụng translate() - Cách này tường minh và an toàn nhất trong Test
+        // 2. Gán dữ liệu dịch THỦ CÔNG (giống hàm test đã chạy được)
+        $banner->translateOrNew('vi')->fill(['name' => 'Tiếng Việt']);
+        $banner->translateOrNew('en')->fill(['name' => 'English Name']);
+        $banner->save();
+
+        // 3. Quan trọng: Refresh để Model load lại các bản dịch vừa lưu vào quan hệ (relations)
+        $banner = $banner->fresh();
+
+        // Kiểm tra qua translate()
         $this->assertEquals('Tiếng Việt', $banner->translate('vi')->name);
         $this->assertEquals('English Name', $banner->translate('en')->name);
 
-        // Cách 2: Nếu muốn test thuộc tính ảo $banner->name theo app locale
+        // Kiểm tra qua app()->setLocale()
         app()->setLocale('vi');
         $this->assertEquals('Tiếng Việt', $banner->name);
 
         app()->setLocale('en');
-        // Một số phiên bản yêu cầu refresh để xóa cache locale trong model
-        $this->assertEquals('English Name', $banner->refresh()->name);
+        // Dùng fresh() để đảm bảo Model nhận diện lại locale mới từ app
+        $this->assertEquals('English Name', $banner->fresh()->name);
     }
 
     /** @test */
@@ -105,14 +114,14 @@ class MediaBannerTest extends TestCase
     {
         config(['translatable.locales' => ['vi']]);
         $banner = MediaBanner::create([
-            'vi' => ['name' => 'Temporary Banner']
+            'status' => 1,
+            'order'  => 1,
         ]);
-
+        $banner->translateOrNew('vi')->fill(['name' => 'Temporary Banner']);
         $banner->delete();
 
         // Kiểm tra xóa mềm ở bảng chính
         $this->assertSoftDeleted('media_banners', ['id' => $banner->id]);
-
         // Kiểm tra bản dịch vẫn còn trong DB (không bị xóa cứng)
         $this->assertDatabaseHas('media_banner_translations', [
             'media_banner_id' => $banner->id,
