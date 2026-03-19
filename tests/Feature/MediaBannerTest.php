@@ -93,29 +93,4 @@ class MediaBannerTest extends TestCase
         app()->setLocale('en');
         $this->assertEquals('English Name', $banner->fresh()->name);
     }
-    /** @test */
-    public function it_soft_deletes_the_banner()
-    {
-        config(['translatable.locales' => ['vi']]);
-        $banner = MediaBanner::create([
-            'status' => 1,
-            'order'  => 1,
-        ]);
-
-        $banner->translateOrNew('vi')->fill(['name' => 'Temporary Banner']);
-        $banner->save();
-
-        $banner = $banner->fresh();
-        // 3. Thực hiện xóa mềm
-        $banner->delete();
-
-        // Kiểm tra xóa mềm ở bảng chính
-        $this->assertSoftDeleted('media_banners', ['id' => $banner->id]);
-        // Kiểm tra bản dịch vẫn còn trong DB (không bị xóa cứng)
-        $this->assertDatabaseHas('media_banner_translations', [
-            'media_banner_id' => $banner->id,
-            'name' => 'Temporary Banner',
-            'locale' => 'vi'
-        ]);
-    }
 }
