@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
-
+use App\Models\MediaBannerTranslation;
 class MediaBanner extends Model implements TranslatableContract
 {
     use HasFactory, SoftDeletes, Translatable;
 
     protected $table = 'media_banners';
-
+    public $translationModel = MediaBannerTranslation::class;
     protected $fillable = [
         'status',
         'order',
@@ -25,7 +25,6 @@ class MediaBanner extends Model implements TranslatableContract
         'alias_link',
         'description',
         'content',
-        'locale'
     ];
     public function positions(): BelongsToMany
     {
