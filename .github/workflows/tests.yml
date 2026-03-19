@@ -71,5 +71,5 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: password
         run: |
-          php artisan migrate --force
+          php artisan migrate:fresh --force
           php artisan test --parallel
