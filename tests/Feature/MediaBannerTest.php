@@ -114,10 +114,14 @@ class MediaBannerTest extends TestCase
     {
         config(['translatable.locales' => ['vi']]);
         $banner = MediaBanner::create([
-            'status' => 1,
-            'order'  => 1,
+            'status' => 1
         ]);
+
+        // 2. Gán dịch thủ công (Cách này chắc chắn lưu vào DB)
         $banner->translateOrNew('vi')->fill(['name' => 'Temporary Banner']);
+        $banner->save();
+
+        // 3. Thực hiện xóa mềm
         $banner->delete();
 
         // Kiểm tra xóa mềm ở bảng chính
@@ -125,7 +129,8 @@ class MediaBannerTest extends TestCase
         // Kiểm tra bản dịch vẫn còn trong DB (không bị xóa cứng)
         $this->assertDatabaseHas('media_banner_translations', [
             'media_banner_id' => $banner->id,
-            'name' => 'Temporary Banner'
+            'name' => 'Temporary Banner',
+            'locale' => 'vi'
         ]);
     }
 }
