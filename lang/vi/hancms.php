@@ -38,7 +38,14 @@ return [
     'catalog' => [
         'name' => 'Bán hàng',
         'category' => [
-            'name' => 'Danh mục'
+            'name' => 'Danh mục',
+            'created' => 'Thêm danh mục',
+            'edit' => 'Chỉnh sửa danh mục',
+            'tree_structure' => 'Cấu trúc cây danh mục',
+            'no_data' => 'Chưa có dữ liệu cây danh mục.',
+            'select_to_view' => 'Vui lòng chọn một danh mục để xem chi tiết',
+            'instruction_text' => 'Nhấp vào các mục bên trái để chỉnh sửa thông tin hoặc cấu hình SEO.',
+            'select' => '--- Chọn cấp danh mục gốc ---'
         ],
         'product' => [
             'name' => 'Sản phẩm'
@@ -67,7 +74,7 @@ return [
         'tabs' => [
             'home' => 'Trang chủ',
             'general' => 'Cài đặt chung',
-            'content' => 'Nội dung'
+            'content' => 'Nội dung',
         ],
         'items' => [
             'logo' => 'Logo website',
@@ -81,6 +88,23 @@ return [
             'tax' => 'Mã số thuế',
             'copyright' => 'Bản quyền',
         ]
+    ],
+    'seo' => [
+        'name' => 'Tối ưu hóa công cụ tìm kiếm (SEO)',
+        'slug' => 'Đường dẫn',
+        'character' => 'ký tự',
+        'field' => [
+            'title' => 'Tiêu đề',
+            'keyword' => 'Từ khóa',
+            'description' => 'Mô tả',
+        ],
+        'review' => [
+            'title' => 'Xem trước kết quả tìm kiếm Google',
+            'description' => 'Nhập mô tả SEO hoặc nhấn nút đồng bộ để xem trước nội dung hiển thị trên Google...',
+        ],
+        'placeholder' => [
+            'description' => 'Mô tả ngắn gọn nội dung trang web...',
+        ],
     ],
     'button' => [
         'created' => 'Thêm mới',
@@ -97,6 +121,7 @@ return [
     ],
     'column' => [
         'name' => 'Tên',
+        'slug' => 'Đường dẫn',
         'guard' => 'Cổng bảo vệ',
         'action' => 'Hành động',
         'first_name' => 'Tên',

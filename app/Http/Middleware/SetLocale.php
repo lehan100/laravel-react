@@ -5,20 +5,17 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
-use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
-        // 1. Kiểm tra nếu có session 'locale'
-        if (Session::has('locale')) {
-            // 2. Thiết lập ngôn ngữ hệ thống dựa trên session
-            App::setLocale(Session::get('locale'));
-        } else {
-            // 3. (Tùy chọn) Mặc định lấy theo cấu hình app.php hoặc ngôn ngữ trình duyệt
-            App::setLocale(config('app.locale'));
+        if (session()->has('locale')) {
+            $locale = session()->get('locale');
+            // 1. Thiết lập ngôn ngữ hệ thống
+            App::setLocale($locale);
+            // 2. Ép luôn vào config của Laravel (Rất quan trọng cho các package)
+            config(['app.locale' => $locale]);
         }
 
         return $next($request);

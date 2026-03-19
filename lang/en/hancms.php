@@ -38,7 +38,14 @@ return [
     'catalog' => [
         'name' => 'Catalog',
         'category' => [
-            'name' => 'Categories'
+            'name' => 'Categories',
+            'created' => 'Add Category',
+            'edit' => 'Edit Category',
+            'tree_structure' => 'Category Tree Structure',
+            'no_data' => 'No category tree data available.',
+            'select_to_view' => 'Please select a category to view details',
+            'instruction_text' => 'Click on the items on the left to edit information or configure SEO.',
+             'select' => '--- Select Category Root ---'
         ],
         'product' => [
             'name' => 'Products'
@@ -82,6 +89,23 @@ return [
             'copyright' => 'Copyright',
         ]
     ],
+    'seo' => [
+        'name' => 'Search Engine Optimization',
+        'slug' => 'Slug / URL',
+        'character' => 'characters',
+        'field' => [
+            'title' => 'SEO Title',
+            'keyword' => 'SEO Keywords',
+            'description' => 'SEO Description',
+        ],
+        'review' => [
+            'title' => 'Google Search Result Preview',
+            'description' => 'Enter an SEO description or click the sync button to preview how it appears on Google...',
+        ],
+        'placeholder' => [
+            'description' => 'Briefly describe the website content...',
+        ],
+    ],
     'button' => [
         'created' => 'Add New',
         'delete.selected' => 'Delete Selected Items',
@@ -97,6 +121,7 @@ return [
     ],
     'column' => [
         'name' => 'Name',
+        'slug' => 'Slug',
         'guard' => 'Guard',
         'action' => 'Action',
         'first_name' => 'First Name',

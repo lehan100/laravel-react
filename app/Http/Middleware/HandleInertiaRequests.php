@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            'app_name' => config('app.name'), 
             'langs' => function () {
                 return new LanguageCollection($this->languageModel->lists(null, [
                     'task' => 'admin-list-items-active'

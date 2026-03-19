@@ -26,7 +26,7 @@ export default function MainMenu({ className }: MainMenuProps) {
   const routers: any = {
     'dashboard': ['dashboard'],
     'users': ['roles', 'users'],
-    'catalog': ['categories', 'product'],
+    'catalog': ['category', 'product'],
     'media': ['media-position', 'media-banner'],
     'settings': ['languages', 'labels', 'layout'],
   }

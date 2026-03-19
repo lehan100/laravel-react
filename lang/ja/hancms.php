@@ -38,7 +38,14 @@ return [
     'catalog' => [
         'name' => 'カタログ管理',
         'category' => [
-            'name' => 'カテゴリー'
+            'name' => 'カテゴリー',
+            'created' => 'カテゴリーを追加',
+            'edit' => 'カテゴリーを編集',
+            'tree_structure' => 'カテゴリー樹形図',
+            'no_data' => 'カテゴリーデータがありません。',
+            'select_to_view' => '詳細を表示するにはカテゴリーを選択してください',
+            'instruction_text' => '左側の項目をクリックして情報を編集するか、SEOを設定してください。',
+            'select' => '--- ルートカテゴリーを選択 ---'
         ],
         'product' => [
             'name' => '商品管理'
@@ -82,6 +89,23 @@ return [
             'copyright' => 'コピーライト / 著作権',
         ]
     ],
+    'seo' => [
+        'name' => '検索エンジン最適化 (SEO)',
+        'slug' => 'スラッグ / URL',
+        'character' => '文字',
+        'field' => [
+            'title' => 'SEOタイトル',
+            'keyword' => 'SEOキーワード',
+            'description' => 'SEO説明文',
+        ],
+        'review' => [
+            'title' => 'Google検索結果のプレビュー',
+            'description' => 'SEO説明を入力するか、同期ボタンをクリックしてGoogleでの表示を確認してください...',
+        ],
+        'placeholder' => [
+            'description' => 'ウェブサイトの内容を簡潔に説明してください...',
+        ],
+    ],
     'button' => [
         'created' => '新規作成',
         'delete.selected' => '選択項目を削除',
@@ -97,6 +121,7 @@ return [
     ],
     'column' => [
         'name' => '名前',
+        'slug' => 'ナメクジ',
         'guard' => 'ガード',
         'action' => '操作',
         'first_name' => '名',

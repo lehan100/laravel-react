@@ -30,9 +30,38 @@ class ImageUploadController extends Controller
             $filePath = public_path($configPath['temp']);
             $img = $this->ImageManager::make($file->getRealPath());
             $img->resize(1200, null, function ($constraint) {
-                $constraint->aspectRatio();     // Giữ tỉ lệ ảnh
-                $constraint->upsize();          // Không phóng to nếu ảnh nhỏ hơn 1200px
-            })->encode('webp', 60);             // Chuyển format sang webp với chất lượng 60
+                $constraint->aspectRatio();     
+                $constraint->upsize();         
+            })->encode('webp', 60);             
+            if (!file_exists($filePath)) {
+                mkdir($filePath, 0755, true);
+            }
+            $img->save($filePath . '/' . $fileNameWebp);
+
+            $url = asset($configPath['temp'] . '/' . $fileNameWebp);
+
+            return response()->json([
+                'file_name' => $fileNameWebp,
+                'uploaded' => 1,
+                'status' => true,
+                'url' => $url
+            ]);
+        }
+    }
+    public function storeCategory(Request $request)
+    {
+        if ($request->hasFile('photo')) {
+            $configPath = $this->configPath['category'];
+            $file = $request->file('photo');
+            $originName = $file->getClientOriginalName();
+            $fileNameOnly = pathinfo($originName, PATHINFO_FILENAME);
+            $fileNameWebp = Filter::setUrlKey($fileNameOnly) . '-' . time() . '.webp';
+            $filePath = public_path($configPath['temp']);
+            $img = $this->ImageManager::make($file->getRealPath());
+            $img->resize(1200, null, function ($constraint) {
+                $constraint->aspectRatio();     
+                $constraint->upsize();         
+            })->encode('webp', 60);             
             if (!file_exists($filePath)) {
                 mkdir($filePath, 0755, true);
             }

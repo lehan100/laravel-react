@@ -32,24 +32,31 @@ Route::get('/check-ai', function () {
 // End Test AI
 
 Route::post('photo-upload', [App\Http\Controllers\ImageUploadController::class, 'storePhoto'])->name('photo.upload');
+Route::post('category-upload', [App\Http\Controllers\ImageUploadController::class, 'storeCategory'])->name('category.upload');
 $prefixAdmin = config('configs.prefix.admin', 'admin');
 Route::prefix($prefixAdmin)->group(function () {
     Route::get('lang/{locale}', function ($locale) {
         $sharedLangs = Inertia::getShared('langs');
+
         $languages = is_callable($sharedLangs) ? $sharedLangs() : $sharedLangs;
-        $availableCodes = collect($languages)->map(function ($lang) {
-            return $lang->resource->code ?? $lang['code'] ?? null;
+
+        $availableCodes = collect($languages->resource->items())->map(function ($lang) {
+            return $lang->code;
         })->toArray();
-        if (is_array($availableCodes) && in_array($locale, $availableCodes)) {
+
+        // 3. Kiểm tra và lưu Session
+        if (in_array($locale, $availableCodes)) {
             session()->put('locale', $locale);
+            session()->save();
         }
+
         return redirect()->back();
     })->name('lang.switch');
     Route::get('/', fn() => redirect()->route('auth.login'));
     /* -----------LOGIN--------------- */
     Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
         Route::get('login', 'login')->name('login')->middleware('check.login');
-        Route::post('post-login', 'postLogin')->name('post-login')->middleware(['check.login', 'throttle:login']); 
+        Route::post('post-login', 'postLogin')->name('post-login')->middleware(['check.login', 'throttle:login']);
         Route::get('logout', 'logout')->name('logout');
     });
 
