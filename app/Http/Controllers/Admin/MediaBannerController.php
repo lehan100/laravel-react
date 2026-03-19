@@ -96,7 +96,7 @@ class MediaBannerController extends MainController
     public function update(MediaBannerRequest $request, string $id)
     {
         //
-        //try {
+        try {
             $params = $request->all();
             $params['id'] = $id;
             $banner = $this->mainModel->save($params, ['task' => 'edit-item']);
@@ -104,10 +104,10 @@ class MediaBannerController extends MainController
                 return Redirect::to(route($this->routeName . 'index'))->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.media.banner.name'))]));
             }
             return Redirect::route($this->routeName . 'edit', $banner->id)->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.media.banner.name'))]));
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        //     return Redirect::back()->with('error',  __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.media.banner.name'))]));
-        // }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Redirect::back()->with('error',  __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.media.banner.name'))]));
+        }
     }
 
     /**

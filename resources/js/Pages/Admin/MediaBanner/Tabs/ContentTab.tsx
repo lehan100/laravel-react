@@ -16,18 +16,18 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
     const currentLang = (props.locale as string) || 'vi';
     const langCode = (currentLang === 'vn') ? 'vi' : (currentLang || 'vi');
     const updateTranslation = (locale: string, field: string, value: any) => {
-        setData((prev: any) => ({
-            ...prev,
-            translations: {
-                ...(prev.translations || {}),
-                [locale]: {
-                    ...(prev.translations?.[locale] || {}),
-                    [field]: value
+        setData((prev: any) => {
+            const currentLangData = prev.translations?.[locale] || {};
+            let updatedData = { ...currentLangData, [field]: value };
+            return {
+                ...prev,
+                translations: {
+                    ...(prev.translations || {}),
+                    [locale]: updatedData
                 }
-            }
-        }));
+            };
+        });
     };
-
 
     const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>, locale: string) => {
         const file = e.target.files?.[0];
