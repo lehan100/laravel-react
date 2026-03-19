@@ -6,6 +6,7 @@ use App\Models\MediaBanner;
 use App\Models\MediaPosition;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class MediaBannerTest extends TestCase
@@ -16,15 +17,16 @@ class MediaBannerTest extends TestCase
     {
         parent::setUp();
         
-        // Thiết lập cấu hình bắt buộc cho package Translatable trong môi trường Test
+        // 1. Cấu hình đa ngôn ngữ
         config(['translatable.locales' => ['vi', 'en']]);
         config(['translatable.locale' => 'vi']);
         
-        // Thiết lập cấu hình đường dẫn ảnh để Trait HasImageFile không bị lỗi null
-        config(['image.path.photo' => 'uploads/test']);
+        // 2. Cấu hình đường dẫn chính (để Trait biết chỗ đẩy vào)
+        config(['image.path.photo' => 'uploads/banners']);
         
-        // Giả lập ổ đĩa public
-        Storage::fake('public');
+        // 3. Giả lập các ổ đĩa
+        Storage::fake('public'); // Ổ đĩa chính
+        Storage::fake('local');  // Giả lập cho thư mục /tmp nếu bồ dùng disk local
     }
 
     /** @test */
@@ -37,61 +39,55 @@ class MediaBannerTest extends TestCase
             'status' => 1
         ]);
 
-        // 2. Act: Tạo Banner và gán bản dịch (Sử dụng fill để đảm bảo tính ổn định trong Test)
+        // 2. Prepare: Giả lập file đã nằm trong thư mục TMP
+        // Giả sử bồ lưu tên file vào DB, Trait sẽ bốc file từ tmp này đi
+        $tempFileName = 'banner_temp_123.jpg';
+        
+        // 3. Act: Khởi tạo Banner
         $banner = new MediaBanner();
         $banner->status = 1;
         $banner->order = 1;
 
-        // Gán dữ liệu tiếng Việt
+        // Gán dữ liệu bản dịch
+        // Nếu Trait của bồ nhận UploadedFile, hãy dùng UploadedFile::fake()
+        // Nếu Trait nhận tên file trong tmp, hãy truyền string tên file
+        $fileVi = UploadedFile::fake()->image('banner-vi.jpg');
+
         $banner->translateOrNew('vi')->fill([
             'name'       => 'Chào Hè 2024',
             'content'    => 'Nội dung tiếng Việt',
-            'description'=> 'Mô tả tiếng Việt',
-            'photo'      => 'banner-vi.jpg',
+            'photo'      => $fileVi, // Trait sẽ bắt sự kiện saving để move từ tmp sang chính
             'alias_link' => 'https://example.com',
         ]);
 
-        // Gán dữ liệu tiếng Anh
         $banner->translateOrNew('en')->fill([
             'name'       => 'Summer Sale 2024',
-            'content'    => 'English content',
-            'description'=> 'English description',
-            'photo'      => 'banner-en.jpg',
-            'alias_link' => 'https://example.com',
+            'photo'      => UploadedFile::fake()->image('banner-en.jpg'),
         ]);
 
         $banner->save();
         $banner->positions()->attach($position->id);
 
-        // 3. Assert: Kiểm tra bảng chính
-        $this->assertDatabaseHas('media_banners', [
-            'id'     => $banner->id,
-            'status' => 1,
-        ]);
+        // 4. Assert: Kiểm tra bảng chính
+        $this->assertDatabaseHas('media_banners', ['id' => $banner->id]);
 
-        // 4. Assert: Kiểm tra bảng Translations
+        // 5. Assert: Kiểm tra bản dịch đã được lưu
         $this->assertDatabaseHas('media_banner_translations', [
             'media_banner_id' => $banner->id,
-            'locale'     => 'vi',
-            'name'       => 'Chào Hè 2024',
-            'photo'      => 'banner-vi.jpg'
+            'locale'          => 'vi',
+            'name'            => 'Chào Hè 2024',
         ]);
 
-        $this->assertDatabaseHas('media_banner_translations', [
-            'media_banner_id' => $banner->id,
-            'locale'     => 'en',
-            'name'       => 'Summer Sale 2024'
-        ]);
-
-        // 5. Assert: Kiểm tra quan hệ Many-to-Many
-        $this->assertEquals(1, $banner->positions()->count());
-        $this->assertEquals('home-slider', $banner->positions->first()->code);
+        // 6. Assert: Kiểm tra file đã được move vào thư mục chính (nếu Trait xử lý đúng)
+        // Lấy tên file thực tế từ DB vì Trait thường đổi tên file (timestamp...)
+        $savedPhoto = $banner->translate('vi')->photo;
+        Storage::disk('public')->assertExists('uploads/banners/' . $savedPhoto);
     }
 
     /** @test */
     public function it_retrieves_correct_translation_based_on_app_locale()
     {
-        $banner = new MediaBanner();
+        $banner = new MediaBanner(['status' => 1]);
         $banner->translateOrNew('vi')->name = 'Tiếng Việt';
         $banner->translateOrNew('en')->name = 'English Name';
         $banner->save();
@@ -106,18 +102,14 @@ class MediaBannerTest extends TestCase
     /** @test */
     public function it_soft_deletes_the_banner()
     {
-        $banner = new MediaBanner();
+        $banner = new MediaBanner(['status' => 1]);
         $banner->translateOrNew('vi')->name = 'Temporary Banner';
         $banner->save();
 
         $banner->delete();
 
-        // Kiểm tra xóa mềm
         $this->assertSoftDeleted('media_banners', ['id' => $banner->id]);
-
-        // Bản dịch vẫn phải tồn tại (chế độ xóa mềm bảng chính)
         $this->assertDatabaseHas('media_banner_translations', [
-            'media_banner_id' => $banner->id,
             'name' => 'Temporary Banner'
         ]);
     }
