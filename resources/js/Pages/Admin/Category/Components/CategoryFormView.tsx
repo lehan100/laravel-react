@@ -22,6 +22,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             [locale]: !isLocked(locale)
         }));
     };
+    
     const createSlug = (str: string) => {
         if (!str) return '';
         return str.toLowerCase()

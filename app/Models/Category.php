@@ -48,7 +48,8 @@ class Category extends Model implements TranslatableContract
     {
         return $this->morphOne(Slug::class, 'sluggable')
             ->where('locale', app()->getLocale())
-            ->where('is_default', true);
+            ->where('is_default', true)
+            ->whereNull('redirect_to');
     }
 
 

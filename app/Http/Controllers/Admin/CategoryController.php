@@ -44,9 +44,8 @@ class CategoryController extends MainController
     public function index()
     {
         //
-       
-        return Inertia::render($this->controllerView . 'Index', [
-        ]);
+
+        return Inertia::render($this->controllerView . 'Index', []);
     }
 
     /**
@@ -69,17 +68,17 @@ class CategoryController extends MainController
     public function store(CategoryRequest $request)
     {
         //
-        // try {
-        $params = $request->all();
-        $category = $this->mainModel->save($params, ['task' => 'add-item']);
-        if ($params['undo'] == 1) {
-            return Redirect::to(route($this->routeName . 'index'))->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
+        try {
+            $params = $request->all();
+            $category = $this->mainModel->save($params, ['task' => 'add-item']);
+            if ($params['undo'] == 1) {
+                return Redirect::to(route($this->routeName . 'index'))->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
+            }
+            return Redirect::route($this->routeName . 'edit', $category->id)->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Redirect::back()->with('error',  __('hancms.message.error.created', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
         }
-        return Redirect::route($this->routeName . 'edit', $category->id)->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        //     return Redirect::back()->with('error',  __('hancms.message.error.created', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
-        // }
     }
 
     /**
@@ -99,6 +98,7 @@ class CategoryController extends MainController
         $itemsCategoryActive = $this->mainModel->lists(null, [
             'task' => 'admin-list-items-active'
         ]);
+        // echo "<pre>";print_r(new CategoryResource($category));die();
         return Inertia::render($this->controllerView . 'Edit', [
             'item' => new CategoryResource($category),
             'itemsCategoryActive' => $itemsCategoryActive
@@ -112,18 +112,19 @@ class CategoryController extends MainController
     public function update(CategoryRequest $request, string $id)
     {
         //
-       // try {
+        try {
             $params = $request->all();
             $params['id'] = $id;
+            print_r($params);die();
             $banner = $this->mainModel->save($params, ['task' => 'edit-item']);
             if ($params['undo'] == 1) {
                 return Redirect::to(route($this->routeName . 'index'))->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
             }
             return Redirect::route($this->routeName . 'edit', $banner->id)->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        //     return Redirect::back()->with('error',  __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
-        // }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Redirect::back()->with('error',  __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));
+        }
     }
 
     /**

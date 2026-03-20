@@ -25,7 +25,7 @@ class CategoryResource extends JsonResource
             'photo'       => $this->photo ?? '',
             'photo_url'   => $this->photo ? rtrim($baseUrl, '/') . '/' . trim($path, '/') . '/' . $this->photo : null,
             'translations' => $this->translations->mapWithKeys(function ($item) use ($configPath, $baseUrl) {
-                $slugLocale = $this->slugs->where('locale', $item->locale)->first();
+                $slugLocale = $this->slugs->where('locale', $item->locale)->whereNull('redirect_to')->where('is_default', true)->first();
                 return [$item->locale => [
                     'name'        => $item->name ?? '',
                     'slug'        => $slugLocale ? $slugLocale->slug : '',

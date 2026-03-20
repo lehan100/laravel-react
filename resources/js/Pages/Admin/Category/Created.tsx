@@ -34,7 +34,7 @@ function CreatedPage() {
         };
         return result;
     }, {});
-    
+
     const { data, setData, errors, post, processing } = useForm({
         status: item?.status ?? 0,
         parent_id: item?.parent_id ?? 0,
@@ -62,13 +62,11 @@ function CreatedPage() {
                 >
                     {trans('hancms.button.save')}
                 </SaveButton>
-                <Link
-                    className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-all shadow-sm"
-                    href={route('category.index')}
+                <CreatedButton
+                    href={route("category.create")}
                 >
-                    <Undo size={20} />
-                    <span>{trans('hancms.button.back')}</span>
-                </Link>
+                    {trans('hancms.button.created')}
+                </CreatedButton>
             </HeaderToolbar>
             <div className="grid grid-cols-12 gap-6 mt-4">
                 <div className="col-span-12 lg:col-span-4 h-full">

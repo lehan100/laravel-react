@@ -4,6 +4,7 @@ namespace App\Repositories\Category;
 
 use Illuminate\Pipeline\Pipeline;
 use App\Pipelines\SortCategoriesByHierarchy;
+use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -85,51 +86,44 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
             $status = ($params['status'] == 0) ? 1 : 0;
             return $this->_model->where('id', $params['id'])->update(['status' => $status]);
         }
-        // DB::beginTransaction();
-        // try {
-        $item = ($options['task'] == 'add-item')
-            ? new $this->_model
-            : $this->_model->find($params['id']);
+        DB::beginTransaction();
+        try {
+            $item = ($options['task'] == 'add-item')
+                ? new $this->_model
+                : $this->_model->find($params['id']);
 
-        if (!$item) return false;
-
-        $item->status = $params['status'] ?? 0;
-        $item->order  = $params['order'] ?? 0;
-        $item->photo  = $params['photo'] ?? null;
-        $item->parent_id  = ($params['parent_id'] == 0 || empty($params['parent_id'])) ? null : $params['parent_id'];;
-        $item->save();
-        $translationsData = $params['translations'] ?? [];
-        $locales = array_keys($translationsData);
-        config(['translatable.locales' => $locales]);
-
-        foreach ($locales as $locale) {
-            if (isset($translationsData[$locale])) {
-                $data = $translationsData[$locale];
+            if (!$item) return false;
+            // 1. Save Basic Info
+            $item->status = $params['status'] ?? 0;
+            $item->order  = $params['order'] ?? 0;
+            $item->photo  = $params['photo'] ?? null;
+            $item->parent_id  = ($params['parent_id'] == 0 || empty($params['parent_id'])) ? null : $params['parent_id'];;
+            $item->save();
+            // 2. Save Translations (exclude slug/is_default to let Pipe handle it)
+            $translationsData = $params['translations'] ?? [];
+            foreach ($translationsData as $locale => $data) {
                 $translation = $item->translateOrNew($locale);
                 $translation->fill(\Illuminate\Support\Arr::except($data, ['slug', 'is_default']));
                 $translation->save();
-                if (isset($data['slug']) && !empty($data['slug'])) {
-                    $newSlug = preg_replace('/\s+/u', '-', trim($data['slug']));
-                    $item->slugs()->updateOrCreate(
-                        [
-                            'locale'         => $locale,
-                            'is_default'     => true,
-                        ],
-                        [
-                            'slug' => $newSlug
-                        ]
-                    );
-                }
             }
+            // 3. Process Slugs via Pipeline
+            // This will handle Unicode, History, and Redirects
+            app(Pipeline::class)
+                ->send([
+                    'item' => $item,
+                    'translations' => $translationsData
+                ])
+                ->through([
+                    HandleSlugHistory::class,
+                ])
+                ->thenReturn();
+            DB::commit();
+            return $item;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger("Error save category: " . $e->getMessage());
+            return false;
         }
-
-        // DB::commit();
-        return $item;
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     logger("Error save category: " . $e->getMessage());
-        //     return false;
-        // }
     }
 
     public function delete($params = null, $options = null)
