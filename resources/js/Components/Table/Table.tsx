@@ -19,15 +19,15 @@ export default function Table<T>({
   getRowDetailsUrl
 }: TableProps<T>) {
   return (
-    <div className="overflow-x-auto bg-white rounded shadow">
+    <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
       <table className="w-full whitespace-nowrap">
         <thead>
-          <tr className="font-bold text-left">
+          <tr className="text-left bg-slate-950 text-white">
             {columns?.map(column => (
               <th
                 key={column.label}
                 colSpan={column.colSpan ?? 1}
-                className="px-6 pt-5 pb-4"
+                className="px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80"
               >
                 {column.label}
               </th>
@@ -39,7 +39,7 @@ export default function Table<T>({
           {rows?.length === 0 && (
             <tr>
               <td
-                className="px-6 py-24 border-t text-center"
+                className="border-t border-slate-200 px-4 py-16 text-center text-slate-500"
                 colSpan={columns.length}
               >
                 No data found.
@@ -50,15 +50,15 @@ export default function Table<T>({
             return (
               <tr
                 key={index}
-                className="hover:bg-gray-100 focus-within:bg-gray-100"
+                className="border-t border-slate-200/80 odd:bg-white even:bg-slate-50/60 transition-colors hover:bg-cyan-50/50 focus-within:bg-cyan-50/50"
               >
                 {columns.map(column => {
                   return (
-                    <td key={column.name} className="border-t">
+                    <td key={column.name} className="px-4 py-3 align-middle text-slate-700">
                       <Link
                         tabIndex={-1}
                         href={getRowDetailsUrl?.(row) as string}
-                        className="flex items-center px-6 py-4 focus:text-indigo focus:outline-none"
+                        className="flex items-center focus:outline-none"
                       >
                         {column.renderCell?.(row) ??
                           get(row, column.name) ??
@@ -67,12 +67,12 @@ export default function Table<T>({
                     </td>
                   );
                 })}
-                <td className={"w-px border-t"}>
+                <td className={"w-px border-t border-slate-200"}>
                   <Link
                     href={getRowDetailsUrl?.(row)!}
                     className="flex items-center px-4 focus:outline-none"
                   >
-                    <ChevronRight size={24} className="text-gray-400" />
+                    <ChevronRight size={20} className="text-slate-400" />
                   </Link>
                 </td>
               </tr>

@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-
-import { CircleGauge, Users, UserCog, Cog, Languages, FileText,  Library, LayoutTemplate, Image, LayoutDashboard, LayoutGrid, Store, FolderTree, Package } from 'lucide-react';
+import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Library, LayoutTemplate, Image, LayoutDashboard, Store, FolderTree, Package } from 'lucide-react';
 import classNames from 'classnames';
 import MainMenuItem from '@/Components/Menu/MainMenuItem';
 import BsFace from '@/Components/Menu/Fade';
@@ -17,12 +15,6 @@ function getRoute() {
   return match ? match[0] : null;;
 }
 export default function MainMenu({ className }: MainMenuProps) {
-  const iconClasses = classNames(
-    'text-white'
-  );
-  const textClasses = classNames(
-    'text-white'
-  );
   const routers: any = {
     'dashboard': ['dashboard'],
     'users': ['roles', 'users'],
@@ -33,12 +25,9 @@ export default function MainMenu({ className }: MainMenuProps) {
   const { can } = usePermission();
 
   const { trans } = useTrans();
-  const [routeIndex, setRouteIndex] = useState(getRoute());
-  useEffect(() => {
-    setRouteIndex(getRoute());
-  });
+  const routeIndex = getRoute();
   return (
-    <div className={className}>
+    <div className={classNames(className, 'flex flex-col gap-4')}>
       {can("dashboard") &&
         <BsFaceLink title={trans('hancms.dashboard.main')} href={route('dashboard')} index={routers['dashboard'].indexOf(routeIndex)} icon={<CircleGauge size={20} />} />
       }
@@ -114,7 +103,7 @@ export default function MainMenu({ className }: MainMenuProps) {
           </ul>
         </BsFace>
       }
-      {(can("languages.index") || can("labels.index") || can("layout,index")) &&
+      {(can("languages.index") || can("labels.index") || can("layout.index")) &&
         <BsFace title={trans('hancms.settings.main')} id={'menu-3'} index={routers['settings'].indexOf(routeIndex)} icon={<Cog size={20} />}>
           <ul className='ps-3'>
             {can("languages.index") &&
@@ -147,9 +136,6 @@ export default function MainMenu({ className }: MainMenuProps) {
           </ul>
         </BsFace>
       }
-      <BsFace title='Test' id={'menu-4'} icon={<CircleGauge size={20} />}>
-
-      </BsFace>
     </div>
   );
 }

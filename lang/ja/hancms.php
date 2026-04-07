@@ -89,6 +89,8 @@ return [
             'copyright' => 'コピーライト / 著作権',
         ]
     ],
+    'tabs' => 'タブ',
+    'section' => 'セクション',
     'seo' => [
         'name' => '検索エンジン最適化 (SEO)',
         'slug' => 'スラッグ / URL',
@@ -112,6 +114,7 @@ return [
         'edit' => '編集',
         'delete' => '削除',
         'view' => '詳細',
+        'open' => '開く',
         'save' => '保存',
         'back' => '戻る',
         'choose_image' => '画像を選択',
@@ -119,6 +122,11 @@ return [
         'confirm' => '確認',
         'cancel' => 'キャンセル'
     ],
+    'view' => '詳細',
+    'open' => '開く',
+    'current_tab' => '現在のタブ',
+    'ready' => '準備完了',
+    'needs_attention' => '要確認',
     'column' => [
         'name' => '名前',
         'slug' => 'ナメクジ',

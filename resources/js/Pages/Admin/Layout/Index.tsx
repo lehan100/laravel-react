@@ -1,7 +1,7 @@
 import CountryInput from "@/Components/Form/CountryInput";
 import { useTrans } from "@/Hooks/useTrans";
 import MainLayout from "@/Layouts/MainLayout";
-import { usePage, useForm, router } from "@inertiajs/react";
+import { usePage, useForm } from "@inertiajs/react";
 import React, { useState, useMemo } from 'react';
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import SaveButton from '@/Components/Button/SaveButton';
@@ -90,40 +90,55 @@ const HomeTab = ({ languages, formData, setFormData, translate, layoutItems }: a
 
     return (
         <div className="space-y-4">
-            {renderUploadField('logo')}
-            {renderUploadField('favicon')}
+            <div className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+                <div className="grid gap-4 sm:grid-cols-2">
+                    {renderUploadField('logo')}
+                    {renderUploadField('favicon')}
+                </div>
+            </div>
             {itemEntries.map(([fieldKey, fieldConfig]: [string, any]) => {
                 return (
-                    <InputGroup key={fieldKey} label={translate(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
-                        {languages.data.map((row: any) => {
-                            const langCode = row.code;
-                            const langName = row.name;
-                            const langData = formData.pages?.[langCode];
+                    <section key={fieldKey} className="rounded-3xl border border-slate-200 bg-white shadow-[0_14px_30px_-24px_rgba(15,23,42,0.3)]">
+                        <div className="border-b border-slate-200 bg-gradient-to-r from-slate-950 to-slate-800 px-4 py-3 text-white sm:px-5">
+                            <div className="text-[11px] uppercase tracking-[0.28em] text-white/60">
+                                {translate(`hancms.layout.items.${fieldKey}`) || fieldConfig.name}
+                            </div>
+                            <div className="mt-1 text-sm font-semibold">
+                                {fieldConfig.name}
+                            </div>
+                        </div>
+                        <div className="space-y-4 p-4 sm:p-5">
+                            {languages.data.map((row: any) => {
+                                const langCode = row.code;
+                                const langName = row.name;
+                                const langData = formData.pages?.[langCode];
 
-                            const cellValue = (typeof langData === 'object' && langData !== null)
-                                ? (langData[fieldKey] || '')
-                                : '';
-                            return (
-                                <CountryInput
-                                    key={`${langCode}-${fieldKey}`}
-                                    photo={row.photo}
-                                    value={cellValue}
-                                    isTextArea={fieldConfig.is_textarea}
-                                    placeholder={`${translate(`hancms.layout.items.${fieldKey}`)} (${langName})`}
-                                    onChange={(e: any) => {
-                                        const newValue = e.target.value;
-                                        setFormData('pages', {
-                                            ...formData.pages,
-                                            [langCode]: {
-                                                ...(typeof langData === 'object' ? langData : {}),
-                                                [fieldKey]: newValue
-                                            }
-                                        });
-                                    }}
-                                />
-                            );
-                        })}
-                    </InputGroup>
+                                const cellValue = (typeof langData === 'object' && langData !== null)
+                                    ? (langData[fieldKey] || '')
+                                    : '';
+                                return (
+                                    <div key={`${langCode}-${fieldKey}`} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
+                                        <CountryInput
+                                            photo={row.photo}
+                                            value={cellValue}
+                                            isTextArea={fieldConfig.is_textarea}
+                                            placeholder={`${translate(`hancms.layout.items.${fieldKey}`)} (${langName})`}
+                                            onChange={(e: any) => {
+                                                const newValue = e.target.value;
+                                                setFormData('pages', {
+                                                    ...formData.pages,
+                                                    [langCode]: {
+                                                        ...(typeof langData === 'object' ? langData : {}),
+                                                        [fieldKey]: newValue
+                                                    }
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
                 )
             })}
         </div>
@@ -136,36 +151,47 @@ const GeneralTab = ({ languages, formData, setFormData, translate, layoutItems }
         <div className="space-y-4">
             {itemEntries.map(([fieldKey, fieldConfig]: [string, any]) => {
                 return (
-                    <InputGroup key={fieldKey} label={translate(`hancms.layout.items.${fieldKey}`) || fieldConfig.name} align='center' className='border border-gray-200 p-4 pt-6 bg-gray-50 rounded-lg'>
-                        {languages.data.map((row: any) => {
-                            const langCode = row.code;
-                            const langName = row.name;
-                            const langData = formData.pages?.[langCode];
+                    <section key={fieldKey} className="rounded-3xl border border-slate-200 bg-white shadow-[0_14px_30px_-24px_rgba(15,23,42,0.3)]">
+                        <div className="border-b border-slate-200 bg-gradient-to-r from-slate-950 to-slate-800 px-4 py-3 text-white sm:px-5">
+                            <div className="text-[11px] uppercase tracking-[0.28em] text-white/60">
+                                {translate(`hancms.layout.items.${fieldKey}`) || fieldConfig.name}
+                            </div>
+                            <div className="mt-1 text-sm font-semibold">
+                                {fieldConfig.name}
+                            </div>
+                        </div>
+                        <div className="space-y-4 p-4 sm:p-5">
+                            {languages.data.map((row: any) => {
+                                const langCode = row.code;
+                                const langName = row.name;
+                                const langData = formData.pages?.[langCode];
 
-                            const cellValue = (typeof langData === 'object' && langData !== null)
-                                ? (langData[fieldKey] || '')
-                                : '';
-                            return (
-                                <CountryInput
-                                    key={`${langCode}-${fieldKey}`}
-                                    photo={row.photo}
-                                    value={cellValue}
-                                    isTextArea={fieldConfig.is_textarea}
-                                    placeholder={`${translate(`hancms.layout.items.${fieldKey}`)} (${langName})`}
-                                    onChange={(e: any) => {
-                                        const newValue = e.target.value;
-                                        setFormData('pages', {
-                                            ...formData.pages,
-                                            [langCode]: {
-                                                ...(typeof langData === 'object' ? langData : {}),
-                                                [fieldKey]: newValue
-                                            }
-                                        });
-                                    }}
-                                />
-                            );
-                        })}
-                    </InputGroup>
+                                const cellValue = (typeof langData === 'object' && langData !== null)
+                                    ? (langData[fieldKey] || '')
+                                    : '';
+                                return (
+                                    <div key={`${langCode}-${fieldKey}`} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
+                                        <CountryInput
+                                            photo={row.photo}
+                                            value={cellValue}
+                                            isTextArea={fieldConfig.is_textarea}
+                                            placeholder={`${translate(`hancms.layout.items.${fieldKey}`)} (${langName})`}
+                                            onChange={(e: any) => {
+                                                const newValue = e.target.value;
+                                                setFormData('pages', {
+                                                    ...formData.pages,
+                                                    [langCode]: {
+                                                        ...(typeof langData === 'object' ? langData : {}),
+                                                        [fieldKey]: newValue
+                                                    }
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
                 )
             })}
 
@@ -211,7 +237,7 @@ function IndexPage() {
         return initialized;
     }, [pages, langs, layout_items_home, layout_items_general]);
 
-    const { data, setData, post, processing, reset } = useForm({
+    const { data, setData, post, processing } = useForm({
         pages: initialPages,
         undo: 0,
     });
@@ -246,7 +272,7 @@ function IndexPage() {
             <HeaderToolbar title={trans('hancms.layout.admin.name')}>
                 <SaveButton
                     loading={processing}
-                    undo={0}
+                    undo={undo}
                     icon={<Save size={18} />}
                     sendDataStatusUndo={handleUndo}
                     form='my-form'
@@ -255,28 +281,55 @@ function IndexPage() {
                 </SaveButton>
             </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
-                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
-                    {/* Tab List */}
-                    <div className="flex flex-row md:flex-col w-full md:w-56 overflow-x-auto border-r border-gray-200 text-base" role="tablist">
-                        {['home', 'general'].map((id) => (
-                            <button
-                                type="button"
-                                key={id}
-                                onClick={() => setActiveTab(id)}
-                                className={`p-5 font-medium text-left transition-all ${activeTab === id ? 'bg-indigo-800 text-white' : 'bg-indigo-50'}`}
-                            >
-                                {trans(`hancms.layout.tabs.${id}`)}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Tab Content */}
-                    <div className="w-full flex-1 bg-white min-h-[200px] rounded-lg shadow-sm overflow-hidden">
-                        <div className="bg-indigo-800 text-white px-6 py-3 font-bold uppercase text-base">
-                            {trans(`hancms.layout.tabs.${activeTab}`)}
+                <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.45)]">
+                    <div className="flex flex-col md:flex-row">
+                        <div className="border-b border-slate-200 bg-gradient-to-b from-slate-950/[0.03] to-white p-3 md:w-64 md:border-b-0 md:border-r md:p-4">
+                            <div className="mb-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+                                <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">{trans('hancms.tabs')}</div>
+                                <div className="mt-1 text-sm font-semibold text-slate-900">{trans('hancms.layout.admin.name')}</div>
+                            </div>
+                            <div className="flex flex-row gap-2 overflow-x-auto md:flex-col md:overflow-visible" role="tablist">
+                                {['home', 'general'].map((id) => {
+                                    const active = activeTab === id;
+                                    return (
+                                        <button
+                                            type="button"
+                                            key={id}
+                                            onClick={() => setActiveTab(id)}
+                                            className={`group flex min-w-[170px] items-center justify-between rounded-2xl border p-4 text-left transition-all duration-200 md:min-w-0 ${active
+                                                    ? 'border-slate-950 bg-slate-950 text-white shadow-[0_18px_45px_-24px_rgba(15,23,42,0.7)]'
+                                                    : 'border-slate-200 bg-white/90 text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+                                                }`}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="mt-1 text-sm font-semibold">{trans(`hancms.layout.tabs.${id}`)}</span>
+                                            </div>
+                                            <span className={`ml-3 text-xs font-semibold ${active ? 'text-cyan-200' : 'text-slate-300 group-hover:text-slate-500'}`}>
+                                                {active ? trans('hancms.open') : trans('hancms.view')}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <div className="p-6">
-                            {renderTabContent()}
+
+                        <div className="min-w-0 flex-1 bg-gradient-to-b from-white to-slate-50/70">
+                            <div className="border-b border-slate-200/80 bg-white/80 px-5 py-4 backdrop-blur sm:px-6">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div className="text-[11px] uppercase tracking-[0.28em] text-slate-400">{trans('hancms.current_tab')}</div>
+                                        <h2 className="mt-1 text-lg font-semibold text-slate-900">
+                                            {trans(`hancms.layout.tabs.${activeTab}`)}
+                                        </h2>
+                                    </div>
+                                    <div className="hidden rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500 sm:inline-flex">
+                                        {trans('hancms.ready')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-5 sm:p-6">
+                                {renderTabContent()}
+                            </div>
                         </div>
                     </div>
                 </div>

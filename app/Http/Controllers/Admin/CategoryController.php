@@ -115,7 +115,7 @@ class CategoryController extends MainController
         try {
             $params = $request->all();
             $params['id'] = $id;
-            print_r($params);die();
+            // print_r($params);die();
             $banner = $this->mainModel->save($params, ['task' => 'edit-item']);
             if ($params['undo'] == 1) {
                 return Redirect::to(route($this->routeName . 'index'))->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]));

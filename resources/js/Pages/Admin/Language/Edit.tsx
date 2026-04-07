@@ -1,17 +1,18 @@
 import { useTrans } from "@/Hooks/useTrans";
 import MainLayout from "@/Layouts/MainLayout";
-import { Link, router, useForm, usePage } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import { Save, Undo, ImagePlus, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import SaveButton from '@/Components/Button/SaveButton';
+import BackButton from '@/Components/Button/BackButton';
 import axios from "axios";
 import { Language } from "@/types";
-import { Checkbox } from "@/Components/Form/HancmsCheckbox";
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import SingleUpload from "@/Components/ImageUpload/SingleUpload";
 import Card from "@/Components/Main/Card";
 import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import MessageError from "@/Components/Form/MessageError";
+import StatusSwitch from "@/Components/Status/StatusSwitch";
 function EditPage() {
     const { trans } = useTrans();
     const { item, config_path }: any = usePage<{
@@ -80,38 +81,27 @@ function EditPage() {
             }>
                 <SaveButton
                     loading={processing}
-                    undo={0}
+                    undo={undo}
                     icon={<Save size={18} />}
                     sendDataStatusUndo={handleUndo}
                     form='my-form'
                 >
                     {trans('hancms.button.save')}
                 </SaveButton>
-                <Link
-                    href={route('languages.index')}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-all text-sm font-medium no-underline shadow-sm active:scale-95"
-                >
-                    <Undo size={18} />
-                    <span>{trans('hancms.button.back')}</span>
-                </Link>
+                <BackButton href={route('languages.index')}>
+                    {trans('hancms.button.back')}
+                </BackButton>
             </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <Card title={trans('hancms.title.infomation')}>
                         <div className="p-4 space-y-5">
-                            {/* Status Switch */}
-                            <Checkbox>
-                                <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    checked={active == '1'}
-                                    onChange={() => setActive(active == 1 ? 0 : 1)}
-                                />
-                                <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                                <span className={`ml-3 text-sm font-medium ${active == '1' ? 'text-green-600' : 'text-gray-500'}`}>
-                                    {active == '1' ? trans('hancms.status.active') : trans('hancms.status.inactive')}
-                                </span>
-                            </Checkbox>
+                            <StatusSwitch
+                                value={active}
+                                onChange={setActive}
+                                activeLabel={trans('hancms.status.active')}
+                                inactiveLabel={trans('hancms.status.inactive')}
+                            />
 
                             {/* Name Input */}
                             <InputGroup label={trans('hancms.column.name')}>

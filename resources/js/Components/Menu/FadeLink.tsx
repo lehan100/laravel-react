@@ -16,11 +16,11 @@ export default function FadeLink({ children, ...props }: any) {
         }
     });
     return (
-        <div className={open || openRoute ? 'is-open btn-fade-group' : 'btn-fade-group'}>
+        <div className={open || openRoute ? 'mb-3 rounded-2xl border border-white/10 bg-white/5 p-1 ring-1 ring-cyan-400/30' : 'mb-3 rounded-2xl border border-white/10 bg-white/5 p-1'}>
             <Link
                 onClick={() => setOpen(!open)}
                 href={props.href}
-                className={`w-full flex items-center justify-between p-2 text-indigo-200 hover:bg-indigo-800 rounded-md transition-colors ${open || openRoute ? 'is-open' : ''}`}
+                className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-slate-200 transition-colors hover:bg-white/5 hover:text-white ${open || openRoute ? 'bg-white/10 text-white' : ''}`}
             >
                 <div className="flex items-center gap-2 p-3">
                     {props.icon}

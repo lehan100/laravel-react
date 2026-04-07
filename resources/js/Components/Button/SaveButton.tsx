@@ -17,12 +17,7 @@ export default function Save({ loading, icon, children, sendDataStatusUndo, undo
       disabled={loading}
       onClick={() => !loading && sendDataStatusUndo(undo)}
       className={cx(
-        // Cấu trúc & Font (text-sm và font-medium theo ý bạn)
-        'inline-flex items-center justify-center gap-2 p-3 rounded-md font-medium transition-all duration-200',
-        // Màu sắc & Hiệu ứng
-        'bg-green-600 text-white shadow-sm hover:bg-green-700 active:scale-95',
-        // Trạng thái Loading
-        'disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-green-600',
+        'inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3.5 text-base font-semibold text-white shadow-xl shadow-emerald-950/10 ring-1 ring-emerald-950/5 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-500 hover:to-teal-500 hover:shadow-2xl hover:shadow-emerald-950/15 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:from-emerald-600 disabled:hover:to-teal-600',
         className // Cho phép ghi đè từ bên ngoài
       )}
     >

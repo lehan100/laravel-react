@@ -35,9 +35,9 @@ export default function FlashedMessages() {
   return (
     <div
       aria-live="assertive"
-      className="pointer-events-none fixed inset-0 z-[100] flex items-end px-4 py-6 sm:items-start sm:p-6"
+      className="pointer-events-none fixed inset-x-0 top-4 z-[100] flex justify-center px-4 sm:px-6"
     >
-      <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
+      <div className="flex w-full max-w-xl flex-col gap-3">
         <Transition
           show={show}
           as={Fragment}
@@ -48,33 +48,38 @@ export default function FlashedMessages() {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className={`pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 border-l-4 ${type === 'success' ? 'border-green-500' : 'border-red-500'
-            }`}>
-            <div className="p-4">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
+          <div
+            className={`pointer-events-auto overflow-hidden rounded-2xl border bg-white/95 shadow-2xl shadow-slate-950/10 ring-1 ring-slate-900/5 backdrop-blur ${
+              type === 'success'
+                ? 'border-emerald-200'
+                : type === 'warning'
+                  ? 'border-amber-200'
+                  : 'border-rose-200'
+            }`}
+          >
+            <div className="flex items-start gap-4 px-4 py-4 sm:px-5">
+              <div className="mt-0.5 flex-shrink-0">
                   {type === 'success' ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-6 w-6 text-emerald-500" />
                   ) : (
-                    <XCircle className="h-5 w-5 text-red-500" />
+                    <XCircle className="h-6 w-6 text-rose-500" />
                   )}
                 </div>
-                <div className="ml-3 w-0 flex-1 pt-0.5">
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-900">
                     {type === 'success' ? trans('hancms.title.success') : trans('hancms.title.error')}
                   </p>
-                  <p className="mt-1 text-sm text-gray-500">{message}</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">{message}</p>
                 </div>
-                <div className="ml-4 flex flex-shrink-0">
+                <div className="flex flex-shrink-0">
                   <button
                     type="button"
-                    className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700 focus:outline-none"
                     onClick={() => setShow(false)}
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
-              </div>
             </div>
           </div>
         </Transition>

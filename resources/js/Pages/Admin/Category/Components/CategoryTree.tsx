@@ -5,11 +5,11 @@ import {
     Folder,
     FolderOpen,
     Trash2,
-    Hash,
-    EyeOff
+    Hash
 } from 'lucide-react';
 import { useTrans } from '@/Hooks/useTrans';
 import { Link } from '@inertiajs/react';
+import StatusBadge from '@/Components/Status/StatusBadge';
 
 interface Props {
     data: any[];
@@ -123,9 +123,13 @@ const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
                                     {displayName}
                                 </span>
 
-                                {/* Inactive Icon: Small and subtle to avoid visual noise */}
                                 {isInactive && (
-                                    <EyeOff size={14} />
+                                    <StatusBadge
+                                        value={0}
+                                        activeLabel={trans('hancms.status.active')}
+                                        inactiveLabel={trans('hancms.status.inactive')}
+                                        className="ml-1 scale-90"
+                                    />
                                 )}
                             </div>
                         </Link>

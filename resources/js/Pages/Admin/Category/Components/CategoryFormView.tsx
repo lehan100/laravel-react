@@ -7,11 +7,12 @@ import Card from '@/Components/Main/Card';
 import { usePage } from '@inertiajs/react';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
 import SingleUpload from '@/Components/ImageUpload/SingleUpload';
+import StatusSwitch from '@/Components/Status/StatusSwitch';
 import axios from 'axios';
 import CategorySelector from './CategorySelector';
 
 const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive }: any) => {
-    const [currentTab, setCurrentTab] = useState(langList[0]?.code || 'vi');
+    const [currentTab, setCurrentTab] = useState(langCode || 'vi');
     const { props }: any = usePage();
     const siteName = props.app_name || 'HanCMS Store';
     const [lockedTabs, setLockedTabs] = useState<Record<string, boolean>>({});
@@ -113,20 +114,12 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             <Card title={trans('hancms.layout.tabs.general')} className='mb-6'>
                 <div className="p-6 space-y-6 ">
                     <InputGroup label={trans('hancms.column.status')} align="center">
-                        <div className="flex items-center gap-4">
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    checked={data.status === 1}
-                                    onChange={(e) => setData('status', e.target.checked ? 1 : 0)}
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                                <span className="ml-3 text-sm font-medium text-gray-700">
-                                    {data.status === 1 ? trans('hancms.status.active') : trans('hancms.status.inactive')}
-                                </span>
-                            </label>
-                        </div>
+                        <StatusSwitch
+                            value={data.status}
+                            onChange={(value) => setData('status', value)}
+                            activeLabel={trans('hancms.status.active')}
+                            inactiveLabel={trans('hancms.status.inactive')}
+                        />
                     </InputGroup>
                     <InputGroup label={trans('hancms.catalog.category.name')}>
                         <CategorySelector

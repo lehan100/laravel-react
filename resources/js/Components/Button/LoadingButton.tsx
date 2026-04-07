@@ -12,16 +12,14 @@ export default function LoadingButton({
   ...props
 }: LoadingButtonProps) {
   const classNames = cx(
-    'flex items-center',
-    'focus:outline-none',
-    {
-      'pointer-events-none bg-opacity-75 select-none': loading
-    },
+    'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+    'shadow-lg shadow-slate-900/10 ring-1 ring-slate-900/5',
+    loading ? 'pointer-events-none select-none opacity-80' : 'hover:-translate-y-0.5 active:translate-y-0',
     className
   );
   return (
     <button disabled={loading} className={classNames} {...props}>
-      {loading && <div className="mr-2 btn-spinner" />}
+      {loading && <div className="btn-spinner" />}
       {children}
     </button>
   );

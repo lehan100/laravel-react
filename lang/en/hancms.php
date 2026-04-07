@@ -89,6 +89,8 @@ return [
             'copyright' => 'Copyright',
         ]
     ],
+    'tabs' => 'Tabs',
+    'section' => 'Section',
     'seo' => [
         'name' => 'Search Engine Optimization',
         'slug' => 'Slug / URL',
@@ -112,6 +114,7 @@ return [
         'edit' => 'Edit',
         'delete' => 'Delete',
         'view' => 'View',
+        'open' => 'Open',
         'save' => 'Save',
         'back' => 'Back',
         'choose_image' => 'Choose Image',
@@ -119,6 +122,11 @@ return [
         'confirm' => 'Confirm',
         'cancel' => 'Cancel'
     ],
+    'view' => 'View',
+    'open' => 'Open',
+    'current_tab' => 'Current Tab',
+    'ready' => 'Ready',
+    'needs_attention' => 'Needs Attention',
     'column' => [
         'name' => 'Name',
         'slug' => 'Slug',

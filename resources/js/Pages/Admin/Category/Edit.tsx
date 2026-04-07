@@ -92,5 +92,5 @@ function CreatedPage() {
         </div>
     )
 }
-CreatedPage.layout = (page: React.ReactNode) => <MainLayout title='hancms.catalog.category.created' children={page} />
+CreatedPage.layout = (page: React.ReactNode) => <MainLayout title='hancms.catalog.category.edit' children={page} />
 export default CreatedPage;

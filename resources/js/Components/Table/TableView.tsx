@@ -20,7 +20,7 @@ export default function TableView<T>({
 }: TableProps<T>) {
   const styles = {
     id: {
-      width: '100px',
+      width: '88px',
       verticalAlign: 'middle',
       textAlign: 'center'
     },
@@ -77,32 +77,31 @@ export default function TableView<T>({
     }
   }, []);
   return (
-    <div className="overflow-x-auto bg-white rounded shadow">
+    <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
       <table className="mb-0 w-full whitespace-nowrap">
         <thead>
-          <tr className="font-bold text-left bg-gray-300">
+          <tr className="text-left bg-slate-950 text-white">
             {columns?.map(column => (
               <th
                 key={column.label}
                 colSpan={column.colSpan ?? 1}
-                className="pb-3 pt-5 px-3"
+                className="px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80"
                 style={column.name == 'id' ? styles.id : styles.auto}
               >
                 {column.name == 'id' ? <input
                   type="checkbox"
                   onChange={handleChangeAll}
-                  className="w-5 h-5 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500 accent-blue-600"
+                  className="h-4 w-4 cursor-pointer rounded border-white/30 text-cyan-500 focus:ring-cyan-400"
                 /> : column.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className='body-items'>
-          {/* Empty state */}
+        <tbody className="body-items">
           {rows?.length === 0 && (
             <tr>
               <td
-                className="px-6 py-24 border-t text-center"
+                className="border-t border-slate-200 px-4 py-16 text-center text-slate-500"
                 colSpan={columns.length}
               >
                 No data found.
@@ -110,11 +109,10 @@ export default function TableView<T>({
             </tr>
           )}
           {rows?.map((row, index) => {
-
             return (
               <tr
                 key={index}
-                className="hover:bg-gray-100 focus-within:bg-gray-100"
+                className="border-t border-slate-200/80 odd:bg-white even:bg-slate-50/60 transition-colors hover:bg-cyan-50/50 focus-within:bg-cyan-50/50"
               >
                 {columns.map(column => {
                   let val = get(row, column.name);
@@ -122,14 +120,14 @@ export default function TableView<T>({
                     <td
                       key={column.name}
                       style={column.name == 'id' ? styles.id : styles.auto}
-                      className="p-3"
+                      className="px-4 py-3 align-middle text-slate-700"
                     >
                       {column.name == 'id' ?
                         <input
                           type="checkbox"
                           value={val}
                           onChange={handleChange}
-                          className="check-item h-5 w-5 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                          className="check-item h-4 w-4 cursor-pointer rounded border-slate-300 text-cyan-600 focus:ring-cyan-400 focus:ring-offset-0"
                         /> : column.renderCell?.(row) ??
                         val ??
                         'N/A'}

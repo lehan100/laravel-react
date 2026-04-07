@@ -15,7 +15,7 @@ export default function CloseButton({ color, onClick }: CloseButtonProps) {
     <button
       onClick={onClick}
       type="button"
-      className="focus:outline-none group p-2"
+      className="group inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
     >
       <X size={16} className={className} />
     </button>

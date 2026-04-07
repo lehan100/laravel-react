@@ -138,46 +138,46 @@ function IndexPage() {
             </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
                 <Card title={trans('hancms.label.admin.name')}>
-                    <table className="min-w-full divide-y divide-gray-200 text-left">
-                        <thead className="bg-gray-50">
-                            <tr className="font-bold text-gray-700">
-                                <th className="px-4 py-3 whitespace-nowrap">{trans('hancms.column.key')}</th>
+                    <table className="min-w-full whitespace-nowrap">
+                        <thead className="bg-slate-950 text-white">
+                            <tr className="text-left">
+                                <th className="whitespace-nowrap px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">{trans('hancms.column.key')}</th>
                                 {langs.data.map((row: any) => (
-                                    <th key={row.id} className="px-4 py-3">
+                                    <th key={row.id} className="px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
                                         <div className="flex items-center gap-2 whitespace-nowrap">
                                             {row.photo && (
                                                 <img
                                                     src={'/' + config_path.path + "/" + row.photo}
-                                                    className="w-5 h-4 object-contain shadow-sm rounded-sm"
+                                                    className="h-4 w-5 rounded-sm object-contain ring-1 ring-white/20"
                                                     alt={row.name}
                                                 />
                                             )}
-                                            <span className="font-medium text-[13px]">{row.name}</span>
+                                            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">{row.name}</span>
                                         </div>
                                     </th>
                                 ))}
-                                <th className="px-4 py-3 text-center">{trans('hancms.column.action')}</th>
+                                <th className="px-4 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">{trans('hancms.column.action')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 bg-white">
+                        <tbody className="bg-white">
                             {data.labels.en && Object.entries(data.labels.en).map(([key, value]) => (
-                                <tr key={key} className="hover:bg-blue-50/50 transition-colors odd:bg-white even:bg-gray-50/30">
-                                    <td className="px-4 py-2 align-middle text-gray-500 font-mono text-xs italic">
+                                <tr key={key} className="border-t border-slate-200/80 odd:bg-white even:bg-slate-50/60 transition-colors hover:bg-cyan-50/50">
+                                    <td className="px-4 py-3 align-middle font-mono text-xs italic text-slate-500">
                                         label.{key}
                                     </td>
                                     {langs.data.map((row: any) => {
                                         const cellValue = data.labels[row.code] ? data.labels[row.code][key] : '';
                                         return (
-                                            <td key={row.id} className="px-4 py-2 align-middle min-w-[200px]">
+                                            <td key={row.id} className="min-w-[200px] px-4 py-3 align-middle">
                                                 {renderInput(row.code, key, cellValue)}
                                             </td>
                                         )
                                     })}
-                                    <td className="px-4 py-2 text-center">
+                                    <td className="px-4 py-3 text-center">
                                         <button
                                             type="button"
                                             onClick={() => openDeleteModal(key)}
-                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-rose-500 transition-colors hover:bg-rose-50"
                                             title="Xóa dòng này"
                                         >
                                             <svg xmlns="http://www.w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
@@ -186,15 +186,15 @@ function IndexPage() {
                                 </tr>
                             ))}
                         </tbody>
-                        <tfoot>
-                            <tr className="bg-gray-100">
+                        <tfoot className="bg-slate-50">
+                            <tr>
                                 <td className="px-4 py-3">
                                     {isAdding ? (
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
                                                 placeholder={trans('hancms.label.msg_placeholder')}
-                                                className="border border-indigo-500 rounded px-2 py-1 text-xs w-full focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-200"
                                                 value={newKey}
                                                 onChange={(e) => setNewKey(e.target.value)}
                                                 autoFocus
@@ -210,14 +210,14 @@ function IndexPage() {
                                             <button
                                                 type="button"
                                                 onClick={addNewRow}
-                                                className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
+                                                className="rounded-2xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-500"
                                             >
                                                 {trans('hancms.button.confirm')}
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => { setIsAdding(false); setNewKey(""); }}
-                                                className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs hover:bg-gray-400"
+                                                className="rounded-2xl bg-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-300"
                                             >
                                                 {trans('hancms.button.cancel')}
                                             </button>
@@ -226,7 +226,7 @@ function IndexPage() {
                                         <button
                                             type="button"
                                             onClick={() => setIsAdding(true)}
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-all shadow-sm active:scale-95"
+                                            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-950/10 transition-all hover:-translate-y-0.5 hover:from-emerald-500 hover:to-teal-500 active:translate-y-0"
                                         >
                                             <PlusCircle size={18} />
                                             <span>{trans('hancms.button.new_line')}</span>

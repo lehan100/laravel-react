@@ -1,12 +1,15 @@
-import { Link, usePage, useForm, router } from '@inertiajs/react';
+import { usePage, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Save, Undo } from 'lucide-react';
+import { Save } from 'lucide-react';
 import SaveButton from '@/Components/Button/SaveButton';
+import BackButton from '@/Components/Button/BackButton';
 import { User } from '@/types';
 import { useTrans } from '@/Hooks/useTrans';
-import { Checkbox } from '@/Components/Form/HancmsCheckbox';
 import { InputGroup } from '@/Components/Form/HancmsInput';
+import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import Card from '@/Components/Main/Card';
+import StatusSwitch from '@/Components/Status/StatusSwitch';
 
 function EditPage() {
   const { trans } = useTrans();
@@ -63,10 +66,10 @@ function EditPage() {
     setValidated(true);
   };
   const inputClass = (fieldName: string) => `
-        w-full border rounded-md p-2 text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500
+        w-full rounded-2xl border bg-white px-4 py-3 text-sm transition-all outline-none focus:ring-4
         ${(errors[fieldName as keyof typeof errors]) || (fieldName === 'confirm' && matchError)
-      ? 'border-red-500 bg-red-50'
-      : 'border-gray-300 focus:border-indigo-500'}
+      ? 'border-rose-400 bg-rose-50 ring-rose-100'
+      : 'border-slate-200 focus:border-slate-300 focus:ring-slate-200'}
     `;
   // Callback function to receive data
   const handleChildData = (data: any) => {
@@ -83,113 +86,91 @@ function EditPage() {
     }
   }, [data, undo, active]);
   return (
-    <div className='content p-4 text-sm'>
-      {/* Header Section */}
-      <div className="flex flex-wrap justify-between items-center mb-6">
-        <div className="w-full md:flex-1 mb-3 md:mb-0">
-          <h1 className="text-xl font-bold text-gray-800">
-            {trans('hancms.users.edit')} / <span className='text-blue-600'>{item.name}</span>
-          </h1>
-        </div>
-        <div className="w-full md:w-auto">
-          <div className="flex gap-2">
-            <SaveButton
-              loading={processing}
-              undo={0}
-              icon={<Save size={18} />}
-              sendDataStatusUndo={handleUndo}
-              form='my-form'
-            >
-              {trans('hancms.button.save')}
-            </SaveButton>
-            <Link
-              className="flex items-center gap-2 p-3 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors no-underline text-sm"
-              href={route('users.index')}
-            >
-              <Undo size={18} />
-              <span>{trans('hancms.button.back')}</span>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6 p-4 text-sm">
+      <HeaderToolbar title={
+        <>
+          {trans('hancms.users.edit')}
+          <span className='ml-2 text-cyan-600'>/ {item.name}</span>
+        </>
+      }>
+        <SaveButton
+          loading={processing}
+          undo={undo}
+          icon={<Save size={18} />}
+          sendDataStatusUndo={handleUndo}
+          form='my-form'
+        >
+          {trans('hancms.button.save')}
+        </SaveButton>
+        <BackButton href={route('users.index')}>
+          {trans('hancms.button.back')}
+        </BackButton>
+      </HeaderToolbar>
 
-      <form id='my-form' noValidate onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div className='py-3 px-4 bg-indigo-800 text-white font-semibold text-lg'>
-            {trans('hancms.title.infomation')}
-          </div>
-          <div className="p-4 space-y-4">
-            {/* Switch Status */}
-            <Checkbox>
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={active == '1'}
-                onChange={() => setActive(active == 1 ? 0 : 1)}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-              <span className={`ml-3 text-sm font-medium ${active == '1' ? 'text-green-600' : 'text-gray-500'}`}>
-                {active == '1' ? trans('hancms.status.active') : trans('hancms.status.inactive')}
-              </span>
-            </Checkbox>
-            {/* Account Name */}
+      <form id='my-form' noValidate onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card title={trans('hancms.title.infomation')}>
+          <div className="space-y-6 p-6">
+            <StatusSwitch
+              value={active}
+              onChange={(value) => setActive(String(value))}
+              activeLabel={trans('hancms.status.active')}
+              inactiveLabel={trans('hancms.status.inactive')}
+            />
+
             <div className="grid grid-cols-12 gap-4 items-start">
-              <label className="col-span-12 sm:col-span-3 pt-2 text-sm font-bold text-gray-700">
+              <label className="col-span-12 pt-2 text-sm font-semibold text-slate-700 sm:col-span-3">
                 {trans('hancms.column.account_name')}
               </label>
-              <div className="col-span-12 sm:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="col-span-12 grid grid-cols-1 gap-4 sm:col-span-9 sm:grid-cols-2">
                 <div>
                   <input
-                    type='text' required
+                    type='text'
+                    required
                     className={inputClass('first_name')}
                     defaultValue={data.first_name}
                     onChange={e => setData('first_name', e.target.value)}
                     placeholder={trans('hancms.column.first_name')}
                   />
-                  {errors.first_name && <p className="text-red-500 text-xs mt-1">{errors.first_name}</p>}
+                  {errors.first_name && <p className="mt-1 text-xs text-rose-500">{errors.first_name}</p>}
                 </div>
                 <div>
                   <input
-                    type='text' required
+                    type='text'
+                    required
                     className={inputClass('last_name')}
                     onChange={e => setData('last_name', e.target.value)}
                     defaultValue={data.last_name}
                     placeholder={trans('hancms.column.last_name')}
                   />
-                  {errors.last_name && <p className="text-red-500 text-xs mt-1">{errors.last_name}</p>}
+                  {errors.last_name && <p className="mt-1 text-xs text-rose-500">{errors.last_name}</p>}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Cột 2: Cấu hình tài khoản */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div className='py-3 px-4 bg-indigo-800 text-white font-semibold text-lg'>
-            {trans('hancms.title.setting')}
-          </div>
-          <div className="p-4 space-y-4">
-            {/* Email */}
+        <Card title={trans('hancms.title.setting')}>
+          <div className="space-y-6 p-6">
             <InputGroup label={trans('hancms.column.email')}>
               <input
-                type='text' required
+                type='email'
+                required
                 className={inputClass('email')}
                 onChange={e => setData('email', e.target.value)}
                 defaultValue={item.email}
               />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-xs text-rose-500">{errors.email}</p>}
             </InputGroup>
 
-            {/* Password */}
             <InputGroup label={trans('hancms.column.password')}>
               <input
                 type="password"
-                className={inputClass('confirm')}
+                className={inputClass('password')}
                 placeholder={trans('hancms.column.password')}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </InputGroup>
-            {/* Confirm Password */}
+
             <InputGroup label={trans('hancms.column.password_confirm')}>
               <input
                 type="password"
@@ -198,12 +179,12 @@ function EditPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              {matchError && <p className="text-red-500 text-xs mt-1">{trans('hancms.message.error.password_confirm')}</p>}
+              {matchError && <p className="mt-1 text-xs text-rose-500">{trans('hancms.message.error.password_confirm')}</p>}
             </InputGroup>
-            {/* Group Assign */}
+
             <InputGroup label={trans('hancms.column.assign_group')}>
               <select
-                className="w-full px-3 py-2 border rounded-md outline-none text-sm border-gray-300 focus:border-indigo-500"
+                className={inputClass('group')}
                 defaultValue={item.group}
                 onChange={e => setData('group', e.target.value)}
               >
@@ -215,9 +196,8 @@ function EditPage() {
               </select>
             </InputGroup>
           </div>
-        </div>
+        </Card>
       </form>
-
     </div>
   );
 }

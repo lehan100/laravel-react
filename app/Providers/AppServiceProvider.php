@@ -5,9 +5,13 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\MediaBanner;
 use App\Models\MediaBannerTranslation;
+use App\Models\Product;
+use App\Models\ProductPhoto;
 use App\Observers\CategoryObserver;
+use App\Observers\ImageFileObserver;
 use App\Observers\MediaBannerObserver;
 use App\Observers\MediaBannerTranslationObserver;
+use App\Observers\ProductObserver;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +19,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -56,6 +59,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Category\CategoryRepositoryInterface::class,
             \App\Repositories\Category\CategoryEloquentRepository::class
         );
+         $this->app->singleton(
+            \App\Repositories\Product\ProductRepositoryInterface::class,
+            \App\Repositories\Product\ProductEloquentRepository::class
+        );
     }
 
     /**
@@ -70,10 +77,13 @@ class AppServiceProvider extends ServiceProvider
         $this->bootRoute();
         // ------
         MediaBanner::observe(MediaBannerObserver::class);
-        MediaBannerTranslation::observe(\App\Observers\ImageFileObserver::class);
-        //MediaBannerTranslation::observe(MediaBannerTranslationObserver::class);
+        MediaBannerTranslation::observe(ImageFileObserver::class);
+        // -------
         Category::observe(CategoryObserver::class);
-        Category::observe(\App\Observers\ImageFileObserver::class);
+        Category::observe(ImageFileObserver::class);
+        // -------
+        ProductPhoto::observe(ImageFileObserver::class);
+        Product::observe(ProductObserver::class);
         //Login Api
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {

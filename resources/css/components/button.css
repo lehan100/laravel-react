@@ -1,5 +1,5 @@
 .btn-indigo {
-  @apply px-6 py-3 rounded bg-indigo-700 text-white text-sm font-bold whitespace-nowrap hover:bg-orange-500 focus:bg-orange-500;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-800 px-5 py-3 text-sm font-semibold whitespace-nowrap text-white shadow-lg shadow-slate-900/10 ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:from-cyan-700 hover:via-cyan-700 hover:to-slate-900 hover:shadow-xl hover:shadow-cyan-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2;
 }
 
 .btn-spinner,

@@ -18,12 +18,12 @@ export default function Face({ children, ...props }: any) {
     return (
         /* Sử dụng flex để đưa Button và Content nằm trên 1 dòng nếu cần, 
            hoặc giữ block tùy vào thiết kế UI của bạn */
-        <div className={`mb-4 btn-fade-group transition-all duration-300 ${isOpen ? 'is-open' : ''}`}>
+        <div className={`mb-3 rounded-2xl border border-white/10 bg-white/5 p-1 transition-all duration-300 ${isOpen ? 'ring-1 ring-cyan-400/30' : ''}`}>
 
             <button
                 onClick={() => setOpen(!open)}
                 aria-expanded={isOpen}
-                className="w-full flex items-center justify-between p-2 text-indigo-200 hover:bg-indigo-800 rounded-md transition-colors"
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-slate-200 transition-colors hover:bg-white/5 hover:text-white"
             >
                 {/* Phần chứa Icon và Title luôn nằm trên 1 dòng nhờ flex */}
                 <div className="flex items-center gap-2 px-2">
@@ -43,8 +43,8 @@ export default function Face({ children, ...props }: any) {
             {/* Hiệu ứng Fade bằng Tailwind: opacity + transform */}
             <div
                 id={props.id}
-                className={`text-sm transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'opacity-100 max-h-screen' : 'opacity-0 max-h-0'
-                    } ps-5 text-indigo-300`}
+                className={`overflow-hidden ps-3 text-sm text-slate-300 transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+                    }`}
             >
                 {children}
             </div>

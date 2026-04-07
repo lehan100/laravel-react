@@ -2,23 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Category;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CategoryTranslation extends Model
+class ProductTranslation extends Model
 {
-    use SoftDeletes,HasFactory;
-
-
+    use SoftDeletes, HasFactory;
     public $timestamps = true;
 
-    protected $table = 'category_translations';
-
-
+    protected $table = 'product_translations';
     protected $fillable = [
-        'category_id',
+        'product_id',
         'locale',
         'name',
         'description',
@@ -27,8 +23,9 @@ class CategoryTranslation extends Model
         'seo_keyword',
         'seo_description'
     ];
-    public function category()
+
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Product::class);
     }
 }

@@ -13,6 +13,7 @@ import FilterBar from '@/Components/FilterBar/FilterBar';
 import { useTrans } from '@/Hooks/useTrans';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import Card from '@/Components/Main/Card';
+import StatusBadge from '@/Components/Status/StatusBadge';
 function UsersPage() {
   const { trans } = useTrans();
   const { data, setData, errors, post, processing } = useForm({
@@ -22,36 +23,26 @@ function UsersPage() {
   const { items } = usePage<{ items: PaginatedData<User>; }>().props;
 
   const { meta: { links } }: any = items;
-  const groupClass: any = {
+  const groupBadge: Record<string, { className: string; text: string }> = {
     '0': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
-      'text': 'Not Access'
+      className: 'border border-slate-200 bg-slate-100 text-slate-600',
+      text: 'Not Access'
     },
     '1': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
-      'text': 'Administrators'
+      className: 'border border-emerald-200 bg-emerald-50 text-emerald-700',
+      text: 'Administrators'
     },
     '2': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-amber-500 text-white',
-      'text': 'Admin'
+      className: 'border border-amber-200 bg-amber-50 text-amber-700',
+      text: 'Admin'
     },
     '3': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-orange-500 text-white',
-      'text': 'Moderator'
+      className: 'border border-orange-200 bg-orange-50 text-orange-700',
+      text: 'Moderator'
     },
     '4': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-blue-500 text-white',
-      'text': 'Api'
-    }
-  };
-  const statusClass: any = {
-    '0': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
-      'text': trans('hancms.status.inactive')
-    },
-    '1': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
-      'text': trans('hancms.status.active')
+      className: 'border border-cyan-200 bg-cyan-50 text-cyan-700',
+      text: 'Api'
     }
   };
   const columns = useMemo(
@@ -77,14 +68,22 @@ function UsersPage() {
         label: trans('hancms.column.status'),
         name: 'status',
         renderCell: (row: any) => (
-          <span className={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</span >
+          <StatusBadge
+            value={row.status}
+            activeLabel={trans('hancms.status.active')}
+            inactiveLabel={trans('hancms.status.inactive')}
+          />
         )
       },
       {
         label: trans('hancms.column.group'),
         name: 'group',
         renderCell: (row: any) => (
-          <span className={groupClass[row.group]['bg']}>{groupClass[row.group]['text']}</span >
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ring-1 ${groupBadge[row.group]?.className || 'border border-slate-200 bg-slate-100 text-slate-600'}`}
+          >
+            {groupBadge[row.group]?.text || row.group}
+          </span>
         )
       },
       {
@@ -105,7 +104,7 @@ function UsersPage() {
         )
       },
     ],
-    []
+    [trans]
   );
   function destroy(id: any) {
     if (confirm(trans('hancms.message.destroy', { name: trans('hancms.users.name').toLowerCase() }))) {

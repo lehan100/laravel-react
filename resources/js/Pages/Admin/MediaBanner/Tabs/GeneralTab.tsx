@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import { ChevronDown, Check, X } from "lucide-react";
 import MessageError from "@/Components/Form/MessageError";
+import StatusSwitch from "@/Components/Status/StatusSwitch";
 interface Option {
     id: number;
     name: string;
@@ -50,90 +51,86 @@ const GeneralTab = ({ data, setData, trans, positions = [], errors }: GeneralTab
     const positionError = errors?.position_ids;
     return (
         <div className="space-y-6">
-            <InputGroup label={trans('hancms.column.status')} align="center">
-                <div className="flex items-center gap-4">
-                    <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                            type="checkbox"
-                            className="sr-only peer"
-                            checked={data.status === 1}
-                            onChange={(e) => setData('status', e.target.checked ? 1 : 0)}
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                        <span className="ml-3 text-sm font-medium text-gray-700">
-                            {data.status === 1 ? trans('hancms.status.active') : trans('hancms.status.inactive')}
-                        </span>
-                    </label>
-                </div>
-            </InputGroup>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+                <InputGroup label={trans('hancms.column.status')} align="center">
+                    <StatusSwitch
+                        value={data.status}
+                        onChange={(value) => setData('status', value)}
+                        activeLabel={trans('hancms.status.active')}
+                        inactiveLabel={trans('hancms.status.inactive')}
+                    />
+                </InputGroup>
+            </div>
 
-            <InputGroup label={trans('hancms.media.position.name')} align="center">
-                <div className="relative w-full" ref={dropdownRef}>
-                    <div
-                        onClick={() => setIsOpen(!isOpen)}
-                        className={`min-h-[42px] w-full border rounded-md shadow-sm px-2 py-1.5 text-sm bg-white cursor-pointer flex justify-between items-center transition-all ${positionError
-                                ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-                                : 'border-gray-300 hover:border-indigo-400 focus:ring-2 focus:ring-indigo-500'
-                            }`}
-                    >
-                        <div className="flex flex-wrap gap-1.5 mr-2 max-w-[92%]">
-                            {currentIds.length > 0 ? (
-                                positions
-                                    .filter(opt => currentIds.includes(opt.id))
-                                    .map((opt) => (
-                                        <span
-                                            key={opt.id}
-                                            className="inline-flex items-center bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-indigo-100 hover:bg-indigo-100 transition-colors"
-                                        >
-                                            {opt.name}
-                                            <button
-                                                type="button"
-                                                onClick={(e) => removeOption(e, opt.id)}
-                                                className="ml-1.5 p-0.5 rounded-full hover:bg-indigo-200 text-indigo-400 hover:text-indigo-600 transition-all"
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+                <InputGroup label={trans('hancms.media.position.name')} align="center">
+                    <div className="relative w-full" ref={dropdownRef}>
+                        <div
+                            onClick={() => setIsOpen(!isOpen)}
+                            className={`flex min-h-[52px] w-full cursor-pointer items-center justify-between rounded-2xl border bg-white px-4 py-3 text-sm shadow-sm transition-all ${positionError
+                                    ? 'border-rose-400 ring-4 ring-rose-100'
+                                    : 'border-slate-200 hover:border-slate-300 hover:shadow-md focus-visible:ring-4 focus-visible:ring-slate-200'
+                                }`}
+                        >
+                            <div className="mr-3 flex max-w-[92%] flex-wrap gap-2">
+                                {currentIds.length > 0 ? (
+                                    positions
+                                        .filter(opt => currentIds.includes(opt.id))
+                                        .map((opt) => (
+                                            <span
+                                                key={opt.id}
+                                                className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200"
                                             >
-                                                <X size={12} strokeWidth={3} />
-                                            </button>
-                                        </span>
-                                    ))
-                            ) : (
-                                <span className="text-gray-400 ml-1 font-normal">
-                                    {trans('hancms.placeholder.select')}
-                                </span>
-                            )}
-                        </div>
-                        <ChevronDown size={16} className={`text-gray-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-                    </div>
-                    {positionError && (
-                        <MessageError>{positionError}</MessageError>
-                    )}
-                    {isOpen && (
-                        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto py-1 ring-1 ring-black ring-opacity-5">
-                            {positions.map((position) => {
-                                const isChecked = currentIds.includes(position.id);
-                                return (
-                                    <label
-                                        key={position.id}
-                                        className="flex items-center justify-between px-4 py-2.5 hover:bg-indigo-50 cursor-pointer group transition-colors"
-                                    >
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
-                                                checked={isChecked}
-                                                onChange={() => toggleOption(position.id)}
-                                            />
-                                            <span className={`ml-3 text-sm transition-colors ${isChecked ? 'font-semibold text-indigo-700' : 'text-gray-700 group-hover:text-indigo-600'}`}>
-                                                {position.name}
+                                                {opt.name}
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => removeOption(e, opt.id)}
+                                                    className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-300 hover:text-slate-700"
+                                                >
+                                                    <X size={10} strokeWidth={3} />
+                                                </button>
                                             </span>
-                                        </div>
-                                        {isChecked && <Check size={14} className="text-indigo-600" />}
-                                    </label>
-                                );
-                            })}
+                                        ))
+                                ) : (
+                                    <span className="ml-1 font-normal text-slate-400">
+                                        {trans('hancms.placeholder.select')}
+                                    </span>
+                                )}
+                            </div>
+                            <ChevronDown size={16} className={`shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                         </div>
-                    )}
-                </div>
-            </InputGroup>
+                        {positionError && (
+                            <MessageError>{positionError}</MessageError>
+                        )}
+                        {isOpen && (
+                            <div className="absolute z-50 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-950/10 ring-1 ring-black/5">
+                                {positions.map((position) => {
+                                    const isChecked = currentIds.includes(position.id);
+                                    return (
+                                        <label
+                                            key={position.id}
+                                            className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-50 group"
+                                        >
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                                    checked={isChecked}
+                                                    onChange={() => toggleOption(position.id)}
+                                                />
+                                                <span className={`ml-3 text-sm transition-colors ${isChecked ? 'font-semibold text-slate-900' : 'text-slate-600 group-hover:text-slate-900'}`}>
+                                                    {position.name}
+                                                </span>
+                                            </div>
+                                            {isChecked && <Check size={14} className="text-emerald-600" />}
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </InputGroup>
+            </div>
         </div>
     );
 };

@@ -8,12 +8,12 @@ interface Props extends ComponentProps<'button'> {
 export default function DeleteButton({ onDelete, size_icon, children }: Props) {
   return (
     <button
-      className='inline-flex items-center gap-2 px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded-md transition-colors duration-200 no-underline shadow-sm'
+      className='inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-red-600 px-2.5 py-1.5 text-[11px] font-semibold text-white no-underline shadow-md shadow-rose-950/10 ring-1 ring-rose-950/5 transition-all duration-200 hover:-translate-y-0.5 hover:from-rose-500 hover:to-red-500 hover:shadow-lg hover:shadow-rose-950/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2'
       type="button"
       tabIndex={-1}
       onClick={onDelete}
     >
-      {<Trash2 size={size_icon} />}
+      <Trash2 size={size_icon} />
       <span>{children}</span>
     </button>
   );

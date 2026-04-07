@@ -1,10 +1,11 @@
 import SaveButton from "@/Components/Button/SaveButton";
+import BackButton from "@/Components/Button/BackButton";
 import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import { useTrans } from "@/Hooks/useTrans";
 import MainLayout from "@/Layouts/MainLayout";
 import { MediaBanner, MediaPosition } from "@/types";
-import { Link, useForm, usePage } from "@inertiajs/react";
-import { Save, Undo } from "lucide-react";
+import { useForm, usePage } from "@inertiajs/react";
+import { Save } from "lucide-react";
 import { useState } from "react";
 import GeneralTab from "./Tabs/GeneralTab";
 import ContentTab from "./Tabs/ContentTab";
@@ -78,59 +79,75 @@ function CreatedPage() {
             <HeaderToolbar title={trans('hancms.media.banner.name')}>
                 <SaveButton
                     loading={processing}
-                    undo={0}
+                    undo={undo}
                     icon={<Save size={18} />}
                     sendDataStatusUndo={handleUndo}
                     form='my-form'
                 >
                     {trans('hancms.button.save')}
                 </SaveButton>
-                <Link
-                    className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-all shadow-sm"
-                    href={route('media-banner.index')}
-                >
-                    <Undo size={20} />
-                    <span>{trans('hancms.button.back')}</span>
-                </Link>
+                <BackButton href={route('media-banner.index')}>
+                    {trans('hancms.button.back')}
+                </BackButton>
             </HeaderToolbar>
             <form id='my-form' onSubmit={handleSubmit} noValidate className="text-sm">
-                <div className="flex flex-col md:flex-row item-start gap-4 md:gap-8">
-                    {/* Tab List */}
-                    <div className="flex flex-row md:flex-col w-full md:w-56 overflow-x-auto border-r border-gray-200 text-base" role="tablist">
-                        {['general', 'content'].map((id) => {
-                            const errorInTab = hasTabError(id);
-                            return (
-                                <button
-                                    type="button"
-                                    key={id}
-                                    onClick={() => setActiveTab(id)}
-                                    className={`p-5 text-left font-medium transition-all flex justify-between item-center ${activeTab === id
-                                            ? 'bg-indigo-800 text-white'
-                                            : errorInTab
-                                                ? 'bg-red-50 text-red-600' 
-                                                : 'bg-indigo-50 text-indigo-900'
-                                        }`}
-                                >
-                                    <span>{trans(`hancms.layout.tabs.${id}`)}</span>
+                <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.45)]">
+                    <div className="flex flex-col md:flex-row">
+                        <div className="border-b border-slate-200 bg-gradient-to-b from-slate-950/[0.03] to-white p-3 md:w-72 md:border-b-0 md:border-r md:p-4">
+                            <div className="mb-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+                                <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">{trans('hancms.tabs')}</div>
+                                <div className="mt-1 text-sm font-semibold text-slate-900">{trans('hancms.media.banner.name')}</div>
+                            </div>
+                            <div className="flex flex-row gap-2 overflow-x-auto md:flex-col md:overflow-visible" role="tablist">
+                                {['general', 'content'].map((id) => {
+                                    const errorInTab = hasTabError(id);
+                                    const active = activeTab === id;
+                                    return (
+                                        <button
+                                            type="button"
+                                            key={id}
+                                            onClick={() => setActiveTab(id)}
+                                            className={`group flex min-w-[170px] items-center justify-between rounded-2xl border p-4 text-left transition-all duration-200 md:min-w-0 ${active
+                                                    ? 'border-slate-950 bg-slate-950 text-white shadow-[0_18px_45px_-24px_rgba(15,23,42,0.7)]'
+                                                    : errorInTab
+                                                        ? 'border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100'
+                                                        : 'border-slate-200 bg-white/90 text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900'
+                                                }`}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="mt-1 text-sm font-semibold">{trans(`hancms.layout.tabs.${id}`)}</span>
+                                            </div>
 
-                                    {errorInTab && (
-                                        <span className="relative flex h-2 w-2 ml-3">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-                                        </span>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* Tab Content */}
-                    <div className="w-full flex-1 bg-white min-h-[200px] rounded-lg shadow-sm ">
-                        <div className="bg-indigo-800 text-white px-6 py-3 font-medium uppercase text-base rounded-tl-lg  rounded-tr-lg">
-                            {trans(`hancms.layout.tabs.${activeTab}`)}
+                                            {errorInTab ? (
+                                                <span className="ml-3 inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 shadow-[0_0_0_4px_rgba(244,63,94,0.14)]" />
+                                            ) : (
+                                                <span className={`ml-3 text-xs font-semibold ${active ? 'text-cyan-200' : 'text-slate-300 group-hover:text-slate-500'}`}>
+                                                    {active ? trans('hancms.open') : trans('hancms.view')}
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <div className="p-6">
-                            {renderTabContent()}
+
+                        <div className="min-w-0 flex-1 bg-gradient-to-b from-white to-slate-50/70">
+                            <div className="border-b border-slate-200/80 bg-white/80 px-5 py-4 backdrop-blur sm:px-6">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div className="text-[11px] uppercase tracking-[0.28em] text-slate-400">{trans('hancms.current_tab')}</div>
+                                        <h2 className="mt-1 text-lg font-semibold text-slate-900">
+                                            {trans(`hancms.layout.tabs.${activeTab}`)}
+                                        </h2>
+                                    </div>
+                                    <div className="hidden rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500 sm:inline-flex">
+                                        {hasTabError(activeTab) ? trans('hancms.needs_attention') : trans('hancms.ready')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-5 sm:p-6">
+                                {renderTabContent()}
+                            </div>
                         </div>
                     </div>
                 </div>

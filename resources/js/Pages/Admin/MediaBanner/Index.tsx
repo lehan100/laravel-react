@@ -7,6 +7,7 @@ import DeleteButtonView from '@/Components/Button/DeleteButtonView';
 import EditButton from '@/Components/Button/EditButtonView';
 import CreatedButton from '@/Components/Button/CreatedButton';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import StatusBadge from '@/Components/Status/StatusBadge';
 import { useTrans } from "@/Hooks/useTrans";
 import MainLayout from "@/Layouts/MainLayout";
 import { MediaBanner, PaginatedData } from "@/types";
@@ -115,7 +116,11 @@ function IndexPage() {
                 label: trans('hancms.column.status'),
                 name: 'status',
                 renderCell: (row: any) => (
-                    <span className={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</span >
+                    <StatusBadge
+                        value={row.status}
+                        activeLabel={trans('hancms.status.active')}
+                        inactiveLabel={trans('hancms.status.inactive')}
+                    />
                 )
             },
             {
@@ -136,18 +141,8 @@ function IndexPage() {
                 )
             },
         ],
-        []
+        [trans]
     );
-    const statusClass: any = {
-        '0': {
-            'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
-            'text': trans('hancms.status.inactive')
-        },
-        '1': {
-            'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
-            'text': trans('hancms.status.active')
-        }
-    };
     function destroy(id: any) {
         if (confirm(trans('hancms.message.destroy', { name: trans('hancms.media.banner.name').toLowerCase() }))) {
             router.delete(route('media-banner.destroy', id), {

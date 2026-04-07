@@ -13,17 +13,19 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string("sku")->nullable()->index(); 
+            $table->string("sku")->nullable()->index();
             $table->integer("quantity")->nullable()->default(0);
-            $table->integer("stock")->nullable()->default(0);
             $table->integer("weight")->nullable()->default(0);
             $table->decimal('price', 15, 2)->default(0);
-            $table->integer('status')->unsigned()->nullable()->default(0);
-            $table->integer('use_coupon')->unsigned()->nullable()->default(1);
-            $table->integer('sort')->unsigned()->nullable()->default(0);
+            $table->boolean("is_coupon")->default(false);
+            $table->boolean("is_stock")->default(false);
+            $table->unsignedTinyInteger('status')->default(0);
+            $table->unsignedInteger('order')->default(0);
             $table->integer('hit_viewer')->unsigned()->nullable()->default(0);
             $table->integer('hit_order')->unsigned()->nullable()->default(0);
+            $table->index(['status', 'order']);
             $table->timestamps();
+            $table->softDeletes();
         });
         Schema::create('category_product', function (Blueprint $table) {
             $table->id();
@@ -37,9 +39,10 @@ return new class extends Migration
             $table->string('filename');
             $table->string('disk')->default('public');
             $table->string('alt')->nullable();
-            $table->integer('sort')->default(0);
-            $table->boolean('is_main')->default(false);
+            $table->integer('order')->default(0);
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
         Schema::create('product_translations', function (Blueprint $table) {
             $table->id();
@@ -47,7 +50,7 @@ return new class extends Migration
                 ->constrained('products')
                 ->onDelete('cascade');
             $table->string('locale', 10)->index();
-            $table->string('name')->nullable();
+            $table->string('name');
             $table->text('description')->nullable();
             $table->text('content')->nullable();
             // SEO Field
@@ -56,6 +59,7 @@ return new class extends Migration
             $table->text('seo_description')->nullable();
             $table->unique(['product_id', 'locale'], 'product_locale_unique');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

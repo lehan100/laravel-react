@@ -89,6 +89,8 @@ return [
             'copyright' => 'Bản quyền',
         ]
     ],
+    'tabs' => 'Tab',
+    'section' => 'Phần',
     'seo' => [
         'name' => 'Tối ưu hóa công cụ tìm kiếm (SEO)',
         'slug' => 'Đường dẫn',
@@ -112,6 +114,7 @@ return [
         'edit' => 'Chỉnh sửa',
         'delete' => 'Xóa',
         'view' => 'Xem',
+        'open' => 'Mở',
         'save' => 'Lưu lại',
         'back' => 'Quay lại',
         'choose_image' => 'Chọn ảnh',
@@ -119,6 +122,11 @@ return [
         'confirm' => 'Xác nhận',
         'cancel' => 'Hủy bỏ'
     ],
+    'view' => 'Xem',
+    'open' => 'Mở',
+    'current_tab' => 'Tab hiện tại',
+    'ready' => 'Sẵn sàng',
+    'needs_attention' => 'Cần chú ý',
     'column' => [
         'name' => 'Tên',
         'slug' => 'Đường dẫn',

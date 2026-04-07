@@ -33,36 +33,35 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
     public function lists($params = null, $options = null)
     {
         $currentLocale = app()->getLocale();
-        if ($options['task'] == "admin-list-items") {
-            return $this->_model->with([
+        $task = $options['task'] ?? null;
+
+        // Kiểm tra nếu là các task quản trị danh mục
+        if (in_array($task, ["admin-list-items", "admin-list-items-active"])) {
+
+            $query = $this->_model->with([
                 'translations' => function ($q) use ($currentLocale) {
+                    // Phải có category_id để Eloquent map được quan hệ
                     $q->select(['id', 'category_id', 'locale', 'name'])
                         ->where('locale', $currentLocale);
                 }
-            ])
-                ->select($this->FIELDSELECT)
-                ->orderBy('order', 'asc')
-                ->get();
-        }
+            ]);
 
+            // FIELDSELECT bắt buộc phải có 'id' và 'parent_id' để Pipeline hoạt động
+            $query->select($this->FIELDSELECT)->orderBy('order', 'asc');
 
-        if ($options['task'] == "admin-list-items-active") {
-            $categories = $this->_model->with([
-                'translations' => function ($q) use ($currentLocale) {
-                    $q->select(['id', 'category_id', 'locale', 'name'])
-                        ->where('locale', $currentLocale);
-                }
-            ])
-                ->select($this->FIELDSELECT)
-                ->where("status", 1)
-                ->orderBy('order', 'asc')
-                ->get();
-            return app(Pipeline::class)
-                ->send($categories)
-                ->through([
-                    SortCategoriesByHierarchy::class,
-                ])
-                ->thenReturn();
+            if ($task == "admin-list-items-active") {
+                $categories = $query->where("status", 1)->get();
+
+                // Xử lý phân cấp qua Pipeline
+                return app(\Illuminate\Pipeline\Pipeline::class)
+                    ->send($categories)
+                    ->through([
+                        SortCategoriesByHierarchy::class,
+                    ])
+                    ->thenReturn();
+            }
+
+            return $query->get();
         }
 
         return null;

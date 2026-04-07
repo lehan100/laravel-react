@@ -17,7 +17,7 @@ class Category extends Model implements TranslatableContract
     use HasFactory, SoftDeletes, HasImageFile, Translatable;
 
     protected $table = 'categories';
-    protected $imageColumn = 'photo';
+    
     protected $fillable = [
         'status',
         'order',
@@ -33,7 +33,7 @@ class Category extends Model implements TranslatableContract
         'seo_keyword',   
         'seo_description' 
     ];
-
+    protected $imageColumn = 'photo';
     public function getImagePath()
     {
         return config('image.path.category', null);
@@ -65,16 +65,16 @@ class Category extends Model implements TranslatableContract
     }
 
 
-    protected static function booted()
-    {
-        static::deleting(function ($category) {
-            $category->translations()->get()->each(function ($translation) {
-                $translation->delete();
-            });
+    // protected static function booted()
+    // {
+    //     static::deleting(function ($category) {
+    //         $category->translations()->get()->each(function ($translation) {
+    //             $translation->delete();
+    //         });
 
-            if ($category->isForceDeleting()) {
-                $category->slugs()->delete();
-            }
-        });
-    }
+    //         if ($category->isForceDeleting()) {
+    //             $category->slugs()->delete();
+    //         }
+    //     });
+    // }
 }

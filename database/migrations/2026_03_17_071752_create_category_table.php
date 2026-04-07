@@ -37,6 +37,7 @@ return new class extends Migration
             $table->text('seo_description')->nullable();
             $table->unique(['category_id', 'locale'], 'categories_locale_unique');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

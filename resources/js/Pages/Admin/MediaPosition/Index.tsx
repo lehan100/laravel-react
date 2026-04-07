@@ -11,6 +11,7 @@ import EditButton from '@/Components/Button/EditButtonView';
 import CreatedButton from '@/Components/Button/CreatedButton';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import Card from '@/Components/Main/Card';
+import StatusBadge from '@/Components/Status/StatusBadge';
 function IndexPage() {
   const { trans } = useTrans();
   const { data, setData, errors, post, processing } = useForm({
@@ -19,16 +20,6 @@ function IndexPage() {
   
   const { items }: any = usePage<{ items: PaginatedData<MediaPosition>; }>().props;
   const { meta: { links } }: any = items;
-  const statusClass: any = {
-    '0': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-red-500 text-white',
-      'text': trans('hancms.status.inactive')
-    },
-    '1': {
-      'bg': 'inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-green-500 text-white',
-      'text': trans('hancms.status.active')
-    }
-  };
   const columns = useMemo(
     () => [
       {
@@ -48,7 +39,11 @@ function IndexPage() {
         label: trans('hancms.column.status'),
         name: 'status',
         renderCell: (row: any) => (
-          <span className={statusClass[row.status]['bg']}>{statusClass[row.status]['text']}</span >
+          <StatusBadge
+            value={row.status}
+            activeLabel={trans('hancms.status.active')}
+            inactiveLabel={trans('hancms.status.inactive')}
+          />
         )
       },
       {
@@ -69,7 +64,7 @@ function IndexPage() {
         )
       },
     ],
-    []
+    [trans]
   );
   function destroy(id: any) {
     if (confirm(trans('hancms.message.destroy', { name: trans('hancms.media.position.name').toLowerCase() }))) {

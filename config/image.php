@@ -11,6 +11,10 @@ return [
             'width' => 480,
             'height' => 480
         ],
+        'product' => [
+            'width' => 800,
+            'height' => 800
+        ],
         'rating' => [
             'width' => 80,
             'height' => 80
@@ -35,6 +39,11 @@ return [
             "temp" => 'var/temp',
             'path' => 'media/category',
             'size' => 'category'
+        ],
+        'product' => [
+            "temp" => 'var/temp',
+            'path' => 'media/product',
+            'size' => 'product'
         ]
     ]
 ];
