@@ -2,6 +2,7 @@
 
 use Inertia\Inertia;
 use function Laravel\Ai\agent;
+use App\Http\Controllers\Ai\ProductAiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -71,7 +72,11 @@ Route::prefix($prefixAdmin)->group(function () {
         Route::post('media-move-file', [TinyMCEController::class, 'moveFile'])->name('media.move.file');
         Route::post('media-rename', [TinyMCEController::class, 'rename'])->name('media.rename');
         Route::post('media-delete', [TinyMCEController::class, 'delete'])->name('media.delete');
+        /* ----------- Exchange Rate ----------- */ 
         Route::get('exchange-rates/{currency?}', [ExchangeRateController::class, 'show'])->name('exchange-rates.show');
+       /* ----------- Product AI ----------- */
+        Route::post('product/ai-suggest-content', [ProductAiController::class, 'suggestContent'])->name('product.ai.suggest-content');
+        Route::post('product/ai-suggest-seo', [ProductAiController::class, 'suggestSeo'])->name('product.ai.suggest-seo');
         /* ----------- Dashboard ----------- */
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         /* ----------- Roles ----------- */

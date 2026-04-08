@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
-import { Globe, Save, Search } from 'lucide-react';
+import axios from 'axios';
+import { Globe, Save, Search, Sparkles } from 'lucide-react';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import SaveButton from '@/Components/Button/SaveButton';
 import BackButton from '@/Components/Button/BackButton';
@@ -78,6 +79,10 @@ const ProductFormView = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tinyCallback, setTinyCallback] = useState<any>(null);
     const [priceInput, setPriceInput] = useState(() => formatPriceInput(data.price, priceCurrency));
+    const [aiSuggestingLocale, setAiSuggestingLocale] = useState<string | null>(null);
+    const [aiSuggestionError, setAiSuggestionError] = useState('');
+    const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
+    const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
     const selectedCategoryIds = Array.isArray(data.category_ids) ? data.category_ids : [];
     const selectedFiles = Array.isArray(data.photos) ? data.photos : [];
     const defaultPhotoId = data.default_photo_id ?? item?.default_photo_id ?? existingPhotos.find((photo: any) => photo.is_default)?.id ?? null;
@@ -171,6 +176,85 @@ const ProductFormView = ({
             setTinyCallback(null);
         }
         setIsModalOpen(false);
+    };
+
+    const handleAiSuggestContent = async (locale: string) => {
+        const langData = data.translations?.[locale] || {};
+
+        setAiSuggestionError('');
+        setAiSuggestingLocale(locale);
+
+        try {
+            const response = await axios.post(route('product.ai.suggest-content'), {
+                locale,
+                name: langData.name || '',
+                description: langData.description || '',
+                seo_keyword: langData.seo_keyword || '',
+                current_content: langData.content || '',
+            });
+
+            const generated = String(response?.data?.content || '').trim();
+
+            if (!generated) {
+                setAiSuggestionError(
+                    trans('hancms.catalog.product.ai.empty_response') || 'AI did not return content.'
+                );
+                return;
+            }
+
+            updateTranslation(locale, 'content', generated);
+        } catch (error: any) {
+            const message = error?.response?.data?.message
+                || trans('hancms.catalog.product.ai.failed')
+                || 'Cannot generate content right now.';
+            setAiSuggestionError(message);
+        } finally {
+            setAiSuggestingLocale(null);
+        }
+    };
+
+    const handleAiSuggestSeo = async (locale: string) => {
+        const langData = data.translations?.[locale] || {};
+
+        setAiSeoSuggestionError('');
+        setAiSeoSuggestingLocale(locale);
+
+        try {
+            const response = await axios.post(route('product.ai.suggest-seo'), {
+                locale,
+                name: langData.name || '',
+                description: langData.description || '',
+                seo_keyword: langData.seo_keyword || '',
+                current_content: langData.content || '',
+                current_seo_title: langData.seo_title || '',
+                current_seo_description: langData.seo_description || '',
+            });
+
+            const seoTitle = String(response?.data?.seo_title || '').trim();
+            const seoDescription = String(response?.data?.seo_description || '').trim();
+
+            if (!seoTitle && !seoDescription) {
+                setAiSeoSuggestionError(
+                    trans('hancms.catalog.product.ai.empty_response') || 'AI did not return SEO content.'
+                );
+                return;
+            }
+
+            if (seoTitle) {
+                updateTranslation(locale, 'seo_title', seoTitle);
+            }
+
+            if (seoDescription) {
+                updateTranslation(locale, 'seo_description', seoDescription);
+            }
+        } catch (error: any) {
+            const message = error?.response?.data?.message
+                || trans('hancms.catalog.product.ai.failed')
+                || 'Cannot generate SEO right now.';
+            setAiSeoSuggestionError(message);
+        } finally {
+            setAiSeoSuggestingLocale(null);
+        }
     };
 
     const hasTabError = (tabId: string) => {
@@ -399,6 +483,22 @@ const ProductFormView = ({
                         </InputGroup>
 
                         <InputGroup label={trans('hancms.column.content')}>
+                            <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => handleAiSuggestContent(locale)}
+                                    disabled={aiSuggestingLocale === locale}
+                                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSuggestingLocale === locale
+                                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                        }`}
+                                >
+                                    <Sparkles size={14} />
+                                    {aiSuggestingLocale === locale
+                                        ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
+                                        : (trans('hancms.catalog.product.ai.suggest_content') || 'AI suggest content')}
+                                </button>
+                            </div>
                             <Editor
                                 tinymceScriptSrc="/js/tinymce/tinymce.min.js"
                                 licenseKey="gpl"
@@ -425,13 +525,31 @@ const ProductFormView = ({
                                 }}
                                 onEditorChange={(content) => updateTranslation(locale, 'content', content)}
                             />
+                            {aiSuggestionError && <MessageError>{aiSuggestionError}</MessageError>}
                             {contentError && <MessageError>{contentError}</MessageError>}
                         </InputGroup>
 
                         <div className="bg-gray-100 p-5 rounded-xl border border-gray-200 space-y-6">
-                            <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase mb-2">
-                                <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
+                            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase">
+                                    <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => handleAiSuggestSeo(locale)}
+                                    disabled={aiSeoSuggestingLocale === locale}
+                                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoSuggestingLocale === locale
+                                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                        : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                        }`}
+                                >
+                                    <Sparkles size={14} />
+                                    {aiSeoSuggestingLocale === locale
+                                        ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
+                                        : (trans('hancms.catalog.product.ai.suggest_seo') || 'AI suggest SEO')}
+                                </button>
                             </div>
+                            {aiSeoSuggestionError && <MessageError>{aiSeoSuggestionError}</MessageError>}
 
                             <InputGroup
                                 label={
