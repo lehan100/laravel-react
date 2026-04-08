@@ -27,6 +27,7 @@ class LanguageUpdateRequest extends FormRequest
         return [
             'name' => ['required'],
             'code' => ['required', Rule::unique('languages', 'code')->ignore($this->id, 'id')],
+            'currency' => ['nullable', Rule::in(['VND', 'USD', 'JPY'])],
             'photo' => ['nullable'],
             'status' => ['required'],
         ];

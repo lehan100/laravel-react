@@ -12,11 +12,13 @@ import HeaderToolbar from "@/Components/Main/HeaderToolbar";
 import Card from "@/Components/Main/Card";
 import MessageError from "@/Components/Form/MessageError";
 import StatusSwitch from "@/Components/Status/StatusSwitch";
+import SelectInput from "@/Components/Form/SelectInput";
 function CreatedPage() {
     const { trans } = useTrans();
     const { data, setData, errors, post, processing } = useForm({
         name: '',
         code: '',
+        currency: 'VND',
         photo: '',
         status: 0,
         undo: 0,
@@ -113,6 +115,20 @@ function CreatedPage() {
                                 onChange={e => setData('code', e.target.value)}
                             />
                             {errors.code && <MessageError>{errors.code}</MessageError>}
+                        </InputGroup>
+
+                        <InputGroup label={trans('hancms.column.currency')}>
+                            <SelectInput
+                                name="currency"
+                                value={data.currency}
+                                onChange={(e: any) => setData('currency', e.target.value)}
+                                options={[
+                                    { value: 'VND', label: 'VND' },
+                                    { value: 'USD', label: 'USD' },
+                                    { value: 'JPY', label: 'JPY' },
+                                ]}
+                            />
+                            {errors.currency && <MessageError>{errors.currency}</MessageError>}
                         </InputGroup>
 
                         {/* Image Upload Box */}

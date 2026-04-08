@@ -15,7 +15,7 @@ use Inertia\Inertia;
 
 class CategoryEloquentRepository extends EloquentRepository implements CategoryRepositoryInterface
 {
-    private $FIELDSELECT = ['id', 'photo', 'parent_id', 'status', 'order'];
+    private $FIELDSELECT = ['id', 'photo', 'parent_id', 'type', 'status', 'order'];
     protected $configPath;
 
     public function __construct()
@@ -49,6 +49,10 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
             // FIELDSELECT bắt buộc phải có 'id' và 'parent_id' để Pipeline hoạt động
             $query->select($this->FIELDSELECT)->orderBy('order', 'asc');
 
+            if (!empty($options['type'])) {
+                $query->where('type', $options['type']);
+            }
+
             if ($task == "admin-list-items-active") {
                 $categories = $query->where("status", 1)->get();
 
@@ -77,6 +81,29 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
 
     public function save($params = null, $options = null)
     {
+        if (($options['task'] ?? null) === 'reorder-tree') {
+            $items = $params['items'] ?? [];
+            if (empty($items)) {
+                return false;
+            }
+
+            DB::beginTransaction();
+            try {
+                foreach ($items as $item) {
+                    $this->_model->where('id', $item['id'])->update([
+                        'parent_id' => $item['parent_id'] ?? null,
+                        'order' => (int) ($item['order'] ?? 0),
+                    ]);
+                }
+                DB::commit();
+                return true;
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                logger("Error reorder category tree: " . $e->getMessage());
+                return false;
+            }
+        }
+
         if ($options['task'] == "admin-update-multi-status") {
             return $this->_model->whereIn('id', $params['aid'])->update(['status' => $params['value']]);
         }
@@ -95,8 +122,15 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
             // 1. Save Basic Info
             $item->status = $params['status'] ?? 0;
             $item->order  = $params['order'] ?? 0;
+            $item->type   = $params['type'] ?? 'product';
             $item->photo  = $params['photo'] ?? null;
-            $item->parent_id  = ($params['parent_id'] == 0 || empty($params['parent_id'])) ? null : $params['parent_id'];;
+            $parentId = ($params['parent_id'] == 0 || empty($params['parent_id'])) ? null : $params['parent_id'];
+            if ($parentId) {
+                $parent = $this->_model->find($parentId);
+                $item->parent_id = $parent && ($parent->type ?? 'product') === ($item->type ?? 'product') ? $parentId : null;
+            } else {
+                $item->parent_id = null;
+            }
             $item->save();
             // 2. Save Translations (exclude slug/is_default to let Pipe handle it)
             $translationsData = $params['translations'] ?? [];

@@ -35,7 +35,7 @@ export default function FlashedMessages() {
   return (
     <div
       aria-live="assertive"
-      className="pointer-events-none fixed inset-x-0 top-4 z-[100] flex justify-center px-4 sm:px-6"
+      className="pointer-events-none fixed inset-x-0 top-4 z-[10050] flex justify-center px-4 sm:px-6"
     >
       <div className="flex w-full max-w-xl flex-col gap-3">
         <Transition

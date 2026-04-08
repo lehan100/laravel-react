@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 25);
             $table->string('code', 10);
+            $table->string('currency', 10)->nullable();
             $table->string('photo', 50);
             $table->integer('status')->nullable()->default(0);
             $table->timestamps();

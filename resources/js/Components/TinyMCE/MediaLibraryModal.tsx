@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { X, Loader2, ImageIcon, Folder, ChevronRight, Home, FolderPlus, Upload, Move, Trash2, Edit2Icon } from 'lucide-react';
 import { useTrans } from '@/Hooks/useTrans';
@@ -133,20 +134,24 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden relative border border-white/20">
+    const portalTarget = typeof document !== 'undefined' ? document.body : null;
 
-                <div className="p-4 border-b flex justify-between items-center bg-gray-50/80 backdrop-blur-md z-30">
+    if (!portalTarget) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl w-[96vw] max-w-6xl h-[92vh] max-h-[92vh] sm:w-full sm:h-auto sm:max-h-[85vh] flex flex-col shadow-2xl overflow-hidden relative border border-white/20">
+
+                <div className="flex flex-col gap-3 border-b bg-gray-50/80 p-3 backdrop-blur-md z-30 sm:flex-row sm:items-center sm:justify-between sm:p-4">
                     <div className="flex items-center gap-2">
                         <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm">
                             <ImageIcon className="text-white" size={18} />
                         </div>
-                        <h3 className="font-black text-gray-800 text-[14px] uppercase tracking-wider">{trans('hancms.tinymce.name')}</h3>
+                        <h3 className="font-black text-gray-800 text-[13px] uppercase tracking-wider sm:text-[14px]">{trans('hancms.tinymce.name')}</h3>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <label className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[12px] font-black hover:bg-emerald-600 cursor-pointer shadow-md shadow-emerald-100 active:scale-95 transition-all uppercase tracking-tighter">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <label className="flex flex-1 min-w-[130px] items-center justify-center gap-2 px-3 py-2 bg-emerald-500 text-white rounded-xl text-[11px] font-black hover:bg-emerald-600 cursor-pointer shadow-md shadow-emerald-100 active:scale-95 transition-all uppercase tracking-tighter sm:flex-none sm:px-4 sm:text-[12px]">
                             {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                             {trans('hancms.tinymce.button.upload_image')}
                             <input type="file" className="hidden" multiple onChange={(e) => e.target.files && uploadFiles(e.target.files)} accept="image/*" />
@@ -155,18 +160,18 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                         <button
                             type="button"
                             onClick={() => setIsCreating(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-[12px] font-black hover:bg-indigo-700 shadow-md shadow-indigo-100 active:scale-95 transition-all uppercase tracking-tighter"
+                            className="flex flex-1 min-w-[130px] items-center justify-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-xl text-[11px] font-black hover:bg-indigo-700 shadow-md shadow-indigo-100 active:scale-95 transition-all uppercase tracking-tighter sm:flex-none sm:px-4 sm:text-[12px]"
                         >
                             <FolderPlus size={14} />  {trans('hancms.tinymce.button.create_folder')}
                         </button>
 
-                        <button type="button" onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all ml-1">
+                        <button type="button" onClick={onClose} className="ml-auto rounded-full p-2 text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 sm:ml-1">
                             <X size={20} />
                         </button>
                     </div>
                 </div>
 
-                <div className="px-6 py-2.5 border-b bg-white flex items-center gap-2 text-[11px] font-bold text-gray-400 overflow-x-auto whitespace-nowrap z-20 shadow-sm">
+                <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap border-b bg-white px-4 py-2 text-[10px] font-bold text-gray-400 shadow-sm sm:px-6 sm:py-2.5 sm:text-[11px] z-20">
                     <button type="button" onClick={() => fetchMedia('')} className="hover:text-indigo-600 flex items-center gap-1 transition-colors uppercase"><Home size={14} /> Root</button>
                     {breadcrumbs.map((folder, i) => (
                         <React.Fragment key={i}>
@@ -176,7 +181,7 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                     ))}
                 </div>
 
-                <div className="p-6 overflow-y-auto flex-1 bg-white custom-scrollbar relative min-h-[400px]" onClick={() => setDraggingItem(null)}>
+                <div className="relative flex-1 overflow-y-auto bg-white p-4 custom-scrollbar sm:min-h-[400px] sm:p-6" onClick={() => setDraggingItem(null)}>
                     {(uploading || loading) && (
                         <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center backdrop-blur-[1px]">
                             <div className="flex flex-col items-center gap-3 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
@@ -186,9 +191,9 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-6">
                         {isCreating && (
-                            <div className="border-2 border-indigo-400 rounded-2xl p-4 bg-indigo-50 flex flex-col items-center justify-center gap-3 aspect-square shadow-inner animate-in zoom-in-95">
+                            <div className="border-2 border-indigo-400 rounded-2xl p-3 bg-indigo-50 flex flex-col items-center justify-center gap-3 aspect-square shadow-inner animate-in zoom-in-95 sm:p-4">
                                 <Folder size={40} className="text-indigo-400 fill-indigo-100" />
                                 <input autoFocus className="w-full text-[11px] p-2 border-2 border-indigo-200 rounded-xl outline-none focus:border-indigo-600 bg-white font-bold text-center" placeholder="Tên thư mục..." value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCreateFolder()} />
                                 <div className="flex gap-2 w-full">
@@ -282,17 +287,18 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                     </div>
                 </div>
 
-                <div className="p-4 border-t bg-gray-50 flex justify-end items-center gap-3">
+                <div className="flex items-center justify-end gap-3 border-t bg-gray-50 p-3 sm:p-4">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl text-[12px] font-black hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all uppercase tracking-widest flex items-center gap-2 shadow-sm active:scale-95"
+                        className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2 text-[11px] font-black uppercase tracking-widest text-gray-600 shadow-sm transition-all active:scale-95 hover:border-red-100 hover:bg-red-50 hover:text-red-500 sm:px-6 sm:text-[12px]"
                     >
                         <X size={16} /> {trans('hancms.tinymce.button.close')}
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        portalTarget
     );
 };
 

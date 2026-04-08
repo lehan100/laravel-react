@@ -18,6 +18,7 @@ class LanguageResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'currency' => $this->currency,
             'status' => $this->status,
             'photo' => $this->photo ? $this->photo : null,
         ];

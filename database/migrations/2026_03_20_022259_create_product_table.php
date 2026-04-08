@@ -57,6 +57,7 @@ return new class extends Migration
             $table->string('seo_title')->nullable();
             $table->string('seo_keyword')->nullable();
             $table->text('seo_description')->nullable();
+            $table->integer('order')->default(0);
             $table->unique(['product_id', 'locale'], 'product_locale_unique');
             $table->timestamps();
             $table->softDeletes();

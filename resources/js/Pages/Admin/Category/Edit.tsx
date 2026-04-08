@@ -38,6 +38,7 @@ function CreatedPage() {
     const { data, setData, errors, put, processing } = useForm({
         id: item?.id ?? 0,
         status: item?.status ?? 0,
+        type: item?.type ?? 'product',
         parent_id: item?.parent_id ?? 0,
         photo: item?.photo ?? '',
         undo: item?.undo ?? 0,

@@ -51,8 +51,9 @@ export interface Category {
   id: number;
   status: number;
   order: number;
+  type?: string;
   photo: string;
-  parent_id: number,
+  parent_id: number | null;
   translations: Record<string, CategoryTranslation>;
   created_at?: string;
   updated_at?: string;

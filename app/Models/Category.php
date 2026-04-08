@@ -22,6 +22,7 @@ class Category extends Model implements TranslatableContract
         'status',
         'order',
         'parent_id',
+        'type',
         'photo',
     ];
 

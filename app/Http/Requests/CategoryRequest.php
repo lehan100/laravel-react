@@ -26,6 +26,7 @@ class CategoryRequest extends FormRequest
     {
         return [
             'status' => 'required|integer|in:0,1',
+            'type' => ['required', 'string', Rule::in(['product', 'news', 'blog', 'page','contact'])],
             'photo' => 'nullable|string',
             'undo' => 'nullable|integer',
 

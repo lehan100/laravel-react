@@ -15,7 +15,7 @@ class ProductPhoto extends Model
 
     protected $table = 'product_photos';
 
-    protected $fillable = ['product_id', 'filename', 'disk', 'alt', 'sort', 'is_default'];
+    protected $fillable = ['product_id', 'filename', 'disk', 'alt', 'order', 'is_default'];
     protected $imageColumn = 'filename';
     public function getImagePath()
     {

@@ -9,6 +9,8 @@ use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Repositories\Category\CategoryRepositoryInterface as RepositoryInterface;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Redirect;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Illuminate\Support\Facades\Request;
@@ -140,5 +142,29 @@ class CategoryController extends MainController
         } catch (\Throwable $th) {
             return Redirect::back()->with('error', __('hancms.message.error.deleted'));
         }
+    }
+
+    public function reorder(HttpRequest $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.id' => ['required', 'integer', 'exists:categories,id'],
+            'items.*.parent_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'items.*.order' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $success = $this->mainModel->save($validated, ['task' => 'reorder-tree']);
+
+        if (!$success) {
+            return response()->json([
+                'status' => false,
+                'message' => __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]),
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]),
+        ]);
     }
 }

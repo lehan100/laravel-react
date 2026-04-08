@@ -5,7 +5,11 @@ import { ChevronDown, UserCircle2 } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { useTrans } from '@/Hooks/useTrans';
 import { Language } from '@/types';
-export default () => {
+type BottomHeaderProps = {
+  mobileMenuOpened: boolean;
+};
+
+export default ({ mobileMenuOpened }: BottomHeaderProps) => {
   const { trans } = useTrans();
   const { auth } = usePage<PageProps>().props;
   const { langs }: any = usePage<{
@@ -25,7 +29,7 @@ export default () => {
     });
   };
   return (
-    <div className="flex w-full items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 py-4 text-sm backdrop-blur md:px-8 lg:px-10">
+    <div className={`${mobileMenuOpened ? 'hidden' : 'flex'} w-full items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 py-4 text-sm backdrop-blur md:flex md:px-8 lg:px-10`}>
       <div className="mr-4 hidden min-h-[1px] md:block">
         <div className="text-xs uppercase tracking-[0.25em] text-slate-400">
           Workspace

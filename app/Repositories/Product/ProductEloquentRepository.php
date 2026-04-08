@@ -7,8 +7,6 @@ use App\Pipelines\SortCategoriesByHierarchy;
 use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Intervention\Image\Facades\Image;
 use App\Models\Product;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -67,8 +65,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 },
                 // 3. Ảnh đại diện (Cần disk để hiển thị URL)
                 'photos' => function ($q) {
-                    $q->select(['id', 'product_id', 'filename', 'disk', 'is_default'])
-                        ->where('is_default', true);
+                    $q->select(['id', 'product_id', 'filename', 'disk', 'order', 'is_default']);
                 }
             ]);
 
@@ -89,7 +86,19 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
     public function get($params = null, $options = null)
     {
         if ($options['task'] == 'get-item') {
-            return $this->_model->with(['photos', 'translations', 'slugs'])->find($params['id']);
+            $currentLocale = app()->getLocale();
+            return $this->_model->with([
+                'photos',
+                'translations',
+                'slugs',
+                'categories' => function ($q) use ($currentLocale) {
+                    $q->select(['categories.id'])
+                        ->with(['translations' => function ($sq) use ($currentLocale) {
+                            $sq->select(['id', 'category_id', 'locale', 'name'])
+                                ->where('locale', $currentLocale);
+                        }]);
+                },
+            ])->find($params['id']);
         }
         return null;
     }
@@ -121,15 +130,18 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 ? new $this->_model
                 : $this->_model->find($params['id']);
 
-            if (!$item) return false;
+            if (!$item) {
+                DB::rollBack();
+                return false;
+            }
             // 2. Lưu thông tin cơ bản (Bảng products)
             $item->sku        = $params['sku'] ?? $item->sku;
             $item->price      = $params['price'] ?? 0;
             $item->quantity   = $params['quantity'] ?? 0;
             $item->weight     = $params['weight'] ?? 0;
             $item->status     = $params['status'] ?? 0;
-            $item->is_stock   = $params['is_stock'] ?? true;
-            $item->is_coupon  = $params['is_coupon'] ?? false;
+            $item->is_stock   = $params['is_stock'] ?? 0;
+            $item->is_coupon  = $params['is_coupon'] ?? 0;
             $item->order      = $params['order'] ?? 0;
             $item->save();
             // 3. Lưu Bản dịch (Product Translations)
@@ -149,16 +161,56 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
             if ($options['task'] == 'edit-item' && isset($params['delete_photo_ids'])) {
                 $item->photos()->whereIn('id', $params['delete_photo_ids'])->get()->each->delete();
             }
+
+            if (isset($params['photo_orders']) && is_array($params['photo_orders'])) {
+                foreach (array_values($params['photo_orders']) as $index => $photoId) {
+                    $item->photos()->where('id', $photoId)->update(['order' => $index]);
+                }
+            }
+
             if (isset($params['photos']) && is_array($params['photos'])) {
+                $existingCount = $item->photos()->count();
+                $hasDefaultPhoto = $item->photos()->where('is_default', true)->exists();
+                $defaultPhotoTarget = $params['default_photo_id'] ?? null;
+                $newDefaultPhotoId = null;
                 foreach ($params['photos'] as $index => $photoFile) {
-                    if ($photoFile instanceof \Illuminate\Http\UploadedFile) {
-                        $item->photos()->create([
-                            'filename'   => $photoFile,
-                            'disk'       => 'public',
-                            'is_default' => ($index === 0 && $options['task'] == 'add-item'),
-                            'sort'       => $index,
-                        ]);
+                    if (!is_string($photoFile) || trim($photoFile) === '') {
+                        continue;
                     }
+
+                    $isDefaultPhoto = false;
+                    if (is_string($defaultPhotoTarget)) {
+                        $isDefaultPhoto = $defaultPhotoTarget === $photoFile;
+                    } elseif (!$hasDefaultPhoto && $index === 0) {
+                        $isDefaultPhoto = true;
+                    }
+
+                    $createdPhoto = $item->photos()->create([
+                        'filename'   => $photoFile,
+                        'disk'       => 'public',
+                        'is_default' => $isDefaultPhoto,
+                        'order'      => $existingCount + $index,
+                    ]);
+                    if ($isDefaultPhoto) {
+                        $hasDefaultPhoto = true;
+                        $newDefaultPhotoId = $createdPhoto->id;
+                    }
+                }
+                if ($newDefaultPhotoId) {
+                    $item->photos()->update(['is_default' => false]);
+                    $item->photos()->where('id', $newDefaultPhotoId)->update(['is_default' => true]);
+                    $hasDefaultPhoto = true;
+                }
+            }
+            if (!empty($params['default_photo_id']) && is_numeric($params['default_photo_id'])) {
+                $defaultPhotoTarget = $params['default_photo_id'];
+                $item->photos()->update(['is_default' => false]);
+                $item->photos()->where('id', $defaultPhotoTarget)->update(['is_default' => true]);
+            }
+            if (!$item->photos()->where('is_default', true)->exists()) {
+                $firstPhoto = $item->photos()->orderBy('order')->orderBy('id')->first();
+                if ($firstPhoto) {
+                    $firstPhoto->update(['is_default' => true]);
                 }
             }
             // 6. Xử lý Slugs qua Pipeline (Unicode, History, Redirects)

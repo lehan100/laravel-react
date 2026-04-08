@@ -9,11 +9,13 @@ interface Props extends ComponentProps<'button'> {
 }
 
 export default function Save({ loading, icon, children, sendDataStatusUndo, undo, className, ...props }: Props) {
+  const formId = typeof props.form === 'string' && props.form ? props.form : 'my-form';
+
   return (
     <button
       {...props}
       type="submit"
-      form="my-form"
+      form={formId}
       disabled={loading}
       onClick={() => !loading && sendDataStatusUndo(undo)}
       className={cx(

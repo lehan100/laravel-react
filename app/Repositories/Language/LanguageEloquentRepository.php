@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Artisan;
 class LanguageEloquentRepository extends EloquentRepository implements LanguageRepositoryInterface
 {
 
-    private $FIELDSELECT = array('id', 'name', 'code', 'photo',  'status');
+    private $FIELDSELECT = array('id', 'name', 'code', 'currency', 'photo', 'status');
     public $configPath;
     /**
      * get model

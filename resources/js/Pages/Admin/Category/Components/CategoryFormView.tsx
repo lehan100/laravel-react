@@ -10,6 +10,7 @@ import SingleUpload from '@/Components/ImageUpload/SingleUpload';
 import StatusSwitch from '@/Components/Status/StatusSwitch';
 import axios from 'axios';
 import CategorySelector from './CategorySelector';
+import CategoryTypeSelector from './CategoryTypeSelector';
 
 const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive }: any) => {
     const [currentTab, setCurrentTab] = useState(langCode || 'vi');
@@ -23,7 +24,8 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             [locale]: !isLocked(locale)
         }));
     };
-    
+
+
     const createSlug = (str: string) => {
         if (!str) return '';
         return str.toLowerCase()
@@ -109,6 +111,19 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
         return Object.keys(errors).some(key => key.startsWith(`translations.${langCode}.`));
     };
     // Check Error Tab for Languages
+    const categoryTypes = [
+        { value: '', label: trans('hancms.catalog.category.type.options.select') },
+        { value: 'product', label: trans('hancms.catalog.category.type.options.product') },
+        { value: 'news', label: trans('hancms.catalog.category.type.options.news') },
+        // { value: 'blog', label: trans('hancms.catalog.category.type.options.blog') },
+        { value: 'page', label: trans('hancms.catalog.category.type.options.page') },
+        { value: 'contact', label: trans('hancms.catalog.category.type.options.contact') },
+    ];
+    const filteredParentCategories = (itemsCategoryActive || []).filter((category: any) => {
+        const currentType = String(data.type || '').trim();
+        if (!currentType) return false;
+        return String(category.type || 'product') === String(currentType);
+    });
     return (
         <div className="animate-in fade-in duration-300">
             <Card title={trans('hancms.layout.tabs.general')} className='mb-6'>
@@ -121,14 +136,30 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                             inactiveLabel={trans('hancms.status.inactive')}
                         />
                     </InputGroup>
+
                     <InputGroup label={trans('hancms.catalog.category.name')}>
                         <CategorySelector
-                            data={itemsCategoryActive}
+                            data={filteredParentCategories}
                             value={data.parent_id}
                             error={errors.parent_id}
                             onChange={(val: any) => setData('parent_id', val)}
                             trans={trans}
                         />
+                    </InputGroup>
+                    <InputGroup label={trans('hancms.catalog.category.type.label')}>
+                        <CategoryTypeSelector
+                            value={data.type || ''}
+                            onChange={(nextType) => {
+                                setData((prev: any) => ({
+                                    ...prev,
+                                    type: nextType,
+                                    parent_id: 0,
+                                }));
+                            }}
+                            options={categoryTypes}
+                            placeholder={trans('hancms.catalog.category.type.options.select')}
+                        />
+                        {errors?.type && <MessageError>{errors.type}</MessageError>}
                     </InputGroup>
                     <InputGroup label={trans('hancms.column.image')} className='items-center'>
                         <SingleUpload

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\LabelController;
 use App\Http\Controllers\Admin\LayoutController;
 use App\Http\Controllers\Admin\MediaPositionController;
 use App\Http\Controllers\Admin\MediaBannerController;
+use App\Http\Controllers\Admin\ExchangeRateController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TinyMCEController;
 /*
@@ -33,6 +34,7 @@ Route::get('/check-ai', function () {
 
 Route::post('photo-upload', [App\Http\Controllers\ImageUploadController::class, 'storePhoto'])->name('photo.upload');
 Route::post('category-upload', [App\Http\Controllers\ImageUploadController::class, 'storeCategory'])->name('category.upload');
+Route::post('product-upload', [App\Http\Controllers\ImageUploadController::class, 'storeProduct'])->name('product.upload');
 $prefixAdmin = config('configs.prefix.admin', 'admin');
 Route::prefix($prefixAdmin)->group(function () {
     Route::get('lang/{locale}', function ($locale) {
@@ -62,12 +64,14 @@ Route::prefix($prefixAdmin)->group(function () {
 
 
     Route::middleware(['auth', 'permission'])->group(function () {
+        Route::post('category/reorder', [CategoryController::class, 'reorder'])->name('category.reorder');
         Route::post('upload-tinymce', [TinyMCEController::class, 'uploadTinyMCE'])->name('media.upload.tinymce');
         Route::get('media-get-images', [TinyMCEController::class, 'getImages'])->name('media.get.images');
         Route::post('media-create-folder', [TinyMCEController::class, 'createFolder'])->name('media.create.folder');
         Route::post('media-move-file', [TinyMCEController::class, 'moveFile'])->name('media.move.file');
         Route::post('media-rename', [TinyMCEController::class, 'rename'])->name('media.rename');
         Route::post('media-delete', [TinyMCEController::class, 'delete'])->name('media.delete');
+        Route::get('exchange-rates/{currency?}', [ExchangeRateController::class, 'show'])->name('exchange-rates.show');
         /* ----------- Dashboard ----------- */
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         /* ----------- Roles ----------- */

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $id
  * @property string $name
  * @property string $code
+ * @property string|null $currency
  * @property string $photo
  * @property int|null $status
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -41,6 +42,7 @@ class Language extends Model
     protected $fillable = [
         'name',
         'code',
+        'currency',
         'photo',
         'status'
     ];

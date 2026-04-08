@@ -27,6 +27,7 @@ class LanguageStoreRequest extends FormRequest
         return [
             'name' => ['required'],
             'code' => ['required', Rule::unique('languages', 'code')],
+            'currency' => ['nullable', Rule::in(['VND', 'USD', 'JPY'])],
             'photo' => ['nullable'],
             'status' => ['required'],
         ];

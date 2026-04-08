@@ -4,6 +4,7 @@ import FlashMessages from '@/Components/Messages/FlashMessages';
 import TopHeader from '@/Components/Header/TopHeader';
 import BottomHeader from '@/Components/Header/BottomHeader';
 import { useTrans } from '@/Hooks/useTrans';
+import { useState } from 'react';
 interface MainLayoutProps {
   title?: string;
   children: React.ReactNode;
@@ -11,11 +12,12 @@ interface MainLayoutProps {
 
 export default function MainLayout({ title, children }: MainLayoutProps) {
   const { trans }: any = useTrans();
+  const [mobileMenuOpened, setMobileMenuOpened] = useState(false);
 
   return (
     <>
       <Head title={trans(title)} />
-      <div className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
+      <div className="relative min-h-screen overflow-x-hidden bg-slate-50 text-slate-900">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -left-24 top-0 h-80 w-80 rounded-full bg-cyan-200/40 blur-3xl" />
           <div className="absolute right-0 top-24 h-96 w-96 rounded-full bg-amber-200/40 blur-3xl" />
@@ -23,12 +25,15 @@ export default function MainLayout({ title, children }: MainLayoutProps) {
         </div>
 
         <div className="relative z-10 flex min-h-screen flex-col">
-          <div className="flex flex-col md:flex-row z-50">
-            <TopHeader />
-            <BottomHeader />
+          <div className="relative z-[9999] flex flex-col md:flex-row">
+            <TopHeader
+              mobileMenuOpened={mobileMenuOpened}
+              setMobileMenuOpened={setMobileMenuOpened}
+            />
+            <BottomHeader mobileMenuOpened={mobileMenuOpened} />
           </div>
 
-          <div className="flex flex-1 overflow-hidden">
+          <div className="flex flex-1 overflow-x-hidden">
             <MainMenu className="hidden w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-slate-950/95 px-4 py-5 shadow-2xl shadow-slate-950/20 md:block" />
             {/**
              * We need to scroll the content of the page, not the whole page.
@@ -37,7 +42,7 @@ export default function MainLayout({ title, children }: MainLayoutProps) {
              * [Read more](https://inertiajs.com/pages#scroll-regions)
              */}
             <div
-              className="flex-1 overflow-hidden overflow-y-auto px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
+              className="flex-1 overflow-x-hidden overflow-y-auto px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
               scroll-region="true"
             >
               <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
