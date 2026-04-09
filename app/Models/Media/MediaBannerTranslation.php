@@ -5,11 +5,10 @@ namespace App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasImageFile;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MediaBannerTranslation extends Model
 {
-    use HasFactory, SoftDeletes, HasImageFile;
+    use HasFactory, HasImageFile;
 
 
     public $timestamps = true;
