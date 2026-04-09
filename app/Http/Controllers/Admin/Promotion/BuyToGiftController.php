@@ -97,13 +97,12 @@ class BuyToGiftController extends MainController
                 ->with('error', __('hancms.message.error.deleted'));
         }
 
-        $selectedBuyProductIds = $item?->buyProducts?->pluck('id')->values()->all() ?? [];
-        $selectedGiftProductIds = $item?->giftProducts?->pluck('id')->values()->all() ?? [];
+        $selectedProductIds = $this->collectAllRuleProductIds($item);
 
         return Inertia::render($this->controllerView . 'Show', [
             'item' => new BuyToGiftResource($item),
-            'itemsSelectedBuyProducts' => $this->fetchProductRowsByIds($selectedBuyProductIds),
-            'itemsSelectedGiftProducts' => $this->fetchProductRowsByIds($selectedGiftProductIds),
+            'itemsSelectedBuyProducts' => $this->fetchProductRowsByIds($selectedProductIds),
+            'itemsSelectedGiftProducts' => $this->fetchProductRowsByIds($selectedProductIds),
         ]);
     }
 
@@ -124,15 +123,14 @@ class BuyToGiftController extends MainController
             }])
             ->orderBy('id')
             ->get();
-        $selectedBuyProductIds = $item?->buyProducts?->pluck('id')->values()->all() ?? [];
-        $selectedGiftProductIds = $item?->giftProducts?->pluck('id')->values()->all() ?? [];
+        $selectedProductIds = $this->collectAllRuleProductIds($item);
 
         return Inertia::render($this->controllerView . 'Edit', [
             'item' => new BuyToGiftResource($item),
             'itemsCategoryActive' => $itemsCategoryActive,
             'itemsProductActive' => $itemsProductActive,
-            'itemsSelectedBuyProducts' => $this->fetchProductRowsByIds($selectedBuyProductIds),
-            'itemsSelectedGiftProducts' => $this->fetchProductRowsByIds($selectedGiftProductIds),
+            'itemsSelectedBuyProducts' => $this->fetchProductRowsByIds($selectedProductIds),
+            'itemsSelectedGiftProducts' => $this->fetchProductRowsByIds($selectedProductIds),
         ]);
     }
 
@@ -271,5 +269,37 @@ class BuyToGiftController extends MainController
         } catch (\Throwable $th) {
             return Redirect::back()->with('error', __('hancms.message.error.deleted'));
         }
+    }
+
+    private function getPrimaryRule($item)
+    {
+        if (!$item) {
+            return null;
+        }
+
+        if ($item->relationLoaded('rules')) {
+            return $item->rules
+                ->sortBy(fn($rule) => sprintf('%010d-%010d', (int) ($rule->priority ?? 100), (int) $rule->id))
+                ->first();
+        }
+
+        return $item->rules()->orderBy('priority')->orderBy('id')->first();
+    }
+
+    private function collectAllRuleProductIds($item): array
+    {
+        if (!$item) {
+            return [];
+        }
+
+        $rules = $item->relationLoaded('rules')
+            ? $item->rules
+            : $item->rules()->with(['buyProducts:id', 'giftProducts:id'])->get();
+
+        return $rules->flatMap(function ($rule) {
+            $buyIds = $rule->buyProducts?->pluck('id')->all() ?? [];
+            $giftIds = $rule->giftProducts?->pluck('id')->all() ?? [];
+            return array_merge($buyIds, $giftIds);
+        })->map(fn($id) => (int) $id)->unique()->values()->all();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repositories\BuyToGift;
 
 use App\Models\Promotion\PromotionBuyToGiftOffer;
+use App\Models\Promotion\PromotionBuyToGiftOfferRule;
 use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
 
@@ -12,9 +13,7 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         'id',
         'code',
         'name',
-        'condition_type',
-        'min_order_amount',
-        'max_sets_per_order',
+        'description',
         'starts_at',
         'ends_at',
         'priority',
@@ -35,6 +34,21 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         }
 
         $query = $this->_model->select($this->FIELDSELECT)
+            ->with([
+                'rules' => function ($q) {
+                    $q->select([
+                        'id',
+                        'promotion_buytogift_offer_id',
+                        'condition_type',
+                        'min_order_amount',
+                        'max_sets_per_order',
+                        'priority',
+                        'is_active',
+                    ])
+                    ->orderBy('priority')
+                    ->orderBy('id');
+                },
+            ])
             ->orderBy('priority')
             ->orderByDesc('id');
 
@@ -61,8 +75,11 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         }
 
         return $this->_model->with([
-            'buyProducts:id',
-            'giftProducts:id',
+            'rules' => function ($q) {
+                $q->orderBy('priority')->orderBy('id');
+            },
+            'rules.buyProducts:id',
+            'rules.giftProducts:id',
         ])->find($params['id'] ?? null);
     }
 
@@ -97,9 +114,6 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
             $item->code = $params['code'] ?? $item->code;
             $item->name = $params['name'] ?? $item->name;
             $item->description = $params['description'] ?? $item->description;
-            $item->condition_type = $params['condition_type'] ?? $item->condition_type ?? 'order_amount';
-            $item->min_order_amount = $params['min_order_amount'] ?? $item->min_order_amount;
-            $item->max_sets_per_order = $params['max_sets_per_order'] ?? $item->max_sets_per_order;
             $item->starts_at = $params['starts_at'] ?? $item->starts_at;
             $item->ends_at = $params['ends_at'] ?? $item->ends_at;
             $item->priority = $params['priority'] ?? $item->priority ?? 100;
@@ -107,21 +121,10 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
             $item->stackable = $params['stackable'] ?? $item->stackable ?? false;
             $item->save();
 
-            $buyQty = max(1, (int) ($params['buy_qty'] ?? 1));
-            $giftQty = max(1, (int) ($params['gift_qty'] ?? 1));
-
-            if (array_key_exists('buy_product_ids', (array) $params)) {
-                $syncBuyProducts = collect($params['buy_product_ids'] ?? [])
-                    ->mapWithKeys(fn($id) => [(int) $id => ['buy_qty' => $buyQty]])
-                    ->all();
-                $item->buyProducts()->sync($syncBuyProducts);
-            }
-
-            if (array_key_exists('gift_product_ids', (array) $params)) {
-                $syncGiftProducts = collect($params['gift_product_ids'] ?? [])
-                    ->mapWithKeys(fn($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
-                    ->all();
-                $item->giftProducts()->sync($syncGiftProducts);
+            if (is_array($params['rules'] ?? null) && count($params['rules']) > 0) {
+                $this->syncMultiRules($item, $params['rules'], $params);
+            } else {
+                $this->syncLegacySingleRule($item, $params, $task);
             }
 
             DB::commit();
@@ -154,5 +157,92 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         }
 
         return false;
+    }
+
+    private function syncLegacySingleRule(PromotionBuyToGiftOffer $item, array $params, string $task): void
+    {
+        $rule = null;
+        if ($task === 'add-item') {
+            $rule = new PromotionBuyToGiftOfferRule();
+            $rule->promotion_buytogift_offer_id = $item->id;
+        } else {
+            $rule = $item->rules()->orderBy('priority')->orderBy('id')->first();
+            if (!$rule) {
+                $rule = new PromotionBuyToGiftOfferRule();
+                $rule->promotion_buytogift_offer_id = $item->id;
+            }
+        }
+
+        $rule->condition_type = $params['condition_type'] ?? $rule->condition_type ?? 'order_amount';
+        $rule->min_order_amount = $params['min_order_amount'] ?? $rule->min_order_amount;
+        $rule->max_sets_per_order = $params['max_sets_per_order'] ?? $rule->max_sets_per_order;
+        $rule->priority = $params['priority'] ?? $rule->priority ?? 100;
+        $rule->is_active = $params['is_active'] ?? $rule->is_active ?? true;
+        $rule->stackable = $params['stackable'] ?? $rule->stackable ?? false;
+        $rule->save();
+
+        $buyQty = max(1, (int) ($params['buy_qty'] ?? 1));
+        $giftQty = max(1, (int) ($params['gift_qty'] ?? 1));
+
+        $syncBuyProducts = collect($params['buy_product_ids'] ?? [])
+            ->mapWithKeys(fn($id) => [(int) $id => ['buy_qty' => $buyQty]])
+            ->all();
+        $rule->buyProducts()->sync($syncBuyProducts);
+
+        $syncGiftProducts = collect($params['gift_product_ids'] ?? [])
+            ->mapWithKeys(fn($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
+            ->all();
+        $rule->giftProducts()->sync($syncGiftProducts);
+    }
+
+    private function syncMultiRules(PromotionBuyToGiftOffer $item, array $rulesInput, array $params): void
+    {
+        $existingRules = $item->rules()->get()->keyBy('id');
+        $keepIds = [];
+
+        foreach ($rulesInput as $index => $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $ruleId = isset($row['id']) ? (int) $row['id'] : null;
+            $rule = $ruleId && $existingRules->has($ruleId)
+                ? $existingRules->get($ruleId)
+                : new PromotionBuyToGiftOfferRule(['promotion_buytogift_offer_id' => $item->id]);
+
+            $rule->condition_type = $row['condition_type'] ?? 'order_amount';
+            $rule->min_order_amount = $row['min_order_amount'] ?? null;
+            $rule->max_sets_per_order = $row['max_sets_per_order'] ?? null;
+            $rule->priority = isset($row['priority']) ? (int) $row['priority'] : ((int) ($params['priority'] ?? 100) + (int) $index);
+            $rule->is_active = array_key_exists('is_active', $row)
+                ? filter_var($row['is_active'], FILTER_VALIDATE_BOOLEAN)
+                : true;
+            $rule->stackable = array_key_exists('stackable', $row)
+                ? filter_var($row['stackable'], FILTER_VALIDATE_BOOLEAN)
+                : false;
+            $rule->promotion_buytogift_offer_id = $item->id;
+            $rule->save();
+
+            $keepIds[] = (int) $rule->id;
+
+            $buyQty = max(1, (int) ($row['buy_qty'] ?? 1));
+            $giftQty = max(1, (int) ($row['gift_qty'] ?? 1));
+
+            $syncBuyProducts = collect($row['buy_product_ids'] ?? [])
+                ->mapWithKeys(fn($id) => [(int) $id => ['buy_qty' => $buyQty]])
+                ->all();
+            $rule->buyProducts()->sync($syncBuyProducts);
+
+            $syncGiftProducts = collect($row['gift_product_ids'] ?? [])
+                ->mapWithKeys(fn($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
+                ->all();
+            $rule->giftProducts()->sync($syncGiftProducts);
+        }
+
+        if (!empty($keepIds)) {
+            $item->rules()->whereNotIn('id', $keepIds)->delete();
+        } else {
+            $item->rules()->delete();
+        }
     }
 }

@@ -25,6 +25,8 @@ export default function ShowPage() {
   const [resolvedCurrency, setResolvedCurrency] = useState<ProductCurrency>(() => getProductCurrencyFromLocale(currentLocale, currentLanguage));
   const buyRows = Array.isArray(itemsSelectedBuyProducts) ? itemsSelectedBuyProducts : [];
   const giftRows = Array.isArray(itemsSelectedGiftProducts) ? itemsSelectedGiftProducts : [];
+  const allRowsMap = new Map<number, any>([...buyRows, ...giftRows].map((row: any) => [Number(row.id), row]));
+  const rules = Array.isArray(item?.rules) ? item.rules : [];
 
   const formatDateTimeByLocale = (value?: string | null) => {
     if (!value) return '---';
@@ -94,6 +96,8 @@ export default function ShowPage() {
     </div>
   );
 
+  const renderRuleProducts = (ids: number[]) => ids.map((id: number) => allRowsMap.get(Number(id))).filter(Boolean);
+
   return (
     <div className="p-6">
       <HeaderToolbar
@@ -143,14 +147,46 @@ export default function ShowPage() {
           </div>
 
           <div className="space-y-6">
-            <div>
-            <h3 className="mb-2 text-sm font-semibold text-slate-900">{trans('hancms.promotion.buytogift.fields.buy_products')}</h3>
-            {renderProductTable(buyRows)}
-            </div>
-            <div>
-            <h3 className="mb-2 text-sm font-semibold text-slate-900">{trans('hancms.promotion.buytogift.fields.gift_products')}</h3>
-            {renderProductTable(giftRows)}
-            </div>
+            {rules.length === 0 ? (
+              <div className="text-sm text-slate-500">---</div>
+            ) : (
+              rules.map((rule: any, index: number) => (
+                <div key={rule.id || index} className="space-y-4 rounded-2xl border border-slate-200 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-semibold text-slate-900">Rule #{index + 1}</div>
+                    <div className="text-xs text-slate-500">
+                      {rule.condition_type === 'order_amount'
+                        ? trans('hancms.promotion.buytogift.options.order_amount')
+                        : trans('hancms.promotion.buytogift.options.buy_product')}
+                    </div>
+                  </div>
+                  <div className="grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm md:grid-cols-3">
+                    <div>
+                      <div className="text-xs text-slate-500">{trans('hancms.promotion.buytogift.fields.buy_qty')}</div>
+                      <div className="font-semibold text-slate-800">{rule.buy_qty || 1}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500">{trans('hancms.promotion.buytogift.fields.gift_qty')}</div>
+                      <div className="font-semibold text-slate-800">{rule.gift_qty || 1}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500">{trans('hancms.promotion.buytogift.fields.min_order_amount')}</div>
+                      <div className="font-semibold text-slate-800">
+                        {rule?.min_order_amount ? formatProductPrice(rule.min_order_amount, resolvedCurrency) : '---'}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="mb-2 text-sm font-semibold text-slate-900">{trans('hancms.promotion.buytogift.fields.buy_products')}</h3>
+                    {renderProductTable(renderRuleProducts(rule.buy_product_ids || []))}
+                  </div>
+                  <div>
+                    <h3 className="mb-2 text-sm font-semibold text-slate-900">{trans('hancms.promotion.buytogift.fields.gift_products')}</h3>
+                    {renderProductTable(renderRuleProducts(rule.gift_product_ids || []))}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </Card>

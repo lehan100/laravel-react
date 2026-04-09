@@ -8,6 +8,22 @@ export default function EditPage() {
   const { trans } = useTrans();
   const { item, itemsCategoryActive, itemsSelectedBuyProducts, itemsSelectedGiftProducts }: any = usePage().props;
 
+  const rulesFromItem = Array.isArray(item?.rules) && item.rules.length > 0
+    ? item.rules
+    : [{
+        id: null,
+        condition_type: item?.condition_type || 'order_amount',
+        min_order_amount: item?.min_order_amount ?? '',
+        max_sets_per_order: item?.max_sets_per_order ?? '',
+        buy_product_ids: item?.buy_product_ids || [],
+        buy_qty: item?.buy_qty ?? 1,
+        gift_product_ids: item?.gift_product_ids || [],
+        gift_qty: item?.gift_qty ?? 1,
+        is_active: true,
+        stackable: false,
+        priority: item?.priority ?? 100,
+      }];
+
   const { data, setData, errors, put, processing } = useForm({
     code: item?.code || '',
     name: item?.name || '',
@@ -22,6 +38,7 @@ export default function EditPage() {
     buy_qty: item?.buy_qty ?? 1,
     gift_product_ids: item?.gift_product_ids || [],
     gift_qty: item?.gift_qty ?? 1,
+    rules: rulesFromItem,
     is_active: item?.is_active ?? true,
     stackable: item?.stackable ?? false,
     undo: 0,

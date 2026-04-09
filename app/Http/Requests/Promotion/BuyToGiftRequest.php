@@ -14,15 +14,29 @@ class BuyToGiftRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $numericFields = [
-            'min_order_amount',
-        ];
+        $numericFields = ['min_order_amount'];
 
         $normalized = [];
         foreach ($numericFields as $field) {
             if ($this->exists($field)) {
                 $normalized[$field] = $this->normalizeDecimalInput($this->input($field));
             }
+        }
+
+        $rules = $this->input('rules');
+        if (is_array($rules)) {
+            $normalizedRules = [];
+            foreach ($rules as $index => $rule) {
+                if (!is_array($rule)) {
+                    continue;
+                }
+
+                $normalizedRules[$index] = $rule;
+                if (array_key_exists('min_order_amount', $rule)) {
+                    $normalizedRules[$index]['min_order_amount'] = $this->normalizeDecimalInput($rule['min_order_amount']);
+                }
+            }
+            $normalized['rules'] = $normalizedRules;
         }
 
         $this->merge([
@@ -59,6 +73,19 @@ class BuyToGiftRequest extends FormRequest
             'gift_product_ids' => ['required', 'array', 'min:1'],
             'gift_product_ids.*' => ['integer', 'exists:products,id'],
             'gift_qty' => ['nullable', 'integer', 'min:1'],
+            'rules' => ['nullable', 'array', 'min:1'],
+            'rules.*.condition_type' => ['required_with:rules', Rule::in(['order_amount', 'buy_product'])],
+            'rules.*.min_order_amount' => ['nullable', 'numeric', 'min:0'],
+            'rules.*.max_sets_per_order' => ['nullable', 'integer', 'min:1'],
+            'rules.*.buy_product_ids' => ['nullable', 'array'],
+            'rules.*.buy_product_ids.*' => ['integer', 'exists:products,id'],
+            'rules.*.buy_qty' => ['nullable', 'integer', 'min:1'],
+            'rules.*.gift_product_ids' => ['required_with:rules', 'array', 'min:1'],
+            'rules.*.gift_product_ids.*' => ['integer', 'exists:products,id'],
+            'rules.*.gift_qty' => ['nullable', 'integer', 'min:1'],
+            'rules.*.is_active' => ['nullable', 'boolean'],
+            'rules.*.stackable' => ['nullable', 'boolean'],
+            'rules.*.priority' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['boolean'],
             'stackable' => ['boolean'],
             'undo' => ['nullable', 'integer', Rule::in([0, 1])],
