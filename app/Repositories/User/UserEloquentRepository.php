@@ -24,7 +24,7 @@ class UserEloquentRepository extends EloquentRepository implements UserRepositor
 
     public function getModel()
     {
-        return \App\Models\User::class;
+        return \App\Models\Users\User::class;
     }
 
     public function lists($params = null, $options = null)

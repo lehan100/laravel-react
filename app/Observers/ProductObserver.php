@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Product;
+use App\Models\Catalog\Product;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 

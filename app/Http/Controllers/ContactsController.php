@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ContactStoreRequest;
-use App\Http\Requests\ContactUpdateRequest;
-use App\Http\Resources\ContactCollection;
-use App\Http\Resources\ContactResource;
-use App\Http\Resources\UserOrganizationCollection;
+use App\Http\Requests\CRM\ContactStoreRequest;
+use App\Http\Requests\CRM\ContactUpdateRequest;
+use App\Http\Resources\CRM\ContactCollection;
+use App\Http\Resources\CRM\ContactResource;
+use App\Http\Resources\CRM\UserOrganizationCollection;
 use App\Models\Contact;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

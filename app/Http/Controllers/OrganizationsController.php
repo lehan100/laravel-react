@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\OrganizationStoreRequest;
-use App\Http\Requests\OrganizationUpdateRequest;
-use App\Http\Resources\OrganizationCollection;
-use App\Http\Resources\OrganizationResource;
+use App\Http\Requests\CRM\OrganizationStoreRequest;
+use App\Http\Requests\CRM\OrganizationUpdateRequest;
+use App\Http\Resources\CRM\OrganizationCollection;
+use App\Http\Resources\CRM\OrganizationResource;
 use App\Models\Organization;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

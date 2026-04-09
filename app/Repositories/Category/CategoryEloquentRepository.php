@@ -9,7 +9,7 @@ use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
-use App\Models\Category;
+use App\Models\Catalog\Category;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 

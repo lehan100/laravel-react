@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Category;
+use App\Models\Catalog\Category;
 use App\Models\Slug;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -37,7 +37,7 @@ class CategorySlugTest extends TestCase
 
         // Giả lập task 'add-item' để chạy qua luồng khởi tạo
         $repo->save($params, ['task' => 'add-item']);
-        //dd(\App\Models\Category::all()->toArray());
+        //dd(\App\Models\Catalog\Category::all()->toArray());
         // 3. Kiểm tra Slug tiếng Nhật trong Database
         $this->assertDatabaseHas('slugs', [
             'slug'        => 'フライパン-tokyo',
@@ -53,7 +53,7 @@ class CategorySlugTest extends TestCase
     public function it_handles_slug_history_and_redirect_when_updated()
     {
         // 1. Khởi tạo dữ liệu mẫu sạch
-        $category = \App\Models\Category::create([
+        $category = \App\Models\Catalog\Category::create([
             'status' => 1,
             'order' => 1,
             'parent_id' => null

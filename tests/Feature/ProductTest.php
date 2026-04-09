@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Requests\ProductRequest;
+use App\Http\Requests\Catalog\ProductRequest;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;

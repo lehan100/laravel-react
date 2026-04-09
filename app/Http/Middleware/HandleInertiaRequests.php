@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Resources\UserResource;
+use App\Http\Resources\Users\UserResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Language\LanguageRepositoryInterface;
-use App\Http\Resources\LanguageCollection;
+use App\Http\Resources\Settings\LanguageCollection;
 
 class HandleInertiaRequests extends Middleware
 {

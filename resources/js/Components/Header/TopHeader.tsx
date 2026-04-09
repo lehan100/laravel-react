@@ -7,9 +7,10 @@ import { Menu, X } from 'lucide-react';
 type TopHeaderProps = {
   mobileMenuOpened: boolean;
   setMobileMenuOpened: (opened: boolean) => void;
+  hideDesktop?: boolean;
 };
 
-export default function TopHeader({ mobileMenuOpened, setMobileMenuOpened }: TopHeaderProps) {
+export default function TopHeader({ mobileMenuOpened, setMobileMenuOpened, hideDesktop = false }: TopHeaderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -69,7 +70,9 @@ export default function TopHeader({ mobileMenuOpened, setMobileMenuOpened }: Top
 
   return (
     <>
-      <div className="relative flex items-center justify-between border-b border-white/10 bg-slate-950/95 px-4 py-4 text-white backdrop-blur md:w-72 md:flex-shrink-0 md:justify-start md:border-b-0 md:border-r md:px-6">
+      <div
+        className={`relative flex items-center justify-between border-b border-white/10 bg-slate-950/95 px-4 py-4 text-white backdrop-blur md:w-72 md:flex-shrink-0 md:justify-start md:border-b-0 md:border-r md:px-6 ${hideDesktop ? 'md:hidden' : ''}`}
+      >
         <Link className="flex items-center gap-3" href="/">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-slate-900 shadow-lg shadow-cyan-950/20 ring-1 ring-white/10">
             <span className="text-sm font-black tracking-[0.2em] text-white">HC</span>

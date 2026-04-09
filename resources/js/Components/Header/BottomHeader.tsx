@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { ChevronDown, UserCircle2 } from 'lucide-react';
+import { ChevronDown, UserCircle2, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { useTrans } from '@/Hooks/useTrans';
 import { Language } from '@/types';
 type BottomHeaderProps = {
   mobileMenuOpened: boolean;
+  sidebarVisible: boolean;
+  onToggleSidebar: () => void;
 };
 
-export default ({ mobileMenuOpened }: BottomHeaderProps) => {
+export default ({ mobileMenuOpened, sidebarVisible, onToggleSidebar }: BottomHeaderProps) => {
   const { trans } = useTrans();
   const { auth } = usePage<PageProps>().props;
   const { langs }: any = usePage<{
@@ -34,8 +36,16 @@ export default ({ mobileMenuOpened }: BottomHeaderProps) => {
         <div className="text-xs uppercase tracking-[0.25em] text-slate-400">
           Workspace
         </div>
-        <div className="mt-1 text-sm font-medium text-slate-700">
-          {trans('hancms.dashboard.main')}
+        <div className="mt-1 flex items-center gap-2 text-sm font-medium text-slate-700">
+          <span>{trans('hancms.dashboard.main')}</span>
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+          >
+            {sidebarVisible ? <PanelLeftClose size={14} /> : <PanelLeft size={14} />}
+            <span>{sidebarVisible ? trans('hancms.sidebar.hide') : trans('hancms.sidebar.show')}</span>
+          </button>
         </div>
       </div>
       <div className="relative ml-auto">

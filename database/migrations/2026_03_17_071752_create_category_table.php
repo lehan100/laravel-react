@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('status')->default(0);
             $table->unsignedInteger('order')->default(0);
             $table->unsignedBigInteger('parent_id')->nullable()->index();
+            $table->string('type', 20)->default('product')->index();
             $table->string('photo')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -4,7 +4,7 @@ import FlashMessages from '@/Components/Messages/FlashMessages';
 import TopHeader from '@/Components/Header/TopHeader';
 import BottomHeader from '@/Components/Header/BottomHeader';
 import { useTrans } from '@/Hooks/useTrans';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 interface MainLayoutProps {
   title?: string;
   children: React.ReactNode;
@@ -13,6 +13,22 @@ interface MainLayoutProps {
 export default function MainLayout({ title, children }: MainLayoutProps) {
   const { trans }: any = useTrans();
   const [mobileMenuOpened, setMobileMenuOpened] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem('layout.sidebar.visible');
+    if (saved === '0') {
+      setSidebarVisible(false);
+    }
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarVisible((prev) => {
+      const next = !prev;
+      window.localStorage.setItem('layout.sidebar.visible', next ? '1' : '0');
+      return next;
+    });
+  };
 
   return (
     <>
@@ -29,12 +45,19 @@ export default function MainLayout({ title, children }: MainLayoutProps) {
             <TopHeader
               mobileMenuOpened={mobileMenuOpened}
               setMobileMenuOpened={setMobileMenuOpened}
+              hideDesktop={!sidebarVisible}
             />
-            <BottomHeader mobileMenuOpened={mobileMenuOpened} />
+            <BottomHeader
+              mobileMenuOpened={mobileMenuOpened}
+              sidebarVisible={sidebarVisible}
+              onToggleSidebar={toggleSidebar}
+            />
           </div>
 
           <div className="flex flex-1 overflow-x-hidden">
-            <MainMenu className="hidden w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-slate-950/95 px-4 py-5 shadow-2xl shadow-slate-950/20 md:block" />
+            <MainMenu
+              className={`hidden w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-slate-950/95 px-4 py-5 shadow-2xl shadow-slate-950/20 ${sidebarVisible ? 'md:block' : 'md:hidden'}`}
+            />
             {/**
              * We need to scroll the content of the page, not the whole page.
              * So we need to add `scroll-region="true"` to the div below.

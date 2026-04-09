@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Organization;
-use App\Models\User;
+use App\Models\Users\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

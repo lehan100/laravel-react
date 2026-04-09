@@ -6,7 +6,7 @@ use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
-use App\Models\MediaBanner;
+use App\Models\Media\MediaBanner;
 use Inertia\Inertia;
 
 class MediaBannerEloquentRepository extends EloquentRepository implements MediaBannerRepositoryInterface

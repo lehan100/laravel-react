@@ -7,7 +7,7 @@ use App\Pipelines\SortCategoriesByHierarchy;
 use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
-use App\Models\Product;
+use App\Models\Catalog\Product;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 

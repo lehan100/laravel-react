@@ -25,7 +25,7 @@ class LanguageEloquentRepository extends EloquentRepository implements LanguageR
 
     public function getModel()
     {
-        return \App\Models\Language::class;
+        return \App\Models\Settings\Language::class;
     }
 
     public function lists($params = null, $options = null)

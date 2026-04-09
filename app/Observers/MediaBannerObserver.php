@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\MediaBanner;
+use App\Models\Media\MediaBanner;
 use Illuminate\Support\Facades\Log;
 
 class MediaBannerObserver

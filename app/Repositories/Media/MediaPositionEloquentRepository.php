@@ -23,7 +23,7 @@ class MediaPositionEloquentRepository extends EloquentRepository implements Medi
 
     public function getModel()
     {
-        return \App\Models\MediaPosition::class;
+        return \App\Models\Media\MediaPosition::class;
     }
 
     public function lists($params = null, $options = null)

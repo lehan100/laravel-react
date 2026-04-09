@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserDeleteRequest;
-use App\Http\Requests\UserStoreRequest;
-use App\Http\Requests\UserUpdateRequest;
-use App\Http\Resources\UserCollection;
-use App\Http\Resources\UserResource;
-use App\Models\User;
+use App\Http\Requests\Users\UserDeleteRequest;
+use App\Http\Requests\Users\UserStoreRequest;
+use App\Http\Requests\Users\UserUpdateRequest;
+use App\Http\Resources\Users\UserCollection;
+use App\Http\Resources\Users\UserResource;
+use App\Models\Users\User;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

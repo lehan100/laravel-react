@@ -15,6 +15,10 @@ return [
             'width' => 800,
             'height' => 800
         ],
+        'post' => [
+            'width' => 800,
+            'height' => 'auto'
+        ],
         'rating' => [
             'width' => 80,
             'height' => 80
@@ -44,6 +48,11 @@ return [
             "temp" => 'var/temp',
             'path' => 'media/product',
             'size' => 'product'
+        ],
+        'post' => [
+            "temp" => 'var/temp',
+            'path' => 'media/post',
+            'size' => 'post'
         ]
     ]
 ];

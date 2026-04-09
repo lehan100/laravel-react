@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Category;
+use App\Models\Catalog\Category;
 use Illuminate\Support\Facades\Log;
 
 class CategoryObserver

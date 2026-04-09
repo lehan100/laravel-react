@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\MediaBanner;
-use App\Models\MediaPosition;
+use App\Models\Media\MediaBanner;
+use App\Models\Media\MediaPosition;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
