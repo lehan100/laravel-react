@@ -4,6 +4,10 @@ return [
     'dashboard.main' => 'ダッシュボード',
     'users.main' => 'ユーザー',
     'settings.main' => '設定',
+    'sidebar' => [
+        'show' => 'サイドバーを表示',
+        'hide' => 'サイドバーを非表示',
+    ],
     'roles' => [
         'name' => 'ロール',
         'created' => 'ロール作成',
@@ -35,8 +39,107 @@ return [
             'name' => 'バナー'
         ]
     ],
+    'report' => [
+        'name' => 'レポート',
+        'revenue' => [
+            'name' => '売上レポート',
+        ],
+        'product' => [
+            'name' => '商品レポート',
+        ],
+        'inventory' => [
+            'name' => '在庫レポート',
+        ],
+        'promotion' => [
+            'name' => 'プロモーションレポート',
+        ],
+    ],
+    'promotion' => [
+        'name' => 'プロモーション設定',
+        'saleoffer' => [
+            'name' => 'セールオファー',
+            'conditions' => '条件',
+            'apply_scope' => '適用範囲',
+            'apply_scope_hint' => '商品を選択しない場合、このオファーはすべての商品に適用されます。',
+            'options' => [
+                'percent' => 'パーセント',
+                'fixed' => '固定金額',
+            ],
+            'fields' => [
+                'discount_type' => '割引タイプ',
+                'discount_value' => '割引値',
+                'max_discount_amount' => '最大割引額',
+                'starts_at' => '開始日時',
+                'ends_at' => '終了日時',
+                'priority' => '優先度',
+                'stackable' => '併用可',
+                'apply_products' => '適用商品',
+            ],
+        ],
+        'coupon' => [
+            'name' => 'クーポン',
+            'conditions' => '条件',
+            'apply_scope' => '適用範囲',
+            'apply_scope_hint' => 'カテゴリまたは商品を選択しない場合、このクーポンはすべてに適用されます。',
+            'options' => [
+                'percent' => 'パーセント',
+                'fixed' => '固定金額',
+            ],
+            'fields' => [
+                'discount_type' => '割引タイプ',
+                'discount_value' => '割引値',
+                'max_discount_amount' => '最大割引額',
+                'min_order_amount' => '最低注文金額',
+                'max_order_amount' => '最高注文金額',
+                'usage_limit_total' => '総利用回数上限',
+                'usage_limit_per_user' => 'ユーザーごとの利用上限',
+                'first_order_only' => '初回注文のみ',
+                'is_public' => '公開クーポン',
+                'stackable' => '併用可',
+                'starts_at' => '開始日時',
+                'ends_at' => '終了日時',
+                'apply_categories' => '適用カテゴリ',
+                'apply_products' => '適用商品',
+            ],
+        ],
+        'buytogift' => [
+            'name' => '購入特典',
+            'conditions' => '条件',
+            'apply_scope' => '適用範囲',
+            'options' => [
+                'order_amount' => '注文金額条件',
+                'buy_product' => '商品購入で特典付与',
+            ],
+            'fields' => [
+                'condition_type' => '条件タイプ',
+                'buy_products' => '購入条件商品',
+                'buy_qty' => '購入数量',
+                'gift_products' => '特典商品',
+                'gift_qty' => '特典数量',
+                'min_order_amount' => '特典適用の最低注文金額',
+                'max_sets_per_order' => '1注文あたりの特典セット上限',
+                'starts_at' => '開始日時',
+                'ends_at' => '終了日時',
+                'priority' => '優先度',
+                'stackable' => '併用可',
+            ],
+        ],
+    ],
+    'sales' => [
+        'name' => '販売',
+        'warehouse' => [
+            'name' => '在庫管理',
+        ],
+        'orders' => [
+            'name' => '注文',
+        ],
+        'payment_methods' => [
+            'name' => '支払い方法',
+        ],
+    ],
     'catalog' => [
         'name' => 'カタログ管理',
+        'menu_name' => 'コンテンツ管理',
         'category' => [
             'name' => 'カテゴリー',
             'created' => 'カテゴリーを追加',
@@ -91,6 +194,12 @@ return [
                 'categories' => 'カテゴリー',
                 'photos' => '画像',
             ],
+        ],
+        'post' => [
+            'admin.name' => '記事一覧',
+            'name' => '記事',
+            'created' => '記事を追加',
+            'edit' => '記事を編集',
         ]
     ],
     'languages' => [

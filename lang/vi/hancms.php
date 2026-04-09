@@ -4,6 +4,10 @@ return [
     'dashboard.main' => 'Bảng điều khiển',
     'users.main' => 'Người dùng',
     'settings.main' => 'Cài đặt',
+    'sidebar' => [
+        'show' => 'Hiện sidebar',
+        'hide' => 'Ẩn sidebar',
+    ],
     'roles' => [
         'name' => 'Vai trò',
         'created' => 'Thêm vai trò',
@@ -35,8 +39,107 @@ return [
             'name' => 'Hình ảnh'
         ]
     ],
-    'catalog' => [
+    'report' => [
+        'name' => 'Báo Cáo',
+        'revenue' => [
+            'name' => 'Báo cáo doanh thu',
+        ],
+        'product' => [
+            'name' => 'Báo cáo sản phẩm',
+        ],
+        'inventory' => [
+            'name' => 'Báo cáo kho',
+        ],
+        'promotion' => [
+            'name' => 'Báo cáo khuyến mãi',
+        ],
+    ],
+    'promotion' => [
+        'name' => 'Cài đặt khuyến mãi',
+        'saleoffer' => [
+            'name' => 'Giảm giá',
+            'conditions' => 'Điều kiện',
+            'apply_scope' => 'Phạm vi áp dụng',
+            'apply_scope_hint' => 'Không chọn sản phẩm nào thì chương trình sẽ áp dụng cho tất cả sản phẩm.',
+            'options' => [
+                'percent' => 'Phần trăm',
+                'fixed' => 'Số tiền cố định',
+            ],
+            'fields' => [
+                'discount_type' => 'Loại giảm giá',
+                'discount_value' => 'Giá trị giảm giá',
+                'max_discount_amount' => 'Giảm tối đa',
+                'starts_at' => 'Bắt đầu lúc',
+                'ends_at' => 'Kết thúc lúc',
+                'priority' => 'Độ ưu tiên',
+                'stackable' => 'Cho phép chồng ưu đãi',
+                'apply_products' => 'Áp dụng cho sản phẩm',
+            ],
+        ],
+        'coupon' => [
+            'name' => 'Mã giảm giá',
+            'conditions' => 'Điều kiện',
+            'apply_scope' => 'Phạm vi áp dụng',
+            'apply_scope_hint' => 'Không chọn danh mục hoặc sản phẩm nào thì mã sẽ áp dụng cho tất cả.',
+            'options' => [
+                'percent' => 'Phần trăm',
+                'fixed' => 'Số tiền cố định',
+            ],
+            'fields' => [
+                'discount_type' => 'Loại giảm giá',
+                'discount_value' => 'Giá trị giảm giá',
+                'max_discount_amount' => 'Giảm tối đa',
+                'min_order_amount' => 'Đơn hàng tối thiểu',
+                'max_order_amount' => 'Đơn hàng tối đa',
+                'usage_limit_total' => 'Giới hạn sử dụng tổng',
+                'usage_limit_per_user' => 'Giới hạn mỗi người dùng',
+                'first_order_only' => 'Chỉ áp dụng cho đơn hàng đầu tiên',
+                'is_public' => 'Mã công khai',
+                'stackable' => 'Cho phép chồng mã',
+                'starts_at' => 'Bắt đầu lúc',
+                'ends_at' => 'Kết thúc lúc',
+                'apply_categories' => 'Áp dụng cho danh mục',
+                'apply_products' => 'Áp dụng cho sản phẩm',
+            ],
+        ],
+        'buytogift' => [
+            'name' => 'Mua tặng',
+            'conditions' => 'Điều kiện',
+            'apply_scope' => 'Phạm vi áp dụng',
+            'options' => [
+                'order_amount' => 'Theo giá trị đơn hàng',
+                'buy_product' => 'Mua sản phẩm tặng sản phẩm',
+            ],
+            'fields' => [
+                'condition_type' => 'Loại điều kiện',
+                'buy_products' => 'Sản phẩm điều kiện mua',
+                'buy_qty' => 'Số lượng mua',
+                'gift_products' => 'Sản phẩm quà tặng',
+                'gift_qty' => 'Số lượng tặng',
+                'min_order_amount' => 'Đơn tối thiểu để nhận quà',
+                'max_sets_per_order' => 'Giới hạn số set quà / đơn',
+                'starts_at' => 'Bắt đầu lúc',
+                'ends_at' => 'Kết thúc lúc',
+                'priority' => 'Độ ưu tiên',
+                'stackable' => 'Cho phép cộng dồn',
+            ],
+        ],
+    ],
+    'sales' => [
         'name' => 'Bán hàng',
+        'warehouse' => [
+            'name' => 'Quản lý kho',
+        ],
+        'orders' => [
+            'name' => 'Đơn hàng',
+        ],
+        'payment_methods' => [
+            'name' => 'Phương thức thanh toán',
+        ],
+    ],
+    'catalog' => [
+        'name' => 'Danh mục',
+        'menu_name' => 'Quản lý nội dung',
         'category' => [
             'name' => 'Danh mục',
             'created' => 'Thêm danh mục',
@@ -91,6 +194,12 @@ return [
                 'categories' => 'Danh mục',
                 'photos' => 'Hình ảnh',
             ],
+        ],
+        'post' => [
+            'admin.name' => 'Danh sách bài viết',
+            'name' => 'Bài viết',
+            'created' => 'Thêm bài viết',
+            'edit' => 'Chỉnh sửa bài viết',
         ]
     ],
     'languages' => [

@@ -5,18 +5,29 @@ use function Laravel\Ai\agent;
 use App\Http\Controllers\Ai\ProductAiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\LanguageController;
-use App\Http\Controllers\Admin\LabelController;
-use App\Http\Controllers\Admin\LayoutController;
-use App\Http\Controllers\Admin\MediaPositionController;
-use App\Http\Controllers\Admin\MediaBannerController;
+use App\Http\Controllers\Admin\Catalog\CategoryController;
+use App\Http\Controllers\Admin\Dashboard\DashboardController;
+use App\Http\Controllers\Admin\Users\RoleController;
+use App\Http\Controllers\Admin\Users\UserController;
+use App\Http\Controllers\Admin\Settings\LanguageController;
+use App\Http\Controllers\Admin\Settings\LabelController;
+use App\Http\Controllers\Admin\Settings\LayoutController;
+use App\Http\Controllers\Admin\Media\MediaPositionController;
+use App\Http\Controllers\Admin\Media\MediaBannerController;
 use App\Http\Controllers\Admin\ExchangeRateController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\TinyMCEController;
+use App\Http\Controllers\Admin\Catalog\ProductController;
+use App\Http\Controllers\Admin\Catalog\PostController;
+use App\Http\Controllers\Admin\Promotion\SaleOfferController;
+use App\Http\Controllers\Admin\Promotion\CouponController;
+use App\Http\Controllers\Admin\Promotion\BuyToGiftController;
+use App\Http\Controllers\Admin\Sales\WarehouseController;
+use App\Http\Controllers\Admin\Sales\OrderController;
+use App\Http\Controllers\Admin\Sales\PaymentMethodController;
+use App\Http\Controllers\Admin\Report\ReportRevenueController;
+use App\Http\Controllers\Admin\Report\ReportProductController;
+use App\Http\Controllers\Admin\Report\ReportInventoryController;
+use App\Http\Controllers\Admin\Report\ReportPromotionController;
+use App\Http\Controllers\Admin\Media\TinyMCEController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -87,6 +98,9 @@ Route::prefix($prefixAdmin)->group(function () {
             Route::get('/', [LayoutController::class, 'index'])->name('index');
             Route::post('store', [LayoutController::class, 'store'])->name('store');
         });
+        Route::get('saleoffer/products-picker', [SaleOfferController::class, 'productsPicker'])->name('saleoffer.products-picker');
+        Route::get('coupon/products-picker', [CouponController::class, 'productsPicker'])->name('coupon.products-picker');
+        Route::get('buytogift/products-picker', [BuyToGiftController::class, 'productsPicker'])->name('buytogift.products-picker');
         // Media & Resource
         $resources = [
             'media-position' => MediaPositionController::class,
@@ -97,6 +111,17 @@ Route::prefix($prefixAdmin)->group(function () {
             'roles'         => RoleController::class,
             'category'         => CategoryController::class,
             'product'         => ProductController::class,
+            'post'            => PostController::class,
+            'saleoffer'      => SaleOfferController::class,
+            'coupon'         => CouponController::class,
+            'buytogift'      => BuyToGiftController::class,
+            'warehouse'      => WarehouseController::class,
+            'orders'         => OrderController::class,
+            'payment-methods' => PaymentMethodController::class,
+            'report-revenue' => ReportRevenueController::class,
+            'report-product' => ReportProductController::class,
+            'report-inventory' => ReportInventoryController::class,
+            'report-promotion' => ReportPromotionController::class,
         ];
 
         foreach ($resources as $uri => $controller) {

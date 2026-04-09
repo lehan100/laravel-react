@@ -4,6 +4,10 @@ return [
     'dashboard.main' => 'Dashboard',
     'users.main' => 'Users',
     'settings.main' => 'Settings',
+    'sidebar' => [
+        'show' => 'Show sidebar',
+        'hide' => 'Hide sidebar',
+    ],
     'roles' => [
         'name' => 'Roles',
         'created' => 'Create Role', // Đổi từ Created sang Create cho tự nhiên
@@ -35,8 +39,107 @@ return [
             'name' => 'Banners'
         ]
     ],
+    'report' => [
+        'name' => 'Reports',
+        'revenue' => [
+            'name' => 'Revenue Report',
+        ],
+        'product' => [
+            'name' => 'Product Report',
+        ],
+        'inventory' => [
+            'name' => 'Inventory Report',
+        ],
+        'promotion' => [
+            'name' => 'Promotion Report',
+        ],
+    ],
+    'promotion' => [
+        'name' => 'Promotion Settings',
+        'saleoffer' => [
+            'name' => 'Sale Offer',
+            'conditions' => 'Conditions',
+            'apply_scope' => 'Apply Scope',
+            'apply_scope_hint' => 'If no product is selected, this offer applies to all products.',
+            'options' => [
+                'percent' => 'Percent',
+                'fixed' => 'Fixed amount',
+            ],
+            'fields' => [
+                'discount_type' => 'Discount Type',
+                'discount_value' => 'Discount Value',
+                'max_discount_amount' => 'Max Discount Amount',
+                'starts_at' => 'Starts At',
+                'ends_at' => 'Ends At',
+                'priority' => 'Priority',
+                'stackable' => 'Allow stackable',
+                'apply_products' => 'Apply to products',
+            ],
+        ],
+        'coupon' => [
+            'name' => 'Coupon',
+            'conditions' => 'Conditions',
+            'apply_scope' => 'Apply Scope',
+            'apply_scope_hint' => 'If no category or product is selected, this coupon applies to all.',
+            'options' => [
+                'percent' => 'Percent',
+                'fixed' => 'Fixed amount',
+            ],
+            'fields' => [
+                'discount_type' => 'Discount Type',
+                'discount_value' => 'Discount Value',
+                'max_discount_amount' => 'Max Discount Amount',
+                'min_order_amount' => 'Min Order Amount',
+                'max_order_amount' => 'Max Order Amount',
+                'usage_limit_total' => 'Total Usage Limit',
+                'usage_limit_per_user' => 'Usage Limit Per User',
+                'first_order_only' => 'First order only',
+                'is_public' => 'Public coupon',
+                'stackable' => 'Allow stackable',
+                'starts_at' => 'Starts At',
+                'ends_at' => 'Ends At',
+                'apply_categories' => 'Apply to categories',
+                'apply_products' => 'Apply to products',
+            ],
+        ],
+        'buytogift' => [
+            'name' => 'Buy To Gift',
+            'conditions' => 'Conditions',
+            'apply_scope' => 'Apply Scope',
+            'options' => [
+                'order_amount' => 'Order amount condition',
+                'buy_product' => 'Buy product get gift',
+            ],
+            'fields' => [
+                'condition_type' => 'Condition Type',
+                'buy_products' => 'Condition Products',
+                'buy_qty' => 'Buy Quantity',
+                'gift_products' => 'Gift Products',
+                'gift_qty' => 'Gift Quantity',
+                'min_order_amount' => 'Minimum order amount for gift',
+                'max_sets_per_order' => 'Max gift sets per order',
+                'starts_at' => 'Starts At',
+                'ends_at' => 'Ends At',
+                'priority' => 'Priority',
+                'stackable' => 'Allow stackable',
+            ],
+        ],
+    ],
+    'sales' => [
+        'name' => 'Sales',
+        'warehouse' => [
+            'name' => 'Warehouse Management',
+        ],
+        'orders' => [
+            'name' => 'Orders',
+        ],
+        'payment_methods' => [
+            'name' => 'Payment Methods',
+        ],
+    ],
     'catalog' => [
         'name' => 'Catalog',
+        'menu_name' => 'Content Hub',
         'category' => [
             'name' => 'Categories',
             'created' => 'Add Category',
@@ -91,6 +194,12 @@ return [
                 'categories' => 'Categories',
                 'photos' => 'Images',
             ],
+        ],
+        'post' => [
+            'admin.name' => 'Post List',
+            'name' => 'Posts',
+            'created' => 'Create Post',
+            'edit' => 'Edit Post',
         ]
     ],
     'languages' => [
