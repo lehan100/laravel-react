@@ -3,22 +3,27 @@
 namespace App\Models\Catalog;
 
 use App\Models\Slug;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Traits\HasImageFile;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
-use App\Traits\HasImageFile;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property-read Collection<int, Product> $products
+ */
 class Category extends Model implements TranslatableContract
 {
-    use HasFactory, SoftDeletes, HasImageFile, Translatable;
+    use HasFactory, HasImageFile, SoftDeletes, Translatable;
 
     protected $table = 'categories';
-    
+
     protected $fillable = [
         'status',
         'order',
@@ -31,20 +36,22 @@ class Category extends Model implements TranslatableContract
         'name',
         'description',
         'content',
-        'seo_title',   
-        'seo_keyword',   
-        'seo_description' 
+        'seo_title',
+        'seo_keyword',
+        'seo_description',
     ];
+
     protected $imageColumn = 'photo';
+
     public function getImagePath()
     {
         return config('image.path.category', null);
     }
+
     public function slugs(): MorphMany
     {
         return $this->morphMany(Slug::class, 'sluggable');
     }
-
 
     public function slug()
     {
@@ -54,18 +61,20 @@ class Category extends Model implements TranslatableContract
             ->whereNull('redirect_to');
     }
 
-
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
-
 
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')->orderBy('order');
     }
 
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'category_product');
+    }
 
     // protected static function booted()
     // {

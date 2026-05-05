@@ -1,53 +1,58 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\MainController;
+use App\Models\Post;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use Illuminate\Http\Response;
 use Spatie\Permission\Models\Permission;
+
 class PermissionsController extends MainController
 {
-   protected $controllerView='admin.pages.permissions.';
-   protected $controllerName='permissions';
+    protected string $controllerView = 'admin.pages.permissions.';
 
-   public function __construct(){
-      $this->metaTitle = 'Permissions Admin Control Panel';
-   }
- 
-   /**
+    protected string $controllerName = 'permissions';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->metaTitle = 'Permissions Admin Control Panel';
+    }
+
+    /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
-    {   
+    {
         $permissions = Permission::all();
 
         return view($this->controllerView.'index', [
-            'permissions' => $permissions
+            'permissions' => $permissions,
         ]);
     }
 
     /**
      * Show form for creating permissions
-     * 
-     * @return \Illuminate\Http\Response
+     *
+     * @return Response
      */
-    public function create() 
-    {   
+    public function create()
+    {
         return view($this->controllerView.'create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
-    {   
+    {
         $request->validate([
-            'name' => 'required|unique:users,name'
+            'name' => 'required|unique:users,name',
         ]);
 
         Permission::create($request->only('name'));
@@ -60,26 +65,24 @@ class PermissionsController extends MainController
      * Show the form for editing the specified resource.
      *
      * @param  Permission  $post
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Permission $permission)
     {
         return view($this->controllerView.'edit', [
-            'permission' => $permission
+            'permission' => $permission,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Permission  $permission
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Permission $permission)
     {
         $request->validate([
-            'name' => 'required|unique:permissions,name,'.$permission->id
+            'name' => 'required|unique:permissions,name,'.$permission->id,
         ]);
 
         $permission->update($request->only('name'));
@@ -91,8 +94,8 @@ class PermissionsController extends MainController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
+     * @param  Post  $post
+     * @return Response
      */
     public function destroy(Permission $permission)
     {

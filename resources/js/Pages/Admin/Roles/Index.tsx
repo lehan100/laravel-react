@@ -126,7 +126,7 @@ function RolesPage() {
           className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm active:scale-95 border-none"
           size={18}
         >
-          {trans('hancms.button.delete.selected')}
+          {trans('hancms.button.delete_selected')}
         </DeleteButton>
       </HeaderToolbar>
       <Card>

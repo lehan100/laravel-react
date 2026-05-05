@@ -5,6 +5,13 @@
 /public/storage
 /storage/*.key
 /vendor
+.env
+/certs/*-key.pem
+/certs/local-ca
+/docker/nginx/data/database.sqlite
+/docker/nginx/data/keys.json
+/docker/nginx/data/logs
+/docker/nginx/data/custom_ssl/*/privkey.pem
 .DS_Store
 .env.backup
 .phpunit.result.cache

@@ -8,40 +8,47 @@ use App\Http\Requests\Users\UserStoreRequest;
 use App\Http\Requests\Users\UserUpdateRequest;
 use App\Http\Resources\Users\UserCollection;
 use App\Http\Resources\Users\UserResource;
-use Illuminate\Support\Facades\Request;
 use App\Models\Users\User;
+use App\Repositories\User\UserRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Repositories\User\UserRepositoryInterface as RepositoryInterface;
+use Spatie\Permission\Models\Role;
 
 class UserController extends MainController
 {
-    protected $controllerView = 'Admin/Users/';
-    protected $controllerName = 'users';
-    protected $mainModel;
-    private $USER_GROUP;
+    protected string $controllerView = 'Admin/Users/';
+
+    protected string $controllerName = 'users';
+
+    protected RepositoryInterface $mainModel;
+
+    private array $USER_GROUP;
+
     public function __construct(RepositoryInterface $repository)
     {
+        parent::__construct();
         $this->mainModel = $repository;
         $this->USER_GROUP = config('configs.user_group_name');
     }
+
     public function index(): Response
     {
         $this->params = array_merge(Request::all(), $this->params);
-        $items =  $this->mainModel->lists($this->params, ['task' => 'admin-list-items']);
-        return Inertia::render($this->controllerView . 'Index', [
+        $items = $this->mainModel->lists($this->params, ['task' => 'admin-list-items']);
+
+        return Inertia::render($this->controllerView.'Index', [
             'filters' => Request::all('search', 'group'),
-            'items' => new UserCollection($items)
+            'items' => new UserCollection($items),
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render($this->controllerView . 'Create');
+        return Inertia::render($this->controllerView.'Create');
     }
 
     public function store(UserStoreRequest $request): RedirectResponse
@@ -56,12 +63,13 @@ class UserController extends MainController
                 'photo' => $request->file('photo')->store('users'),
             ]);
         }
+
         return Redirect::route('users.edit', $user->id)->with('success', __('hancms.message.success.created', ['name' => __('hancms.users.name')]));
     }
 
     public function edit(User $user): Response
     {
-        return Inertia::render($this->controllerView . 'Edit', [
+        return Inertia::render($this->controllerView.'Edit', [
             'item' => new UserResource($user),
         ]);
     }
@@ -98,12 +106,14 @@ class UserController extends MainController
 
         return Redirect::back()->with('success', __('hancms.message.success.restored', ['name' => __('hancms.users.name')]));
     }
+
     public function destroyMany(Request $request): RedirectResponse
     {
         try {
             $params = $request->all();
-            $ids = explode(",", $params['ids']);
+            $ids = explode(',', $params['ids']);
             User::whereIn('id', $ids)->delete();
+
             return Redirect::route('users.index')->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.users.name')]));
         } catch (\Throwable $th) {
             return Redirect::route('users.index')->with('error', __('hancms.message.error.deleted'));

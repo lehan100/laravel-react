@@ -21,7 +21,6 @@ export default function EditPage() {
         gift_qty: item?.gift_qty ?? 1,
         is_active: true,
         stackable: false,
-        priority: item?.priority ?? 100,
       }];
 
   const { data, setData, errors, put, processing } = useForm({
@@ -33,7 +32,6 @@ export default function EditPage() {
     max_sets_per_order: item?.max_sets_per_order ?? '',
     starts_at: item?.starts_at ?? '',
     ends_at: item?.ends_at ?? '',
-    priority: item?.priority ?? 100,
     buy_product_ids: item?.buy_product_ids || [],
     buy_qty: item?.buy_qty ?? 1,
     gift_product_ids: item?.gift_product_ids || [],

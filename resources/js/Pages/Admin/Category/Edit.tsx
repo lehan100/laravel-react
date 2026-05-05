@@ -16,7 +16,7 @@ function CreatedPage() {
     const { itemsCategory, locale }: any = usePage().props;
     const currentLocale = (locale as string) || 'vi';
 
-    const { langs, item, config_path, languageConfigPath, itemsCategoryActive }: any = usePage<{
+    const { langs, item, config_path, languageConfigPath, itemsCategoryActive, itemsSelectedProducts }: any = usePage<{
         item: Category;
     }>().props;
     const langList = langs?.data || (Array.isArray(langs) ? langs : Object.values(langs || {}));
@@ -41,10 +41,11 @@ function CreatedPage() {
         type: item?.type ?? 'product',
         parent_id: item?.parent_id ?? 0,
         photo: item?.photo ?? '',
+        product_ids: item?.product_ids ?? [],
         undo: item?.undo ?? 0,
         translations: initialTranslations,
     });
-    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive };
+    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive, itemsSelectedProducts: itemsSelectedProducts || [] };
     const [activeId, setActiveId] = useState<number | null>(data.id);
     const [undo, setUndo] = useState(0);
     const handleUndo = (status: number) => setUndo(status);

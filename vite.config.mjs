@@ -30,10 +30,4 @@ export default defineConfig({
             '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
         }
     },
-    build: {
-        rollupOptions: {
-            // Add 'react' and 'react-dom' to the external list
-            external: ['react', 'react-dom'],
-        },
-    },
 });

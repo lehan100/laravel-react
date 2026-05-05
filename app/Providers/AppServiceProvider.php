@@ -3,29 +3,64 @@
 namespace App\Providers;
 
 use App\Models\Catalog\Category;
-use App\Models\Media\MediaBanner;
-use App\Models\Media\MediaBannerTranslation;
 use App\Models\Catalog\Post;
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductPhoto;
+use App\Models\Media\MediaBanner;
+use App\Models\Media\MediaBannerTranslation;
 use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
+use App\Models\Sales\Order;
 use App\Observers\CategoryObserver;
 use App\Observers\ImageFileObserver;
 use App\Observers\MediaBannerObserver;
-use App\Observers\PromotionBuyToGiftObserver;
+use App\Observers\OrderObserver;
 use App\Observers\PostObserver;
+use App\Observers\ProductObserver;
+use App\Observers\PromotionBuyToGiftObserver;
 use App\Observers\PromotionCouponObserver;
 use App\Observers\PromotionSaleOfferObserver;
-use App\Observers\ProductObserver;
-use Illuminate\Support\Facades\Schema;
+use App\Repositories\BuyToGift\BuyToGiftEloquentRepository;
+use App\Repositories\BuyToGift\BuyToGiftRepositoryInterface;
+use App\Repositories\Category\CategoryEloquentRepository;
+use App\Repositories\Category\CategoryRepositoryInterface;
+use App\Repositories\Coupon\CouponEloquentRepository;
+use App\Repositories\Coupon\CouponRepositoryInterface;
+use App\Repositories\Dashboard\DashboardEloquentRepository;
+use App\Repositories\Dashboard\DashboardRepositoryInterface;
+use App\Repositories\Language\LanguageEloquentRepository;
+use App\Repositories\Language\LanguageRepositoryInterface;
+use App\Repositories\Location\LocationEloquentRepository;
+use App\Repositories\Location\LocationRepositoryInterface;
+use App\Repositories\Media\MediaBannerEloquentRepository;
+use App\Repositories\Media\MediaBannerRepositoryInterface;
+use App\Repositories\Media\MediaPositionEloquentRepository;
+use App\Repositories\Media\MediaPositionRepositoryInterface;
+use App\Repositories\Order\OrderEloquentRepository;
+use App\Repositories\Order\OrderRepositoryInterface;
+use App\Repositories\PaymentMethod\PaymentMethodEloquentRepository;
+use App\Repositories\PaymentMethod\PaymentMethodRepositoryInterface;
+use App\Repositories\Post\PostEloquentRepository;
+use App\Repositories\Post\PostRepositoryInterface;
+use App\Repositories\Product\ProductEloquentRepository;
+use App\Repositories\Product\ProductRepositoryInterface;
+use App\Repositories\SaleOffer\SaleOfferEloquentRepository;
+use App\Repositories\SaleOffer\SaleOfferRepositoryInterface;
+use App\Repositories\ShippingMethod\ShippingMethodEloquentRepository;
+use App\Repositories\ShippingMethod\ShippingMethodRepositoryInterface;
+use App\Repositories\User\UserEloquentRepository;
+use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\Warehouse\WarehouseEloquentRepository;
+use App\Repositories\Warehouse\WarehouseRepositoryInterface;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -43,48 +78,72 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         Model::unguard();
-        //User
+        // User
         $this->app->singleton(
-            \App\Repositories\User\UserRepositoryInterface::class,
-            \App\Repositories\User\UserEloquentRepository::class
+            UserRepositoryInterface::class,
+            UserEloquentRepository::class
         );
-        //Language
+        // Language
         $this->app->singleton(
-            \App\Repositories\Language\LanguageRepositoryInterface::class,
-            \App\Repositories\Language\LanguageEloquentRepository::class
+            LanguageRepositoryInterface::class,
+            LanguageEloquentRepository::class
         );
-        //Media
+        // Media
         $this->app->singleton(
-            \App\Repositories\Media\MediaBannerRepositoryInterface::class,
-            \App\Repositories\Media\MediaBannerEloquentRepository::class
-        );
-        $this->app->singleton(
-            \App\Repositories\Media\MediaPositionRepositoryInterface::class,
-            \App\Repositories\Media\MediaPositionEloquentRepository::class
+            MediaBannerRepositoryInterface::class,
+            MediaBannerEloquentRepository::class
         );
         $this->app->singleton(
-            \App\Repositories\Category\CategoryRepositoryInterface::class,
-            \App\Repositories\Category\CategoryEloquentRepository::class
+            MediaPositionRepositoryInterface::class,
+            MediaPositionEloquentRepository::class
         );
         $this->app->singleton(
-            \App\Repositories\Product\ProductRepositoryInterface::class,
-            \App\Repositories\Product\ProductEloquentRepository::class
+            CategoryRepositoryInterface::class,
+            CategoryEloquentRepository::class
         );
         $this->app->singleton(
-            \App\Repositories\Post\PostRepositoryInterface::class,
-            \App\Repositories\Post\PostEloquentRepository::class
+            ProductRepositoryInterface::class,
+            ProductEloquentRepository::class
         );
         $this->app->singleton(
-            \App\Repositories\Coupon\CouponRepositoryInterface::class,
-            \App\Repositories\Coupon\CouponEloquentRepository::class
+            PostRepositoryInterface::class,
+            PostEloquentRepository::class
         );
         $this->app->singleton(
-            \App\Repositories\SaleOffer\SaleOfferRepositoryInterface::class,
-            \App\Repositories\SaleOffer\SaleOfferEloquentRepository::class
+            CouponRepositoryInterface::class,
+            CouponEloquentRepository::class
         );
         $this->app->singleton(
-            \App\Repositories\BuyToGift\BuyToGiftRepositoryInterface::class,
-            \App\Repositories\BuyToGift\BuyToGiftEloquentRepository::class
+            SaleOfferRepositoryInterface::class,
+            SaleOfferEloquentRepository::class
+        );
+        $this->app->singleton(
+            BuyToGiftRepositoryInterface::class,
+            BuyToGiftEloquentRepository::class
+        );
+        $this->app->singleton(
+            WarehouseRepositoryInterface::class,
+            WarehouseEloquentRepository::class
+        );
+        $this->app->singleton(
+            OrderRepositoryInterface::class,
+            OrderEloquentRepository::class
+        );
+        $this->app->singleton(
+            PaymentMethodRepositoryInterface::class,
+            PaymentMethodEloquentRepository::class
+        );
+        $this->app->singleton(
+            ShippingMethodRepositoryInterface::class,
+            ShippingMethodEloquentRepository::class
+        );
+        $this->app->singleton(
+            LocationRepositoryInterface::class,
+            LocationEloquentRepository::class
+        );
+        $this->app->singleton(
+            DashboardRepositoryInterface::class,
+            DashboardEloquentRepository::class
         );
     }
 
@@ -94,7 +153,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // $this->app->useLangPath(base_path('lang'));
-        //$this->app->instance('path.lang', base_path('lang'));
+        // $this->app->instance('path.lang', base_path('lang'));
         JsonResource::withoutWrapping();
         Schema::defaultStringLength(535);
         $this->bootRoute();
@@ -107,6 +166,7 @@ class AppServiceProvider extends ServiceProvider
         // -------
         ProductPhoto::observe(ImageFileObserver::class);
         Product::observe(ProductObserver::class);
+        Order::observe(OrderObserver::class);
         // -------
         Post::observe(PostObserver::class);
         Post::observe(ImageFileObserver::class);
@@ -114,15 +174,17 @@ class AppServiceProvider extends ServiceProvider
         PromotionCoupon::observe(PromotionCouponObserver::class);
         PromotionSaleOffer::observe(PromotionSaleOfferObserver::class);
         PromotionBuyToGiftOffer::observe(PromotionBuyToGiftObserver::class);
-        //Login Api
+        // Login Api
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {
                 $seconds = $headers['Retry-After'] ?? 60;
-                return response()->json([
-                    'status' => 'sweet_error',
-                   'message' => "Too many attempts! Please take a break and try again in {$seconds} seconds. ⏳",
-                    'retry_after' => $headers['Retry-After'] ?? 60
-                ], 429, $headers);
+                $message = "Too many attempts! Please take a break and try again in {$seconds} seconds.";
+
+                return redirect()
+                    ->back()
+                    ->withInput($request->except('password'))
+                    ->withErrors(['email' => $message])
+                    ->with('message', $message);
             });
         });
     }

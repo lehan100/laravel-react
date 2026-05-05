@@ -110,7 +110,7 @@ export default function IndexPage() {
       <HeaderToolbar title={trans('hancms.promotion.saleoffer.name')}>
         <CreatedButton href={route('saleoffer.create')}>{trans('hancms.button.created')}</CreatedButton>
         <DeleteButton onDelete={() => destroys()} size={18}>
-          {trans('hancms.button.delete.selected')}
+          {trans('hancms.button.delete_selected')}
         </DeleteButton>
       </HeaderToolbar>
 

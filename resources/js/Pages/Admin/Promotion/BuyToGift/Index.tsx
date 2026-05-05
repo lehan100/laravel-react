@@ -1,5 +1,5 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import { useTrans } from '@/Hooks/useTrans';
 import Pagination from '@/Components/Pagination/Pagination';
@@ -15,7 +15,7 @@ import { Eye } from 'lucide-react';
 
 export default function IndexPage() {
   const { trans } = useTrans();
-  const { items }: any = usePage().props;
+  const { items, locale }: any = usePage().props;
   const { data, setData } = useForm({
     ids: '',
   });
@@ -31,11 +31,49 @@ export default function IndexPage() {
       {
         label: trans('hancms.promotion.buytogift.conditions'),
         name: 'condition_type',
-        renderCell: (row: any) => (
-          row.condition_type === 'order_amount'
-            ? trans('hancms.promotion.buytogift.options.order_amount')
-            : trans('hancms.promotion.buytogift.options.buy_product')
-        ),
+        renderCell: (row: any) => {
+          const rules = Array.isArray(row.rules) ? row.rules : [];
+          const primaryRule = rules[0] || null;
+          const conditionLabel = (rule: any) => (
+            rule?.condition_type === 'order_amount'
+              ? trans('hancms.promotion.buytogift.options.order_amount')
+              : trans('hancms.promotion.buytogift.options.buy_product')
+          );
+
+          if (!primaryRule) {
+            return (
+              <div className="text-xs text-slate-500">
+                {row.condition_type === 'order_amount'
+                  ? trans('hancms.promotion.buytogift.options.order_amount')
+                  : trans('hancms.promotion.buytogift.options.buy_product')}
+              </div>
+            );
+          }
+
+          return (
+            <div className="space-y-1 text-xs">
+              <div className="font-semibold text-slate-800">
+                {conditionLabel(primaryRule)}
+              </div>
+              {primaryRule.condition_type === 'order_amount' && (
+                <div className="text-slate-600">
+                  {trans('hancms.promotion.buytogift.summary.min_order_amount')}: {primaryRule.min_order_amount ? Number(primaryRule.min_order_amount).toLocaleString(locale === 'en' ? 'en-US' : (locale === 'ja' ? 'ja-JP' : 'vi-VN')) : 0}
+                </div>
+              )}
+              {primaryRule.condition_type !== 'order_amount' && (
+                <div className="text-slate-600">
+                  {trans('hancms.promotion.buytogift.summary.buy')}: {(primaryRule.buy_product_ids || []).length} {trans('hancms.promotion.buytogift.summary.product_short')} x{primaryRule.buy_qty || 1}
+                </div>
+              )}
+              <div className="text-slate-600">
+                {trans('hancms.promotion.buytogift.summary.gift')}: {(primaryRule.gift_product_ids || []).length} {trans('hancms.promotion.buytogift.summary.product_short')} x{primaryRule.gift_qty || 1}
+              </div>
+              {rules.length > 1 && (
+                <div className="text-slate-500">+{rules.length - 1} {trans('hancms.promotion.buytogift.summary.more_rules')}</div>
+              )}
+            </div>
+          );
+        },
       },
       {
         label: trans('hancms.column.status'),
@@ -52,12 +90,12 @@ export default function IndexPage() {
         label: trans('hancms.column.action'),
         name: 'action',
         renderCell: (row: any) => (
-          <div className="flex gap-2">
+          <div className="flex flex-nowrap items-center justify-end gap-1.5">
             <Link
               href={route('buytogift.show', row.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 px-2.5 py-1.5 text-[11px] font-semibold text-white no-underline shadow-md shadow-cyan-950/10 ring-1 ring-cyan-950/5 transition-all duration-200 hover:-translate-y-0.5 hover:from-sky-400 hover:to-cyan-400 hover:shadow-lg hover:shadow-cyan-950/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 px-2 py-1 text-[10px] font-semibold text-white no-underline shadow-md shadow-cyan-950/10 ring-1 ring-cyan-950/5 transition-all duration-200 hover:-translate-y-0.5 hover:from-sky-400 hover:to-cyan-400 hover:shadow-lg hover:shadow-cyan-950/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2"
             >
-              <Eye size={13} />
+              <Eye size={12} />
               <span>{trans('hancms.button.view')}</span>
             </Link>
             <EditButton href={route('buytogift.edit', row.id)}>{trans('hancms.button.edit')}</EditButton>
@@ -92,14 +130,16 @@ export default function IndexPage() {
       <HeaderToolbar title={trans('hancms.promotion.buytogift.name')}>
         <CreatedButton href={route('buytogift.create')}>{trans('hancms.button.created')}</CreatedButton>
         <DeleteButton onDelete={() => destroys()} size={18}>
-          {trans('hancms.button.delete.selected')}
+          {trans('hancms.button.delete_selected')}
         </DeleteButton>
       </HeaderToolbar>
 
-      <Card>
-        <div className="overflow-x-auto">
-          <TableView columns={columns} rows={rows} sendDataSelectItems={handleChildData} />
-        </div>
+      <Card contentClassName="overflow-hidden">
+        <TableView
+          columns={columns}
+          rows={rows}
+          sendDataSelectItems={handleChildData}
+        />
         <Pagination links={links} />
       </Card>
     </div>

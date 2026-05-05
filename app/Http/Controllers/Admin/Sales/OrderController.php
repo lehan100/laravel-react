@@ -3,49 +3,205 @@
 namespace App\Http\Controllers\Admin\Sales;
 
 use App\Http\Controllers\MainController;
+use App\Http\Requests\Sales\OrderRequest;
+use App\Http\Resources\Sales\OrderCollection;
+use App\Http\Resources\Sales\OrderResource;
+use App\Models\Sales\Order;
+use App\Repositories\Order\OrderRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request as RequestFacade;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class OrderController extends MainController
 {
-    public function index()
+    protected string $controllerView = 'Admin/Sales/Order/';
+
+    protected string $routeName = 'orders.';
+
+    protected RepositoryInterface $mainModel;
+
+    public function __construct(RepositoryInterface $repository)
     {
-        return response('Order index (blank scaffold)');
+        parent::__construct();
+        $this->mainModel = $repository;
     }
 
-    public function create()
+    public function index(): Response
     {
-        return response('Order create (blank scaffold)');
+        $this->params = array_merge(RequestFacade::all(), $this->params);
+        $items = $this->mainModel->lists($this->params, ['task' => 'admin-list-items']);
+
+        return Inertia::render($this->controllerView.'Index', [
+            'items' => new OrderCollection($items),
+            'filters' => [
+                'search' => trim((string) ($this->params['search'] ?? '')),
+                'order_status' => (string) ($this->params['order_status'] ?? 'all'),
+                'payment_status' => (string) ($this->params['payment_status'] ?? 'all'),
+            ],
+            'status_options' => $this->statusOptions(),
+        ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function create(): Response
     {
-        return redirect()->route('orders.index');
+        return Inertia::render($this->controllerView.'Created', [
+            'item' => null,
+            'form_options' => $this->mainModel->get([], ['task' => 'get-form-options']),
+            'status_options' => $this->statusOptions(),
+        ]);
     }
 
-    public function show(string $id)
+    public function store(OrderRequest $request): RedirectResponse
     {
-        return response("Order show {$id} (blank scaffold)");
+        try {
+            $params = $request->validated();
+            $item = $this->mainModel->save($params, ['task' => 'add-item']);
+
+            if ((int) ($params['undo'] ?? 0) === 1) {
+                return Redirect::to(route($this->routeName.'index'))
+                    ->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+            }
+
+            return Redirect::route($this->routeName.'edit', $item->id)
+                ->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        } catch (\Throwable $th) {
+            return Redirect::back()
+                ->withInput()
+                ->with('error', __('hancms.message.error.created', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        }
     }
 
-    public function edit(string $id)
+    public function show(string $id): Response|RedirectResponse
     {
-        return response("Order edit {$id} (blank scaffold)");
+        $item = $this->mainModel->get(['id' => $id], ['task' => 'get-item']);
+        if (! $item) {
+            return redirect()->route($this->routeName.'index')
+                ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        }
+
+        return Inertia::render($this->controllerView.'Show', [
+            'item' => new OrderResource($item),
+            'status_options' => $this->statusOptions(),
+            'layout_info' => $this->layoutInfo(),
+            'page_title' => $this->showPageTitle($item),
+        ]);
     }
 
-    public function update(Request $request, string $id): RedirectResponse
+    public function edit(string $id): Response|RedirectResponse
     {
-        return redirect()->route('orders.index');
+        $item = $this->mainModel->get(['id' => $id], ['task' => 'get-item']);
+        if (! $item) {
+            return redirect()->route($this->routeName.'index')
+                ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        }
+
+        return Inertia::render($this->controllerView.'Edit', [
+            'item' => new OrderResource($item),
+            'form_options' => $this->mainModel->get([], ['task' => 'get-form-options']),
+            'status_options' => $this->statusOptions(),
+        ]);
+    }
+
+    public function update(OrderRequest $request, string $id): RedirectResponse
+    {
+        $item = $this->mainModel->get(['id' => $id], ['task' => 'get-item']);
+        if (! $item) {
+            return redirect()->route($this->routeName.'index')
+                ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        }
+
+        try {
+            $params = $request->validated();
+            $params['id'] = $id;
+            $item = $this->mainModel->save($params, ['task' => 'edit-item']);
+
+            if ((int) ($params['undo'] ?? 0) === 1) {
+                return Redirect::to(route($this->routeName.'index'))
+                    ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+            }
+
+            return Redirect::route($this->routeName.'edit', $item->id)
+                ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        } catch (\Throwable $th) {
+            return Redirect::back()
+                ->withInput()
+                ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        }
     }
 
     public function destroy(string $id): RedirectResponse
     {
-        return redirect()->route('orders.index');
+        try {
+            $this->mainModel->delete(['id' => $id], ['task' => 'delete-item']);
+
+            return Redirect::to(route($this->routeName.'index'))
+                ->with('success', __('hancms.message.success.deleted', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        } catch (\Throwable $th) {
+            return Redirect::back()->with('error', __('hancms.message.error.deleted'));
+        }
     }
 
     public function destroyMany(Request $request): RedirectResponse
     {
-        return redirect()->route('orders.index');
+        try {
+            $this->mainModel->delete($request->all(), ['task' => 'delete-items']);
+
+            return Redirect::to(route($this->routeName.'index'))
+                ->with('success', __('hancms.message.success.deleted', ['name' => mb_strtolower(__('hancms.sales.orders.name'))]));
+        } catch (\Throwable $th) {
+            return Redirect::back()->with('error', __('hancms.message.error.deleted'));
+        }
+    }
+
+    /**
+     * @return array<string, array<int, array<string, string>>>
+     */
+    private function statusOptions(): array
+    {
+        return [
+            'order' => collect(Order::ORDER_STATUSES)
+                ->map(fn (string $status) => ['value' => $status, 'label' => __('hancms.sales.orders.statuses.order.'.$status)])
+                ->all(),
+            'payment' => collect(Order::PAYMENT_STATUSES)
+                ->map(fn (string $status) => ['value' => $status, 'label' => __('hancms.sales.orders.statuses.payment.'.$status)])
+                ->all(),
+            'shipping' => collect(Order::SHIPPING_STATUSES)
+                ->map(fn (string $status) => ['value' => $status, 'label' => __('hancms.sales.orders.statuses.shipping.'.$status)])
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array{company:string, phone:string, address:string, website:string}
+     */
+    private function layoutInfo(): array
+    {
+        $locale = app()->getLocale();
+        $page = Lang::get('page', [], $locale);
+
+        if (! is_array($page)) {
+            $page = Lang::get('page', [], 'vi');
+        }
+
+        return [
+            'company' => trim((string) ($page['company'] ?? '')),
+            'phone' => trim((string) ($page['phone'] ?? '')),
+            'address' => trim((string) ($page['address'] ?? '')),
+            'website' => trim((string) config('app.url', '')),
+        ];
+    }
+
+    private function showPageTitle(Order $item): string
+    {
+        return sprintf(
+            '%s - %s - %s',
+            __('hancms.sales.orders.name'),
+            $item->order_number ?: '#'.$item->id,
+            trim((string) $item->customer_name) !== '' ? trim((string) $item->customer_name) : '---'
+        );
     }
 }
-

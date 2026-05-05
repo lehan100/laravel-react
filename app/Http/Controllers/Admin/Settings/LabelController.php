@@ -5,19 +5,23 @@ namespace App\Http\Controllers\Admin\Settings;
 use App\Http\Controllers\MainController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 
-class LabelController  extends MainController
+class LabelController extends MainController
 {
-    protected $controllerView = 'Admin/Label/';
-    protected $controllerName = 'label';
+    protected string $controllerView = 'Admin/Label/';
+
+    protected string $controllerName = 'label';
+
     public function __construct()
     {
+        parent::__construct();
         $configPath = config('image.path.photo');
         Inertia::share(['config_path' => $configPath]);
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,8 +35,9 @@ class LabelController  extends MainController
                 ? Lang::get('label', [], $lang['code'])
                 : Lang::get('label', [], 'en');
         }
-        return Inertia::render($this->controllerView . 'Index', [
-            'labels' => $labels
+
+        return Inertia::render($this->controllerView.'Index', [
+            'labels' => $labels,
         ]);
     }
 
@@ -51,7 +56,7 @@ class LabelController  extends MainController
     {
         //
         try {
-            //code...
+            // code...
             $labels = $request->labels;
             foreach ($labels as $lang => $content) {
                 // 1. Xác định đường dẫn thư mục và file
@@ -59,21 +64,21 @@ class LabelController  extends MainController
                 $filePath = "$dir/label.php";
 
                 // 2. Kiểm tra và tạo thư mục nếu chưa có (quyền 0755)
-                if (!is_dir($dir)) {
+                if (! is_dir($dir)) {
                     mkdir($dir, 0755, true);
                 }
                 // 3. Chuẩn bị nội dung file PHP
                 $content = preg_replace('/^array\s*\(/', '[', $content);
                 $content = preg_replace('/\)$/', ']', $content);
-                $fileContent = "<?php\n\nreturn " . var_export($content, true) . ";\n";
+                $fileContent = "<?php\n\nreturn ".var_export($content, true).";\n";
 
                 // 4. Ghi đè vào file label.php
                 File::put(lang_path("$lang/label.php"), $fileContent);
             }
             // return Redirect::to(route('label.index'))->with('success',  __('hancms.message.success.edit', ['name' => __('hancms.label.name')]));
         } catch (\Throwable $th) {
-            //throw $th;
-            return Redirect::to(route('label.index'))->with('error',  __('hancms.message.error.edit', ['name' => __('hancms.label.name')]));
+            // throw $th;
+            return Redirect::to(route('label.index'))->with('error', __('hancms.message.error.edit', ['name' => __('hancms.label.name')]));
         }
     }
 

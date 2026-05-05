@@ -28,7 +28,8 @@ createInertiaApp({
         fallbackLocale={'en'}
         files={import.meta.glob([
           '/lang/php_*.json', // Chỉ lấy các file đã được convert từ PHP
-          '/lang/*.json'      // Lấy thêm các file JSON thuần nếu có
+          '/lang/*.json',     // Lấy thêm các file JSON thuần nếu có
+          '!/lang/php_[0-9]*.json'
         ], { eager: true })}
       >
         <App {...props} />

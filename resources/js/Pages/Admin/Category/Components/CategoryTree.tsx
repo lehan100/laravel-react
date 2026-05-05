@@ -24,6 +24,8 @@ type CategoryNode = {
     status?: number;
     type?: string;
     order?: number;
+    products_count?: number;
+    tree_products_count?: number;
     translations?: Record<string, { name?: string }>;
     children?: CategoryNode[];
 };
@@ -84,6 +86,13 @@ function findAncestorIds(data: CategoryNode[], nodeId: number) {
     }
 
     return ancestorIds;
+}
+
+function resolveTreeProductCount(node: CategoryNode): number {
+    const directCount = Number(node.products_count ?? 0);
+    const childrenCount = (node.children || []).reduce((total, child) => total + resolveTreeProductCount(child), 0);
+
+    return directCount + childrenCount;
 }
 
 const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
@@ -192,6 +201,7 @@ const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
             const typeMeta = getTypeMeta(node.type);
             const TypeIcon = typeMeta.icon;
             const isInactive = node.status === 0;
+            const productCount = Number(node.tree_products_count ?? resolveTreeProductCount(node));
             const isDragging = draggingId === node.id;
             const isDropTarget = dropTarget?.id === node.id && draggingId !== null && draggingId !== node.id;
             const showDropBefore = isDropTarget && dropTarget?.position === 'before';
@@ -284,6 +294,13 @@ const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
                                     title={`${trans('hancms.catalog.category.type.label')}: ${trans(typeMeta.labelKey)}`}
                                 >
                                     <TypeIcon size={11} />
+                                </span>
+
+                                <span
+                                    className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
+                                    title="Số lượng sản phẩm"
+                                >
+                                    {productCount}
                                 </span>
 
                                 {isInactive && (

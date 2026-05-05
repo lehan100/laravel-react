@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Globe, Search, Info, Layout, Lock, LockOpen, Languages } from 'lucide-react';
+import { Save, Globe, Search, Info, Layout, Lock, LockOpen, Languages, Sparkles } from 'lucide-react';
 import { InputGroup } from "@/Components/Form/HancmsInput";
 import MessageError from '@/Components/Form/MessageError';
 import { Editor } from '@tinymce/tinymce-react';
@@ -11,9 +11,14 @@ import StatusSwitch from '@/Components/Status/StatusSwitch';
 import axios from 'axios';
 import CategorySelector from './CategorySelector';
 import CategoryTypeSelector from './CategoryTypeSelector';
+import CategoryProductsTab from './CategoryProductsTab';
+import { getLanguageByLocale } from '@/Pages/Admin/Product/productUtils';
 
-const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive }: any) => {
+const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive, itemsSelectedProducts = [] }: any) => {
     const [currentTab, setCurrentTab] = useState(langCode || 'vi');
+    const [contentTab, setContentTab] = useState<'content' | 'products'>('content');
+    const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
+    const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
     const { props }: any = usePage();
     const siteName = props.app_name || 'HanCMS Store';
     const [lockedTabs, setLockedTabs] = useState<Record<string, boolean>>({});
@@ -69,6 +74,49 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             };
         });
     };
+
+    const handleAiSuggestSeo = async (locale: string) => {
+        const langData = data.translations?.[locale] || {};
+
+        setAiSeoSuggestionError('');
+        setAiSeoSuggestingLocale(locale);
+
+        try {
+            const response = await axios.post(route('category.ai.suggest-seo'), {
+                locale,
+                name: langData.name || '',
+                content: langData.content || '',
+                seo_keyword: langData.seo_keyword || '',
+                current_seo_title: langData.seo_title || '',
+                current_seo_description: langData.seo_description || '',
+            });
+
+            const seoTitle = String(response?.data?.seo_title || '').trim();
+            const seoDescription = String(response?.data?.seo_description || '').trim();
+
+            if (!seoTitle && !seoDescription) {
+                setAiSeoSuggestionError(trans('hancms.catalog.category.ai.empty_response') || 'AI returned an empty response. Please try again.');
+                return;
+            }
+
+            if (seoTitle) {
+                updateTranslation(locale, 'seo_title', seoTitle);
+            }
+
+            if (seoDescription) {
+                updateTranslation(locale, 'seo_description', seoDescription);
+            }
+        } catch (error: any) {
+            setAiSeoSuggestionError(
+                error?.response?.data?.message
+                || trans('hancms.catalog.category.ai.failed')
+                || 'Unable to generate AI SEO right now.'
+            );
+        } finally {
+            setAiSeoSuggestingLocale(null);
+        }
+    };
+
     //Upload Image
     const [previewUrl, setPreviewUrl] = useState<string | null>(
         data.photo ? `/${config_path['path']}/${data.photo}` : null
@@ -124,6 +172,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
         if (!currentType) return false;
         return String(category.type || 'product') === String(currentType);
     });
+    const currentLanguage = getLanguageByLocale(langList, currentTab);
     return (
         <div className="animate-in fade-in duration-300">
             <Card title={trans('hancms.layout.tabs.general')} className='mb-6'>
@@ -172,168 +221,219 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             </Card>
             <Card title={trans('hancms.layout.tabs.content')}>
                 <div className="space-y-6 p-6">
-                    <div className="flex gap-3 mb-6 border-b pb-6 pl-1 overflow-x-auto">
-                        {langList.map((lang: any) => {
-                            const errorInTab = hasLangError(lang.code);
+                    <div className="flex flex-wrap gap-2 border-b pb-4">
+                        {[
+                            { id: 'content' as const, label: trans('hancms.column.content') },
+                            { id: 'products' as const, label: trans('hancms.catalog.product.name') },
+                        ].map((tab) => {
+                            const active = contentTab === tab.id;
                             return (
                                 <button
-                                    key={lang.code}
+                                    key={tab.id}
                                     type="button"
-                                    onClick={() => setCurrentTab(lang.code)}
-                                    className={`p-4 rounded-md text-[12px] font-black uppercase transition-all flex items-center gap-2 border-2 
-                                            ${currentTab === lang.code
-                                            ? 'bg-indigo-800 text-white shadow-lg scale-105 border-indigo-800'
-                                            : errorInTab
-                                                ? 'bg-red-50 text-red-600 border-red-300 animate-pulse shadow-sm'
-                                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border-transparent'
-                                        }`}
+                                    onClick={() => setContentTab(tab.id)}
+                                    className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                                        active
+                                            ? 'bg-slate-950 text-white shadow-sm'
+                                            : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                    }`}
                                 >
-                                    <img src={`/${languageConfigPath.path}/${lang.photo}`} className="w-4 h-4 rounded-full object-cover" alt={lang.name} />
-                                    {lang.name}
-                                    {errorInTab && (
-                                        <span className="relative flex h-2 w-2 ml-1">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600 border border-white"></span>
-                                        </span>
-                                    )}
+                                    {tab.label}
                                 </button>
-                            )
+                            );
                         })}
                     </div>
-                    <InputGroup label={trans('hancms.column.name')}>
-                        <input
-                            type="text"
-                            value={data.translations?.[currentTab]?.name || ''}
-                            onChange={(e) => updateTranslation(currentTab, 'name', e.target.value)}
-                            className={`w-full border rounded-md p-2 text-sm outline-none transition-all ${errors?.[`translations.${currentTab}.name`]
-                                ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-                                : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'
-                                }`}
-                        />
-                        {errors?.[`translations.${currentTab}.name`] && <MessageError>{errors[`translations.${currentTab}.name`]}</MessageError>}
-                    </InputGroup>
 
-                    <InputGroup label={trans('hancms.seo.slug') || "Slug / URL (SEO)"}>
-                        <div className="relative flex items-center group">
-                            <input
-                                type="text"
-                                readOnly={isLocked(currentTab)}
-                                value={data.translations?.[currentTab]?.slug || ''}
-                                onChange={(e) => updateTranslation(currentTab, 'slug', e.target.value)}
-                                className={`w-full border rounded-md p-2 pr-10 text-sm outline-none transition-all font-mono ${errors?.[`translations.${currentTab}.slug`]
-                                    ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-                                    : isLocked(currentTab)
-                                        ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'border-indigo-300 focus:ring-2 focus:ring-indigo-500 bg-white'
-                                    }`}
-                            />
-
-                            <button
-                                type="button"
-                                onClick={() => toggleLock(currentTab)}
-                                className={`absolute right-2 p-1.5 rounded-md transition-all ${isLocked(currentTab)
-                                    ? 'text-gray-400 hover:bg-gray-200'
-                                    : 'text-indigo-600 bg-indigo-50 shadow-sm border border-indigo-100'
-                                    }`}
-                            >
-                                {isLocked(currentTab) ? <Lock size={14} /> : <LockOpen size={14} />}
-                            </button>
-                        </div>
-
-                        {errors?.[`translations.${currentTab}.slug`] && (
-                            <div className="mt-1">
-                                <MessageError>{errors[`translations.${currentTab}.slug`]}</MessageError>
+                    {contentTab === 'content' ? (
+                        <>
+                            <div className="flex gap-3 mb-6 border-b pb-6 pl-1 overflow-x-auto">
+                                {langList.map((lang: any) => {
+                                    const errorInTab = hasLangError(lang.code);
+                                    return (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setCurrentTab(lang.code)}
+                                            className={`p-4 rounded-md text-[12px] font-black uppercase transition-all flex items-center gap-2 border-2
+                                                    ${currentTab === lang.code
+                                                    ? 'bg-indigo-800 text-white shadow-lg scale-105 border-indigo-800'
+                                                    : errorInTab
+                                                        ? 'bg-red-50 text-red-600 border-red-300 animate-pulse shadow-sm'
+                                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border-transparent'
+                                                }`}
+                                        >
+                                            <img src={`/${languageConfigPath.path}/${lang.photo}`} className="w-4 h-4 rounded-full object-cover" alt={lang.name} />
+                                            {lang.name}
+                                            {errorInTab && (
+                                                <span className="relative flex h-2 w-2 ml-1">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600 border border-white"></span>
+                                                </span>
+                                            )}
+                                        </button>
+                                    )
+                                })}
                             </div>
-                        )}
+                            <InputGroup label={trans('hancms.column.name')}>
+                                <input
+                                    type="text"
+                                    value={data.translations?.[currentTab]?.name || ''}
+                                    onChange={(e) => updateTranslation(currentTab, 'name', e.target.value)}
+                                    className={`w-full border rounded-md p-2 text-sm outline-none transition-all ${errors?.[`translations.${currentTab}.name`]
+                                        ? 'border-red-500 focus:ring-2 focus:ring-red-200'
+                                        : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'
+                                        }`}
+                                />
+                                {errors?.[`translations.${currentTab}.name`] && <MessageError>{errors[`translations.${currentTab}.name`]}</MessageError>}
+                            </InputGroup>
 
-                        {!isLocked(currentTab) && !errors?.[`translations.${currentTab}.slug`] && (
-                            <p className="text-[10px] text-amber-600 mt-1 italic font-medium">
-                                {trans('hancms.message.edit_slug') || "* Đang cho phép sửa tay Slug của ngôn ngữ này."}
-                            </p>
-                        )}
-                    </InputGroup>
+                            <InputGroup label={trans('hancms.seo.slug') || "Slug / URL (SEO)"}>
+                                <div className="relative flex items-center group">
+                                    <input
+                                        type="text"
+                                        readOnly={isLocked(currentTab)}
+                                        value={data.translations?.[currentTab]?.slug || ''}
+                                        onChange={(e) => updateTranslation(currentTab, 'slug', e.target.value)}
+                                        className={`w-full border rounded-md p-2 pr-10 text-sm outline-none transition-all font-mono ${errors?.[`translations.${currentTab}.slug`]
+                                            ? 'border-red-500 focus:ring-2 focus:ring-red-200'
+                                            : isLocked(currentTab)
+                                                ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                                                : 'border-indigo-300 focus:ring-2 focus:ring-indigo-500 bg-white'
+                                            }`}
+                                    />
 
-                    <InputGroup label={trans('hancms.column.content')}>
-                        <Editor
-                            tinymceScriptSrc="/js/tinymce/tinymce.min.js"
-                            licenseKey="gpl"
-                            value={data.translations?.[currentTab]?.content || ''}
-                            init={{
-                                height: 400,
-                                menubar: false,
-                                branding: false,
-                                promotion: false,
-                                document_base_url: '/',
-                                convert_urls: true,
-                                remove_script_host: true,
-                                relative_urls: false,
-                                language: langCode,
-                                language_url: `/js/tinymce/langs/${langCode}.js`,
-                                plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'code', 'table', 'wordcount'],
-                                toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist | image code',
-                                file_picker_callback: (callback, value, meta) => {
-                                    if (meta.filetype === 'image') {
-                                        setTinyCallback(() => callback);
-                                        setIsModalOpen(true);
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleLock(currentTab)}
+                                        className={`absolute right-2 p-1.5 rounded-md transition-all ${isLocked(currentTab)
+                                            ? 'text-gray-400 hover:bg-gray-200'
+                                            : 'text-indigo-600 bg-indigo-50 shadow-sm border border-indigo-100'
+                                            }`}
+                                    >
+                                        {isLocked(currentTab) ? <Lock size={14} /> : <LockOpen size={14} />}
+                                    </button>
+                                </div>
+
+                                {errors?.[`translations.${currentTab}.slug`] && (
+                                    <div className="mt-1">
+                                        <MessageError>{errors[`translations.${currentTab}.slug`]}</MessageError>
+                                    </div>
+                                )}
+
+                                {!isLocked(currentTab) && !errors?.[`translations.${currentTab}.slug`] && (
+                                    <p className="text-[10px] text-amber-600 mt-1 italic font-medium">
+                                        {trans('hancms.message.edit_slug') || "* Đang cho phép sửa tay Slug của ngôn ngữ này."}
+                                    </p>
+                                )}
+                            </InputGroup>
+
+                            <InputGroup label={trans('hancms.column.content')}>
+                                <Editor
+                                    tinymceScriptSrc="/js/tinymce/tinymce.min.js"
+                                    licenseKey="gpl"
+                                    value={data.translations?.[currentTab]?.content || ''}
+                                    init={{
+                                        height: 400,
+                                        menubar: false,
+                                        branding: false,
+                                        promotion: false,
+                                        document_base_url: '/',
+                                        convert_urls: true,
+                                        remove_script_host: true,
+                                        relative_urls: false,
+                                        language: langCode,
+                                        language_url: `/js/tinymce/langs/${langCode}.js`,
+                                        plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'code', 'table', 'wordcount'],
+                                        toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist | image code',
+                                        file_picker_callback: (callback, value, meta) => {
+                                            if (meta.filetype === 'image') {
+                                                setTinyCallback(() => callback);
+                                                setIsModalOpen(true);
+                                            }
+                                        }
+                                    }}
+                                    onEditorChange={(content) => updateTranslation(currentTab, 'content', content)}
+                                />
+                            </InputGroup>
+                            <br />
+                            <div className="bg-gray-100 p-5 rounded-xl border border-gray-200 space-y-6">
+                                <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase">
+                                        <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleAiSuggestSeo(currentTab)}
+                                        disabled={aiSeoSuggestingLocale === currentTab}
+                                        className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        <Sparkles size={14} />
+                                        {aiSeoSuggestingLocale === currentTab
+                                            ? (trans('hancms.catalog.category.ai.generating') || 'Generating...')
+                                            : (trans('hancms.catalog.category.ai.suggest_seo') || 'AI suggest SEO')}
+                                    </button>
+                                </div>
+                                {aiSeoSuggestionError && <MessageError>{aiSeoSuggestionError}</MessageError>}
+                                <InputGroup
+                                    label={
+                                        <div className="flex justify-between items-end w-full">
+                                            <span>{trans('hancms.seo.field.title') || "Seo Title"}</span>
+                                            <span className={`text-[10px] font-mono ${data.translations?.[currentTab]?.seo_title?.length > 60 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                                                {data.translations?.[currentTab]?.seo_title?.length || 0}/60 {trans('hancms.seo.character') || "character"}
+                                            </span>
+                                        </div>
                                     }
-                                }
-                            }}
-                            onEditorChange={(content) => updateTranslation(currentTab, 'content', content)}
+                                >
+                                    <input
+                                        type="text"
+                                        value={data.translations?.[currentTab]?.seo_title || ''}
+                                        onChange={(e) => updateTranslation(currentTab, 'seo_title', e.target.value)}
+                                        className="w-full border-gray-300 rounded-md p-2 text-sm"
+                                    />
+                                </InputGroup>
+                                <InputGroup label={trans('hancms.seo.field.keyword') || "SEO Keywords"}>
+                                    <textarea
+                                        rows={3}
+                                        value={data.translations?.[currentTab]?.seo_keyword || ''}
+                                        onChange={(e) => updateTranslation(currentTab, 'seo_keyword', e.target.value)}
+                                        className="w-full border-gray-300 rounded-md p-2 text-sm"
+                                    />
+                                </InputGroup>
+                                <InputGroup
+                                    label={
+                                        <div className="flex justify-between items-end w-full">
+                                            <span>{trans('hancms.seo.field.description') || "SEO Description"}</span>
+                                            <span className={`text-[10px] font-mono ${data.translations?.[currentTab]?.seo_description?.length > 160 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                                                {data.translations?.[currentTab]?.seo_description?.length || 0}/160 {trans('hancms.seo.character') || "character"}
+                                            </span>
+                                        </div>
+                                    }
+                                >
+                                    <textarea
+                                        rows={3}
+                                        value={data.translations?.[currentTab]?.seo_description || ''}
+                                        onChange={(e) => updateTranslation(currentTab, 'seo_description', e.target.value)}
+                                        className={`w-full border rounded-md p-2 text-sm outline-none transition-all ${data.translations?.[currentTab]?.seo_description?.length > 160 ? 'border-red-300 bg-red-50' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'
+                                            }`}
+                                        placeholder={trans('hancms.seo.placeholder.description') || "Mô tả ngắn gọn nội dung trang web..."}
+                                    />
+                                    {data.translations?.[currentTab]?.seo_description?.length > 160 && (
+                                        <p className="text-[10px] text-red-500 mt-1 italic"> {trans('hancms.seo.message.description') || "* Nội dung quá dài sẽ bị Google cắt bớt khi hiển thị."}</p>
+                                    )}
+                                </InputGroup>
+                            </div>
+                        </>
+                    ) : (
+                        <CategoryProductsTab
+                            data={data}
+                            setData={setData}
+                            errors={errors}
+                            itemsSelectedProducts={itemsSelectedProducts}
+                            trans={trans}
+                            langCode={currentTab}
+                            currentLanguage={currentLanguage}
                         />
-                    </InputGroup>
-                    <br />
-                    <div className="bg-gray-100 p-5 rounded-xl border border-gray-200 space-y-6">
-                        <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase mb-2">
-                            <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
-                        </div>
-                        <InputGroup
-                            label={
-                                <div className="flex justify-between items-end w-full">
-                                    <span>{trans('hancms.seo.field.title') || "Seo Title"}</span>
-                                    <span className={`text-[10px] font-mono ${data.translations?.[currentTab]?.seo_title?.length > 60 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
-                                        {data.translations?.[currentTab]?.seo_title?.length || 0}/60 {trans('hancms.seo.character') || "character"}
-                                    </span>
-                                </div>
-                            }
-                        >
-                            <input
-                                type="text"
-                                value={data.translations?.[currentTab]?.seo_title || ''}
-                                onChange={(e) => updateTranslation(currentTab, 'seo_title', e.target.value)}
-                                className="w-full border-gray-300 rounded-md p-2 text-sm"
-                            />
-                        </InputGroup>
-                        <InputGroup label={trans('hancms.seo.field.keyword') || "SEO Keywords"}>
-                            <textarea
-                                rows={3}
-                                value={data.translations?.[currentTab]?.seo_keyword || ''}
-                                onChange={(e) => updateTranslation(currentTab, 'seo_keyword', e.target.value)}
-                                className="w-full border-gray-300 rounded-md p-2 text-sm"
-                            />
-                        </InputGroup>
-                        <InputGroup
-                            label={
-                                <div className="flex justify-between items-end w-full">
-                                    <span>{trans('hancms.seo.field.description') || "SEO Description"}</span>
-                                    <span className={`text-[10px] font-mono ${data.translations?.[currentTab]?.seo_description?.length > 160 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
-                                        {data.translations?.[currentTab]?.seo_description?.length || 0}/160 {trans('hancms.seo.character') || "character"}
-                                    </span>
-                                </div>
-                            }
-                        >
-                            <textarea
-                                rows={3}
-                                value={data.translations?.[currentTab]?.seo_description || ''}
-                                onChange={(e) => updateTranslation(currentTab, 'seo_description', e.target.value)}
-                                className={`w-full border rounded-md p-2 text-sm outline-none transition-all ${data.translations?.[currentTab]?.seo_description?.length > 160 ? 'border-red-300 bg-red-50' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'
-                                    }`}
-                                placeholder={trans('hancms.seo.placeholder.description') || "Mô tả ngắn gọn nội dung trang web..."}
-                            />
-                            {data.translations?.[currentTab]?.seo_description?.length > 160 && (
-                                <p className="text-[10px] text-red-500 mt-1 italic"> {trans('hancms.seo.message.description') || "* Nội dung quá dài sẽ bị Google cắt bớt khi hiển thị."}</p>
-                            )}
-                        </InputGroup>
-                    </div>
+                    )}
 
                 </div>
             </Card>

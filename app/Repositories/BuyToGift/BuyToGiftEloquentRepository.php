@@ -29,7 +29,7 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
     public function lists($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
+        if (! in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
             return null;
         }
 
@@ -45,14 +45,16 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
                         'priority',
                         'is_active',
                     ])
-                    ->orderBy('priority')
-                    ->orderBy('id');
+                        ->orderBy('priority')
+                        ->orderBy('id');
                 },
+                'rules.buyProducts:id',
+                'rules.giftProducts:id',
             ])
             ->orderBy('priority')
             ->orderByDesc('id');
 
-        if (!empty($params['search'])) {
+        if (! empty($params['search'])) {
             $search = trim((string) $params['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -65,6 +67,7 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         }
 
         $perPage = $params['pagination']['totalItemsPerPage'] ?? 20;
+
         return $query->paginate($perPage);
     }
 
@@ -86,17 +89,18 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
     public function save($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) {
+        if (! $task) {
             return false;
         }
 
         if ($task === 'change-status') {
             $item = $this->_model->find($params['id'] ?? null);
-            if (!$item) {
+            if (! $item) {
                 return false;
             }
 
-            $item->is_active = !$item->is_active;
+            $item->is_active = ! $item->is_active;
+
             return $item->save();
         }
 
@@ -106,8 +110,9 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
                 ? new $this->_model
                 : $this->_model->find($params['id'] ?? null);
 
-            if (!$item) {
+            if (! $item) {
                 DB::rollBack();
+
                 return false;
             }
 
@@ -128,10 +133,12 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
             }
 
             DB::commit();
+
             return $item;
         } catch (\Throwable $e) {
             DB::rollBack();
-            logger('Error save buytogift: ' . $e->getMessage());
+            logger('Error save buytogift: '.$e->getMessage());
+
             return false;
         }
     }
@@ -139,12 +146,13 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
     public function delete($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) {
+        if (! $task) {
             return false;
         }
 
         if ($task === 'delete-item') {
             $item = $this->_model->find($params['id'] ?? null);
+
             return $item ? $item->delete() : false;
         }
 
@@ -163,12 +171,12 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
     {
         $rule = null;
         if ($task === 'add-item') {
-            $rule = new PromotionBuyToGiftOfferRule();
+            $rule = new PromotionBuyToGiftOfferRule;
             $rule->promotion_buytogift_offer_id = $item->id;
         } else {
             $rule = $item->rules()->orderBy('priority')->orderBy('id')->first();
-            if (!$rule) {
-                $rule = new PromotionBuyToGiftOfferRule();
+            if (! $rule) {
+                $rule = new PromotionBuyToGiftOfferRule;
                 $rule->promotion_buytogift_offer_id = $item->id;
             }
         }
@@ -185,12 +193,12 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         $giftQty = max(1, (int) ($params['gift_qty'] ?? 1));
 
         $syncBuyProducts = collect($params['buy_product_ids'] ?? [])
-            ->mapWithKeys(fn($id) => [(int) $id => ['buy_qty' => $buyQty]])
+            ->mapWithKeys(fn ($id) => [(int) $id => ['buy_qty' => $buyQty]])
             ->all();
         $rule->buyProducts()->sync($syncBuyProducts);
 
         $syncGiftProducts = collect($params['gift_product_ids'] ?? [])
-            ->mapWithKeys(fn($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
+            ->mapWithKeys(fn ($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
             ->all();
         $rule->giftProducts()->sync($syncGiftProducts);
     }
@@ -201,7 +209,7 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         $keepIds = [];
 
         foreach ($rulesInput as $index => $row) {
-            if (!is_array($row)) {
+            if (! is_array($row)) {
                 continue;
             }
 
@@ -229,17 +237,17 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
             $giftQty = max(1, (int) ($row['gift_qty'] ?? 1));
 
             $syncBuyProducts = collect($row['buy_product_ids'] ?? [])
-                ->mapWithKeys(fn($id) => [(int) $id => ['buy_qty' => $buyQty]])
+                ->mapWithKeys(fn ($id) => [(int) $id => ['buy_qty' => $buyQty]])
                 ->all();
             $rule->buyProducts()->sync($syncBuyProducts);
 
             $syncGiftProducts = collect($row['gift_product_ids'] ?? [])
-                ->mapWithKeys(fn($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
+                ->mapWithKeys(fn ($id) => [(int) $id => ['gift_qty' => $giftQty, 'is_auto_add' => true]])
                 ->all();
             $rule->giftProducts()->sync($syncGiftProducts);
         }
 
-        if (!empty($keepIds)) {
+        if (! empty($keepIds)) {
             $item->rules()->whereNotIn('id', $keepIds)->delete();
         } else {
             $item->rules()->delete();

@@ -317,9 +317,10 @@ function roundMoney(value: number) {
 }
 
 function formatCurrencyAmount(amount: number, currency: ProductCurrency) {
+    const fractionDigits = currency.code === 'VND' ? 0 : PRICE_DECIMALS;
     const numeric = new Intl.NumberFormat(currency.locale, {
-        minimumFractionDigits: PRICE_DECIMALS,
-        maximumFractionDigits: PRICE_DECIMALS,
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits,
     }).format(amount);
     const format = CURRENCY_FORMATS[currency.code];
     const symbol = getCurrencySymbol(currency.code);

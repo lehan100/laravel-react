@@ -2,17 +2,17 @@
 
 namespace App\Models\Catalog;
 
+use App\Models\Sales\InventoryAdjustmentHistory;
 use App\Models\Slug;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model implements TranslatableContract
 {
@@ -30,7 +30,7 @@ class Product extends Model implements TranslatableContract
         'is_stock',
         'order',
         'hit_viewer',
-        'hit_order'
+        'hit_order',
     ];
 
     public $translatedAttributes = [
@@ -39,7 +39,7 @@ class Product extends Model implements TranslatableContract
         'content',
         'seo_title',
         'seo_keyword',
-        'seo_description'
+        'seo_description',
     ];
 
     protected $casts = [
@@ -48,24 +48,25 @@ class Product extends Model implements TranslatableContract
         'price' => 'decimal:2',
     ];
 
-
     public function photos(): HasMany
     {
         return $this->hasMany(ProductPhoto::class, 'product_id')->orderBy('order');
     }
-
 
     public function defaultPhoto()
     {
         return $this->hasOne(ProductPhoto::class, 'product_id')->where('is_default', true);
     }
 
-
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_product');
     }
 
+    public function adjustmentHistories(): HasMany
+    {
+        return $this->hasMany(InventoryAdjustmentHistory::class, 'product_id');
+    }
 
     public function slugs(): MorphMany
     {

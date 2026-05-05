@@ -1,6 +1,18 @@
 import { useTrans } from '@/Hooks/useTrans';
 
-export default function Card({ title, children, className }: any) {
+type CardProps = {
+    title?: string;
+    children: React.ReactNode;
+    className?: string;
+    contentClassName?: string;
+};
+
+export default function Card({
+    title,
+    children,
+    className,
+    contentClassName,
+}: CardProps) {
     const { trans } = useTrans();
 
     return (
@@ -10,9 +22,9 @@ export default function Card({ title, children, className }: any) {
                 <div className="mt-1 text-sm font-semibold tracking-wide">
                 {title}
                 </div>
-            </div>
+                </div>
             }
-            <div className="overflow-x-auto">
+            <div className={`overflow-x-auto ${contentClassName || ''}`}>
                 {children}
             </div>
         </div>

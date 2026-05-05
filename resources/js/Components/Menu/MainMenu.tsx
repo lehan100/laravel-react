@@ -1,4 +1,4 @@
-import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Library, LayoutTemplate, Image, LayoutDashboard, Store, FolderTree, Package, BadgePercent, Tags, TicketPercent, Boxes, ShoppingCart, CreditCard, FolderKanban, BarChart3, PackageSearch, Warehouse, Gift } from 'lucide-react';
+import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Library, LayoutTemplate, Image, LayoutDashboard, Store, FolderTree, Package, BadgePercent, Tags, TicketPercent, Boxes, ShoppingCart, CreditCard, FolderKanban, BarChart3, PackageSearch, Warehouse, Gift, Truck, MapPinned } from 'lucide-react';
 import classNames from 'classnames';
 import MainMenuItem from '@/Components/Menu/MainMenuItem';
 import BsFace from '@/Components/Menu/Fade';
@@ -26,9 +26,9 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
     catalog: ['category', 'product', 'post'],
     media: ['media-position', 'media-banner'],
     reports: ['report-revenue', 'report-product', 'report-inventory', 'report-promotion'],
-    sales: ['warehouse', 'orders', 'payment-methods'],
+    sales: ['warehouse', 'orders', 'payment-methods', 'shipping-methods'],
     promotion: ['saleoffer', 'coupon', 'buytogift'],
-    settings: ['languages', 'labels', 'layout'],
+    settings: ['languages', 'labels', 'hancms-translations', 'locations', 'layout'],
   };
   const { can } = usePermission();
   const { trans } = useTrans();
@@ -172,7 +172,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
           </ul>
         </BsFace>
       )}
-      {(can('warehouse.index') || can('orders.index') || can('payment-methods.index')) && (
+      {(can('warehouse.index') || can('orders.index') || can('payment-methods.index') || can('shipping-methods.index')) && (
         <BsFace
           mobile={mobile}
           title={trans('hancms.sales.name')}
@@ -211,6 +211,17 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
                   text={trans('hancms.sales.payment_methods.name')}
                   link="payment-methods.index"
                   icon={<CreditCard size={20} />}
+                />
+              </li>
+            )}
+            {can('shipping-methods.index') && (
+              <li>
+                <MainMenuItem
+                  mobile={mobile}
+                  onNavigate={onNavigate}
+                  text={trans('hancms.sales.shipping_methods.name')}
+                  link="shipping-methods.index"
+                  icon={<Truck size={20} />}
                 />
               </li>
             )}
@@ -308,7 +319,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
         </BsFace>
       )}
 
-      {(can('languages.index') || can('labels.index') || can('layout.index')) && (
+      {(can('languages.index') || can('labels.index') || can('hancms-translations.index') || can('locations.index') || can('layout.index')) && (
         <BsFace
           mobile={mobile}
           title={trans('hancms.settings.main')}
@@ -336,6 +347,28 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
                   text={trans('hancms.label.name')}
                   link="labels.index"
                   icon={<FileText size={20} />}
+                />
+              </li>
+            )}
+            {can('hancms-translations.index') && (
+              <li>
+                <MainMenuItem
+                  mobile={mobile}
+                  onNavigate={onNavigate}
+                  text={trans('hancms.translation.name')}
+                  link="hancms-translations.index"
+                  icon={<FileText size={20} />}
+                />
+              </li>
+            )}
+            {can('locations.index') && (
+              <li>
+                <MainMenuItem
+                  mobile={mobile}
+                  onNavigate={onNavigate}
+                  text={trans('hancms.settings.locations.name')}
+                  link="locations.index"
+                  icon={<MapPinned size={20} />}
                 />
               </li>
             )}

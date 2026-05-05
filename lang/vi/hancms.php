@@ -1,9 +1,72 @@
 <?php
 
 return [
-    'dashboard.main' => 'Bảng điều khiển',
-    'users.main' => 'Người dùng',
-    'settings.main' => 'Cài đặt',
+    'dashboard' => [
+        'main' => 'Bảng điều khiển',
+        'hello' => 'Xin chào, :name',
+        'quick_actions' => 'Truy cập nhanh',
+        'revenue_chart' => 'Doanh thu 14 ngày',
+        'order_status' => 'Trạng thái đơn hàng',
+        'top_products' => 'Sản phẩm nổi bật',
+        'stock_alerts' => 'Cảnh báo tồn kho',
+        'recent_orders' => 'Đơn hàng gần đây',
+        'operations' => 'Tổng quan vận hành',
+        'view_products' => 'Đi tới danh sách sản phẩm',
+        'view_categories' => 'Sắp xếp cây danh mục',
+        'view_orders' => 'Xem đơn hàng',
+        'view_reports' => 'Xem báo cáo doanh thu',
+        'empty' => 'Chưa có dữ liệu.',
+        'summary' => [
+            'products' => 'Sản phẩm',
+            'active_products' => 'Đang bật',
+            'categories' => 'Danh mục',
+            'users' => 'Người dùng',
+            'active_promotions' => 'Khuyến mãi chạy',
+            'out_of_stock' => 'Hết hàng',
+        ],
+        'metrics' => [
+            'revenue' => 'Doanh thu',
+            'revenue_hint' => '14 ngày gần nhất',
+            'orders' => 'Đơn hợp lệ',
+            'orders_hint' => 'Không tính đơn hủy',
+            'paid' => 'Đã thanh toán',
+            'paid_hint' => 'Đơn đã thu tiền',
+            'low_stock' => 'Sắp hết hàng',
+            'low_stock_hint' => 'Tồn kho từ 1-5',
+        ],
+    ],
+    'users' => [
+        'main' => 'Người dùng',
+        'admin' => [
+            'name' => 'Danh sách người dùng',
+        ],
+        'name' => 'Người dùng',
+        'created' => 'Thêm người dùng',
+        'edit' => 'Chỉnh sửa người dùng',
+        'profile' => 'Hồ sơ cá nhân',
+        'manage' => 'Quản lý người dùng',
+        'logout' => 'Đăng xuất',
+    ],
+    'settings' => [
+        'main' => 'Cài đặt',
+        'locations' => [
+            'name' => 'Quản lý tỉnh / phường',
+            'summary' => [
+                'provinces' => 'Tỉnh / thành phố',
+                'wards' => 'Phường / xã',
+            ],
+        ],
+    ],
+    'translation' => [
+        'name' => 'Dịch hệ thống',
+        'admin' => [
+            'name' => 'Quản lý bản dịch hệ thống',
+        ],
+        'messages' => [
+            'saved' => 'Đã lưu bản dịch hệ thống',
+            'empty' => 'Không có bản dịch hệ thống.',
+        ],
+    ],
     'sidebar' => [
         'show' => 'Hiện sidebar',
         'hide' => 'Ẩn sidebar',
@@ -16,17 +79,9 @@ return [
     'permissions' => 'Quyền hạn',
     'assign_permissions' => [
         'name' => 'Gán quyền',
-        'error' => 'Lỗi gán quyền',
-        'error.message' => "Bạn chưa chọn quyền nào."
-    ],
-    'users' => [
-        'admin.name' => 'Danh sách người dùng',
-        'name' => 'Người dùng',
-        'created' => 'Thêm người dùng',
-        'edit' => 'Chỉnh sửa người dùng',
-        'profile' => 'Hồ sơ cá nhân',
-        'manage' => 'Quản lý người dùng',
-        'logout' => 'Đăng xuất'
+        'error' => [
+            'message' => 'Bạn chưa chọn quyền nào.',
+        ],
     ],
     'media' => [
         'name' => 'Đa phương tiện',
@@ -36,22 +91,90 @@ return [
             'edit' => 'Chỉnh vị trí hiển thị',
         ],
         'banner' => [
-            'name' => 'Hình ảnh'
-        ]
+            'name' => 'Hình ảnh',
+        ],
     ],
     'report' => [
         'name' => 'Báo Cáo',
+        'center' => 'Trung tâm báo cáo',
+        'from_date' => 'Từ ngày',
+        'to_date' => 'Đến ngày',
+        'filter' => 'Lọc',
+        'trend' => 'Xu hướng',
+        'ai_insight' => 'AI insight',
+        'ai_analyze' => 'AI phân tích',
+        'ai_empty' => 'AI chưa trả về phân tích.',
+        'ai_failed' => 'Không thể phân tích bằng AI lúc này.',
+        'ai_rate_limited' => 'AI đang bị giới hạn tần suất. Vui lòng thử lại sau.',
+        'ai_hint' => 'Bấm AI phân tích để nhận nhận định và hành động đề xuất từ dữ liệu hiện tại.',
+        'details' => 'Dữ liệu chi tiết',
+        'empty_chart' => 'Chưa có dữ liệu biểu đồ.',
+        'empty_rows' => 'Chưa có dữ liệu trong khoảng thời gian này.',
+        'columns' => [
+            'date' => 'Ngày',
+            'orders' => 'Đơn',
+            'quantity' => 'Số lượng',
+            'revenue' => 'Doanh thu',
+            'product' => 'Sản phẩm',
+            'sku' => 'SKU',
+            'sold_quantity' => 'Đã bán',
+            'stock' => 'Tồn kho',
+            'status' => 'Trạng thái',
+            'type' => 'Loại',
+            'code' => 'Mã',
+            'name' => 'Tên',
+        ],
+        'status_labels' => [
+            'active' => 'Đang chạy',
+            'inactive' => 'Tạm dừng/hết hạn',
+            'out_of_stock' => 'Hết hàng',
+            'low_stock' => 'Sắp hết',
+            'healthy' => 'Ổn',
+        ],
+        'campaigns' => [
+            'coupon' => 'Mã giảm giá',
+            'sale_offer' => 'Giảm giá',
+            'buy_to_gift' => 'Mua tặng',
+        ],
         'revenue' => [
             'name' => 'Báo cáo doanh thu',
+            'description' => 'Theo dõi doanh thu, đơn hàng, trạng thái thanh toán và xu hướng theo ngày.',
+            'metrics' => [
+                'revenue' => 'Doanh thu',
+                'paid' => 'Đã thanh toán',
+                'valid_orders' => 'Đơn hợp lệ',
+                'average_order_value' => 'Giá trị TB',
+            ],
         ],
         'product' => [
             'name' => 'Báo cáo sản phẩm',
+            'description' => 'Phân tích sản phẩm bán chạy, doanh thu theo sản phẩm và sức khỏe catalog.',
+            'metrics' => [
+                'sold_products' => 'Sản phẩm có bán',
+                'sold_quantity' => 'Số lượng bán',
+                'top_revenue' => 'Doanh thu top',
+                'active_catalog' => 'Catalog đang bật',
+            ],
         ],
         'inventory' => [
             'name' => 'Báo cáo kho',
+            'description' => 'Theo dõi tồn kho thấp, hết hàng và biến động điều chỉnh kho.',
+            'metrics' => [
+                'total_stock' => 'Tổng tồn kho',
+                'low_stock' => 'Sắp hết hàng',
+                'out_of_stock' => 'Hết hàng',
+                'adjustments' => 'Điều chỉnh kỳ này',
+            ],
         ],
         'promotion' => [
             'name' => 'Báo cáo khuyến mãi',
+            'description' => 'Tổng hợp hiệu quả coupon, sale offer và chương trình mua tặng.',
+            'metrics' => [
+                'active' => 'Đang hoạt động',
+                'coupon_used' => 'Coupon đã dùng',
+                'discount_total' => 'Giảm giá kỳ này',
+                'campaign_total' => 'Tổng chiến dịch',
+            ],
         ],
     ],
     'promotion' => [
@@ -74,6 +197,10 @@ return [
                 'priority' => 'Độ ưu tiên',
                 'stackable' => 'Cho phép chồng ưu đãi',
                 'apply_products' => 'Áp dụng cho sản phẩm',
+            ],
+            'columns' => [
+                'discount' => 'Giảm',
+                'final_price' => 'Giá sau giảm',
             ],
         ],
         'coupon' => [
@@ -100,6 +227,7 @@ return [
                 'ends_at' => 'Kết thúc lúc',
                 'apply_categories' => 'Áp dụng cho danh mục',
                 'apply_products' => 'Áp dụng cho sản phẩm',
+                'products_count' => 'Số lượng SP',
             ],
         ],
         'buytogift' => [
@@ -109,6 +237,16 @@ return [
             'options' => [
                 'order_amount' => 'Theo giá trị đơn hàng',
                 'buy_product' => 'Mua sản phẩm tặng sản phẩm',
+                'stock_scope_all' => 'Không giới hạn tồn kho',
+                'stock_scope_limited' => 'Giới hạn tồn kho',
+            ],
+            'summary' => [
+                'rule' => 'Luật',
+                'buy' => 'Mua',
+                'gift' => 'Quà tặng',
+                'min_order_amount' => 'Đơn tối thiểu',
+                'product_short' => 'SP',
+                'more_rules' => 'luật khác',
             ],
             'fields' => [
                 'condition_type' => 'Loại điều kiện',
@@ -118,6 +256,8 @@ return [
                 'gift_qty' => 'Số lượng tặng',
                 'min_order_amount' => 'Đơn tối thiểu để nhận quà',
                 'max_sets_per_order' => 'Giới hạn số set quà / đơn',
+                'stock_scope' => 'Phạm vi tồn kho',
+                'stock_limit' => 'Số lượng tồn kho áp dụng',
                 'starts_at' => 'Bắt đầu lúc',
                 'ends_at' => 'Kết thúc lúc',
                 'priority' => 'Độ ưu tiên',
@@ -129,12 +269,233 @@ return [
         'name' => 'Bán hàng',
         'warehouse' => [
             'name' => 'Quản lý kho',
+            'default_name' => 'Kho mặc định',
+            'placeholders' => [
+                'search' => 'Tìm kiếm SKU hoặc tên sản phẩm...',
+                'reason' => 'Nhập lý do điều chỉnh...',
+            ],
+            'messages' => [
+                'product_not_found' => 'Không tìm thấy sản phẩm.',
+                'updated_success' => 'Cập nhật thành công.',
+                'toggled_success' => 'Đã thay đổi trạng thái kho thành công.',
+                'delete_not_supported' => 'Chức năng xóa kho không được hỗ trợ.',
+                'bulk_delete_not_supported' => 'Chức năng xóa nhiều kho không được hỗ trợ.',
+                'toggle_reason' => 'Cập nhật trạng thái kho từ trang quản lý kho.',
+            ],
+            'actions' => [
+                'update_stock' => 'Cập nhật kho',
+                'mark_in_stock' => 'Đánh dấu còn hàng',
+                'mark_out_stock' => 'Đánh dấu hết hàng',
+                'save_stock' => 'Lưu kho',
+            ],
+            'fields' => [
+                'current_stock' => 'Tồn hiện tại',
+                'update_method' => 'Phương thức cập nhật',
+                'set_new_stock' => 'Đặt số lượng mới',
+                'adjust_delta' => 'Cộng / trừ số lượng',
+                'new_stock' => 'Số lượng mới',
+                'delta' => 'Số lượng thay đổi',
+                'reason' => 'Lý do',
+                'set_label' => 'Đặt mới',
+                'adjust_label' => 'Điều chỉnh',
+            ],
+            'titles' => [
+                'update_stock' => 'Cập nhật tồn kho',
+                'recent_history' => 'Lịch sử gần đây',
+            ],
+            'empty_history' => 'Chưa có lịch sử điều chỉnh nào.',
+            'system_user' => 'Hệ thống',
         ],
         'orders' => [
             'name' => 'Đơn hàng',
+            'created' => 'Thêm đơn hàng',
+            'edit' => 'Chỉnh sửa đơn hàng',
+            'placeholders' => [
+                'search' => 'Tìm kiếm mã đơn, tên khách hàng hoặc số điện thoại...',
+                'order_number' => 'Nhập mã đơn hàng...',
+                'product' => 'Chọn sản phẩm',
+                'province_first' => 'Vui lòng chọn tỉnh / thành phố trước',
+            ],
+            'sections' => [
+                'customer' => 'Thông tin khách hàng',
+                'status' => 'Trạng thái đơn hàng',
+                'items' => 'Sản phẩm trong đơn',
+                'history' => 'Lịch sử xử lý',
+            ],
+            'actions' => [
+                'add_item' => 'Thêm sản phẩm',
+            ],
+            'empty_items' => 'Chưa có sản phẩm nào trong đơn hàng.',
+            'empty_history' => 'Chưa có lịch sử xử lý nào.',
+            'history' => [
+                'system_user' => 'Hệ thống',
+                'event_labels' => [
+                    'created' => 'Thêm đơn hàng',
+                    'updated' => 'Cập nhật đơn hàng',
+                    'deleted' => 'Xóa đơn hàng',
+                    'order_status_changed' => 'Đổi trạng thái đơn',
+                    'payment_status_changed' => 'Cập nhật thanh toán',
+                    'shipping_status_changed' => 'Cập nhật giao hàng',
+                    'payment_method_changed' => 'Đổi phương thức thanh toán',
+                ],
+                'messages' => [
+                    'created' => 'Đã tạo đơn hàng với trạng thái :order_status, thanh toán :payment_status và giao hàng :shipping_status.',
+                    'updated' => 'Đã cập nhật thông tin đơn hàng.',
+                    'deleted' => 'Đã xóa đơn hàng :order_number của khách :customer_name.',
+                    'order_status_changed' => 'Trạng thái đơn đã đổi từ :from sang :to.',
+                    'payment_status_changed' => 'Trạng thái thanh toán đã đổi từ :from sang :to.',
+                    'shipping_status_changed' => 'Trạng thái giao hàng đã đổi từ :from sang :to.',
+                    'payment_method_changed' => 'Phương thức thanh toán đã đổi từ :from sang :to.',
+                ],
+            ],
+            'fields' => [
+                'order_number' => 'Mã đơn hàng',
+                'customer_name' => 'Tên khách hàng',
+                'customer_phone' => 'Số điện thoại',
+                'customer_email' => 'Email',
+                'payment_method' => 'Phương thức thanh toán',
+                'province' => 'Tỉnh / thành phố',
+                'ward' => 'Phường / xã',
+                'customer_address' => 'Địa chỉ giao hàng',
+                'note' => 'Ghi chú',
+                'order_status' => 'Trạng thái đơn hàng',
+                'payment_status' => 'Trạng thái thanh toán',
+                'shipping_status' => 'Trạng thái giao hàng',
+                'discount_total' => 'Giảm giá',
+                'shipping_total' => 'Phí vận chuyển',
+                'subtotal' => 'Tạm tính',
+                'grand_total' => 'Tổng cộng',
+                'product' => 'Sản phẩm',
+                'available_stock' => 'Tồn khả dụng',
+                'quantity' => 'Số lượng',
+                'unit_price' => 'Đơn giá',
+                'line_total' => 'Thành tiền',
+                'placed_at' => 'Ngày đặt',
+                'total_quantity' => 'Tổng số lượng',
+            ],
+            'payment_methods' => [
+                'cod_label' => 'Thanh toán khi nhận hàng',
+            ],
+            'statuses' => [
+                'order' => [
+                    'pending' => 'Chờ xử lý',
+                    'confirmed' => 'Đã xác nhận',
+                    'processing' => 'Đang xử lý',
+                    'completed' => 'Hoàn thành',
+                    'cancelled' => 'Đã hủy',
+                ],
+                'payment' => [
+                    'unpaid' => 'Chưa thanh toán',
+                    'paid' => 'Đã thanh toán',
+                    'refunded' => 'Đã hoàn tiền',
+                    'failed' => 'Thất bại',
+                ],
+                'shipping' => [
+                    'pending' => 'Chờ giao',
+                    'ready_to_ship' => 'Sẵn sàng giao',
+                    'shipping' => 'Đang giao',
+                    'delivered' => 'Đã giao',
+                    'returned' => 'Đã trả hàng',
+                ],
+            ],
+            'print' => [
+                'confirmation_title' => 'Xác nhận đơn hàng',
+                'confirmation_note' => 'Tôi xác nhận các thông tin trên là đúng và đồng ý với nội dung đơn hàng này.',
+                'confirmation_document' => 'Phiếu xác nhận đơn hàng',
+                'date_line' => 'Ngày :day tháng :month năm :year',
+                'sign_hint' => 'Ký và ghi rõ họ tên',
+                'prepared_by' => 'Người lập phiếu',
+                'stock_keeper' => 'Thủ kho',
+                'customer_label' => 'Khách hàng',
+                'labels' => [
+                    'hotline' => 'Hotline',
+                    'website' => 'Website',
+                    'address' => 'Địa chỉ',
+                    'number' => 'Số',
+                    'date' => 'Ngày',
+                    'name' => 'Tên',
+                    'phone_short' => 'SĐT',
+                    'placed_date' => 'Ngày đặt',
+                    'no' => 'STT',
+                    'unit' => 'Đơn vị',
+                    'item_unit' => 'cái',
+                ],
+                'sections' => [
+                    'fulfillment' => 'Giao nhận',
+                ],
+            ],
         ],
         'payment_methods' => [
             'name' => 'Phương thức thanh toán',
+            'sections' => [
+                'gateway_settings' => 'Cấu hình cổng thanh toán',
+            ],
+            'actions' => [
+                'enable' => 'Bật',
+                'disable' => 'Tắt',
+            ],
+            'providers' => [
+                'cash_on_delivery' => 'Thanh toán khi nhận hàng (COD)',
+                'momo' => 'MoMo',
+                'zalopay' => 'ZaloPay',
+                'vnpay' => 'VNPay',
+                'paypal' => 'PayPal',
+            ],
+            'fields' => [
+                'instructions' => 'Nội dung hướng dẫn',
+                'cod_fee' => 'Phí thu hộ (nếu có)',
+                'partner_code' => 'Partner Code',
+                'access_key' => 'Access Key',
+                'secret_key' => 'Secret Key',
+                'endpoint' => 'Endpoint',
+                'return_url' => 'Return URL',
+                'ipn_url' => 'IPN URL',
+                'app_id' => 'App ID',
+                'key1' => 'Key 1',
+                'key2' => 'Key 2',
+                'callback_url' => 'Callback URL',
+                'tmn_code' => 'TMN Code',
+                'hash_secret' => 'Hash Secret',
+                'client_id' => 'Client ID',
+                'client_secret' => 'Client Secret',
+                'mode' => 'Chế độ (sandbox/live)',
+                'webhook_id' => 'Webhook ID',
+            ],
+        ],
+        'shipping_methods' => [
+            'name' => 'Phương thức vận chuyển',
+            'sections' => [
+                'gateway_settings' => 'Cấu hình API vận chuyển',
+            ],
+            'actions' => [
+                'enable' => 'Bật',
+                'disable' => 'Tắt',
+            ],
+            'providers' => [
+                'ghn' => 'GHN',
+                'ghtk' => 'GHTK',
+                'viettel_post' => 'Viettel Post',
+                'jnt' => 'J&T Express',
+                'ninja_van' => 'Ninja Van',
+            ],
+            'fields' => [
+                'token' => 'Token',
+                'shop_id' => 'Shop ID',
+                'username' => 'Tên đăng nhập',
+                'password' => 'Mật khẩu',
+                'client_id' => 'Client ID',
+                'client_secret' => 'Client Secret',
+                'endpoint' => 'Endpoint',
+                'webhook_url' => 'Webhook URL',
+            ],
+            'messages' => [
+                'method_not_found' => 'Không tìm thấy phương thức vận chuyển.',
+                'updated_success' => 'Cập nhật thành công.',
+                'toggled_success' => 'Đã thay đổi trạng thái phương thức vận chuyển thành công.',
+                'delete_not_supported' => 'Chức năng xóa phương thức vận chuyển không được hỗ trợ.',
+                'bulk_delete_not_supported' => 'Chức năng xóa nhiều phương thức vận chuyển không được hỗ trợ.',
+                'toggle_reason' => 'Cập nhật trạng thái phương thức vận chuyển từ trang quản lý.',
+            ],
         ],
     ],
     'catalog' => [
@@ -144,12 +505,21 @@ return [
             'name' => 'Danh mục',
             'created' => 'Thêm danh mục',
             'edit' => 'Chỉnh sửa danh mục',
+            'products' => 'Sản phẩm của danh mục',
+            'products_hint' => 'Chọn các sản phẩm thuộc danh mục này.',
             'tree_structure' => 'Cấu trúc cây danh mục',
             'tree_drag' => 'Kéo để sắp xếp',
             'no_data' => 'Chưa có dữ liệu cây danh mục.',
             'select_to_view' => 'Vui lòng chọn một danh mục để xem chi tiết',
             'instruction_text' => 'Nhấp vào các mục bên trái để chỉnh sửa thông tin hoặc cấu hình SEO.',
             'select' => '--- Chọn cấp danh mục gốc ---',
+            'ai' => [
+                'suggest_seo' => 'AI gợi ý SEO',
+                'generating' => 'Đang tạo...',
+                'missing_input' => 'Vui lòng nhập ít nhất tên danh mục, nội dung hoặc từ khóa trước khi gợi ý.',
+                'empty_response' => 'AI chưa trả về nội dung SEO, vui lòng thử lại.',
+                'failed' => 'Không thể tạo SEO bằng AI lúc này. Vui lòng thử lại sau.',
+            ],
             'type' => [
                 'label' => 'Loại danh mục',
                 'options' => [
@@ -163,7 +533,9 @@ return [
             ],
         ],
         'product' => [
-            'admin.name' => 'Danh sách sản phẩm',
+            'admin' => [
+                'name' => 'Danh sách sản phẩm',
+            ],
             'name' => 'Sản phẩm',
             'created' => 'Thêm sản phẩm',
             'edit' => 'Chỉnh sửa sản phẩm',
@@ -171,8 +543,10 @@ return [
                 'suggest_content' => 'AI gợi ý nội dung',
                 'suggest_seo' => 'AI gợi ý SEO',
                 'generating' => 'Đang tạo...',
+                'processing' => 'Đang gợi ý...',
                 'missing_input' => 'Vui lòng nhập ít nhất tên, mô tả hoặc từ khóa trước khi gợi ý.',
                 'empty_response' => 'AI chưa trả về nội dung, vui lòng thử lại.',
+                'rate_limited' => 'AI đang quá tải yêu cầu. Vui lòng chờ vài giây rồi thử lại.',
                 'failed' => 'Không thể tạo nội dung AI lúc này. Vui lòng thử lại sau.',
             ],
             'photo_hint' => 'Tải nhiều ảnh cho sản phẩm. Ảnh được chọn mặc định sẽ hiển thị đầu tiên.',
@@ -196,20 +570,48 @@ return [
             ],
         ],
         'post' => [
-            'admin.name' => 'Danh sách bài viết',
+            'admin' => [
+                'name' => 'Danh sách bài viết',
+            ],
             'name' => 'Bài viết',
             'created' => 'Thêm bài viết',
             'edit' => 'Chỉnh sửa bài viết',
-        ]
+            'ai' => [
+                'suggest_content' => 'AI gợi ý nội dung',
+                'suggest_seo' => 'AI gợi ý SEO',
+                'generating' => 'Đang tạo...',
+                'processing' => 'Đang gợi ý...',
+                'missing_input' => 'Vui lòng nhập ít nhất tên, mô tả hoặc từ khóa trước khi gợi ý.',
+                'empty_response' => 'AI chưa trả về nội dung, vui lòng thử lại.',
+                'failed' => 'Không thể tạo nội dung AI lúc này. Vui lòng thử lại sau.',
+            ],
+            'tabs' => [
+                'general' => 'Thông tin chung',
+                'content' => 'Nội dung',
+            ],
+            'type' => [
+                'label' => 'Loại bài viết',
+                'options' => [
+                    'select' => 'Chọn loại',
+                    'primary' => 'Chính',
+                    'footer' => 'Chân trang',
+                    'sidebar' => 'Thanh bên',
+                ],
+            ],
+        ],
     ],
     'languages' => [
-        'admin.name' => 'Danh sách ngôn ngữ',
+        'admin' => [
+            'name' => 'Danh sách ngôn ngữ',
+        ],
         'name' => 'Ngôn ngữ',
         'created' => 'Thêm ngôn ngữ',
         'edit' => 'Chỉnh sửa ngôn ngữ',
     ],
     'label' => [
-        'admin.name' => 'Danh sách nhãn',
+        'admin' => [
+            'name' => 'Danh sách nhãn',
+        ],
         'name' => 'Nhãn dịch',
         'created' => 'Thêm nhãn',
         'edit' => 'Chỉnh sửa nhãn',
@@ -217,10 +619,12 @@ return [
         'msg_placeholder' => 'Nhập khóa (VD: welcome_msg)',
         'msg_verify' => 'Vui lòng nhập tên khóa (Key).',
         'confirm_delete_title' => 'Xác nhận xóa nhãn',
-        'confirm_delete' => 'Bạn có chắc chắn muốn xóa nhãn này không? Hành động này sẽ xóa dữ liệu ở tất cả ngôn ngữ và không thể hoàn tác sau khi lưu.'
+        'confirm_delete' => 'Bạn có chắc chắn muốn xóa nhãn này không? Hành động này sẽ xóa dữ liệu ở tất cả ngôn ngữ và không thể hoàn tác sau khi lưu.',
     ],
     'layout' => [
-        'admin.name' => 'Cấu hình',
+        'admin' => [
+            'name' => 'Cấu hình',
+        ],
         'name' => 'Giao diện',
         'tabs' => [
             'home' => 'Trang chủ',
@@ -238,7 +642,7 @@ return [
             'address' => 'Địa chỉ',
             'tax' => 'Mã số thuế',
             'copyright' => 'Bản quyền',
-        ]
+        ],
     ],
     'tabs' => 'Tab',
     'section' => 'Phần',
@@ -261,18 +665,22 @@ return [
         ],
     ],
     'button' => [
+        'add' => 'Thêm',
         'created' => 'Thêm mới',
-        'delete.selected' => 'Xóa mục đã chọn',
-        'edit' => 'Chỉnh sửa',
         'delete' => 'Xóa',
+        'delete_selected' => 'Xóa đã chọn',
+        'edit' => 'Chỉnh sửa',
         'view' => 'Xem',
+        'print' => 'In',
+        'filter' => 'Lọc',
         'open' => 'Mở',
         'save' => 'Lưu lại',
         'back' => 'Quay lại',
         'choose_image' => 'Chọn ảnh',
         'new_line' => 'Thêm dòng',
         'confirm' => 'Xác nhận',
-        'cancel' => 'Hủy bỏ'
+        'cancel' => 'Hủy bỏ',
+        'close' => 'Đóng',
     ],
     'view' => 'Xem',
     'open' => 'Mở',
@@ -287,6 +695,7 @@ return [
         'first_name' => 'Tên',
         'last_name' => 'Họ',
         'status' => 'Trạng thái',
+        'search' => 'Tìm kiếm',
         'sku' => 'SKU',
         'quantity' => 'Số lượng',
         'weight' => 'Khối lượng',
@@ -305,6 +714,11 @@ return [
         'categories' => 'Danh mục',
         'email' => 'Email',
         'code' => 'Mã',
+        'full_name' => 'Tên đầy đủ',
+        'administrative_unit' => 'Đơn vị hành chính',
+        'province' => 'Tỉnh / thành phố',
+        'ward_count' => 'Số phường / xã',
+        'provider' => 'Nhà cung cấp',
         'currency' => 'Tiền tệ',
         'key' => 'Khóa (Key)',
         'content' => 'Nội dung',
@@ -313,14 +727,15 @@ return [
         'seo_keyword' => 'SEO Keyword',
         'seo_description' => 'SEO Description',
         'default' => 'Mặc định',
-        'upload' => 'Tải lên'
+        'upload' => 'Tải lên',
     ],
     'placeholder' => [
-        'select' => 'Vui lòng chọn...'
+        'select' => 'Vui lòng chọn...',
     ],
     'filter' => [
+        'all' => 'Tất cả',
         'search' => 'Tìm kiếm...',
-        'reset' => 'Làm mới'
+        'reset' => 'Làm mới',
     ],
     'title' => [
         'infomation' => 'Thông tin',
@@ -330,10 +745,16 @@ return [
     ],
     'status' => [
         'active' => 'Hoạt động',
-        'inactive' => 'Ngừng hoạt động'
+        'inactive' => 'Ngừng hoạt động',
     ],
     'message' => [
-        'dashboard.welcome' => 'Hệ thống quản trị của bạn đã sẵn sàng. Mọi thứ đã được thiết lập để bạn bắt đầu quản lý dữ liệu và vận hành một cách suôn sẻ.',
+        'selected' => 'đã chọn',
+        'nodata' => 'Không có dữ liệu.',
+        'empty' => 'Không có dữ liệu.',
+        'edit_slug' => '* Đang cho phép sửa tay Slug của ngôn ngữ này.',
+        'dashboard' => [
+            'welcome' => 'Hệ thống quản trị của bạn đã sẵn sàng. Mọi thứ đã được thiết lập để bạn bắt đầu quản lý dữ liệu và vận hành một cách suôn sẻ.',
+        ],
         'destroy' => 'Bạn có chắc chắn muốn xóa :name này không?',
         'destroys' => 'Bạn có chắc chắn muốn xóa tất cả các mục đã chọn?',
         'security_notice' => 'Tài khoản của bạn đã được đăng nhập từ một thiết bị khác.',
@@ -342,14 +763,14 @@ return [
             'password_confirm' => 'Mật khẩu xác nhận không khớp.',
             'created' => 'Lỗi khi thêm mới :name.',
             'edit' => 'Lỗi khi cập nhật :name.',
-            'deleted' => 'Không tìm thấy dữ liệu để xóa.'
+            'deleted' => 'Không tìm thấy dữ liệu để xóa.',
         ],
         'success' => [
             'created' => 'Thêm :name thành công.',
             'edit' => 'Cập nhật :name thành công.',
             'deleted' => 'Đã xóa :name thành công.',
             'restored' => 'Khôi phục :name thành công.',
-        ]
+        ],
     ],
     'tinymce' => [
         'name' => 'Thư viện ảnh',
@@ -358,12 +779,12 @@ return [
             'create_folder' => 'Tạo thư mục',
             'save' => 'LƯU',
             'cancel' => 'Hủy',
-            'close' => 'Đóng cửa sổ'
+            'close' => 'Đóng cửa sổ',
         ],
         'label' => [
             'folder' => 'thư mục',
             'file' => 'tập tin',
-            'new_name' => 'Nhập tên mới:'
+            'new_name' => 'Nhập tên mới:',
         ],
         'message' => [
             'delete' => 'Xóa :name này?.',
@@ -373,9 +794,8 @@ return [
                 'move' => 'Không thể di chuyển file!',
                 'create_folder' => 'Lỗi tạo thư mục',
                 'delete' => 'Lỗi khi xóa!',
-                'rename' => 'Lỗi đổi tên!'
-            ]
-        ]
-
-    ]
+                'rename' => 'Lỗi đổi tên!',
+            ],
+        ],
+    ],
 ];

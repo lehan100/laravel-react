@@ -1,32 +1,87 @@
 <?php
 
 return [
-    'dashboard.main' => 'Dashboard',
-    'users.main' => 'Users',
-    'settings.main' => 'Settings',
+    'dashboard' => [
+        'main' => 'Dashboard',
+        'hello' => 'Hello, :name',
+        'quick_actions' => 'Quick actions',
+        'revenue_chart' => '14-day revenue',
+        'order_status' => 'Order status',
+        'top_products' => 'Top products',
+        'stock_alerts' => 'Stock alerts',
+        'recent_orders' => 'Recent orders',
+        'operations' => 'Operations overview',
+        'view_products' => 'Open product list',
+        'view_categories' => 'Arrange category tree',
+        'view_orders' => 'View orders',
+        'view_reports' => 'View revenue report',
+        'empty' => 'No data yet.',
+        'summary' => [
+            'products' => 'Products',
+            'active_products' => 'Active',
+            'categories' => 'Categories',
+            'users' => 'Users',
+            'active_promotions' => 'Active promotions',
+            'out_of_stock' => 'Out of stock',
+        ],
+        'metrics' => [
+            'revenue' => 'Revenue',
+            'revenue_hint' => 'Last 14 days',
+            'orders' => 'Valid orders',
+            'orders_hint' => 'Cancelled excluded',
+            'paid' => 'Paid',
+            'paid_hint' => 'Collected orders',
+            'low_stock' => 'Low stock',
+            'low_stock_hint' => 'Stock from 1-5',
+        ],
+    ],
+    'users' => [
+        'main' => 'Users',
+        'admin' => [
+            'name' => 'User List',
+        ],
+        'name' => 'User',
+        'created' => 'Create User',
+        'edit' => 'Edit User',
+        'profile' => 'My Profile',
+        'manage' => 'Manage Users',
+        'logout' => 'Logout',
+    ],
+    'settings' => [
+        'main' => 'Settings',
+        'locations' => [
+            'name' => 'Province / Ward Management',
+            'summary' => [
+                'provinces' => 'Provinces / Cities',
+                'wards' => 'Wards / Communes',
+            ],
+        ],
+    ],
+    'translation' => [
+        'name' => 'Setting Translations',
+        'admin' => [
+            'name' => 'Setting Translation Manager',
+        ],
+        'messages' => [
+            'saved' => 'Setting translations saved.',
+            'empty' => 'No translations available.',
+        ],
+    ],
     'sidebar' => [
         'show' => 'Show sidebar',
         'hide' => 'Hide sidebar',
     ],
     'roles' => [
         'name' => 'Roles',
-        'created' => 'Create Role', // Đổi từ Created sang Create cho tự nhiên
+        'created' => 'Create Role',
         'edit' => 'Edit Role',
     ],
     'permissions' => 'Permissions',
     'assign_permissions' => [
         'name' => 'Assign Permissions',
-        'error' => 'Permission Assignment Error',
-        'error.message' => "Please select at least one permission."
-    ],
-    'users' => [
-        'admin.name' => 'User List', // List Users -> User List chuyên nghiệp hơn
-        'name' => 'User',
-        'created' => 'Create User',
-        'edit' => 'Edit User',
-        'profile' => 'My Profile',
-        'manage' => 'Manage Users',
-        'logout' => 'Logout'
+        'error' => [
+            'message' => 'Please select at least one permission.',
+        ],
     ],
     'media' => [
         'name' => 'Media',
@@ -36,22 +91,90 @@ return [
             'edit' => 'Edit position',
         ],
         'banner' => [
-            'name' => 'Banners'
-        ]
+            'name' => 'Banners',
+        ],
     ],
     'report' => [
         'name' => 'Reports',
+        'center' => 'Report center',
+        'from_date' => 'From date',
+        'to_date' => 'To date',
+        'filter' => 'Filter',
+        'trend' => 'Trend',
+        'ai_insight' => 'AI insight',
+        'ai_analyze' => 'AI analysis',
+        'ai_empty' => 'AI did not return an analysis.',
+        'ai_failed' => 'Unable to analyze with AI right now.',
+        'ai_rate_limited' => 'AI is rate limited. Please try again later.',
+        'ai_hint' => 'Click AI analysis to get insights and recommended actions from the current data.',
+        'details' => 'Detailed data',
+        'empty_chart' => 'No chart data yet.',
+        'empty_rows' => 'No data for this date range.',
+        'columns' => [
+            'date' => 'Date',
+            'orders' => 'Orders',
+            'quantity' => 'Quantity',
+            'revenue' => 'Revenue',
+            'product' => 'Product',
+            'sku' => 'SKU',
+            'sold_quantity' => 'Sold',
+            'stock' => 'Stock',
+            'status' => 'Status',
+            'type' => 'Type',
+            'code' => 'Code',
+            'name' => 'Name',
+        ],
+        'status_labels' => [
+            'active' => 'Running',
+            'inactive' => 'Paused/expired',
+            'out_of_stock' => 'Out of stock',
+            'low_stock' => 'Low stock',
+            'healthy' => 'Healthy',
+        ],
+        'campaigns' => [
+            'coupon' => 'Coupon',
+            'sale_offer' => 'Sale offer',
+            'buy_to_gift' => 'Buy to gift',
+        ],
         'revenue' => [
             'name' => 'Revenue Report',
+            'description' => 'Track revenue, orders, payment status, and daily trends.',
+            'metrics' => [
+                'revenue' => 'Revenue',
+                'paid' => 'Paid',
+                'valid_orders' => 'Valid orders',
+                'average_order_value' => 'Average order value',
+            ],
         ],
         'product' => [
             'name' => 'Product Report',
+            'description' => 'Analyze best-selling products, product revenue, and catalog health.',
+            'metrics' => [
+                'sold_products' => 'Products sold',
+                'sold_quantity' => 'Units sold',
+                'top_revenue' => 'Top revenue',
+                'active_catalog' => 'Active catalog',
+            ],
         ],
         'inventory' => [
             'name' => 'Inventory Report',
+            'description' => 'Track low stock, out-of-stock products, and inventory adjustments.',
+            'metrics' => [
+                'total_stock' => 'Total stock',
+                'low_stock' => 'Low stock',
+                'out_of_stock' => 'Out of stock',
+                'adjustments' => 'Adjustments',
+            ],
         ],
         'promotion' => [
             'name' => 'Promotion Report',
+            'description' => 'Summarize coupon, sale offer, and buy-to-gift campaign performance.',
+            'metrics' => [
+                'active' => 'Active campaigns',
+                'coupon_used' => 'Coupons used',
+                'discount_total' => 'Discount total',
+                'campaign_total' => 'Total campaigns',
+            ],
         ],
     ],
     'promotion' => [
@@ -74,6 +197,10 @@ return [
                 'priority' => 'Priority',
                 'stackable' => 'Allow stackable',
                 'apply_products' => 'Apply to products',
+            ],
+            'columns' => [
+                'discount' => 'Discount',
+                'final_price' => 'Final Price',
             ],
         ],
         'coupon' => [
@@ -100,6 +227,7 @@ return [
                 'ends_at' => 'Ends At',
                 'apply_categories' => 'Apply to categories',
                 'apply_products' => 'Apply to products',
+                'products_count' => 'Product count',
             ],
         ],
         'buytogift' => [
@@ -109,6 +237,16 @@ return [
             'options' => [
                 'order_amount' => 'Order amount condition',
                 'buy_product' => 'Buy product get gift',
+                'stock_scope_all' => 'Unlimited stock scope',
+                'stock_scope_limited' => 'Limited stock scope',
+            ],
+            'summary' => [
+                'rule' => 'Rule',
+                'buy' => 'Buy',
+                'gift' => 'Gift',
+                'min_order_amount' => 'Minimum order',
+                'product_short' => 'product',
+                'more_rules' => 'more rules',
             ],
             'fields' => [
                 'condition_type' => 'Condition Type',
@@ -118,6 +256,8 @@ return [
                 'gift_qty' => 'Gift Quantity',
                 'min_order_amount' => 'Minimum order amount for gift',
                 'max_sets_per_order' => 'Max gift sets per order',
+                'stock_scope' => 'Stock scope',
+                'stock_limit' => 'Applicable stock quantity',
                 'starts_at' => 'Starts At',
                 'ends_at' => 'Ends At',
                 'priority' => 'Priority',
@@ -129,12 +269,233 @@ return [
         'name' => 'Sales',
         'warehouse' => [
             'name' => 'Warehouse Management',
+            'default_name' => 'Default Warehouse',
+            'placeholders' => [
+                'search' => 'Search SKU or product name...',
+                'reason' => 'Enter adjustment reason...',
+            ],
+            'messages' => [
+                'product_not_found' => 'Product not found.',
+                'updated_success' => 'Updated successfully.',
+                'toggled_success' => 'Warehouse status updated successfully.',
+                'delete_not_supported' => 'Warehouse delete is not supported.',
+                'bulk_delete_not_supported' => 'Bulk warehouse delete is not supported.',
+                'toggle_reason' => 'Warehouse status updated from the warehouse management page.',
+            ],
+            'actions' => [
+                'update_stock' => 'Update stock',
+                'mark_in_stock' => 'Mark in stock',
+                'mark_out_stock' => 'Mark out of stock',
+                'save_stock' => 'Save stock',
+            ],
+            'fields' => [
+                'current_stock' => 'Current stock',
+                'update_method' => 'Update method',
+                'set_new_stock' => 'Set new stock',
+                'adjust_delta' => 'Adjust by quantity',
+                'new_stock' => 'New stock',
+                'delta' => 'Delta',
+                'reason' => 'Reason',
+                'set_label' => 'Set',
+                'adjust_label' => 'Adjust',
+            ],
+            'titles' => [
+                'update_stock' => 'Update stock',
+                'recent_history' => 'Recent history',
+            ],
+            'empty_history' => 'No stock adjustment history yet.',
+            'system_user' => 'System',
         ],
         'orders' => [
             'name' => 'Orders',
+            'created' => 'Create Order',
+            'edit' => 'Edit Order',
+            'placeholders' => [
+                'search' => 'Search order number, customer name, or phone...',
+                'order_number' => 'Enter order number...',
+                'product' => 'Select product',
+                'province_first' => 'Please select a province / city first',
+            ],
+            'sections' => [
+                'customer' => 'Customer Information',
+                'status' => 'Order Status',
+                'items' => 'Order Items',
+                'history' => 'Processing History',
+            ],
+            'actions' => [
+                'add_item' => 'Add Item',
+            ],
+            'empty_items' => 'No items have been added to this order yet.',
+            'empty_history' => 'No processing history yet.',
+            'history' => [
+                'system_user' => 'System',
+                'event_labels' => [
+                    'created' => 'Order Created',
+                    'updated' => 'Order Updated',
+                    'deleted' => 'Order Deleted',
+                    'order_status_changed' => 'Order Status Changed',
+                    'payment_status_changed' => 'Payment Status Updated',
+                    'shipping_status_changed' => 'Shipping Status Updated',
+                    'payment_method_changed' => 'Payment Method Changed',
+                ],
+                'messages' => [
+                    'created' => 'Created an order with status :order_status, payment :payment_status, and shipping :shipping_status.',
+                    'updated' => 'Updated the order information.',
+                    'deleted' => 'Deleted order :order_number for customer :customer_name.',
+                    'order_status_changed' => 'Order status changed from :from to :to.',
+                    'payment_status_changed' => 'Payment status changed from :from to :to.',
+                    'shipping_status_changed' => 'Shipping status changed from :from to :to.',
+                    'payment_method_changed' => 'Payment method changed from :from to :to.',
+                ],
+            ],
+            'fields' => [
+                'order_number' => 'Order Number',
+                'customer_name' => 'Customer Name',
+                'customer_phone' => 'Phone Number',
+                'customer_email' => 'Email',
+                'payment_method' => 'Payment Method',
+                'province' => 'Province / City',
+                'ward' => 'Ward / Commune',
+                'customer_address' => 'Shipping Address',
+                'note' => 'Note',
+                'order_status' => 'Order Status',
+                'payment_status' => 'Payment Status',
+                'shipping_status' => 'Shipping Status',
+                'discount_total' => 'Discount',
+                'shipping_total' => 'Shipping Fee',
+                'subtotal' => 'Subtotal',
+                'grand_total' => 'Grand Total',
+                'product' => 'Product',
+                'available_stock' => 'Available Stock',
+                'quantity' => 'Quantity',
+                'unit_price' => 'Unit Price',
+                'line_total' => 'Line Total',
+                'placed_at' => 'Placed At',
+                'total_quantity' => 'Total Quantity',
+            ],
+            'payment_methods' => [
+                'cod_label' => 'Cash on Delivery',
+            ],
+            'statuses' => [
+                'order' => [
+                    'pending' => 'Pending',
+                    'confirmed' => 'Confirmed',
+                    'processing' => 'Processing',
+                    'completed' => 'Completed',
+                    'cancelled' => 'Cancelled',
+                ],
+                'payment' => [
+                    'unpaid' => 'Unpaid',
+                    'paid' => 'Paid',
+                    'refunded' => 'Refunded',
+                    'failed' => 'Failed',
+                ],
+                'shipping' => [
+                    'pending' => 'Pending',
+                    'ready_to_ship' => 'Ready to Ship',
+                    'shipping' => 'Shipping',
+                    'delivered' => 'Delivered',
+                    'returned' => 'Returned',
+                ],
+            ],
+            'print' => [
+                'confirmation_title' => 'Order Confirmation',
+                'confirmation_note' => 'I confirm that the information above is correct and agree with the contents of this order.',
+                'confirmation_document' => 'Order Confirmation Form',
+                'date_line' => 'Date :day Month :month Year :year',
+                'sign_hint' => 'Sign and print your full name',
+                'prepared_by' => 'Prepared By',
+                'stock_keeper' => 'Stock Keeper',
+                'customer_label' => 'Customer',
+                'labels' => [
+                    'hotline' => 'Hotline',
+                    'website' => 'Website',
+                    'address' => 'Address',
+                    'number' => 'No.',
+                    'date' => 'Date',
+                    'name' => 'Name',
+                    'phone_short' => 'Phone',
+                    'placed_date' => 'Placed At',
+                    'no' => 'No.',
+                    'unit' => 'Unit',
+                    'item_unit' => 'pcs',
+                ],
+                'sections' => [
+                    'fulfillment' => 'Fulfillment',
+                ],
+            ],
         ],
         'payment_methods' => [
             'name' => 'Payment Methods',
+            'sections' => [
+                'gateway_settings' => 'Gateway Settings',
+            ],
+            'actions' => [
+                'enable' => 'Enable',
+                'disable' => 'Disable',
+            ],
+            'providers' => [
+                'cash_on_delivery' => 'Cash on Delivery (COD)',
+                'momo' => 'MoMo',
+                'zalopay' => 'ZaloPay',
+                'vnpay' => 'VNPay',
+                'paypal' => 'PayPal',
+            ],
+            'fields' => [
+                'instructions' => 'Instructions',
+                'cod_fee' => 'Cash collection fee (if any)',
+                'partner_code' => 'Partner Code',
+                'access_key' => 'Access Key',
+                'secret_key' => 'Secret Key',
+                'endpoint' => 'Endpoint',
+                'return_url' => 'Return URL',
+                'ipn_url' => 'IPN URL',
+                'app_id' => 'App ID',
+                'key1' => 'Key 1',
+                'key2' => 'Key 2',
+                'callback_url' => 'Callback URL',
+                'tmn_code' => 'TMN Code',
+                'hash_secret' => 'Hash Secret',
+                'client_id' => 'Client ID',
+                'client_secret' => 'Client Secret',
+                'mode' => 'Mode (sandbox/live)',
+                'webhook_id' => 'Webhook ID',
+            ],
+        ],
+        'shipping_methods' => [
+            'name' => 'Shipping Methods',
+            'sections' => [
+                'gateway_settings' => 'Shipping API Settings',
+            ],
+            'actions' => [
+                'enable' => 'Enable',
+                'disable' => 'Disable',
+            ],
+            'providers' => [
+                'ghn' => 'GHN',
+                'ghtk' => 'GHTK',
+                'viettel_post' => 'Viettel Post',
+                'jnt' => 'J&T Express',
+                'ninja_van' => 'Ninja Van',
+            ],
+            'fields' => [
+                'token' => 'Token',
+                'shop_id' => 'Shop ID',
+                'username' => 'Username',
+                'password' => 'Password',
+                'client_id' => 'Client ID',
+                'client_secret' => 'Client Secret',
+                'endpoint' => 'Endpoint',
+                'webhook_url' => 'Webhook URL',
+            ],
+            'messages' => [
+                'method_not_found' => 'Shipping method not found.',
+                'updated_success' => 'Updated successfully.',
+                'toggled_success' => 'Shipping method status updated successfully.',
+                'delete_not_supported' => 'Shipping method delete is not supported.',
+                'bulk_delete_not_supported' => 'Bulk shipping method delete is not supported.',
+                'toggle_reason' => 'Shipping method status updated from the shipping management page.',
+            ],
         ],
     ],
     'catalog' => [
@@ -144,12 +505,21 @@ return [
             'name' => 'Categories',
             'created' => 'Add Category',
             'edit' => 'Edit Category',
+            'products' => 'Category Products',
+            'products_hint' => 'Select the products that belong to this category.',
             'tree_structure' => 'Category Tree Structure',
             'tree_drag' => 'Drag to reorder',
             'no_data' => 'No category tree data available.',
             'select_to_view' => 'Please select a category to view details',
             'instruction_text' => 'Click on the items on the left to edit information or configure SEO.',
-             'select' => '--- Select Category Root ---',
+            'select' => '--- Select Category Root ---',
+            'ai' => [
+                'suggest_seo' => 'AI Suggest SEO',
+                'generating' => 'Generating...',
+                'missing_input' => 'Please enter at least category name, content, or keywords before generating.',
+                'empty_response' => 'AI returned empty SEO content. Please try again.',
+                'failed' => 'Unable to generate AI SEO right now. Please try again later.',
+            ],
             'type' => [
                 'label' => 'Category Type',
                 'options' => [
@@ -163,7 +533,9 @@ return [
             ],
         ],
         'product' => [
-            'admin.name' => 'Product List',
+            'admin' => [
+                'name' => 'Product List',
+            ],
             'name' => 'Products',
             'created' => 'Create Product',
             'edit' => 'Edit Product',
@@ -171,8 +543,10 @@ return [
                 'suggest_content' => 'AI Suggest Content',
                 'suggest_seo' => 'AI Suggest SEO',
                 'generating' => 'Generating...',
+                'processing' => 'Processing...',
                 'missing_input' => 'Please enter at least name, description, or keywords before generating.',
                 'empty_response' => 'AI returned an empty response. Please try again.',
+                'rate_limited' => 'AI is currently rate limited. Please wait a few seconds and try again.',
                 'failed' => 'Unable to generate AI content right now. Please try again later.',
             ],
             'photo_hint' => 'Upload multiple photos for the product. The default photo will be shown first.',
@@ -196,20 +570,48 @@ return [
             ],
         ],
         'post' => [
-            'admin.name' => 'Post List',
+            'admin' => [
+                'name' => 'Post List',
+            ],
             'name' => 'Posts',
             'created' => 'Create Post',
             'edit' => 'Edit Post',
-        ]
+            'ai' => [
+                'suggest_content' => 'AI Suggest Content',
+                'suggest_seo' => 'AI Suggest SEO',
+                'generating' => 'Generating...',
+                'processing' => 'Processing...',
+                'missing_input' => 'Please enter at least name, description, or keywords before generating.',
+                'empty_response' => 'AI returned an empty response. Please try again.',
+                'failed' => 'Unable to generate AI content right now. Please try again later.',
+            ],
+            'tabs' => [
+                'general' => 'General',
+                'content' => 'Content',
+            ],
+            'type' => [
+                'label' => 'Post Type',
+                'options' => [
+                    'select' => 'Select type',
+                    'primary' => 'Primary',
+                    'footer' => 'Footer',
+                    'sidebar' => 'Sidebar',
+                ],
+            ],
+        ],
     ],
     'languages' => [
-        'admin.name' => 'Language List',
+        'admin' => [
+            'name' => 'Language List',
+        ],
         'name' => 'Language',
         'created' => 'Create Language',
         'edit' => 'Edit Language',
     ],
     'label' => [
-        'admin.name' => 'Label List',
+        'admin' => [
+            'name' => 'Label List',
+        ],
         'name' => 'Label',
         'created' => 'Create Label',
         'edit' => 'Edit Label',
@@ -217,15 +619,17 @@ return [
         'msg_placeholder' => 'Enter key (e.g., welcome_msg)',
         'msg_verify' => 'Please enter a valid key name.',
         'confirm_delete_title' => 'Confirm Label Deletion',
-        'confirm_delete' => 'Are you sure you want to delete this label? This action will remove it across all languages and cannot be undone after saving.'
+        'confirm_delete' => 'Are you sure you want to delete this label? This action will remove it across all languages and cannot be undone after saving.',
     ],
     'layout' => [
-        'admin.name' => 'Layout',
+        'admin' => [
+            'name' => 'Layout',
+        ],
         'name' => 'Layout',
         'tabs' => [
-            'home' => "Home",
+            'home' => 'Home',
             'general' => 'General',
-            'content' => 'Contents'
+            'content' => 'Contents',
         ],
         'items' => [
             'logo' => 'Logo',
@@ -238,7 +642,7 @@ return [
             'address' => 'Address',
             'tax' => 'Tax Code',
             'copyright' => 'Copyright',
-        ]
+        ],
     ],
     'tabs' => 'Tabs',
     'section' => 'Section',
@@ -261,18 +665,22 @@ return [
         ],
     ],
     'button' => [
+        'add' => 'Add',
         'created' => 'Add New',
-        'delete.selected' => 'Delete Selected Items',
-        'edit' => 'Edit',
         'delete' => 'Delete',
+        'delete_selected' => 'Delete selected',
+        'edit' => 'Edit',
         'view' => 'View',
+        'print' => 'Print',
+        'filter' => 'Filter',
         'open' => 'Open',
         'save' => 'Save',
         'back' => 'Back',
         'choose_image' => 'Choose Image',
         'new_line' => 'Add New Line',
         'confirm' => 'Confirm',
-        'cancel' => 'Cancel'
+        'cancel' => 'Cancel',
+        'close' => 'Close',
     ],
     'view' => 'View',
     'open' => 'Open',
@@ -287,6 +695,7 @@ return [
         'first_name' => 'First Name',
         'last_name' => 'Last Name',
         'status' => 'Status',
+        'search' => 'Search',
         'sku' => 'SKU',
         'quantity' => 'Quantity',
         'weight' => 'Weight',
@@ -305,6 +714,11 @@ return [
         'categories' => 'Categories',
         'email' => 'Email',
         'code' => 'Code',
+        'full_name' => 'Full Name',
+        'administrative_unit' => 'Administrative Unit',
+        'province' => 'Province / City',
+        'ward_count' => 'Ward Count',
+        'provider' => 'Provider',
         'currency' => 'Currency',
         'key' => 'Key',
         'content' => 'Content',
@@ -313,27 +727,34 @@ return [
         'seo_keyword' => 'SEO Keyword',
         'seo_description' => 'SEO Description',
         'default' => 'Default',
-        'upload' => 'Upload'
+        'upload' => 'Upload',
     ],
     'placeholder' => [
-        'select' => 'Please select...'
+        'select' => 'Please select...',
     ],
     'filter' => [
+        'all' => 'All',
         'search' => 'Search',
-        'reset' => 'Reset'
+        'reset' => 'Reset',
     ],
     'title' => [
-        'infomation' => 'Information', // Sửa lỗi Infomation
+        'infomation' => 'Information',
         'setting' => 'Settings',
         'success' => 'Success',
         'error' => 'Error',
     ],
     'status' => [
         'active' => 'Active',
-        'inactive' => 'Inactive'
+        'inactive' => 'Inactive',
     ],
     'message' => [
-        'dashboard.welcome' => 'Your administration system is ready. Everything is set up for you to start managing your data and operations seamlessly.',
+        'selected' => 'selected',
+        'nodata' => 'No data.',
+        'empty' => 'No data.',
+        'edit_slug' => '* Manual slug editing is enabled for this language.',
+        'dashboard' => [
+            'welcome' => 'Your administration system is ready. Everything is set up for you to start managing your data and operations seamlessly.',
+        ],
         'destroy' => 'Are you sure you want to delete this :name?',
         'destroys' => 'Are you sure you want to delete all selected items?',
         'security_notice' => 'Your account has been logged in from another device.',
@@ -342,14 +763,14 @@ return [
             'password_confirm' => 'Passwords do not match.',
             'created' => 'Error creating :name.',
             'edit' => 'Error updating :name.',
-            'deleted' => 'No data found to delete.'
+            'deleted' => 'No data found to delete.',
         ],
         'success' => [
             'created' => ':name created successfully.',
-            'edit' => ':name updated successfully.', // edit -> updated
+            'edit' => ':name updated successfully.',
             'deleted' => ':name deleted successfully.',
             'restored' => ':name restored successfully.',
-        ]
+        ],
     ],
     'tinymce' => [
         'name' => 'Image Library',
@@ -358,12 +779,12 @@ return [
             'create_folder' => 'Create Folder',
             'save' => 'SAVE',
             'cancel' => 'Cancel',
-            'close' => 'Close'
+            'close' => 'Close',
         ],
         'label' => [
             'folder' => 'folder',
             'file' => 'file',
-            'new_name' => 'Enter new name:'
+            'new_name' => 'Enter new name:',
         ],
         'message' => [
             'delete' => 'Delete this :name?',
@@ -373,8 +794,8 @@ return [
                 'move' => 'Cannot move file!',
                 'create_folder' => 'Error creating folder',
                 'delete' => 'Error while deleting!',
-                'rename' => 'Error renaming!'
-            ]
-        ]
-    ]
+                'rename' => 'Error renaming!',
+            ],
+        ],
+    ],
 ];

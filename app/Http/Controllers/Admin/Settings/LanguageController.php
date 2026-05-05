@@ -8,34 +8,39 @@ use App\Http\Requests\Settings\LanguageUpdateRequest;
 use App\Http\Resources\Settings\LanguageCollection;
 use App\Http\Resources\Settings\LanguageResource;
 use App\Models\Settings\Language;
-use Illuminate\Support\Facades\Request;
 use App\Repositories\Language\LanguageRepositoryInterface as RepositoryInterface;
-use Inertia\Inertia;
-use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class LanguageController extends MainController
 {
-    protected $controllerView = 'Admin/Language/';
-    protected $controllerName = 'language';
-    protected $mainModel;
+    protected string $controllerView = 'Admin/Language/';
+
+    protected string $controllerName = 'language';
+
+    protected RepositoryInterface $mainModel;
+
     public function __construct(RepositoryInterface $repository)
     {
+        parent::__construct();
         $this->mainModel = $repository;
         $configPath = config('image.path.photo');
         Inertia::share(['config_path' => $configPath]);
     }
+
     /**
      * Display a listing of the resource.
      */
-
     public function index(): Response
     {
         $this->params = array_merge(Request::all(), $this->params);
-        $items =  $this->mainModel->lists($this->params, ['task' => 'admin-list-items']);
-        return Inertia::render($this->controllerView . 'Index', [
-            'items' => new LanguageCollection($items)
+        $items = $this->mainModel->lists($this->params, ['task' => 'admin-list-items']);
+
+        return Inertia::render($this->controllerView.'Index', [
+            'items' => new LanguageCollection($items),
         ]);
     }
 
@@ -44,7 +49,7 @@ class LanguageController extends MainController
      */
     public function create()
     {
-        return Inertia::render($this->controllerView . 'Created', []);
+        return Inertia::render($this->controllerView.'Created', []);
     }
 
     /**
@@ -59,10 +64,11 @@ class LanguageController extends MainController
             if ($params['undo'] == 1) {
                 return Redirect::to(route('languages.index'))->with('success', __('hancms.message.success.created', ['name' => __('hancms.languages.name')]));
             }
+
             return Redirect::route('languages.edit', $language->id)->with('success', __('hancms.message.success.created', ['name' => __('hancms.languages.name')]));
         } catch (\Throwable $th) {
-            //throw $th;
-            return Redirect::back()->with('error',  __('hancms.message.error.created', ['name' => __('hancms.languages.name')]));
+            // throw $th;
+            return Redirect::back()->with('error', __('hancms.message.error.created', ['name' => __('hancms.languages.name')]));
         }
     }
 
@@ -79,7 +85,7 @@ class LanguageController extends MainController
      */
     public function edit(Language $language)
     {
-        return Inertia::render($this->controllerView . 'Edit', [
+        return Inertia::render($this->controllerView.'Edit', [
             'item' => new LanguageResource($language),
         ]);
     }
@@ -97,10 +103,11 @@ class LanguageController extends MainController
             if ($params['undo'] == 1) {
                 return Redirect::to(route('languages.index'))->with('success', __('hancms.message.success.edit', ['name' => __('hancms.languages.name')]));
             }
+
             return Redirect::route('languages.edit', $language->id)->with('success', __('hancms.message.success.edit', ['name' => __('hancms.languages.name')]));
         } catch (\Throwable $th) {
-            //throw $th;
-            return Redirect::back()->with('error',  __('hancms.message.error.edit', ['name' => __('hancms.languages.name')]));
+            // throw $th;
+            return Redirect::back()->with('error', __('hancms.message.error.edit', ['name' => __('hancms.languages.name')]));
         }
     }
 
@@ -112,16 +119,19 @@ class LanguageController extends MainController
         try {
             $params['id'] = $id;
             $this->mainModel->delete($params, ['task' => 'delete-item']);
+
             return Redirect::back()->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.languages.name')]));
         } catch (\Throwable $th) {
             return Redirect::back()->with('error', __('hancms.message.error.deleted'));
         }
     }
+
     public function destroyMany(Request $request): RedirectResponse
     {
         try {
             $params = $request::all();
             $this->mainModel->delete($params, ['task' => 'delete-items']);
+
             return Redirect::route('languages.index')->with('success', __('hancms.message.success.deleted', ['name' => __('hancms.languages.name')]));
         } catch (\Throwable $th) {
             return Redirect::route('languages.index')->with('error', __('hancms.message.error.deleted'));

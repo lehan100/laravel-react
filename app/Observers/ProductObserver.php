@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Catalog\Product;
+use App\Models\Sales\InventoryAdjustmentHistory;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ProductObserver
 {
@@ -16,10 +16,32 @@ class ProductObserver
         // Load relationships to ensure all data is logged
         $product->load(['translations', 'photos']);
 
-        Log::info("--- NEW PRODUCT CREATED ---", [
-            'id'    => $product->id,
-            'sku'   => $product->sku,
-            'locale_count' => $product->translations->count()
+        Log::info('--- NEW PRODUCT CREATED ---', [
+            'id' => $product->id,
+            'sku' => $product->sku,
+            'locale_count' => $product->translations->count(),
+        ]);
+    }
+
+    public function updated(Product $product): void
+    {
+        $context = request()->attributes->get('inventory_log_context');
+        if (! is_array($context) || (! $product->wasChanged('quantity') && ! $product->wasChanged('is_stock'))) {
+            return;
+        }
+
+        $oldQuantity = (int) $product->getOriginal('quantity');
+        $newQuantity = (int) ($product->quantity ?? 0);
+
+        InventoryAdjustmentHistory::query()->create([
+            'product_id' => $product->id,
+            'user_id' => auth()->id(),
+            'action' => (string) ($context['action'] ?? 'set'),
+            'old_quantity' => $oldQuantity,
+            'new_quantity' => $newQuantity,
+            'delta' => $newQuantity - $oldQuantity,
+            'reason' => $context['reason'] ?? null,
+            'meta' => is_array($context['meta'] ?? null) ? $context['meta'] : null,
         ]);
     }
 
@@ -38,7 +60,7 @@ class ProductObserver
             // 3. Trigger ImageFileObserver for each photo by force deleting them
             // This ensures physical files are deleted via ImageFileObserver
             $product->photos()->get()->each->forceDelete();
-            Log::warning("--- PRODUCT PERMANENTLY DELETED ---", ['id' => $product->id]);
+            Log::warning('--- PRODUCT PERMANENTLY DELETED ---', ['id' => $product->id]);
         } else {
             // 1. Soft Delete translations (Only hides them from queries)
             $product->translations()->get()->each->delete();
@@ -47,7 +69,7 @@ class ProductObserver
             // 3. Soft Delete photos (Ensures ImageFileObserver isn't triggered for physical deletion)
             // This hides photos from the product but keeps the physical files for potential restoration
             $product->photos()->get()->each->delete();
-            Log::info("--- PRODUCT SOFT DELETED ---", ['id' => $product->id]);
+            Log::info('--- PRODUCT SOFT DELETED ---', ['id' => $product->id]);
         }
     }
 
@@ -62,6 +84,6 @@ class ProductObserver
         $product->slugs()->update(['status' => 1]);
         // 3. Restore photos (Bring back image records)
         $product->photos()->withTrashed()->get()->each->restore();
-        Log::info("--- PRODUCT RESTORED ---", ['id' => $product->id]);
+        Log::info('--- PRODUCT RESTORED ---', ['id' => $product->id]);
     }
 }

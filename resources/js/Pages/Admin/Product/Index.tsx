@@ -136,7 +136,7 @@ function IndexPage() {
                     {trans('hancms.button.created')}
                 </CreatedButton>
                 <DeleteButton onDelete={() => destroys()} size={18}>
-                    {trans('hancms.button.delete.selected')}
+                    {trans('hancms.button.delete_selected')}
                 </DeleteButton>
             </HeaderToolbar>
 

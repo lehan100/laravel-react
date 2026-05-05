@@ -15,7 +15,13 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|integer|exists:categories,id',
+            'category_id' => [
+                'required',
+                'integer',
+                Rule::exists('categories', 'id')->where(function ($query) {
+                    $query->whereIn('type', ['news', 'blog']);
+                }),
+            ],
             'photo' => 'nullable|string|max:255',
             'type' => ['required', 'string', Rule::in(['primary', 'footer', 'sidebar'])],
             'status' => 'required|integer|in:0,1',

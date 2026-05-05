@@ -261,15 +261,11 @@ const ProductFormView = ({
         if (!errors) return false;
 
         if (tabId === 'general') {
-            return !!errors.sku || !!errors.price || !!errors.quantity || !!errors.weight || !!errors.order || !!errors.status || !!errors.is_stock || !!errors.is_coupon;
+            return !!errors.sku || !!errors.price || !!errors.quantity || !!errors.weight || !!errors.order || !!errors.status || !!errors.is_stock || !!errors.is_coupon || !!errors.category_ids;
         }
 
         if (tabId === 'content') {
             return Object.keys(errors).some((key) => key.startsWith('translations.'));
-        }
-
-        if (tabId === 'categories') {
-            return !!errors.category_ids;
         }
 
         if (tabId === 'photos') {
@@ -344,6 +340,18 @@ const ProductFormView = ({
                     </InputGroup>
 
                 </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+                <InputGroup label={trans('hancms.column.categories')} align="center">
+                    <CategoryMultiSelect
+                        data={itemsCategoryActive || []}
+                        value={selectedCategoryIds}
+                        onChange={(ids) => setData('category_ids', ids)}
+                        trans={trans}
+                        error={errors?.category_ids}
+                    />
+                </InputGroup>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
@@ -637,20 +645,6 @@ const ProductFormView = ({
         );
     };
 
-    const renderCategoriesTab = () => (
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.35)] sm:p-6">
-            <InputGroup label={trans('hancms.column.categories')} align="center">
-                <CategoryMultiSelect
-                    data={itemsCategoryActive || []}
-                    value={selectedCategoryIds}
-                    onChange={(ids) => setData('category_ids', ids)}
-                    trans={trans}
-                    error={errors?.category_ids}
-                />
-            </InputGroup>
-        </div>
-    );
-
     const renderPhotosTab = () => (
         <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.35)] sm:p-6">
             <MultiUpload
@@ -679,8 +673,6 @@ const ProductFormView = ({
                 return renderGeneralTab();
             case 'content':
                 return renderContentTab();
-            case 'categories':
-                return renderCategoriesTab();
             case 'photos':
                 return renderPhotosTab();
             default:
@@ -709,7 +701,7 @@ const ProductFormView = ({
                 <Card title={trans('hancms.catalog.product.admin.name')} className="mb-6">
                     <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
                         <div className="flex flex-wrap gap-3 overflow-x-auto pb-1">
-                            {['general', 'content', 'categories', 'photos'].map((id) => {
+                            {['general', 'content', 'photos'].map((id) => {
                                 const errorInTab = hasTabError(id);
                                 const active = activeTab === id;
 

@@ -4,7 +4,6 @@ import { PageProps } from '@/types';
 import { ChevronDown, UserCircle2, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import { useTrans } from '@/Hooks/useTrans';
-import { Language } from '@/types';
 type BottomHeaderProps = {
   mobileMenuOpened: boolean;
   sidebarVisible: boolean;
@@ -13,13 +12,9 @@ type BottomHeaderProps = {
 
 export default ({ mobileMenuOpened, sidebarVisible, onToggleSidebar }: BottomHeaderProps) => {
   const { trans } = useTrans();
-  const { auth } = usePage<PageProps>().props;
-  const { langs }: any = usePage<{
-    langs: Language;
-
-  }>().props;
-  const { props } = usePage();
-  const currentLang = props.locale;
+  const { auth, langs, locale } = usePage<PageProps & { langs?: any }>().props as any;
+  const langList = langs?.data || (Array.isArray(langs) ? langs : Object.values(langs || {}));
+  const currentLang = locale;
   const [menuOpened, setMenuOpened] = useState(false);
   const can = (permission: any) => auth.permissions.includes(permission);
   const handleSwitchLang = (e: any, locale: any) => {
@@ -92,7 +87,7 @@ export default ({ mobileMenuOpened, sidebarVisible, onToggleSidebar }: BottomHea
             <div className="border-t border-slate-100 px-5 py-3">
               <p className="text-[11px] uppercase tracking-[0.24em] text-slate-400">{trans("hancms.languages.name")}</p>
             </div>
-            {langs.data.map((row: any) => {
+            {langList.map((row: any) => {
               const langCode = row.code;
               const langName = row.name
               return (

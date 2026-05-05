@@ -30,6 +30,13 @@ class DatabaseSeeder extends Seeder
 
         User::factory(5)->create(['account_id' => $account->id]);
 
+        $this->call([
+            LocationPermissionSeeder::class,
+            HancmsTranslationPermissionSeeder::class,
+            VietnameseAdministrativeUnitsSeeder::class,
+            CatalogSampleSeeder::class,
+        ]);
+
         // $organizations = Organization::factory(100)
         //     ->create(['account_id' => $account->id]);
 

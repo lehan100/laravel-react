@@ -3,48 +3,24 @@
 namespace App\Http\Controllers\Admin\Report;
 
 use App\Http\Controllers\MainController;
-use Illuminate\Http\RedirectResponse;
+use App\Services\Reports\AdminReportService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ReportInventoryController extends MainController
 {
-    public function index()
+    public function index(Request $request, AdminReportService $reports): Response
     {
-        return response('ReportInventory index (blank scaffold)');
+        return Inertia::render('Admin/Report/Index', [
+            'report' => $reports->build('inventory', $request),
+            'analyzeRoute' => route('report-inventory.analyze'),
+        ]);
     }
 
-    public function create()
+    public function analyze(Request $request, AdminReportService $reports): JsonResponse
     {
-        return response('ReportInventory create (blank scaffold)');
-    }
-
-    public function store(Request $request): RedirectResponse
-    {
-        return redirect()->route('report-inventory.index');
-    }
-
-    public function show(string $id)
-    {
-        return response("ReportInventory show {$id} (blank scaffold)");
-    }
-
-    public function edit(string $id)
-    {
-        return response("ReportInventory edit {$id} (blank scaffold)");
-    }
-
-    public function update(Request $request, string $id): RedirectResponse
-    {
-        return redirect()->route('report-inventory.index');
-    }
-
-    public function destroy(string $id): RedirectResponse
-    {
-        return redirect()->route('report-inventory.index');
-    }
-
-    public function destroyMany(Request $request): RedirectResponse
-    {
-        return redirect()->route('report-inventory.index');
+        return response()->json($reports->analyze('inventory', $request));
     }
 }

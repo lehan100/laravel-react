@@ -2,8 +2,10 @@
 
 namespace App\Repositories\SaleOffer;
 
+use App\Models\Catalog\Product;
 use App\Models\Promotion\PromotionSaleOffer;
 use App\Repositories\EloquentRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class SaleOfferEloquentRepository extends EloquentRepository implements SaleOfferRepositoryInterface
@@ -19,7 +21,7 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
         'ends_at',
         'priority',
         'is_active',
-        'stackable'
+        'stackable',
     ];
 
     public function getModel()
@@ -30,7 +32,7 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
     public function lists($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
+        if (! in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
             return null;
         }
 
@@ -38,7 +40,7 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
             ->orderBy('priority')
             ->orderByDesc('id');
 
-        if (!empty($params['search'])) {
+        if (! empty($params['search'])) {
             $search = trim((string) $params['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -51,6 +53,7 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
         }
 
         $perPage = $params['pagination']['totalItemsPerPage'] ?? 20;
+
         return $query->paginate($perPage);
     }
 
@@ -68,17 +71,18 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
     public function save($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) {
+        if (! $task) {
             return false;
         }
 
         if ($task === 'change-status') {
             $item = $this->_model->find($params['id'] ?? null);
-            if (!$item) {
+            if (! $item) {
                 return false;
             }
 
-            $item->is_active = !$item->is_active;
+            $item->is_active = ! $item->is_active;
+
             return $item->save();
         }
 
@@ -88,8 +92,9 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
                 ? new $this->_model
                 : $this->_model->find($params['id'] ?? null);
 
-            if (!$item) {
+            if (! $item) {
                 DB::rollBack();
+
                 return false;
             }
 
@@ -110,10 +115,12 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
             }
 
             DB::commit();
+
             return $item;
         } catch (\Throwable $e) {
             DB::rollBack();
-            logger('Error save saleoffer: ' . $e->getMessage());
+            logger('Error save saleoffer: '.$e->getMessage());
+
             return false;
         }
     }
@@ -121,12 +128,13 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
     public function delete($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) {
+        if (! $task) {
             return false;
         }
 
         if ($task === 'delete-item') {
             $item = $this->_model->find($params['id'] ?? null);
+
             return $item ? $item->delete() : false;
         }
 
@@ -139,5 +147,64 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
         }
 
         return false;
+    }
+
+    public function appliedProductsPaginator(int $saleOfferId, object $saleOffer, int $perPage = 20): LengthAwarePaginator
+    {
+        $currentLocale = app()->getLocale();
+        $productsPaginator = Product::query()
+            ->select(['products.id', 'products.sku', 'products.price', 'products.status'])
+            ->join('saleoffer_products as sop', 'sop.product_id', '=', 'products.id')
+            ->where('sop.promotion_saleoffer_id', $saleOfferId)
+            ->with(['translations' => function ($query) use ($currentLocale): void {
+                $query->select(['id', 'product_id', 'locale', 'name'])
+                    ->where('locale', $currentLocale);
+            }])
+            ->orderBy('products.id')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $rows = collect($productsPaginator->items())->map(function (Product $product) use ($saleOffer): array {
+            $translations = $product->translations ?? collect();
+            $name = optional($translations->first())->name ?: ($product->sku ?: ('#'.$product->id));
+            $price = (float) ($product->price ?? 0);
+            $discount = $this->calculateDiscountAmount(
+                $price,
+                (string) ($saleOffer->discount_type ?? 'percent'),
+                (float) ($saleOffer->discount_value ?? 0),
+                $saleOffer->max_discount_amount !== null ? (float) $saleOffer->max_discount_amount : null
+            );
+
+            return [
+                'id' => (int) $product->id,
+                'sku' => $product->sku,
+                'name' => $name,
+                'price' => $price,
+                'discount_amount' => $discount,
+                'final_price' => max(0, round($price - $discount, 2)),
+                'status' => (int) ($product->status ?? 0),
+            ];
+        })->values();
+
+        $productsPaginator->setCollection($rows);
+
+        return $productsPaginator;
+    }
+
+    private function calculateDiscountAmount(
+        float $price,
+        string $discountType,
+        float $discountValue,
+        ?float $maxDiscountAmount = null
+    ): float {
+        $rawDiscount = $discountType === 'percent'
+            ? ($price * $discountValue / 100)
+            : $discountValue;
+
+        if ($maxDiscountAmount !== null) {
+            $rawDiscount = min($rawDiscount, $maxDiscountAmount);
+        }
+
+        return round(max(0, min($rawDiscount, $price)), 2);
     }
 }

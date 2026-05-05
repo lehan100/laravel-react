@@ -37,13 +37,14 @@ function CreatedPage() {
 
     const { data, setData, errors, post, processing } = useForm({
         status: item?.status ?? 0,
-        type: item?.type ?? '',
+        type: item?.type ?? 'product',
         parent_id: item?.parent_id ?? 0,
         photo: item?.photo ?? '',
+        product_ids: item?.product_ids ?? [],
         undo: item?.undo ?? 0,
         translations: initialTranslations,
     });
-    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive };
+    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive, itemsSelectedProducts: [] };
     const [activeId, setActiveId] = useState<number | null>(null);
     const [undo, setUndo] = useState(0);
     const handleUndo = (status: number) => setUndo(status);

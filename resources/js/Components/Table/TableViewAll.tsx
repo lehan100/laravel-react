@@ -11,11 +11,13 @@ interface TableProps<T> {
   rows: T[];
   sendDataSelectItems: (data: any) => void;
   getRowDetailsUrl?: (row: T) => string;
+  stickyActionColumn?: boolean;
 }
 export default function TableViewAll<T>({
   columns = [],
   rows = [],
   sendDataSelectItems,
+  stickyActionColumn = true,
 }: TableProps<T>) {
   const styles = {
     id: {
@@ -76,7 +78,9 @@ export default function TableViewAll<T>({
               <th
                 key={column.label}
                 colSpan={column.colSpan ?? 1}
-                className="px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80"
+                className={`px-4 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80 ${
+                  stickyActionColumn && column.name === 'action' ? 'md:sticky md:right-0 md:z-20 md:bg-slate-950' : ''
+                }`}
                 style={column.name == 'id' ? styles.id : styles.auto}
               >
                 {column.name == 'id' ? <input
@@ -112,7 +116,9 @@ export default function TableViewAll<T>({
                   return (
                     <td
                       key={column.name}
-                      className="px-4 py-3 align-middle text-slate-700"
+                      className={`px-4 py-3 align-middle text-slate-700 ${
+                        stickyActionColumn && column.name === 'action' ? 'md:sticky md:right-0 md:z-10 md:bg-white' : ''
+                      }`}
                       style={column.name == 'id' ? styles.id : column.name == 'action' ? styles.action : styles.auto}
                     >
                       {column.name == 'id' ?

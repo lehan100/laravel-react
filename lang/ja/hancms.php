@@ -1,9 +1,72 @@
 <?php
 
 return [
-    'dashboard.main' => 'ダッシュボード',
-    'users.main' => 'ユーザー',
-    'settings.main' => '設定',
+    'dashboard' => [
+        'main' => 'ダッシュボード',
+        'hello' => 'こんにちは、:name',
+        'quick_actions' => 'クイック操作',
+        'revenue_chart' => '14日間の売上',
+        'order_status' => '注文ステータス',
+        'top_products' => '注目商品',
+        'stock_alerts' => '在庫アラート',
+        'recent_orders' => '最近の注文',
+        'operations' => '運用概要',
+        'view_products' => '商品一覧へ',
+        'view_categories' => 'カテゴリツリーを整理',
+        'view_orders' => '注文を見る',
+        'view_reports' => '売上レポートを見る',
+        'empty' => 'データがありません。',
+        'summary' => [
+            'products' => '商品',
+            'active_products' => '有効',
+            'categories' => 'カテゴリ',
+            'users' => 'ユーザー',
+            'active_promotions' => '実行中プロモーション',
+            'out_of_stock' => '在庫切れ',
+        ],
+        'metrics' => [
+            'revenue' => '売上',
+            'revenue_hint' => '直近14日間',
+            'orders' => '有効注文',
+            'orders_hint' => 'キャンセル除外',
+            'paid' => '支払い済み',
+            'paid_hint' => '入金済み注文',
+            'low_stock' => '低在庫',
+            'low_stock_hint' => '在庫1-5',
+        ],
+    ],
+    'users' => [
+        'main' => 'ユーザー',
+        'admin' => [
+            'name' => 'ユーザー一覧',
+        ],
+        'name' => 'ユーザー',
+        'created' => 'ユーザー作成',
+        'edit' => 'ユーザー編集',
+        'profile' => 'プロフィール',
+        'manage' => 'ユーザー管理',
+        'logout' => 'ログアウト',
+    ],
+    'settings' => [
+        'main' => '設定',
+        'locations' => [
+            'name' => '省・区管理',
+            'summary' => [
+                'provinces' => '省・市',
+                'wards' => '区・町村',
+            ],
+        ],
+    ],
+    'translation' => [
+        'name' => '翻訳の設定',
+        'admin' => [
+            'name' => '翻訳マネージャーの設定',
+        ],
+        'messages' => [
+            'saved' => '設定翻訳が保存されました。',
+            'empty' => '翻訳がありません。',
+        ],
+    ],
     'sidebar' => [
         'show' => 'サイドバーを表示',
         'hide' => 'サイドバーを非表示',
@@ -16,17 +79,9 @@ return [
     'permissions' => '権限',
     'assign_permissions' => [
         'name' => '権限の割り当て',
-        'error' => '権限割り当てエラー',
-        'error.message' => "権限が選択されていません。"
-    ],
-    'users' => [
-        'admin.name' => 'ユーザー一覧',
-        'name' => 'ユーザー',
-        'created' => 'ユーザー作成',
-        'edit' => 'ユーザー編集',
-        'profile' => 'プロフィール',
-        'manage' => 'ユーザー管理',
-        'logout' => 'ログアウト'
+        'error' => [
+            'message' => '権限が選択されていません。',
+        ],
     ],
     'media' => [
         'name' => 'メディア',
@@ -36,22 +91,90 @@ return [
             'edit' => '役職編集',
         ],
         'banner' => [
-            'name' => 'バナー'
-        ]
+            'name' => 'バナー',
+        ],
     ],
     'report' => [
         'name' => 'レポート',
+        'center' => 'レポートセンター',
+        'from_date' => '開始日',
+        'to_date' => '終了日',
+        'filter' => '絞り込み',
+        'trend' => 'トレンド',
+        'ai_insight' => 'AIインサイト',
+        'ai_analyze' => 'AI分析',
+        'ai_empty' => 'AI分析が返されませんでした。',
+        'ai_failed' => '現在AI分析を実行できません。',
+        'ai_rate_limited' => 'AIのレート制限中です。後でもう一度お試しください。',
+        'ai_hint' => 'AI分析をクリックすると、現在のデータからインサイトと推奨アクションを取得できます。',
+        'details' => '詳細データ',
+        'empty_chart' => 'グラフデータがありません。',
+        'empty_rows' => 'この期間のデータはありません。',
+        'columns' => [
+            'date' => '日付',
+            'orders' => '注文',
+            'quantity' => '数量',
+            'revenue' => '売上',
+            'product' => '商品',
+            'sku' => 'SKU',
+            'sold_quantity' => '販売数',
+            'stock' => '在庫',
+            'status' => 'ステータス',
+            'type' => '種類',
+            'code' => 'コード',
+            'name' => '名称',
+        ],
+        'status_labels' => [
+            'active' => '実行中',
+            'inactive' => '停止中/期限切れ',
+            'out_of_stock' => '在庫切れ',
+            'low_stock' => '在庫僅少',
+            'healthy' => '正常',
+        ],
+        'campaigns' => [
+            'coupon' => 'クーポン',
+            'sale_offer' => 'セールオファー',
+            'buy_to_gift' => '購入特典',
+        ],
         'revenue' => [
             'name' => '売上レポート',
+            'description' => '売上、注文、支払い状況、日別トレンドを追跡します。',
+            'metrics' => [
+                'revenue' => '売上',
+                'paid' => '支払い済み',
+                'valid_orders' => '有効注文',
+                'average_order_value' => '平均注文額',
+            ],
         ],
         'product' => [
             'name' => '商品レポート',
+            'description' => '売れ筋商品、商品別売上、カタログ状況を分析します。',
+            'metrics' => [
+                'sold_products' => '販売商品数',
+                'sold_quantity' => '販売数量',
+                'top_revenue' => '上位売上',
+                'active_catalog' => '有効カタログ',
+            ],
         ],
         'inventory' => [
             'name' => '在庫レポート',
+            'description' => '低在庫、在庫切れ、在庫調整の変動を追跡します。',
+            'metrics' => [
+                'total_stock' => '総在庫',
+                'low_stock' => '低在庫',
+                'out_of_stock' => '在庫切れ',
+                'adjustments' => '調整数',
+            ],
         ],
         'promotion' => [
             'name' => 'プロモーションレポート',
+            'description' => 'クーポン、セールオファー、購入特典キャンペーンの効果を集計します。',
+            'metrics' => [
+                'active' => '実行中',
+                'coupon_used' => '使用済みクーポン',
+                'discount_total' => '割引合計',
+                'campaign_total' => 'キャンペーン合計',
+            ],
         ],
     ],
     'promotion' => [
@@ -74,6 +197,10 @@ return [
                 'priority' => '優先度',
                 'stackable' => '併用可',
                 'apply_products' => '適用商品',
+            ],
+            'columns' => [
+                'discount' => '割引',
+                'final_price' => '割引後価格',
             ],
         ],
         'coupon' => [
@@ -100,6 +227,7 @@ return [
                 'ends_at' => '終了日時',
                 'apply_categories' => '適用カテゴリ',
                 'apply_products' => '適用商品',
+                'products_count' => '商品数',
             ],
         ],
         'buytogift' => [
@@ -109,6 +237,16 @@ return [
             'options' => [
                 'order_amount' => '注文金額条件',
                 'buy_product' => '商品購入で特典付与',
+                'stock_scope_all' => '在庫制限なし',
+                'stock_scope_limited' => '在庫制限あり',
+            ],
+            'summary' => [
+                'rule' => 'ルール',
+                'buy' => '購入',
+                'gift' => '特典',
+                'min_order_amount' => '最低注文金額',
+                'product_short' => '商品',
+                'more_rules' => '件の追加ルール',
             ],
             'fields' => [
                 'condition_type' => '条件タイプ',
@@ -118,6 +256,8 @@ return [
                 'gift_qty' => '特典数量',
                 'min_order_amount' => '特典適用の最低注文金額',
                 'max_sets_per_order' => '1注文あたりの特典セット上限',
+                'stock_scope' => '在庫適用範囲',
+                'stock_limit' => '在庫適用数量',
                 'starts_at' => '開始日時',
                 'ends_at' => '終了日時',
                 'priority' => '優先度',
@@ -129,12 +269,233 @@ return [
         'name' => '販売',
         'warehouse' => [
             'name' => '在庫管理',
+            'default_name' => 'デフォルト在庫',
+            'placeholders' => [
+                'search' => 'SKU または商品名を検索...',
+                'reason' => '調整理由を入力...',
+            ],
+            'messages' => [
+                'product_not_found' => '商品が見つかりません。',
+                'updated_success' => '更新に成功しました。',
+                'toggled_success' => '在庫状態を更新しました。',
+                'delete_not_supported' => '在庫の削除はサポートされていません。',
+                'bulk_delete_not_supported' => '在庫の一括削除はサポートされていません。',
+                'toggle_reason' => '在庫管理画面から在庫状態を更新しました。',
+            ],
+            'actions' => [
+                'update_stock' => '在庫更新',
+                'mark_in_stock' => '在庫ありにする',
+                'mark_out_stock' => '在庫切れにする',
+                'save_stock' => '在庫を保存',
+            ],
+            'fields' => [
+                'current_stock' => '現在の在庫',
+                'update_method' => '更新方法',
+                'set_new_stock' => '新しい在庫数を設定',
+                'adjust_delta' => '数量を増減',
+                'new_stock' => '新しい在庫数',
+                'delta' => '増減数',
+                'reason' => '理由',
+                'set_label' => '設定',
+                'adjust_label' => '調整',
+            ],
+            'titles' => [
+                'update_stock' => '在庫更新',
+                'recent_history' => '最近の履歴',
+            ],
+            'empty_history' => '在庫調整履歴はまだありません。',
+            'system_user' => 'システム',
         ],
         'orders' => [
             'name' => '注文',
+            'created' => '注文を追加',
+            'edit' => '注文を編集',
+            'placeholders' => [
+                'search' => '注文番号、顧客名、電話番号を検索...',
+                'order_number' => '注文番号を入力...',
+                'product' => '商品を選択',
+                'province_first' => '先に都道府県 / 市を選択してください',
+            ],
+            'sections' => [
+                'customer' => '顧客情報',
+                'status' => '注文ステータス',
+                'items' => '注文商品',
+                'history' => '処理履歴',
+            ],
+            'actions' => [
+                'add_item' => '商品を追加',
+            ],
+            'empty_items' => 'まだ商品が追加されていません。',
+            'empty_history' => '処理履歴はまだありません。',
+            'history' => [
+                'system_user' => 'システム',
+                'event_labels' => [
+                    'created' => '注文を作成',
+                    'updated' => '注文を更新',
+                    'deleted' => '注文を削除',
+                    'order_status_changed' => '注文ステータス変更',
+                    'payment_status_changed' => '支払いステータス更新',
+                    'shipping_status_changed' => '配送ステータス更新',
+                    'payment_method_changed' => '支払い方法変更',
+                ],
+                'messages' => [
+                    'created' => '注文を作成しました。ステータスは :order_status、支払いは :payment_status、配送は :shipping_status です。',
+                    'updated' => '注文情報を更新しました。',
+                    'deleted' => '顧客 :customer_name の注文 :order_number を削除しました。',
+                    'order_status_changed' => '注文ステータスが :from から :to に変更されました。',
+                    'payment_status_changed' => '支払いステータスが :from から :to に変更されました。',
+                    'shipping_status_changed' => '配送ステータスが :from から :to に変更されました。',
+                    'payment_method_changed' => '支払い方法が :from から :to に変更されました。',
+                ],
+            ],
+            'fields' => [
+                'order_number' => '注文番号',
+                'customer_name' => '顧客名',
+                'customer_phone' => '電話番号',
+                'customer_email' => 'メールアドレス',
+                'payment_method' => '支払い方法',
+                'province' => '都道府県 / 市',
+                'ward' => '区 / 町村',
+                'customer_address' => '配送先住所',
+                'note' => '備考',
+                'order_status' => '注文ステータス',
+                'payment_status' => '支払いステータス',
+                'shipping_status' => '配送ステータス',
+                'discount_total' => '割引額',
+                'shipping_total' => '送料',
+                'subtotal' => '小計',
+                'grand_total' => '合計',
+                'product' => '商品',
+                'available_stock' => '利用可能在庫',
+                'quantity' => '数量',
+                'unit_price' => '単価',
+                'line_total' => '金額',
+                'placed_at' => '注文日時',
+                'total_quantity' => '合計数量',
+            ],
+            'payment_methods' => [
+                'cod_label' => '代金引換',
+            ],
+            'statuses' => [
+                'order' => [
+                    'pending' => '保留中',
+                    'confirmed' => '確認済み',
+                    'processing' => '処理中',
+                    'completed' => '完了',
+                    'cancelled' => 'キャンセル済み',
+                ],
+                'payment' => [
+                    'unpaid' => '未払い',
+                    'paid' => '支払い済み',
+                    'refunded' => '返金済み',
+                    'failed' => '失敗',
+                ],
+                'shipping' => [
+                    'pending' => '保留中',
+                    'ready_to_ship' => '発送準備完了',
+                    'shipping' => '配送中',
+                    'delivered' => '配達済み',
+                    'returned' => '返品済み',
+                ],
+            ],
+            'print' => [
+                'confirmation_title' => '注文確認',
+                'confirmation_note' => '上記の内容が正しいことを確認し、この注文内容に同意します。',
+                'confirmation_document' => '注文確認書',
+                'date_line' => '日付 :day 年 :month 月 :year',
+                'sign_hint' => '署名と氏名を記入してください',
+                'prepared_by' => '作成者',
+                'stock_keeper' => '在庫担当',
+                'customer_label' => '顧客',
+                'labels' => [
+                    'hotline' => 'ホットライン',
+                    'website' => 'ウェブサイト',
+                    'address' => '住所',
+                    'number' => '番号',
+                    'date' => '日付',
+                    'name' => '氏名',
+                    'phone_short' => '電話',
+                    'placed_date' => '注文日',
+                    'no' => '番号',
+                    'unit' => '単位',
+                    'item_unit' => '個',
+                ],
+                'sections' => [
+                    'fulfillment' => '配送情報',
+                ],
+            ],
         ],
         'payment_methods' => [
             'name' => '支払い方法',
+            'sections' => [
+                'gateway_settings' => 'ゲートウェイ設定',
+            ],
+            'actions' => [
+                'enable' => '有効化',
+                'disable' => '無効化',
+            ],
+            'providers' => [
+                'cash_on_delivery' => '代金引換 (COD)',
+                'momo' => 'MoMo',
+                'zalopay' => 'ZaloPay',
+                'vnpay' => 'VNPay',
+                'paypal' => 'PayPal',
+            ],
+            'fields' => [
+                'instructions' => '案内内容',
+                'cod_fee' => '代引き手数料（必要な場合）',
+                'partner_code' => 'パートナーコード',
+                'access_key' => 'アクセスキー',
+                'secret_key' => 'シークレットキー',
+                'endpoint' => 'エンドポイント',
+                'return_url' => '戻り先URL',
+                'ipn_url' => 'IPN URL',
+                'app_id' => 'App ID',
+                'key1' => 'キー 1',
+                'key2' => 'キー 2',
+                'callback_url' => 'コールバックURL',
+                'tmn_code' => 'TMNコード',
+                'hash_secret' => 'ハッシュシークレット',
+                'client_id' => 'クライアントID',
+                'client_secret' => 'クライアントシークレット',
+                'mode' => 'モード (sandbox/live)',
+                'webhook_id' => 'Webhook ID',
+            ],
+        ],
+        'shipping_methods' => [
+            'name' => '配送方法',
+            'sections' => [
+                'gateway_settings' => '配送API設定',
+            ],
+            'actions' => [
+                'enable' => '有効化',
+                'disable' => '無効化',
+            ],
+            'providers' => [
+                'ghn' => 'GHN',
+                'ghtk' => 'GHTK',
+                'viettel_post' => 'Viettel Post',
+                'jnt' => 'J&T Express',
+                'ninja_van' => 'Ninja Van',
+            ],
+            'fields' => [
+                'token' => 'トークン',
+                'shop_id' => 'Shop ID',
+                'username' => 'ユーザー名',
+                'password' => 'パスワード',
+                'client_id' => 'Client ID',
+                'client_secret' => 'Client Secret',
+                'endpoint' => 'Endpoint',
+                'webhook_url' => 'Webhook URL',
+            ],
+            'messages' => [
+                'method_not_found' => '配送方法が見つかりません。',
+                'updated_success' => '更新に成功しました。',
+                'toggled_success' => '配送方法の状態を更新しました。',
+                'delete_not_supported' => '配送方法の削除はサポートされていません。',
+                'bulk_delete_not_supported' => '配送方法の一括削除はサポートされていません。',
+                'toggle_reason' => '配送管理画面から配送方法の状態を更新しました。',
+            ],
         ],
     ],
     'catalog' => [
@@ -144,12 +505,21 @@ return [
             'name' => 'カテゴリー',
             'created' => 'カテゴリーを追加',
             'edit' => 'カテゴリーを編集',
+            'products' => 'カテゴリーの商品',
+            'products_hint' => 'このカテゴリーに属する商品を選択してください。',
             'tree_structure' => 'カテゴリー樹形図',
             'tree_drag' => 'ドラッグして並び替え',
             'no_data' => 'カテゴリーデータがありません。',
             'select_to_view' => '詳細を表示するにはカテゴリーを選択してください',
             'instruction_text' => '左側の項目をクリックして情報を編集するか、SEOを設定してください。',
             'select' => '--- ルートカテゴリーを選択 ---',
+            'ai' => [
+                'suggest_seo' => 'AIでSEO提案',
+                'generating' => '生成中...',
+                'missing_input' => '生成前にカテゴリー名・内容・キーワードのいずれかを入力してください。',
+                'empty_response' => 'AIがSEO内容を返しませんでした。もう一度お試しください。',
+                'failed' => '現在AI SEOを生成できません。しばらくしてから再試行してください。',
+            ],
             'type' => [
                 'label' => 'カテゴリータイプ',
                 'options' => [
@@ -163,7 +533,9 @@ return [
             ],
         ],
         'product' => [
-            'admin.name' => '商品一覧',
+            'admin' => [
+                'name' => '商品一覧',
+            ],
             'name' => '商品',
             'created' => '商品を追加',
             'edit' => '商品を編集',
@@ -171,8 +543,10 @@ return [
                 'suggest_content' => 'AIで内容提案',
                 'suggest_seo' => 'AIでSEO提案',
                 'generating' => '生成中...',
+                'processing' => '処理中...',
                 'missing_input' => '生成前に商品名・説明・キーワードのいずれかを入力してください。',
                 'empty_response' => 'AIが内容を返しませんでした。もう一度お試しください。',
+                'rate_limited' => 'AIリクエストが混雑しています。数秒待ってから再試行してください。',
                 'failed' => '現在AIコンテンツを生成できません。しばらくしてから再試行してください。',
             ],
             'photo_hint' => '商品に複数の写真をアップロードできます。デフォルト写真が最初に表示されます。',
@@ -196,20 +570,48 @@ return [
             ],
         ],
         'post' => [
-            'admin.name' => '記事一覧',
+            'admin' => [
+                'name' => '記事一覧',
+            ],
             'name' => '記事',
             'created' => '記事を追加',
             'edit' => '記事を編集',
-        ]
+            'ai' => [
+                'suggest_content' => 'AIで内容提案',
+                'suggest_seo' => 'AIでSEO提案',
+                'generating' => '生成中...',
+                'processing' => '処理中...',
+                'missing_input' => '生成前に記事名・説明・キーワードのいずれかを入力してください。',
+                'empty_response' => 'AIが内容を返しませんでした。もう一度お試しください。',
+                'failed' => '現在AIコンテンツを生成できません。しばらくしてから再試行してください。',
+            ],
+            'tabs' => [
+                'general' => '基本情報',
+                'content' => '内容',
+            ],
+            'type' => [
+                'label' => '記事タイプ',
+                'options' => [
+                    'select' => 'タイプを選択',
+                    'primary' => 'メイン',
+                    'footer' => 'フッター',
+                    'sidebar' => 'サイドバー',
+                ],
+            ],
+        ],
     ],
     'languages' => [
-        'admin.name' => '言語一覧',
+        'admin' => [
+            'name' => '言語一覧',
+        ],
         'name' => '言語',
         'created' => '言語作成',
         'edit' => '言語編集',
     ],
     'label' => [
-        'admin.name' => 'ラベル一覧',
+        'admin' => [
+            'name' => 'ラベル一覧',
+        ],
         'name' => 'ラベル',
         'created' => 'ラベル作成',
         'edit' => 'ラベル編集',
@@ -217,15 +619,17 @@ return [
         'msg_placeholder' => 'キーを入力（例：welcome_msg）',
         'msg_verify' => 'キーを入力してください。',
         'confirm_delete_title' => '削除の確認',
-        'confirm_delete' => 'このラベルを削除してもよろしいですか？この操作を行うとすべての言語のデータが削除され、保存後は元に戻すことはできません。'
+        'confirm_delete' => 'このラベルを削除してもよろしいですか？この操作を行うとすべての言語のデータが削除され、保存後は元に戻すことはできません。',
     ],
     'layout' => [
-        'admin.name' => 'レイアウト管理',
+        'admin' => [
+            'name' => 'レイアウト管理',
+        ],
         'name' => 'レイアウト',
         'tabs' => [
             'home' => 'ホーム',
             'general' => '基本設定',
-            'content' => 'コンテンツ'
+            'content' => 'コンテンツ',
         ],
         'items' => [
             'logo' => 'システムロゴ',
@@ -238,7 +642,7 @@ return [
             'address' => '住所',
             'tax' => '登録番号 / 登録番号',
             'copyright' => 'コピーライト / 著作権',
-        ]
+        ],
     ],
     'tabs' => 'タブ',
     'section' => 'セクション',
@@ -261,18 +665,22 @@ return [
         ],
     ],
     'button' => [
+        'add' => '追加',
         'created' => '新規作成',
-        'delete.selected' => '選択項目を削除',
-        'edit' => '編集',
         'delete' => '削除',
+        'delete_selected' => '選択を削除',
+        'edit' => '編集',
         'view' => '詳細',
+        'print' => '印刷',
+        'filter' => '絞り込み',
         'open' => '開く',
         'save' => '保存',
         'back' => '戻る',
         'choose_image' => '画像を選択',
         'new_line' => '行追加',
         'confirm' => '確認',
-        'cancel' => 'キャンセル'
+        'cancel' => 'キャンセル',
+        'close' => '閉じる',
     ],
     'view' => '詳細',
     'open' => '開く',
@@ -287,6 +695,7 @@ return [
         'first_name' => '名',
         'last_name' => '姓',
         'status' => 'ステータス',
+        'search' => '検索',
         'sku' => 'SKU',
         'quantity' => '数量',
         'weight' => '重さ',
@@ -305,6 +714,11 @@ return [
         'categories' => 'カテゴリー',
         'email' => 'メールアドレス',
         'code' => 'コード',
+        'full_name' => '正式名称',
+        'administrative_unit' => '行政区分',
+        'province' => '省・市',
+        'ward_count' => '区・町村数',
+        'provider' => '提供者',
         'currency' => '通貨',
         'key' => 'キー',
         'content' => 'コンテンツ',
@@ -313,10 +727,10 @@ return [
         'seo_keyword' => 'SEOキーワード',
         'seo_description' => 'SEO説明文',
         'default' => 'デフォルト',
-        'upload' => 'アップロード'
+        'upload' => 'アップロード',
     ],
     'placeholder' => [
-        'select' => '選択してください...'
+        'select' => '選択してください...',
     ],
     'title' => [
         'infomation' => '情報',
@@ -325,15 +739,22 @@ return [
         'error' => 'エラー',
     ],
     'filter' => [
+        'all' => 'すべて',
         'search' => '検索...',
         'reset' => 'リセット',
     ],
     'status' => [
         'active' => '有効',
-        'inactive' => '無効'
+        'inactive' => '無効',
     ],
     'message' => [
-        'dashboard.welcome' => '管理システムの準備が整いました。データの管理と運用をスムーズに開始できます。',
+        'selected' => '選択済み',
+        'nodata' => 'データがありません。',
+        'empty' => 'データがありません。',
+        'edit_slug' => '* この言語ではスラッグを手動で編集できます。',
+        'dashboard' => [
+            'welcome' => '管理システムの準備が整いました。データの管理と運用をスムーズに開始できます。',
+        ],
         'destroy' => ':name を削除してもよろしいですか？',
         'destroys' => '選択したすべての項目を削除してもよろしいですか？',
         'security_notice' => '別の端末でログインされています。',
@@ -342,14 +763,14 @@ return [
             'password_confirm' => 'パスワードが一致しません。',
             'created' => ':name の作成に失敗しました。',
             'edit' => ':name の編集に失敗しました。',
-            'deleted' => '削除するデータが見つかりません。'
+            'deleted' => '削除するデータが見つかりません。',
         ],
         'success' => [
             'created' => ':name を作成しました。',
             'edit' => ':name を更新しました。',
             'deleted' => ':name を削除しました。',
             'restored' => ':name を復元しました。',
-        ]
+        ],
     ],
     'tinymce' => [
         'name' => '画像ライブラリ',
@@ -358,12 +779,12 @@ return [
             'create_folder' => 'フォルダ作成',
             'save' => '保存',
             'cancel' => 'キャンセル',
-            'close' => '閉じる'
+            'close' => '閉じる',
         ],
         'label' => [
             'folder' => 'フォルダ',
             'file' => 'ファイル',
-            'new_name' => '新しい名前を入力:'
+            'new_name' => '新しい名前を入力:',
         ],
         'message' => [
             'delete' => 'この :name を削除しますか？',
@@ -373,8 +794,8 @@ return [
                 'move' => 'ファイルを移動できません！',
                 'create_folder' => 'フォルダ作成エラー',
                 'delete' => '削除エラー！',
-                'rename' => '名前変更エラー！'
-            ]
-        ]
-    ]
+                'rename' => '名前変更エラー！',
+            ],
+        ],
+    ],
 ];
