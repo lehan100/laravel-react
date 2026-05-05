@@ -19,8 +19,6 @@ function EditPage() {
         sku: item?.sku || '',
         quantity: item?.quantity ?? 0,
         weight: item?.weight ?? 0,
-        brand: item?.brand || '',
-        base_price: formatPriceInput(convertPriceToDisplay(item?.base_price ?? item?.price ?? 0, productCurrency), productCurrency),
         price: formatPriceInput(convertPriceToDisplay(item?.price ?? 0, productCurrency), productCurrency),
         status: item?.status ?? 0,
         is_stock: item?.is_stock ? 1 : 0,
@@ -34,6 +32,7 @@ function EditPage() {
         variants: Array.isArray(item?.variants)
             ? item.variants.map((variant: any) => ({
                 id: variant.id,
+                translations: variant.translations || (variant.name ? { [currentLocale]: { name: variant.name } } : {}),
                 sku: variant.sku || '',
                 price: formatPriceInput(convertPriceToDisplay(variant.price ?? 0, productCurrency), productCurrency),
                 stock: variant.stock ?? 0,
@@ -48,7 +47,6 @@ function EditPage() {
     });
     form.transform((payload: any) => ({
         ...payload,
-        base_price: convertPriceToBase(payload.base_price, productCurrency),
         price: convertPriceToBase(payload.price, productCurrency),
         variants: Array.isArray(payload.variants)
             ? payload.variants.map((variant: any) => ({

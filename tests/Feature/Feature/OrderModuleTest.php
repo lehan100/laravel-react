@@ -4,7 +4,9 @@ namespace Tests\Feature\Feature;
 
 use App\Http\Requests\Sales\OrderRequest;
 use App\Models\Catalog\Product;
+use App\Models\Catalog\ProductVariant;
 use App\Models\Sales\Order;
+use App\Models\Sales\OrderItem;
 use App\Models\Sales\OrderTimeline;
 use App\Models\Sales\PaymentMethod;
 use App\Models\Users\User;
@@ -31,7 +33,12 @@ class OrderModuleTest extends TestCase
             'items' => [],
         ];
 
-        $validator = Validator::make($payload, (new OrderRequest)->rules());
+        $request = new OrderRequest;
+        $request->merge($payload);
+        $validator = Validator::make($payload, $request->rules());
+        foreach ($request->after() as $callback) {
+            $callback($validator);
+        }
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('order_status', $validator->errors()->messages());
@@ -41,6 +48,9 @@ class OrderModuleTest extends TestCase
     #[Test]
     public function it_rejects_products_with_zero_stock(): void
     {
+        $user = User::factory()->create([
+            'account_id' => 1,
+        ]);
         $product = $this->createProduct('SKU-OUT', 'Out Of Stock Product', 100000, 0);
 
         $payload = [
@@ -59,10 +69,9 @@ class OrderModuleTest extends TestCase
             ],
         ];
 
-        $validator = Validator::make($payload, (new OrderRequest)->rules());
-
-        $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('items.0.product_id', $validator->errors()->messages());
+        $this->actingAs($user)
+            ->post(route('orders.store'), $payload)
+            ->assertSessionHasErrors('items.0.product_id');
     }
 
     #[Test]
@@ -140,6 +149,55 @@ class OrderModuleTest extends TestCase
             'product_name' => 'Product One',
             'quantity' => 2,
         ]);
+    }
+
+    #[Test]
+    public function it_requires_variant_when_product_has_variants_and_stores_variant_snapshot(): void
+    {
+        $user = User::factory()->create([
+            'account_id' => 1,
+        ]);
+
+        $product = $this->createProduct('SKU-VAR', 'Variant Product', 100000, 20);
+        $variant = ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'sku' => 'SKU-VAR-RED',
+            'price' => 125000,
+            'stock' => 5,
+            'image' => null,
+            'images' => [],
+        ]);
+
+        $payload = [
+            'customer_name' => 'Nguyen Van A',
+            'order_status' => 'pending',
+            'payment_status' => 'unpaid',
+            'shipping_status' => 'pending',
+            'discount_total' => 0,
+            'shipping_total' => 0,
+            'items' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 1,
+                    'unit_price' => 125000,
+                ],
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->post(route('orders.store'), $payload)
+            ->assertSessionHasErrors('items.0.variant_id');
+
+        $payload['items'][0]['variant_id'] = $variant->id;
+
+        $response = $this->actingAs($user)->post(route('orders.store'), $payload);
+        $order = Order::query()->with('items')->latest('id')->firstOrFail();
+
+        $response->assertRedirect(route('orders.edit', $order->id));
+
+        $orderItem = OrderItem::query()->where('order_id', $order->id)->firstOrFail();
+        $this->assertSame($variant->id, $orderItem->meta['variant']['id'] ?? null);
+        $this->assertSame('SKU-VAR-RED', $orderItem->product_sku);
     }
 
     #[Test]

@@ -101,7 +101,8 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
         return $orders
             ->groupBy('order_status')
             ->map(fn (Collection $items, string $status) => [
-                'label' => $status,
+                'status' => $status,
+                'label' => __('hancms.sales.orders.statuses.order.'.$status),
                 'value' => $items->count(),
             ])
             ->values()

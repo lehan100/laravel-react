@@ -23,7 +23,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
   const routers: any = {
     dashboard: ['dashboard'],
     users: ['roles', 'users'],
-    catalog: ['category', 'product', 'post'],
+    catalog: ['category', 'product', 'attribute', 'post'],
     media: ['media-position', 'media-banner'],
     reports: ['report-revenue', 'report-product', 'report-inventory', 'report-promotion'],
     sales: ['warehouse', 'orders', 'payment-methods', 'shipping-methods'],
@@ -110,6 +110,17 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
                   text={trans('hancms.catalog.product.name')}
                   link="product.index"
                   icon={<Package size={20} />}
+                />
+              </li>
+            )}
+            {can('attribute.index') && (
+              <li>
+                <MainMenuItem
+                  mobile={mobile}
+                  onNavigate={onNavigate}
+                  text={trans('hancms.catalog.attribute.name')}
+                  link="attribute.index"
+                  icon={<Tags size={20} />}
                 />
               </li>
             )}

@@ -24,8 +24,6 @@ class Product extends Model implements TranslatableContract
         'sku',
         'quantity',
         'weight',
-        'brand',
-        'base_price',
         'price',
         'status',
         'is_coupon',
@@ -47,7 +45,6 @@ class Product extends Model implements TranslatableContract
     protected $casts = [
         'is_coupon' => 'boolean',
         'is_stock' => 'boolean',
-        'base_price' => 'decimal:2',
         'price' => 'decimal:2',
     ];
 

@@ -28,12 +28,14 @@ type DashboardProps = PageProps<{
     metrics: DashboardMetric[];
     summary: Record<string, number>;
     revenueChart: Array<{
+      date: string;
       label: string;
       revenue: number;
       revenue_label: string;
       orders: number;
     }>;
     orderStatusChart: Array<{
+      status: string;
       label: string;
       value: number;
     }>;
@@ -68,6 +70,47 @@ const metricToneClasses: Record<string, string> = {
   emerald: 'from-emerald-50 to-white text-emerald-900 ring-emerald-100',
   amber: 'from-amber-50 to-white text-amber-900 ring-amber-100',
   slate: 'from-slate-50 to-white text-slate-900 ring-slate-100',
+};
+
+const orderStatusToneClasses: Record<string, { badge: string; bar: string; text: string }> = {
+  pending: {
+    badge: 'bg-amber-50 text-amber-700 ring-amber-200',
+    bar: 'from-amber-400 to-amber-600',
+    text: 'text-amber-700',
+  },
+  confirmed: {
+    badge: 'bg-sky-50 text-sky-700 ring-sky-200',
+    bar: 'from-sky-400 to-sky-700',
+    text: 'text-sky-700',
+  },
+  processing: {
+    badge: 'bg-indigo-50 text-indigo-700 ring-indigo-200',
+    bar: 'from-indigo-400 to-indigo-700',
+    text: 'text-indigo-700',
+  },
+  completed: {
+    badge: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+    bar: 'from-emerald-400 to-emerald-700',
+    text: 'text-emerald-700',
+  },
+  cancelled: {
+    badge: 'bg-rose-50 text-rose-700 ring-rose-200',
+    bar: 'from-rose-400 to-rose-700',
+    text: 'text-rose-700',
+  },
+};
+
+const paymentStatusToneClasses: Record<string, string> = {
+  unpaid: 'bg-amber-50 text-amber-700 ring-amber-200',
+  paid: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  refunded: 'bg-violet-50 text-violet-700 ring-violet-200',
+  failed: 'bg-rose-50 text-rose-700 ring-rose-200',
+};
+
+const fallbackStatusTone = {
+  badge: 'bg-slate-100 text-slate-700 ring-slate-200',
+  bar: 'from-slate-400 to-slate-700',
+  text: 'text-slate-700',
 };
 
 function DashboardPage() {
@@ -232,20 +275,24 @@ function DashboardPage() {
                 {trans('hancms.dashboard.empty')}
               </div>
             )}
-            {dashboard.orderStatusChart.map(item => (
-              <div key={item.label} className="grid gap-2">
+            {dashboard.orderStatusChart.map(item => {
+              const tone = orderStatusToneClasses[item.status] || fallbackStatusTone;
+
+              return (
+              <div key={item.status || item.label} className="grid gap-2">
                 <div className="flex items-center justify-between gap-4 text-sm">
-                  <span className="font-medium capitalize text-slate-700">{item.label}</span>
-                  <span className="font-semibold text-slate-950">{item.value}</span>
+                  <span className={`font-semibold capitalize ${tone.text}`}>{item.label}</span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ${tone.badge}`}>{item.value}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-slate-900"
+                    className={`h-full rounded-full bg-gradient-to-r ${tone.bar}`}
                     style={{ width: `${Math.max(8, Math.round((item.value / maxStatus) * 100))}%` }}
                   />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -303,7 +350,11 @@ function DashboardPage() {
                     </td>
                   </tr>
                 )}
-                {dashboard.recentOrders.map(order => (
+                {dashboard.recentOrders.map(order => {
+                  const orderTone = orderStatusToneClasses[order.order_status] || fallbackStatusTone;
+                  const paymentTone = paymentStatusToneClasses[order.payment_status] || fallbackStatusTone.badge;
+
+                  return (
                   <tr key={order.id} className="border-b border-slate-100 last:border-0">
                     <td className="py-3 pr-4">
                       <Link href={route('orders.show', order.id)} className="font-semibold text-slate-900 hover:text-cyan-700">
@@ -312,18 +363,19 @@ function DashboardPage() {
                       <div className="mt-1 text-xs text-slate-500">{order.customer_name}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${orderTone.badge}`}>
                         {order.order_status_label || order.order_status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${paymentTone}`}>
                         {order.payment_status_label || order.payment_status}
                       </span>
                     </td>
                     <td className="py-3 pl-4 text-right font-semibold text-slate-950">{order.grand_total}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

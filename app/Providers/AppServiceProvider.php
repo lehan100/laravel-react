@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Catalog\AttributeValue;
 use App\Models\Catalog\Category;
 use App\Models\Catalog\Post;
 use App\Models\Catalog\Product;
+use App\Models\Catalog\ProductAttribute;
 use App\Models\Catalog\ProductPhoto;
 use App\Models\Media\MediaBanner;
 use App\Models\Media\MediaBannerTranslation;
@@ -12,6 +14,8 @@ use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
 use App\Models\Sales\Order;
+use App\Observers\AttributeObserver;
+use App\Observers\AttributeValueObserver;
 use App\Observers\CategoryObserver;
 use App\Observers\ImageFileObserver;
 use App\Observers\MediaBannerObserver;
@@ -21,6 +25,8 @@ use App\Observers\ProductObserver;
 use App\Observers\PromotionBuyToGiftObserver;
 use App\Observers\PromotionCouponObserver;
 use App\Observers\PromotionSaleOfferObserver;
+use App\Repositories\Attribute\AttributeEloquentRepository;
+use App\Repositories\Attribute\AttributeRepositoryInterface;
 use App\Repositories\BuyToGift\BuyToGiftEloquentRepository;
 use App\Repositories\BuyToGift\BuyToGiftRepositoryInterface;
 use App\Repositories\Category\CategoryEloquentRepository;
@@ -102,6 +108,10 @@ class AppServiceProvider extends ServiceProvider
             CategoryEloquentRepository::class
         );
         $this->app->singleton(
+            AttributeRepositoryInterface::class,
+            AttributeEloquentRepository::class
+        );
+        $this->app->singleton(
             ProductRepositoryInterface::class,
             ProductEloquentRepository::class
         );
@@ -166,6 +176,8 @@ class AppServiceProvider extends ServiceProvider
         // -------
         ProductPhoto::observe(ImageFileObserver::class);
         Product::observe(ProductObserver::class);
+        ProductAttribute::observe(AttributeObserver::class);
+        AttributeValue::observe(AttributeValueObserver::class);
         Order::observe(OrderObserver::class);
         // -------
         Post::observe(PostObserver::class);

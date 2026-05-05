@@ -19,6 +19,9 @@ return new class extends Migration
                 if (! Schema::hasColumn('orders', 'payment_method_id')) {
                     $table->unsignedBigInteger('payment_method_id')->nullable()->index();
                 }
+                if (! Schema::hasColumn('orders', 'price_snapshot')) {
+                    $table->json('price_snapshot')->nullable()->after('payment_method_id');
+                }
                 if (! Schema::hasColumn('orders', 'customer_name')) {
                     $table->string('customer_name')->nullable();
                 }
@@ -61,6 +64,9 @@ return new class extends Migration
                 if (! Schema::hasColumn('orders', 'placed_at')) {
                     $table->timestamp('placed_at')->nullable()->index();
                 }
+                if (! Schema::hasColumn('orders', 'deleted_at')) {
+                    $table->softDeletes();
+                }
             });
 
             return;
@@ -71,6 +77,7 @@ return new class extends Migration
             $table->string('order_number', 50)->unique();
             $table->unsignedInteger('user_id')->nullable()->index();
             $table->unsignedBigInteger('payment_method_id')->nullable()->index();
+            $table->json('price_snapshot')->nullable();
             $table->string('customer_name');
             $table->string('customer_email')->nullable();
             $table->string('customer_phone', 50)->nullable();
@@ -86,6 +93,7 @@ return new class extends Migration
             $table->decimal('grand_total', 15, 2)->default(0);
             $table->timestamp('placed_at')->nullable()->index();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

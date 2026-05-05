@@ -3,11 +3,15 @@
 namespace App\Repositories\Product;
 
 use App\Models\Catalog\Product;
+use App\Models\Catalog\ProductAttribute;
+use App\Models\Catalog\ProductVariant;
 use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class ProductEloquentRepository extends EloquentRepository implements ProductRepositoryInterface
 {
@@ -16,8 +20,6 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         'sku',
         'quantity',
         'weight',
-        'brand',
-        'base_price',
         'price',
         'is_coupon',
         'is_stock',
@@ -39,6 +41,22 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
     public function getModel()
     {
         return Product::class;
+    }
+
+    public function getAttributeRows(): Collection
+    {
+        return ProductAttribute::query()
+            ->with([
+                'translations',
+                'values' => function ($query) {
+                    $query->orderBy('order', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->with('translations');
+                },
+            ])
+            ->orderBy('order', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
     }
 
     public function lists($params = null, $options = null)
@@ -67,6 +85,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 'photos' => function ($q) {
                     $q->select(['id', 'product_id', 'filename', 'disk', 'order', 'is_default']);
                 },
+                'variants.translations',
                 'variants.attributeValues.attribute',
             ]);
 
@@ -100,6 +119,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                                 ->where('locale', $currentLocale);
                         }]);
                 },
+                'variants.translations',
                 'variants.attributeValues.attribute',
             ])->find($params['id']);
         }
@@ -148,9 +168,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
             }
             // 2. Lưu thông tin cơ bản (Bảng products)
             $item->sku = $params['sku'] ?? $item->sku;
-            $item->brand = $params['brand'] ?? null;
-            $item->base_price = $params['base_price'] ?? ($params['price'] ?? 0);
-            $item->price = $params['price'] ?? $item->base_price;
+            $item->price = $params['price'] ?? $item->price ?? 0;
             $item->quantity = $params['quantity'] ?? 0;
             $item->weight = $params['weight'] ?? 0;
             $item->status = $params['status'] ?? 0;
@@ -263,14 +281,17 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
             }
 
             $variant ??= $product->variants()->make();
+            $images = $this->syncVariantImageFiles($variantData);
+            $coverImage = $this->normalizeVariantImageName($variantData['image'] ?? null) ?? ($images[0] ?? null);
             $variant->fill([
                 'sku' => $variantData['sku'],
                 'price' => $variantData['price'],
                 'stock' => $variantData['stock'],
-                'image' => $variantData['image'] ?? ($variantData['images'][0] ?? null),
-                'images' => array_values(array_filter($variantData['images'] ?? [])),
+                'image' => $coverImage,
+                'images' => $images,
             ]);
             $variant->save();
+            $this->syncVariantTranslations($variant, is_array($variantData['translations'] ?? null) ? $variantData['translations'] : []);
             $variant->attributeValues()->sync($variantData['attribute_value_ids'] ?? []);
 
             $keptVariantIds[] = $variant->id;
@@ -279,6 +300,88 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         $product->variants()
             ->when($keptVariantIds !== [], fn ($query) => $query->whereNotIn('id', $keptVariantIds))
             ->delete();
+    }
+
+    private function syncVariantTranslations(ProductVariant $variant, array $translations): void
+    {
+        $keptLocales = [];
+
+        foreach ($translations as $locale => $translationData) {
+            $name = trim((string) ($translationData['name'] ?? ''));
+
+            if ($name === '') {
+                continue;
+            }
+
+            $variant->translations()->updateOrCreate(
+                ['locale' => (string) $locale],
+                ['name' => $name]
+            );
+
+            $keptLocales[] = (string) $locale;
+        }
+
+        $variant->translations()
+            ->when($keptLocales !== [], fn ($query) => $query->whereNotIn('locale', $keptLocales))
+            ->delete();
+    }
+
+    private function syncVariantImageFiles(array $variantData): array
+    {
+        $configPath = config('image.path.product');
+        $tempDir = $configPath['temp'] ?? 'var/temp';
+        $mainDir = $configPath['path'] ?? 'media/product';
+        $tempPath = public_path(trim($tempDir, '/'));
+        $mainPath = public_path(trim($mainDir, '/'));
+
+        if (! File::exists($mainPath)) {
+            File::makeDirectory($mainPath, 0755, true);
+        }
+
+        $normalizedImages = [];
+        $candidateImages = array_merge(
+            is_array($variantData['images'] ?? null) ? $variantData['images'] : [],
+            [$variantData['image'] ?? null]
+        );
+
+        foreach ($candidateImages as $fileName) {
+            $normalizedFileName = $this->normalizeVariantImageName($fileName);
+
+            if (! $normalizedFileName) {
+                continue;
+            }
+
+            $normalizedImages[] = $normalizedFileName;
+
+            $sourceFile = rtrim($tempPath, '/').'/'.$normalizedFileName;
+            $destinationFile = rtrim($mainPath, '/').'/'.$normalizedFileName;
+
+            if (File::exists($sourceFile) && ! File::exists($destinationFile)) {
+                File::copy($sourceFile, $destinationFile);
+                File::delete($sourceFile);
+            }
+        }
+
+        return array_values(array_unique($normalizedImages));
+    }
+
+    private function normalizeVariantImageName(mixed $image): ?string
+    {
+        if (! is_string($image)) {
+            return null;
+        }
+
+        $image = trim($image);
+
+        if ($image === '') {
+            return null;
+        }
+
+        $path = parse_url($image, PHP_URL_PATH);
+        $path = is_string($path) && $path !== '' ? $path : $image;
+        $fileName = basename($path);
+
+        return $fileName !== '' ? $fileName : null;
     }
 
     public function delete($params = null, $options = null)

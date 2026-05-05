@@ -19,8 +19,6 @@ function CreatedPage() {
         sku: '',
         quantity: 0,
         weight: 0,
-        brand: '',
-        base_price: formatPriceInput(convertPriceToDisplay(0, productCurrency), productCurrency),
         price: formatPriceInput(convertPriceToDisplay(0, productCurrency), productCurrency),
         status: 0,
         is_stock: 0,
@@ -36,7 +34,6 @@ function CreatedPage() {
     });
     form.transform((payload: any) => ({
         ...payload,
-        base_price: convertPriceToBase(payload.base_price, productCurrency),
         price: convertPriceToBase(payload.price, productCurrency),
         variants: Array.isArray(payload.variants)
             ? payload.variants.map((variant: any) => ({

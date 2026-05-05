@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\Catalog\AttributeController;
 use App\Http\Controllers\Admin\Catalog\CategoryController;
 use App\Http\Controllers\Admin\Catalog\PostController;
 use App\Http\Controllers\Admin\Catalog\ProductController;
@@ -55,6 +56,7 @@ Route::get('/check-ai', function () {
 Route::post('photo-upload', [ImageUploadController::class, 'storePhoto'])->name('photo.upload');
 Route::post('category-upload', [ImageUploadController::class, 'storeCategory'])->name('category.upload');
 Route::post('product-upload', [ImageUploadController::class, 'storeProduct'])->name('product.upload');
+Route::post('attribute-upload', [ImageUploadController::class, 'storeAttribute'])->name('attribute.upload');
 $prefixAdmin = config('configs.prefix.admin', 'admin');
 Route::prefix($prefixAdmin)->group(function () {
     Route::get('lang/{locale}', function ($locale) {
@@ -124,6 +126,7 @@ Route::prefix($prefixAdmin)->group(function () {
             'users' => UserController::class,
             'roles' => RoleController::class,
             'category' => CategoryController::class,
+            'attribute' => AttributeController::class,
             'product' => ProductController::class,
             'post' => PostController::class,
             'saleoffer' => SaleOfferController::class,
@@ -135,6 +138,7 @@ Route::prefix($prefixAdmin)->group(function () {
             'shipping-methods' => ShippingMethodController::class,
             'pages' => PageController::class,
         ];
+        Route::post('attribute/quick-save', [AttributeController::class, 'quickSave'])->name('attribute.quick-save');
 
         Route::get('report-revenue', [ReportRevenueController::class, 'index'])->name('report-revenue.index');
         Route::post('report-revenue/analyze', [ReportRevenueController::class, 'analyze'])->name('report-revenue.analyze');
@@ -148,6 +152,9 @@ Route::prefix($prefixAdmin)->group(function () {
         foreach ($resources as $uri => $controller) {
             if ($uri === 'warehouse') {
                 Route::put("$uri/{id}/toggle-stock", [$controller, 'toggleStock'])->name("$uri.toggle-stock");
+                Route::get("$uri/variants/{variant}/edit", [$controller, 'editVariant'])->name("$uri.variants.edit");
+                Route::put("$uri/variants/{variant}", [$controller, 'updateVariant'])->name("$uri.variants.update");
+                Route::put("$uri/variants/{variant}/toggle-stock", [$controller, 'toggleVariantStock'])->name("$uri.variants.toggle-stock");
             }
 
             Route::delete("$uri/destroy-many", [$controller, 'destroyMany'])->name("$uri.destroy-many");

@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
 import { Globe, Plus, RefreshCw, Save, Search, Sparkles, Trash2, X } from 'lucide-react';
+import { quickSave } from '@/actions/App/Http/Controllers/Admin/Catalog/AttributeController';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import SaveButton from '@/Components/Button/SaveButton';
 import BackButton from '@/Components/Button/BackButton';
@@ -33,6 +34,38 @@ interface Props {
     undo: number;
     handleUndo: (status: number) => void;
 }
+
+type QuickAttributeTranslation = {
+    locale: string;
+    name: string;
+};
+
+type QuickAttributeValueTranslation = {
+    locale: string;
+    value: string;
+};
+
+type QuickAttributeValueForm = {
+    translations: QuickAttributeValueTranslation[];
+    image: string;
+    image_url: string;
+    color: string;
+};
+
+type QuickAttributeFormState = {
+    code: string;
+    type: 'text' | 'image' | 'color';
+    translations: QuickAttributeTranslation[];
+    values: QuickAttributeValueForm[];
+};
+
+type QuickAttributeValueDraft = {
+    id?: number | null;
+    translations: QuickAttributeValueTranslation[];
+    image: string;
+    image_url: string;
+    color: string;
+};
 
 const ProductFormView = ({
     title,
@@ -84,14 +117,14 @@ const ProductFormView = ({
     const [variantDraft, setVariantDraft] = useState<any>(null);
     const [variantImageUploading, setVariantImageUploading] = useState(false);
     const [priceInput, setPriceInput] = useState(() => formatPriceInput(data.price, priceCurrency));
-    const [basePriceInput, setBasePriceInput] = useState(() => formatPriceInput(data.base_price ?? data.price, priceCurrency));
+    const [attributeList, setAttributeList] = useState<any[]>(attributes || []);
     const [selectedValueIdsByAttribute, setSelectedValueIdsByAttribute] = useState<Record<string, number[]>>(() => {
         const selected: Record<string, number[]> = {};
         const variants = Array.isArray(data.variants) ? data.variants : [];
 
         variants.forEach((variant: any) => {
             (variant.attribute_value_ids || []).forEach((valueId: any) => {
-                const attribute = attributes.find((attr: any) =>
+                const attribute = attributeList.find((attr: any) =>
                     (attr.values || []).some((value: any) => Number(value.id) === Number(valueId))
                 );
 
@@ -104,10 +137,106 @@ const ProductFormView = ({
 
         return selected;
     });
+    const [isQuickAttributeModalOpen, setIsQuickAttributeModalOpen] = useState(false);
+    const [isQuickAttributeSubmitting, setIsQuickAttributeSubmitting] = useState(false);
+    const [isQuickAttributeImageUploading, setIsQuickAttributeImageUploading] = useState(false);
+    const [quickAttributeErrors, setQuickAttributeErrors] = useState<Record<string, string>>({});
+    const [isQuickValueModalOpen, setIsQuickValueModalOpen] = useState(false);
+    const [isQuickValueSubmitting, setIsQuickValueSubmitting] = useState(false);
+    const [isQuickValueImageUploading, setIsQuickValueImageUploading] = useState(false);
+    const [quickValueErrors, setQuickValueErrors] = useState<Record<string, string>>({});
+    const [quickValueAttributeId, setQuickValueAttributeId] = useState<number | null>(null);
+    const [quickValueDraft, setQuickValueDraft] = useState<QuickAttributeValueDraft | null>(null);
+    const [quickAttributeDraft, setQuickAttributeDraft] = useState<QuickAttributeFormState>(() => ({
+        code: '',
+        type: 'text',
+        translations: langList.slice(0, 3).map((lang: any) => ({
+            locale: lang.code,
+            name: '',
+        })),
+        values: [
+                {
+                    translations: langList.slice(0, 3).map((lang: any) => ({
+                        locale: lang.code,
+                        value: '',
+                    })),
+                    image: '',
+                    image_url: '',
+                    color: '#000000',
+                },
+            ],
+    }));
     const [aiSuggestingLocale, setAiSuggestingLocale] = useState<string | null>(null);
     const [aiSuggestionError, setAiSuggestionError] = useState('');
     const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
+    useEffect(() => {
+        setAttributeList(attributes || []);
+    }, [attributes]);
+    const currentVariantLanguage = langList.find((item: any) => item.code === currentTab) || langList[0] || null;
+    const currentVariantLocale = currentVariantLanguage?.code || currentTab || langCode || 'vi';
+    const variantLocales = langList.slice(0, 3);
+    const quickAttributeLocales = langList.slice(0, 3);
+    const quickValueAttribute = quickValueAttributeId !== null
+        ? attributeList.find((item: any) => Number(item.id) === Number(quickValueAttributeId))
+        : null;
+    const getTranslatedValue = (translations: any, locale: string, fallbackFields: string[]) => {
+        if (!translations) {
+            return '';
+        }
+
+        const localeCandidates = getLocaleCandidates(locale);
+
+        if (Array.isArray(translations)) {
+            const matched = translations.find((item) => localeCandidates.includes(String(item?.locale)));
+
+            if (matched) {
+                for (const field of fallbackFields) {
+                    if (matched?.[field]) {
+                        return matched[field];
+                    }
+                }
+            }
+
+            for (const item of translations) {
+                for (const field of fallbackFields) {
+                    if (item?.[field]) {
+                        return item[field];
+                    }
+                }
+            }
+
+            return '';
+        }
+
+        if (typeof translations === 'object') {
+            const matched = localeCandidates.reduce((result: any, candidate) => result || translations[candidate], null);
+
+            if (matched) {
+                for (const field of fallbackFields) {
+                    if (matched?.[field]) {
+                        return matched[field];
+                    }
+                }
+            }
+
+            for (const item of Object.values(translations)) {
+                for (const field of fallbackFields) {
+                    if ((item as any)?.[field]) {
+                        return (item as any)[field];
+                    }
+                }
+            }
+        }
+
+        return '';
+    };
+    const getLanguageLogoUrl = (lang: any) => {
+        const languagePath = props.languageConfigPath?.path;
+        if (!languagePath || !lang?.photo) return '';
+
+        return `/${String(languagePath).replace(/^\/+|\/+$/g, '')}/${String(lang.photo).replace(/^\/+/, '')}`;
+    };
     const selectedCategoryIds = Array.isArray(data.category_ids) ? data.category_ids : [];
     const selectedFiles = Array.isArray(data.photos) ? data.photos : [];
     const defaultPhotoId = data.default_photo_id ?? item?.default_photo_id ?? existingPhotos.find((photo: any) => photo.is_default)?.id ?? null;
@@ -118,7 +247,6 @@ const ProductFormView = ({
 
     useEffect(() => {
         setPriceInput(formatPriceInput(data.price, priceCurrency));
-        setBasePriceInput(formatPriceInput(data.base_price ?? data.price, priceCurrency));
     }, [priceCurrency.code]);
 
     const getVariantKey = (attributeValueIds: any[]) => attributeValueIds
@@ -126,17 +254,56 @@ const ProductFormView = ({
         .sort((a, b) => a - b)
         .join('-');
 
-    const buildCombinations = (groups: number[][]): number[][] => {
-        if (groups.length === 0) return [];
+    const getLocaleCandidates = (locale: string) => {
+        const normalizedLocale = String(locale);
+        const candidates = new Set<string>([normalizedLocale]);
+        const matchedIndex = langList.findIndex((lang: any) => String(lang.code) === normalizedLocale);
 
-        return groups.reduce<number[][]>((result, group) => {
-            if (result.length === 0) {
-                return group.map((id) => [id]);
-            }
+        if (matchedIndex >= 0) {
+            candidates.add(String(matchedIndex));
+        }
 
-            return result.flatMap((combination) => group.map((id) => [...combination, id]));
-        }, []);
+        return Array.from(candidates);
     };
+
+    const normalizeTranslationList = (translations: any) => {
+        if (!translations) {
+            return [];
+        }
+
+        const items = Array.isArray(translations)
+            ? translations
+            : typeof translations === 'object'
+                ? Object.values(translations)
+                : [];
+
+        return items.map((item: any, index: number) => ({
+            ...item,
+            locale: String(item?.locale ?? langList[index]?.code ?? ''),
+        }));
+    };
+
+    const getLocalizedAttributeName = (attribute: any) => {
+        return getTranslatedValue(attribute?.translations, currentVariantLocale, ['name']) || attribute?.name || '-';
+    };
+
+    const getLocalizedAttributeValue = (value: any) => {
+        return getTranslatedValue(value?.translations, currentVariantLocale, ['value', 'name']) || value?.value || '-';
+    };
+
+    const buildEmptyVariantTranslations = () => variantLocales.reduce((translations: Record<string, { name: string }>, lang: any) => {
+        translations[lang.code] = { name: '' };
+
+        return translations;
+    }, {});
+
+    const normalizeVariantTranslations = (translations: any = {}) => variantLocales.reduce((result: Record<string, { name: string }>, lang: any) => {
+        result[lang.code] = {
+            name: translations?.[lang.code]?.name || '',
+        };
+
+        return result;
+    }, {});
 
     const toggleAttributeValue = (attributeId: number, valueId: number) => {
         setSelectedValueIdsByAttribute((prev) => {
@@ -153,36 +320,407 @@ const ProductFormView = ({
         });
     };
 
-    const generateVariantRows = () => {
-        const groups = attributes
-            .map((attribute: any) => selectedValueIdsByAttribute[String(attribute.id)] || [])
-            .filter((values: number[]) => values.length > 0);
-        const combinations = buildCombinations(groups);
-        const existingVariants = Array.isArray(data.variants) ? data.variants : [];
-        const existingByKey = new Map(existingVariants.map((variant: any) => [
-            getVariantKey(variant.attribute_value_ids || []),
-            variant,
-        ]));
-        const baseSku = String(data.sku || 'VAR').trim() || 'VAR';
+    const openQuickAttributeModal = () => {
+        setQuickAttributeErrors({});
+        setQuickAttributeDraft({
+            code: '',
+            type: 'text',
+            translations: quickAttributeLocales.map((lang: any) => ({
+                locale: lang.code,
+                name: '',
+            })),
+            values: [
+                {
+                    translations: quickAttributeLocales.map((lang: any) => ({
+                        locale: lang.code,
+                        value: '',
+                    })),
+                    image: '',
+                    image_url: '',
+                    color: '#000000',
+                },
+            ],
+        });
+        setIsQuickAttributeModalOpen(true);
+    };
 
-        setData('variants', combinations.map((attributeValueIds) => {
-            const key = getVariantKey(attributeValueIds);
-            const existing = existingByKey.get(key);
+    const closeQuickAttributeModal = () => {
+        setIsQuickAttributeModalOpen(false);
+        setIsQuickAttributeSubmitting(false);
+        setIsQuickAttributeImageUploading(false);
+        setQuickAttributeErrors({});
+    };
 
-            if (existing) {
-                return existing;
+    const buildQuickValueDraft = (): QuickAttributeValueDraft => ({
+        translations: quickAttributeLocales.map((lang: any) => ({
+            locale: lang.code,
+            value: '',
+        })),
+        image: '',
+        image_url: '',
+        color: '#000000',
+    });
+
+    const openQuickValueModal = (attribute: any) => {
+        setQuickValueErrors({});
+        setQuickValueAttributeId(Number(attribute?.id) || null);
+        setQuickValueDraft(buildQuickValueDraft());
+        setIsQuickValueModalOpen(true);
+    };
+
+    const closeQuickValueModal = () => {
+        setIsQuickValueModalOpen(false);
+        setIsQuickValueSubmitting(false);
+        setIsQuickValueImageUploading(false);
+        setQuickValueErrors({});
+        setQuickValueAttributeId(null);
+        setQuickValueDraft(null);
+    };
+
+    const updateQuickValueTranslation = (index: number, value: string) => {
+        setQuickValueDraft((current) => {
+            if (!current) {
+                return current;
+            }
+
+            const translations = current.translations.slice();
+            translations[index] = {
+                ...translations[index],
+                value,
+            };
+
+            return {
+                ...current,
+                translations,
+            };
+        });
+    };
+
+    const updateQuickValueColor = (color: string) => {
+        setQuickValueDraft((current) => {
+            if (!current) {
+                return current;
             }
 
             return {
-                sku: `${baseSku}-${key}`,
-                price: data.base_price || data.price || 0,
-                stock: 0,
-                image: '',
-                image_url: '',
-                images: [],
-                image_urls: [],
-                attribute_value_ids: attributeValueIds,
+                ...current,
+                color,
             };
+        });
+    };
+
+    const updateQuickAttributeTranslation = (index: number, value: string) => {
+        setQuickAttributeDraft((current) => {
+            const translations = current.translations.slice();
+            translations[index] = {
+                ...translations[index],
+                name: value,
+            };
+
+            return {
+                ...current,
+                translations,
+            };
+        });
+    };
+
+    const updateQuickAttributeValueTranslation = (index: number, valueIndex: number, value: string) => {
+        setQuickAttributeDraft((current) => {
+            const values = current.values.slice();
+            const translations = values[valueIndex].translations.slice();
+            translations[index] = {
+                ...translations[index],
+                value,
+            };
+            values[valueIndex] = {
+                ...values[valueIndex],
+                translations,
+            };
+
+            return {
+                ...current,
+                values,
+            };
+        });
+    };
+
+    const appendQuickAttributeValue = () => {
+        setQuickAttributeDraft((current) => ({
+            ...current,
+            values: [
+                ...current.values,
+                {
+                    translations: quickAttributeLocales.map((lang: any) => ({
+                        locale: lang.code,
+                        value: '',
+                    })),
+                    image: '',
+                    image_url: '',
+                    color: '#000000',
+                },
+            ],
+        }));
+    };
+
+    const removeQuickAttributeValue = (valueIndex: number) => {
+        setQuickAttributeDraft((current) => {
+            const values = current.values.filter((_, index) => index !== valueIndex);
+
+            return {
+                ...current,
+                values: values.length > 0 ? values : [
+                    {
+                        translations: quickAttributeLocales.map((lang: any) => ({
+                            locale: lang.code,
+                            value: '',
+                        })),
+                        image: '',
+                        image_url: '',
+                        color: '#000000',
+                    },
+                ],
+            };
+        });
+    };
+
+    const uploadQuickAttributeImage = async (file: File): Promise<{ file_name: string; url: string }> => {
+        const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+        const formData = new FormData();
+        formData.append('photo', file);
+
+        const response = await fetch(route('attribute.upload'), {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('Unable to upload attribute image');
+        }
+
+        return response.json();
+    };
+
+    const updateQuickAttributeValueImage = async (valueIndex: number, file: File | null) => {
+        if (!file) {
+            return;
+        }
+
+        setIsQuickAttributeImageUploading(true);
+
+        try {
+            const response = await uploadQuickAttributeImage(file);
+            setQuickAttributeDraft((current) => {
+                const values = current.values.slice();
+                values[valueIndex] = {
+                    ...values[valueIndex],
+                    image: response.file_name,
+                    image_url: response.url,
+                };
+
+                return {
+                    ...current,
+                    values,
+                };
+            });
+        } finally {
+            setIsQuickAttributeImageUploading(false);
+        }
+    };
+
+    const uploadQuickValueImage = async (file: File): Promise<{ file_name: string; url: string }> => {
+        const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+        const formData = new FormData();
+        formData.append('photo', file);
+
+        const response = await fetch(route('attribute.upload'), {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('Unable to upload attribute image');
+        }
+
+        return response.json();
+    };
+
+    const updateQuickValueImage = async (file: File | null) => {
+        if (!file) {
+            return;
+        }
+
+        setIsQuickValueImageUploading(true);
+
+        try {
+            const response = await uploadQuickValueImage(file);
+            setQuickValueDraft((current) => {
+                if (!current) {
+                    return current;
+                }
+
+                return {
+                    ...current,
+                    image: response.file_name,
+                    image_url: response.url,
+                };
+            });
+        } finally {
+            setIsQuickValueImageUploading(false);
+        }
+    };
+
+    const submitQuickAttribute = () => {
+        setIsQuickAttributeSubmitting(true);
+        setQuickAttributeErrors({});
+
+        const payload = {
+            ...quickAttributeDraft,
+            values: quickAttributeDraft.values.map((value, index) => ({
+                ...value,
+                order: index,
+            })),
+            status: 1,
+            order: 0,
+        };
+
+        axios.post(quickSave().url, payload, {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        }).then((response) => {
+            if (response?.data?.attribute) {
+                const createdAttribute = response.data.attribute;
+                setAttributeList((current) => [...current, createdAttribute]);
+            }
+
+            closeQuickAttributeModal();
+        }).catch((error) => {
+            setQuickAttributeErrors(error?.response?.data?.errors || {});
+        }).finally(() => {
+            setIsQuickAttributeSubmitting(false);
+        });
+    };
+
+    const submitQuickValue = () => {
+        if (!quickValueDraft || quickValueAttributeId === null) {
+            return;
+        }
+
+        const attribute = attributeList.find((item: any) => Number(item.id) === Number(quickValueAttributeId));
+        if (!attribute) {
+            return;
+        }
+
+        setIsQuickValueSubmitting(true);
+        setQuickValueErrors({});
+
+        const existingValues = Array.isArray(attribute.values) ? attribute.values : [];
+        const newValueIndex = existingValues.length;
+        const payload = {
+            id: attribute.id,
+            code: attribute.code || '',
+            type: attribute.type || 'text',
+            status: Number(attribute.status ?? 1),
+            order: Number(attribute.order ?? 0),
+            translations: normalizeTranslationList(attribute.translations).map((translation: any) => ({
+                locale: translation.locale,
+                name: translation.name || '',
+            })),
+            values: [
+                ...existingValues.map((value: any) => ({
+                    id: value.id,
+                    translations: normalizeTranslationList(value.translations).map((translation: any) => ({
+                        locale: translation.locale,
+                        value: translation.value || translation.name || '',
+                    })),
+                    image: value.image || '',
+                    color: value.color || '',
+                })),
+                {
+                    translations: quickValueDraft.translations.map((translation) => ({
+                        locale: translation.locale,
+                        value: translation.value,
+                    })),
+                    image: quickValueDraft.image || '',
+                    color: quickValueDraft.color || '',
+                    order: existingValues.length,
+                },
+            ],
+        };
+
+        axios.post(quickSave().url, payload, {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        }).then((response) => {
+            if (response?.data?.attribute) {
+                const updatedAttribute = response.data.attribute;
+                setAttributeList((current) => current.map((item: any) =>
+                    Number(item.id) === Number(updatedAttribute.id) ? updatedAttribute : item
+                ));
+            }
+
+            closeQuickValueModal();
+        }).catch((error) => {
+            const errors = error?.response?.data?.errors || {};
+            const mappedErrors: Record<string, string> = {};
+
+            Object.entries(errors).forEach(([key, message]) => {
+                const prefix = `values.${newValueIndex}.`;
+
+                if (!key.startsWith(prefix)) {
+                    return;
+                }
+
+                const normalizedKey = key.slice(prefix.length);
+
+                if (normalizedKey.startsWith('translations.')) {
+                    const translationMatch = normalizedKey.match(/^translations\.(\d+)\.value$/);
+
+                    if (translationMatch) {
+                        mappedErrors[`translations.${translationMatch[1]}.value`] = message as string;
+                    }
+
+                    return;
+                }
+
+                if (normalizedKey === 'image' || normalizedKey === 'color') {
+                    mappedErrors[normalizedKey] = message as string;
+                }
+            });
+
+            if (Object.keys(mappedErrors).length === 0 && error?.response?.data?.message) {
+                mappedErrors.form = error.response.data.message;
+            }
+
+            setQuickValueErrors(mappedErrors);
+        }).finally(() => {
+            setIsQuickValueSubmitting(false);
+        });
+    };
+
+    const updateVariantDraftTranslation = (locale: string, value: string) => {
+        setVariantDraft((prev: any) => ({
+            ...(prev || {}),
+            translations: {
+                ...(prev?.translations || {}),
+                [locale]: {
+                    ...(prev?.translations?.[locale] || {}),
+                    name: value,
+                },
+            },
         }));
     };
 
@@ -198,7 +736,10 @@ const ProductFormView = ({
     const openVariantModal = (index: number) => {
         const variants = Array.isArray(data.variants) ? data.variants : [];
         setEditingVariantIndex(index);
-        setVariantDraft({ ...(variants[index] || {}) });
+        setVariantDraft({
+            ...(variants[index] || {}),
+            translations: normalizeVariantTranslations(variants[index]?.translations || {}),
+        });
     };
 
     const closeVariantModal = () => {
@@ -293,10 +834,10 @@ const ProductFormView = ({
     };
 
     const getAttributeValueLabel = (valueId: number) => {
-        for (const attribute of attributes) {
+        for (const attribute of attributeList) {
             const value = (attribute.values || []).find((item: any) => Number(item.id) === Number(valueId));
             if (value) {
-                return `${attribute.name}: ${value.value}`;
+                return `${getLocalizedAttributeName(attribute)}: ${getLocalizedAttributeValue(value)}`;
             }
         }
 
@@ -516,38 +1057,6 @@ const ProductFormView = ({
                             onChange={(e) => setData('quantity', e.target.value)}
                         />
                         {errors?.quantity && <MessageError>{errors.quantity}</MessageError>}
-                    </InputGroup>
-                    <InputGroup label={trans('hancms.column.brand') || 'Brand'}>
-                        <input
-                            type="text"
-                            className={inputClass('brand')}
-                            value={data.brand || ''}
-                            onChange={(e) => setData('brand', e.target.value)}
-                        />
-                        {errors?.brand && <MessageError>{errors.brand}</MessageError>}
-                    </InputGroup>
-                    <InputGroup label={trans('hancms.catalog.product.fields.base_price') || 'Base price'}>
-                        <div className="relative">
-                            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-semibold text-slate-500">
-                                {priceSymbol}
-                            </span>
-                            <input
-                                type="text"
-                                inputMode={priceCurrency.code === 'VND' || priceCurrency.code === 'JPY' || priceCurrency.code === 'KRW' ? 'numeric' : 'decimal'}
-                                className={`${inputClass('base_price')} pl-8`}
-                                value={basePriceInput}
-                                onChange={(e) => {
-                                    setBasePriceInput(e.target.value);
-                                    setData('base_price', e.target.value);
-                                }}
-                                onBlur={() => {
-                                    const formatted = formatPriceInput(basePriceInput, priceCurrency);
-                                    setBasePriceInput(formatted);
-                                    setData('base_price', formatted);
-                                }}
-                            />
-                        </div>
-                        {errors?.base_price && <MessageError>{errors.base_price}</MessageError>}
                     </InputGroup>
                     <InputGroup label={trans('hancms.column.price')}>
                         <div className="relative">
@@ -928,28 +1437,37 @@ const ProductFormView = ({
                         </div>
                         <button
                             type="button"
-                            onClick={generateVariantRows}
-                            disabled={attributes.length === 0}
-                            className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-4 py-3 text-xs font-black uppercase text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                            onClick={openQuickAttributeModal}
+                            className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-4 py-3 text-xs font-black uppercase text-white transition hover:bg-slate-700"
                         >
-                            <RefreshCw size={15} />
-                            {trans('hancms.catalog.product.variants.generate') || 'Generate variants'}
+                            <Plus size={15} />
+                            {trans('hancms.catalog.product.variants.create_attribute') || 'Tạo thuộc tính'}
                         </button>
                     </div>
 
-                    {attributes.length === 0 ? (
+                    {attributeList.length === 0 ? (
                         <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-500">
                             {trans('hancms.catalog.product.variants.empty_attributes') || 'Create product attributes and values before generating variants.'}
                         </div>
                     ) : (
                         <div className="grid gap-4 lg:grid-cols-2">
-                            {attributes.map((attribute: any) => {
+                            {attributeList.map((attribute: any) => {
                                 const selectedValues = selectedValueIdsByAttribute[String(attribute.id)] || [];
 
                                 return (
                                     <div key={attribute.id} className="rounded-xl border border-slate-200 bg-white p-4">
                                         <div className="mb-3 flex items-center justify-between gap-3">
-                                            <div className="text-sm font-bold text-slate-800">{attribute.name}</div>
+                                            <div className="flex min-w-0 flex-1 items-center gap-2">
+                                                <div className="text-sm font-bold text-slate-800">{getLocalizedAttributeName(attribute)}</div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openQuickValueModal(attribute)}
+                                                    className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2 py-1 text-[11px] font-black uppercase text-slate-700 transition hover:bg-slate-50"
+                                                >
+                                                    <Plus size={12} />
+                                                    {trans('hancms.catalog.attribute.fields.add_value')}
+                                                </button>
+                                            </div>
                                             <div className="text-xs font-semibold text-slate-400">
                                                 {selectedValues.length}/{attribute.values?.length || 0}
                                             </div>
@@ -968,7 +1486,7 @@ const ProductFormView = ({
                                                             : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-400'
                                                             }`}
                                                     >
-                                                        {value.value}
+                                                        {getLocalizedAttributeValue(value)}
                                                     </button>
                                                 );
                                             })}
@@ -995,8 +1513,9 @@ const ProductFormView = ({
                             onClick={() => setData('variants', [
                                 ...variants,
                                 {
+                                    translations: buildEmptyVariantTranslations(),
                                     sku: data.sku ? `${data.sku}-${variants.length + 1}` : '',
-                                    price: data.base_price || data.price || 0,
+                                    price: data.price || 0,
                                     stock: 0,
                                     image: '',
                                     image_url: '',
@@ -1018,10 +1537,11 @@ const ProductFormView = ({
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="min-w-[980px] w-full text-left text-sm">
+                            <table className="min-w-[1120px] w-full text-left text-sm">
                                 <thead className="bg-slate-50 text-xs font-black uppercase text-slate-500">
                                     <tr>
                                         <th className="px-4 py-3">{trans('hancms.column.attributes') || 'Attributes'}</th>
+                                        <th className="px-4 py-3">{trans('hancms.column.name') || 'Name'}</th>
                                         <th className="px-4 py-3">{trans('hancms.column.sku')}</th>
                                         <th className="px-4 py-3">{trans('hancms.column.price')}</th>
                                         <th className="px-4 py-3">{trans('hancms.column.stock') || 'Stock'}</th>
@@ -1033,6 +1553,7 @@ const ProductFormView = ({
                                 <tbody className="divide-y divide-slate-100">
                                     {variants.map((variant: any, index: number) => {
                                         const attributeValueIds = variant.attribute_value_ids || [];
+                                        const variantName = variant?.translations?.[currentVariantLocale]?.name || variant?.name || '-';
 
                                         return (
                                             <tr key={variant.id || getVariantKey(attributeValueIds) || index} className="align-top">
@@ -1051,6 +1572,10 @@ const ProductFormView = ({
                                                     {errors?.[`variants.${index}.attribute_value_ids`] && (
                                                         <MessageError>{errors[`variants.${index}.attribute_value_ids`]}</MessageError>
                                                     )}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <div className="max-w-[240px] font-semibold text-slate-800">{variantName}</div>
+                                                    {errors?.[`variants.${index}.translations`] && <MessageError>{errors[`variants.${index}.translations`]}</MessageError>}
                                                 </td>
                                                 <td className="px-4 py-4">
                                                     <div className="font-semibold text-slate-800">{variant.sku || '-'}</div>
@@ -1150,7 +1675,7 @@ const ProductFormView = ({
                 <Card title={trans('hancms.catalog.product.admin.name')} className="mb-6">
                     <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
                         <div className="flex flex-wrap gap-3 overflow-x-auto pb-1">
-                            {['general', 'content', 'photos', 'variants'].map((id) => {
+                            {['general', 'content', 'variants', 'photos'].map((id) => {
                                 const errorInTab = hasTabError(id);
                                 const active = activeTab === id;
 
@@ -1206,70 +1731,52 @@ const ProductFormView = ({
                             </button>
                         </div>
 
-                        <div className="grid gap-6 px-5 py-5 md:grid-cols-[160px_1fr]">
-                            <div className="space-y-3">
-                                <div className="text-xs font-black uppercase text-slate-500">
-                                    {trans('hancms.catalog.product.variants.images') || 'Variant images'}
+                        <div className="space-y-6 px-5 py-5">
+                            <div className="space-y-4">
+                                <div>
+                                    <h4 className="text-xs font-black uppercase text-slate-500">
+                                        {trans('hancms.column.name') || 'Name'}
+                                    </h4>
+                                    <p className="mt-1 text-xs text-slate-400">
+                                        {trans('hancms.catalog.product.variants.localized_name_hint') || 'Enter all language names at the same time.'}
+                                    </p>
                                 </div>
 
-                                <input
-                                    id={`variant-images-${editingVariantIndex}`}
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleVariantImageChange}
-                                />
-                                <label
-                                    htmlFor={`variant-images-${editingVariantIndex}`}
-                                    className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-center transition hover:border-indigo-400 hover:bg-indigo-50"
-                                >
-                                    {variantImageUploading ? (
-                                        <RefreshCw className="h-7 w-7 animate-spin text-indigo-500" />
-                                    ) : (
-                                        <>
-                                            <Plus className="h-7 w-7 text-slate-400" />
-                                            <span className="mt-2 text-xs font-black uppercase text-slate-600">
-                                                {trans('hancms.catalog.product.variants.upload_images') || 'Upload images'}
-                                            </span>
-                                        </>
-                                    )}
-                                </label>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    {(variantDraft.images || []).map((image: string, imageIndex: number) => (
-                                        <div key={`${image}-${imageIndex}`} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                                            <img
-                                                src={getVariantImagePreviewUrl(variantDraft, image, imageIndex)}
-                                                alt={image}
-                                                className="h-full w-full object-cover"
-                                            />
-                                            {imageIndex === 0 && (
-                                                <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-black uppercase text-white">
-                                                    {trans('hancms.default')}
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    {variantLocales.map((lang: any) => (
+                                        <InputGroup
+                                            key={lang.code}
+                                            stacked
+                                            label={(
+                                                <span className="flex items-center gap-2">
+                                                    {getLanguageLogoUrl(lang) ? (
+                                                        <img
+                                                            src={getLanguageLogoUrl(lang)}
+                                                            alt={lang.name || lang.code}
+                                                            className="h-4 w-4 rounded-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 text-[9px] font-black text-slate-600">
+                                                            {String(lang.code || '?').slice(0, 1).toUpperCase()}
+                                                        </span>
+                                                    )}
+                                                    <span>{lang.name || lang.code?.toUpperCase()}</span>
                                                 </span>
                                             )}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeVariantDraftImage(imageIndex)}
-                                                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-rose-600 text-white opacity-0 transition group-hover:opacity-100"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
+                                        >
+                                            <input
+                                                type="text"
+                                                className={inputClass(`variants.${editingVariantIndex}.translations.${lang.code}.name`)}
+                                                value={variantDraft.translations?.[lang.code]?.name || ''}
+                                                onChange={(e) => updateVariantDraftTranslation(lang.code, e.target.value)}
+                                                placeholder={`${trans('hancms.column.name') || 'Name'} ${lang.name || lang.code?.toUpperCase()}`}
+                                            />
+                                            {errors?.[`variants.${editingVariantIndex}.translations.${lang.code}.name`] && (
+                                                <MessageError>{errors[`variants.${editingVariantIndex}.translations.${lang.code}.name`]}</MessageError>
+                                            )}
+                                        </InputGroup>
                                     ))}
                                 </div>
-
-                                {variantDraft.images?.length > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setVariantDraft((prev: any) => ({ ...(prev || {}), image: '', image_url: '', images: [], image_urls: [] }))}
-                                        className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 transition hover:bg-rose-100"
-                                    >
-                                        <Trash2 size={14} />
-                                        {trans('hancms.catalog.product.variants.clear_images') || 'Clear images'}
-                                    </button>
-                                )}
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
@@ -1310,26 +1817,111 @@ const ProductFormView = ({
                                         <MessageError>{errors[`variants.${editingVariantIndex}.stock`]}</MessageError>
                                     )}
                                 </InputGroup>
+                            </div>
 
-                                <InputGroup label={trans('hancms.column.image') || 'Representative image'}>
-                                    <select
-                                        className={inputClass(`variants.${editingVariantIndex}.image`)}
-                                        value={variantDraft.image || ''}
-                                        onChange={(e) => setVariantDraft((prev: any) => ({
-                                            ...(prev || {}),
-                                            image: e.target.value,
-                                            image_url: getVariantImagePreviewUrl(prev, e.target.value, (prev?.images || []).indexOf(e.target.value)),
-                                        }))}
-                                    >
-                                        <option value="">{trans('hancms.placeholder.select')}</option>
-                                        {(variantDraft.images || []).map((image: string) => (
-                                            <option key={image} value={image}>{image}</option>
-                                        ))}
-                                    </select>
-                                    {errors?.[`variants.${editingVariantIndex}.image`] && (
-                                        <MessageError>{errors[`variants.${editingVariantIndex}.image`]}</MessageError>
+                            <div className="space-y-3 border-t border-slate-200 pt-5">
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <div className="text-xs font-black uppercase text-slate-500">
+                                            {trans('hancms.catalog.product.variants.images') || 'Variant images'}
+                                        </div>
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            {trans('hancms.catalog.product.variants.images_hint') || 'Upload images in one horizontal row. Click an image to make it the cover.'}
+                                        </p>
+                                    </div>
+
+                                    {variantDraft.images?.length > 0 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setVariantDraft((prev: any) => ({ ...(prev || {}), image: '', image_url: '', images: [], image_urls: [] }))}
+                                            className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 transition hover:bg-rose-100"
+                                        >
+                                            <Trash2 size={14} />
+                                            {trans('hancms.catalog.product.variants.clear_images') || 'Clear images'}
+                                        </button>
                                     )}
-                                </InputGroup>
+                                </div>
+
+                                <input
+                                    id={`variant-images-${editingVariantIndex}`}
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleVariantImageChange}
+                                />
+
+                                <div className="flex flex-nowrap items-stretch gap-3 overflow-x-auto pb-1">
+                                    <label
+                                        htmlFor={`variant-images-${editingVariantIndex}`}
+                                        className="flex h-28 w-28 shrink-0 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-center transition hover:border-indigo-400 hover:bg-indigo-50"
+                                    >
+                                        {variantImageUploading ? (
+                                            <RefreshCw className="h-7 w-7 animate-spin text-indigo-500" />
+                                        ) : (
+                                            <>
+                                                <Plus className="h-7 w-7 text-slate-400" />
+                                                <span className="mt-2 text-[11px] font-black uppercase text-slate-600">
+                                                    {trans('hancms.catalog.product.variants.upload_images') || 'Upload images'}
+                                                </span>
+                                            </>
+                                        )}
+                                    </label>
+
+                                    {(variantDraft.images || []).map((image: string, imageIndex: number) => {
+                                        const previewUrl = getVariantImagePreviewUrl(variantDraft, image, imageIndex);
+                                        const isCover = variantDraft.image
+                                            ? variantDraft.image === image
+                                            : imageIndex === 0;
+
+                                        return (
+                                            <button
+                                                key={`${image}-${imageIndex}`}
+                                                type="button"
+                                                onClick={() => setVariantDraft((prev: any) => ({
+                                                    ...(prev || {}),
+                                                    image,
+                                                    image_url: previewUrl,
+                                                }))}
+                                                className={`group relative h-28 w-28 shrink-0 overflow-hidden rounded-xl border transition ${isCover
+                                                    ? 'border-emerald-500 ring-2 ring-emerald-200'
+                                                    : 'border-slate-200 bg-slate-100 hover:border-slate-300'
+                                                }`}
+                                            >
+                                                <img
+                                                    src={previewUrl}
+                                                    alt={image}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                                {isCover && (
+                                                    <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-black uppercase text-white">
+                                                        {trans('hancms.default')}
+                                                    </span>
+                                                )}
+                                                <span className="absolute inset-x-0 bottom-0 bg-slate-950/35 px-2 py-1 text-[10px] font-semibold text-white opacity-0 transition group-hover:opacity-100">
+                                                    {trans('hancms.catalog.product.variants.set_cover') || 'Set cover'}
+                                                </span>
+                                                <span
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        removeVariantDraftImage(imageIndex);
+                                                    }}
+                                                    onKeyDown={(event) => {
+                                                        event.stopPropagation();
+                                                        if (event.key === 'Enter' || event.key === ' ') {
+                                                            removeVariantDraftImage(imageIndex);
+                                                        }
+                                                    }}
+                                                    className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-rose-600 text-white opacity-0 transition group-hover:opacity-100"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
 
@@ -1357,6 +1949,381 @@ const ProductFormView = ({
                 onClose={() => setIsModalOpen(false)}
                 onSelect={handleSelectImage}
             />
+
+            {isQuickValueModalOpen && quickValueDraft && quickValueAttribute && (
+                <div
+                    className="fixed inset-0 z-[95] flex items-center justify-center bg-slate-950/60 px-4 py-6"
+                    onKeyDownCapture={(event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    }}
+                >
+                    <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+                        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                            <div>
+                                <h3 className="text-base font-black uppercase text-slate-900">
+                                    {trans('hancms.catalog.attribute.fields.add_value')}
+                                </h3>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    {getLocalizedAttributeName(quickValueAttribute)}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={closeQuickValueModal}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-5 px-5 py-5">
+                            {quickValueErrors.form && (
+                                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+                                    {quickValueErrors.form}
+                                </div>
+                            )}
+
+                            <div className="rounded-xl border border-slate-200 p-4">
+                                <div className="mb-4">
+                                    <h4 className="text-xs font-black uppercase text-slate-500">
+                                        {trans('hancms.catalog.attribute.fields.localized_value_hint')}
+                                    </h4>
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    {quickAttributeLocales.map((lang: any, index: number) => (
+                                        <div key={lang.code} className="space-y-2">
+                                            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                {getLanguageLogoUrl(lang) ? (
+                                                    <img src={getLanguageLogoUrl(lang)} alt={lang.name || lang.code} className="h-4 w-4 rounded-full object-cover" />
+                                                ) : null}
+                                                <span>{lang.name || lang.code?.toUpperCase()}</span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={quickValueDraft.translations[index]?.value || ''}
+                                                onChange={(e) => updateQuickValueTranslation(index, e.target.value)}
+                                                className="w-full rounded-md border border-gray-300 p-2 text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500"
+                                            />
+                                            {quickValueErrors[`translations.${index}.value`] && (
+                                                <MessageError>{quickValueErrors[`translations.${index}.value`]}</MessageError>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {quickValueAttribute.type === 'image' ? (
+                                <div className="rounded-xl border border-slate-200 p-4">
+                                    <div className="mb-4 flex items-center justify-between gap-3">
+                                        <div>
+                                            <h4 className="text-xs font-black uppercase text-slate-500">
+                                                {trans('hancms.catalog.attribute.fields.image')}
+                                            </h4>
+                                            <p className="mt-1 text-xs text-slate-400">
+                                                {trans('hancms.catalog.attribute.fields.image_hint')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <label className="group flex h-28 w-28 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-white transition hover:border-indigo-400 hover:bg-indigo-50/40">
+                                        <input
+                                            className="sr-only"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => updateQuickValueImage(e.target.files?.[0] ?? null)}
+                                        />
+                                        {isQuickValueImageUploading ? (
+                                            <RefreshCw className="h-6 w-6 animate-spin text-indigo-500" />
+                                        ) : quickValueDraft.image_url ? (
+                                            <img
+                                                src={quickValueDraft.image_url}
+                                                alt={trans('hancms.catalog.attribute.fields.image')}
+                                                className="h-full w-full object-contain p-1"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-slate-400 transition group-hover:text-slate-700">
+                                                <Plus className="h-6 w-6" />
+                                            </div>
+                                        )}
+                                    </label>
+                                    {quickValueErrors.image && <MessageError>{quickValueErrors.image}</MessageError>}
+                                </div>
+                            ) : null}
+
+                            {quickValueAttribute.type === 'color' ? (
+                                <div className="rounded-xl border border-slate-200 p-4">
+                                    <div className="mb-4">
+                                        <h4 className="text-xs font-black uppercase text-slate-500">
+                                            {trans('hancms.catalog.attribute.fields.color')}
+                                        </h4>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="color"
+                                            value={quickValueDraft.color || '#000000'}
+                                            onChange={(e) => updateQuickValueColor(e.target.value)}
+                                            className="h-11 w-14 rounded-lg border border-slate-300 p-1"
+                                        />
+                                        <span className="text-sm font-medium text-slate-600">{quickValueDraft.color || '#000000'}</span>
+                                    </div>
+                                    {quickValueErrors.color && <MessageError>{quickValueErrors.color}</MessageError>}
+                                </div>
+                            ) : null}
+                        </div>
+
+                        <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 px-5 py-4">
+                            <button
+                                type="button"
+                                onClick={closeQuickValueModal}
+                                className="rounded-md border border-slate-300 px-4 py-3 text-xs font-black uppercase text-slate-600 transition hover:bg-slate-50"
+                            >
+                                {trans('hancms.button.cancel') || 'Cancel'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    submitQuickValue();
+                                }}
+                                disabled={isQuickValueSubmitting}
+                                className="rounded-md bg-slate-900 px-4 py-3 text-xs font-black uppercase text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                            >
+                                {isQuickValueSubmitting ? (trans('hancms.loading') || 'Saving...') : (trans('hancms.button.save') || 'Save')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isQuickAttributeModalOpen && (
+                <div
+                    className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/60 px-4 py-6"
+                    onKeyDownCapture={(event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    }}
+                >
+                    <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+                        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                            <div>
+                                <h3 className="text-base font-black uppercase text-slate-900">
+                                    {trans('hancms.catalog.product.variants.create_attribute') || 'Tạo thuộc tính'}
+                                </h3>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    {trans('hancms.catalog.product.variants.quick_attribute_hint') || 'Create a new attribute without leaving the product form.'}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={closeQuickAttributeModal}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6 px-5 py-5">
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black uppercase text-slate-500">
+                                        {trans('hancms.catalog.attribute.fields.code')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={quickAttributeDraft.code}
+                                        onChange={(e) => setQuickAttributeDraft((current) => ({ ...current, code: e.target.value }))}
+                                        className={`w-full rounded-md border p-2 text-sm outline-none transition-all ${quickAttributeErrors.code ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
+                                        placeholder={trans('hancms.catalog.attribute.fields.code_placeholder')}
+                                    />
+                                    {quickAttributeErrors.code && <MessageError>{quickAttributeErrors.code}</MessageError>}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black uppercase text-slate-500">
+                                        {trans('hancms.catalog.attribute.fields.type')}
+                                    </label>
+                                    <select
+                                        value={quickAttributeDraft.type}
+                                        onChange={(e) => setQuickAttributeDraft((current) => ({ ...current, type: e.target.value as QuickAttributeFormState['type'] }))}
+                                        className={`w-full rounded-md border p-2 text-sm outline-none transition-all ${quickAttributeErrors.type ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
+                                    >
+                                        <option value="text">{trans('hancms.catalog.attribute.fields.text')}</option>
+                                        <option value="image">{trans('hancms.catalog.attribute.fields.image')}</option>
+                                        <option value="color">{trans('hancms.catalog.attribute.fields.color')}</option>
+                                    </select>
+                                    {quickAttributeErrors.type && <MessageError>{quickAttributeErrors.type}</MessageError>}
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border border-slate-200 p-4">
+                                <div className="mb-4">
+                                    <h4 className="text-xs font-black uppercase text-slate-500">
+                                        {trans('hancms.catalog.attribute.fields.localized_name_hint')}
+                                    </h4>
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    {quickAttributeLocales.map((lang: any, index: number) => (
+                                        <div key={lang.code} className="space-y-2">
+                                            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                {getLanguageLogoUrl(lang) ? (
+                                                    <img src={getLanguageLogoUrl(lang)} alt={lang.name || lang.code} className="h-4 w-4 rounded-full object-cover" />
+                                                ) : null}
+                                                <span>{lang.name || lang.code?.toUpperCase()}</span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={quickAttributeDraft.translations[index]?.name || ''}
+                                                onChange={(e) => updateQuickAttributeTranslation(index, e.target.value)}
+                                                className="w-full rounded-md border border-gray-300 p-2 text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border border-slate-200 p-4">
+                                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase text-slate-500">
+                                            {trans('hancms.catalog.attribute.sections.values')}
+                                        </h4>
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            {trans('hancms.catalog.attribute.fields.localized_value_hint')}
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={appendQuickAttributeValue}
+                                        className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-xs font-black uppercase text-slate-700 transition hover:bg-slate-50"
+                                    >
+                                        <Plus size={14} />
+                                        {trans('hancms.catalog.attribute.fields.add_value')}
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {quickAttributeDraft.values.map((value, valueIndex) => (
+                                        <div key={valueIndex} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                            <div className="mb-3 flex items-center justify-between gap-3">
+                                                <div className="text-xs font-black uppercase text-slate-500">
+                                                    {trans('hancms.catalog.attribute.fields.value')} {valueIndex + 1}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeQuickAttributeValue(valueIndex)}
+                                                    className="rounded-md border border-rose-200 px-3 py-2 text-[11px] font-black uppercase text-rose-600 transition hover:bg-rose-50"
+                                                >
+                                                    {trans('hancms.catalog.attribute.fields.remove')}
+                                                </button>
+                                            </div>
+                                            <div className="grid gap-4 md:grid-cols-3">
+                                                {quickAttributeLocales.map((lang: any, index: number) => (
+                                                    <div key={lang.code} className="space-y-2">
+                                                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                            {getLanguageLogoUrl(lang) ? (
+                                                                <img src={getLanguageLogoUrl(lang)} alt={lang.name || lang.code} className="h-4 w-4 rounded-full object-cover" />
+                                                            ) : null}
+                                                            <span>{lang.name || lang.code?.toUpperCase()}</span>
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            value={value.translations[index]?.value || ''}
+                                                            onChange={(e) => updateQuickAttributeValueTranslation(index, valueIndex, e.target.value)}
+                                                            className="w-full rounded-md border border-gray-300 p-2 text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {quickAttributeDraft.type === 'image' ? (
+                                                <div className="mt-4 space-y-2">
+                                                    <label className="text-xs font-black uppercase text-slate-500">
+                                                        {trans('hancms.catalog.attribute.fields.image')}
+                                                    </label>
+                                                    <label className="group flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-white transition hover:border-indigo-400 hover:bg-indigo-50/40">
+                                                        <input
+                                                            className="sr-only"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => updateQuickAttributeValueImage(valueIndex, e.target.files?.[0] ?? null)}
+                                                        />
+                                                        {isQuickAttributeImageUploading ? (
+                                                            <RefreshCw className="h-6 w-6 animate-spin text-indigo-500" />
+                                                        ) : value.image_url ? (
+                                                            <img
+                                                                src={value.image_url}
+                                                                alt={trans('hancms.catalog.attribute.fields.image')}
+                                                                className="h-full w-full object-contain p-1"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-full w-full items-center justify-center text-slate-400 transition group-hover:text-slate-700">
+                                                                <Plus className="h-6 w-6" />
+                                                            </div>
+                                                        )}
+                                                    </label>
+                                                    {quickAttributeErrors[`values.${valueIndex}.image`] && (
+                                                        <MessageError>{quickAttributeErrors[`values.${valueIndex}.image`]}</MessageError>
+                                                    )}
+                                                </div>
+                                            ) : null}
+
+                                            {quickAttributeDraft.type === 'color' ? (
+                                                <div className="mt-4 space-y-2">
+                                                    <label className="text-xs font-black uppercase text-slate-500">
+                                                        {trans('hancms.catalog.attribute.fields.color')}
+                                                    </label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="color"
+                                                            value={value.color || '#000000'}
+                                                            onChange={(e) => setQuickAttributeDraft((current) => {
+                                                                const values = current.values.slice();
+                                                                values[valueIndex] = { ...values[valueIndex], color: e.target.value };
+                                                                return { ...current, values };
+                                                            })}
+                                                            className="h-11 w-14 rounded-lg border border-slate-300 p-1"
+                                                        />
+                                                        <span className="text-sm text-slate-600">{value.color || '#000000'}</span>
+                                                    </div>
+                                                    {quickAttributeErrors[`values.${valueIndex}.color`] && (
+                                                        <MessageError>{quickAttributeErrors[`values.${valueIndex}.color`]}</MessageError>
+                                                    )}
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 px-5 py-4">
+                            <button
+                                type="button"
+                                onClick={closeQuickAttributeModal}
+                                className="rounded-md border border-slate-300 px-4 py-3 text-xs font-black uppercase text-slate-600 transition hover:bg-slate-50"
+                            >
+                                {trans('hancms.button.cancel') || 'Cancel'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    submitQuickAttribute();
+                                }}
+                                disabled={isQuickAttributeSubmitting}
+                                className="rounded-md bg-slate-900 px-4 py-3 text-xs font-black uppercase text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                            >
+                                {isQuickAttributeSubmitting ? (trans('hancms.loading') || 'Saving...') : (trans('hancms.button.save') || 'Save')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

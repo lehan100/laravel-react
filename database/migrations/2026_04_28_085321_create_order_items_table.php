@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -35,6 +36,32 @@ return new class extends Migration
                     $table->json('meta')->nullable();
                 }
             });
+
+            if (Schema::hasTable('orders') && DB::connection()->getDriverName() !== 'sqlite') {
+                $hasForeignKey = DB::table('information_schema.KEY_COLUMN_USAGE')
+                    ->where('TABLE_SCHEMA', DB::getDatabaseName())
+                    ->where('TABLE_NAME', 'order_items')
+                    ->where('COLUMN_NAME', 'order_id')
+                    ->where('REFERENCED_TABLE_NAME', 'orders')
+                    ->exists();
+
+                if (! $hasForeignKey) {
+                    DB::table('order_items')
+                        ->whereNotExists(function ($query): void {
+                            $query->select(DB::raw(1))
+                                ->from('orders')
+                                ->whereColumn('orders.id', 'order_items.order_id');
+                        })
+                        ->delete();
+
+                    Schema::table('order_items', function (Blueprint $table): void {
+                        $table->foreign('order_id', 'order_items_order_id_foreign')
+                            ->references('id')
+                            ->on('orders')
+                            ->cascadeOnDelete();
+                    });
+                }
+            }
 
             return;
         }

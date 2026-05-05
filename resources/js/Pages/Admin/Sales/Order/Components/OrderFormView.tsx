@@ -1,10 +1,11 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import BackButton from '@/Components/Button/BackButton';
 import SaveButton from '@/Components/Button/SaveButton';
 import { InputGroup } from '@/Components/Form/HancmsInput';
 import MessageError from '@/Components/Form/MessageError';
 import Card from '@/Components/Main/Card';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
-import { Save, Trash2 } from 'lucide-react';
+import { ChevronDown, Save, Search, Trash2 } from 'lucide-react';
 import { convertPriceToBase, convertPriceToDisplay, formatProductPrice, type ProductCurrency } from '@/Pages/Admin/Product/productUtils';
 
 type Option = {
@@ -19,6 +20,15 @@ type ProductOption = {
   price: number;
   quantity: number;
   is_stock: boolean;
+  has_variants?: boolean;
+  available_quantity?: number;
+  variants?: Array<{
+    id: number;
+    sku: string | null;
+    label: string;
+    price: number;
+    stock: number;
+  }>;
 };
 
 type PaymentMethodOption = {
@@ -45,8 +55,14 @@ type WardOption = {
   province_code?: string;
 };
 
+type SearchableSelectOption = {
+  value: string;
+  label: string;
+};
+
 type OrderItem = {
   product_id: number | '';
+  variant_id?: number | '';
   quantity: number;
   unit_price: number;
 };
@@ -86,6 +102,151 @@ type OrderFormViewProps = {
   currency: ProductCurrency;
 };
 
+type SearchableSelectProps = {
+  value: string;
+  options: SearchableSelectOption[];
+  placeholder: string;
+  searchPlaceholder: string;
+  emptyText: string;
+  disabled?: boolean;
+  error?: string;
+  onChange: (value: string) => void;
+};
+
+function SearchableSelect({
+  value,
+  options,
+  placeholder,
+  searchPlaceholder,
+  emptyText,
+  disabled = false,
+  error,
+  onChange,
+}: SearchableSelectProps) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const selectedOption = options.find((option) => option.value === value);
+  const filteredOptions = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return options;
+    }
+
+    return options.filter((option) => option.label.toLowerCase().includes(normalizedQuery));
+  }, [options, query]);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      setQuery('');
+    }
+  }, [open]);
+
+  const triggerClass = `flex min-h-[42px] w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${
+    error ? 'border-rose-500 bg-rose-50' : 'border-slate-300 bg-white'
+  } ${disabled ? 'cursor-not-allowed bg-slate-100 text-slate-400' : 'cursor-pointer hover:border-slate-400'}`;
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        className={triggerClass}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) {
+            setOpen((current) => !current);
+          }
+        }}
+      >
+        <span className={`min-w-0 flex-1 truncate ${selectedOption ? 'text-slate-900' : 'text-slate-400'}`}>
+          {selectedOption?.label || placeholder}
+        </span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-slate-400 transition ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && !disabled && (
+        <div className="absolute left-0 top-full z-30 mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={query}
+              autoFocus
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                }
+              }}
+              placeholder={searchPlaceholder}
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-200"
+            />
+          </div>
+
+          <div className="mt-3 max-h-60 overflow-auto pr-1">
+            {filteredOptions.length > 0 ? (
+              <div className="space-y-1">
+                {filteredOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition ${
+                      option.value === value ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                    onClick={() => {
+                      onChange(option.value);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                    {option.value === value && <span className="ml-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-600">Selected</span>}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="px-3 py-6 text-sm text-slate-500">{emptyText}</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OrderFormView({
   title,
   backHref,
@@ -114,18 +275,35 @@ export default function OrderFormView({
   const wardOptions = selectedProvinceCode ? wards.filter((ward) => ward.province_code === selectedProvinceCode) : [];
   const getProvinceLabel = (province: ProvinceOption) => {
     if (useEnglishLocationNames) {
-      return province.full_name_en || province.name_en || province.full_name || province.name;
+      return province.full_name_en || province.name_en || province.full_name || province.name || '';
     }
 
-    return province.full_name || province.name || province.full_name_en || province.name_en;
+    return province.full_name || province.name || province.full_name_en || province.name_en || '';
   };
   const getWardLabel = (ward: WardOption) => {
     if (useEnglishLocationNames) {
-      return ward.full_name_en || ward.name_en || ward.full_name || ward.name;
+      return ward.full_name_en || ward.name_en || ward.full_name || ward.name || '';
     }
 
-    return ward.full_name || ward.name || ward.full_name_en || ward.name_en;
+    return ward.full_name || ward.name || ward.full_name_en || ward.name_en || '';
   };
+  const provinceSelectOptions = useMemo<SearchableSelectOption[]>(
+    () => provinces.map((province) => ({ value: province.code, label: getProvinceLabel(province) })),
+    [provinces, useEnglishLocationNames],
+  );
+  const wardSelectOptions = useMemo<SearchableSelectOption[]>(
+    () => wardOptions.map((ward) => ({ value: ward.code, label: getWardLabel(ward) })),
+    [wardOptions, useEnglishLocationNames],
+  );
+
+  useEffect(() => {
+    if (!data.province_code && selectedProvinceCode) {
+      setData({
+        ...data,
+        province_code: selectedProvinceCode,
+      });
+    }
+  }, [data, data.province_code, selectedProvinceCode, setData]);
 
   const inputClass = (fieldName: string) =>
     `w-full rounded-md border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${
@@ -141,6 +319,7 @@ export default function OrderFormView({
       ...items,
       {
         product_id: '',
+        variant_id: '',
         quantity: 1,
         unit_price: 0,
       },
@@ -169,6 +348,9 @@ export default function OrderFormView({
   const selectedProduct = (productId: number | '') => {
     return products.find((product) => product.id === Number(productId));
   };
+  const selectedVariant = (product: ProductOption | undefined, variantId: number | '' | undefined) => {
+    return product?.variants?.find((variant) => variant.id === Number(variantId));
+  };
 
   const subtotal = items.reduce((carry, item) => carry + Number(item.quantity || 0) * Number(item.unit_price || 0), 0);
   const discountTotal = Number(data.discount_total || 0);
@@ -193,7 +375,7 @@ export default function OrderFormView({
 
       <form id="order-form" onSubmit={onSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <Card title={trans('hancms.sales.orders.sections.customer')}>
+          <Card title={trans('hancms.sales.orders.sections.customer')} overflow="visible" contentOverflow="visible">
             <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
               <InputGroup label={trans('hancms.sales.orders.fields.order_number')}>
                 <input
@@ -263,45 +445,43 @@ export default function OrderFormView({
               </InputGroup>
 
               <InputGroup label={trans('hancms.sales.orders.fields.province')}>
-                <select
-                  className={inputClass('province_code')}
+                <SearchableSelect
                   value={data.province_code || ''}
-                  onChange={(event) => {
+                  options={provinceSelectOptions}
+                  placeholder={trans('hancms.placeholder.select')}
+                  searchPlaceholder={trans('hancms.sales.orders.placeholders.search')}
+                  emptyText={trans('hancms.message.empty')}
+                  error={errors.province_code}
+                  onChange={(nextProvinceCode) => {
                     setData({
                       ...data,
-                      province_code: event.target.value,
+                      province_code: nextProvinceCode,
                       ward_code: '',
                     });
                   }}
-                >
-                  <option value="">{trans('hancms.placeholder.select')}</option>
-                  {provinces.map((province) => (
-                    <option key={province.code} value={province.code}>
-                      {getProvinceLabel(province)}
-                    </option>
-                  ))}
-                </select>
+                />
                 {errors.province_code && <MessageError>{errors.province_code}</MessageError>}
               </InputGroup>
 
               <InputGroup label={trans('hancms.sales.orders.fields.ward')}>
-                <select
-                  className={inputClass('ward_code')}
+                <SearchableSelect
                   value={data.ward_code || ''}
-                  onChange={(event) => setData('ward_code', event.target.value)}
+                  options={wardSelectOptions}
+                  placeholder={selectedProvinceCode ? trans('hancms.placeholder.select') : trans('hancms.sales.orders.placeholders.province_first')}
+                  searchPlaceholder={trans('hancms.sales.orders.placeholders.search')}
+                  emptyText={selectedProvinceCode ? trans('hancms.message.empty') : trans('hancms.sales.orders.placeholders.province_first')}
                   disabled={!selectedProvinceCode}
-                >
-                  <option value="">
-                    {selectedProvinceCode
-                      ? trans('hancms.placeholder.select')
-                      : trans('hancms.sales.orders.placeholders.province_first')}
-                  </option>
-                  {wardOptions.map((ward) => (
-                    <option key={ward.code} value={ward.code}>
-                      {getWardLabel(ward)}
-                    </option>
-                  ))}
-                </select>
+                  error={errors.ward_code}
+                  onChange={(nextWardCode) => {
+                    const selectedWard = wards.find((ward) => ward.code === nextWardCode);
+
+                    setData({
+                      ...data,
+                      ward_code: nextWardCode,
+                      province_code: selectedWard?.province_code || data.province_code || '',
+                    });
+                  }}
+                />
                 {errors.ward_code && <MessageError>{errors.ward_code}</MessageError>}
               </InputGroup>
 
@@ -431,11 +611,16 @@ export default function OrderFormView({
             ) : (
               items.map((item, index) => {
                 const product = selectedProduct(item.product_id);
+                const variants = product?.variants || [];
+                const variant = selectedVariant(product, item.variant_id);
+                const availableQuantity = variants.length > 0
+                  ? (variant?.stock ?? 0)
+                  : (product?.quantity ?? 0);
                 const lineTotal = Number(item.quantity || 0) * Number(item.unit_price || 0);
 
                 return (
                   <div key={`${index}-${item.product_id || 'new'}`} className="rounded-xl border border-slate-200 p-4">
-                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.8fr)_minmax(0,150px)_minmax(0,180px)_minmax(0,190px)_auto] xl:items-start">
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,1.5fr)_minmax(0,120px)_minmax(0,160px)_minmax(0,180px)_auto] xl:items-start">
                       <InputGroup stacked label={trans('hancms.sales.orders.fields.product')}>
                           <select
                             className={inputClass(`items.${index}.product_id`)}
@@ -444,29 +629,58 @@ export default function OrderFormView({
                               const nextProduct = products.find((entry) => entry.id === Number(event.target.value));
                               updateItem(index, {
                                 product_id: event.target.value ? Number(event.target.value) : '',
+                                variant_id: '',
                                 unit_price: convertPriceToDisplay(nextProduct?.price ?? 0, currency),
                               });
                             }}
                           >
                             <option value="">{trans('hancms.sales.orders.placeholders.product')}</option>
                             {products.map((entry) => (
-                              <option key={entry.id} value={entry.id} disabled={Number(entry.quantity ?? 0) <= 0}>
-                                {entry.name} {entry.sku ? `(${entry.sku})` : ''}{Number(entry.quantity ?? 0) <= 0 ? ' - Hết hàng' : ''}
+                              <option key={entry.id} value={entry.id} disabled={Number(entry.available_quantity ?? entry.quantity ?? 0) <= 0}>
+                                {entry.name} {entry.sku ? `(${entry.sku})` : ''}{Number(entry.available_quantity ?? entry.quantity ?? 0) <= 0 ? ' - Hết hàng' : ''}
                               </option>
                             ))}
                           </select>
                           {errors[`items.${index}.product_id`] && <MessageError>{errors[`items.${index}.product_id`]}</MessageError>}
                           {product && (
                             <div className="mt-3 text-xs text-slate-500">
-                              {product.sku || 'N/A'} · {trans('hancms.sales.orders.fields.available_stock')}: {product.quantity}
+                              {product.sku || 'N/A'} · {trans('hancms.sales.orders.fields.available_stock')}: {availableQuantity}
                             </div>
                           )}
+                      </InputGroup>
+
+                      <InputGroup stacked label={trans('hancms.sales.orders.fields.variant') || 'Variant'}>
+                        <select
+                          className={inputClass(`items.${index}.variant_id`)}
+                          value={item.variant_id ?? ''}
+                          onChange={(event) => {
+                            const nextVariant = variants.find((entry) => entry.id === Number(event.target.value));
+                            updateItem(index, {
+                              variant_id: event.target.value ? Number(event.target.value) : '',
+                              unit_price: nextVariant
+                                ? convertPriceToDisplay(nextVariant.price ?? 0, currency)
+                                : item.unit_price,
+                            });
+                          }}
+                          disabled={!product || variants.length === 0}
+                        >
+                          <option value="">
+                            {variants.length > 0 ? trans('hancms.placeholder.select') : trans('hancms.sales.orders.fields.no_variant') || 'No variant'}
+                          </option>
+                          {variants.map((entry) => (
+                            <option key={entry.id} value={entry.id} disabled={Number(entry.stock ?? 0) <= 0}>
+                              {entry.label} {entry.sku ? `(${entry.sku})` : ''}{Number(entry.stock ?? 0) <= 0 ? ' - Hết hàng' : ''}
+                            </option>
+                          ))}
+                        </select>
+                        {errors[`items.${index}.variant_id`] && <MessageError>{errors[`items.${index}.variant_id`]}</MessageError>}
                       </InputGroup>
 
                       <InputGroup stacked label={trans('hancms.sales.orders.fields.quantity')}>
                         <input
                           type="number"
                           min={1}
+                          max={availableQuantity || undefined}
                           className={inputClass(`items.${index}.quantity`)}
                           value={item.quantity}
                           onChange={(event) => updateItem(index, { quantity: Number(event.target.value || 1) })}

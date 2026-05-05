@@ -5,6 +5,9 @@ type CardProps = {
     children: React.ReactNode;
     className?: string;
     contentClassName?: string;
+    surface?: 'white' | 'transparent';
+    overflow?: 'hidden' | 'visible';
+    contentOverflow?: 'auto' | 'visible';
 };
 
 export default function Card({
@@ -12,11 +15,20 @@ export default function Card({
     children,
     className,
     contentClassName,
+    surface = 'white',
+    overflow = 'hidden',
+    contentOverflow = 'auto',
 }: CardProps) {
     const { trans } = useTrans();
+    const isTransparent = surface === 'transparent';
+    const overflowClassName = overflow === 'visible' ? 'overflow-visible' : 'overflow-hidden';
+    const contentOverflowClassName = contentOverflow === 'visible' ? 'overflow-visible' : 'overflow-x-auto';
+    const rootClassName = isTransparent
+        ? `${overflowClassName} rounded-2xl ${className || ''}`
+        : `${overflowClassName} rounded-2xl border border-slate-200 bg-white shadow-sm ${className || ''}`;
 
     return (
-        <div className={`overflow-hidden rounded-2xl border border-slate-200 bg-white/90 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.45)] backdrop-blur ${className || ''}`}>
+        <div className={rootClassName}>
             {title && <div className="border-b border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-900 px-5 py-4 text-white">
                 <div className="text-[11px] uppercase tracking-[0.28em] text-cyan-200/80">{trans('hancms.section')}</div>
                 <div className="mt-1 text-sm font-semibold tracking-wide">
@@ -24,7 +36,7 @@ export default function Card({
                 </div>
                 </div>
             }
-            <div className={`overflow-x-auto ${contentClassName || ''}`}>
+            <div className={`${contentOverflowClassName} ${contentClassName || ''}`}>
                 {children}
             </div>
         </div>

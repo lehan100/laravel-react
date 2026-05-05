@@ -6,6 +6,7 @@ use App\Models\Catalog\AttributeValue;
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductAttribute;
 use App\Models\Catalog\ProductVariant;
+use App\Models\Catalog\ProductVariantTranslation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,6 +37,19 @@ class ProductVariantRelationshipTest extends TestCase
         $this->assertInstanceOf(BelongsTo::class, $variant->product());
         $this->assertInstanceOf(BelongsToMany::class, $variant->attributeValues());
         $this->assertSame('variant_attribute_values', $variant->attributeValues()->getTable());
+    }
+
+    public function test_variant_name_accessor_returns_the_locale_translation(): void
+    {
+        app()->setLocale('en');
+
+        $variant = new ProductVariant;
+        $variant->setRelation('translations', collect([
+            new ProductVariantTranslation(['locale' => 'vi', 'name' => 'Áo thun']),
+            new ProductVariantTranslation(['locale' => 'en', 'name' => 'T-Shirt']),
+        ]));
+
+        $this->assertSame('T-Shirt', $variant->name);
     }
 
     public function test_attribute_value_belongs_to_attribute_and_variants(): void

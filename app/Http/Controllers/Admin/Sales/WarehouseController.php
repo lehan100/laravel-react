@@ -7,6 +7,7 @@ use App\Http\Requests\Sales\WarehouseAdjustRequest;
 use App\Http\Resources\Sales\WarehouseCollection;
 use App\Http\Resources\Sales\WarehouseHistoryResource;
 use App\Http\Resources\Sales\WarehouseResource;
+use App\Models\Sales\InventoryAdjustmentHistory;
 use App\Repositories\Warehouse\WarehouseRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -100,6 +101,52 @@ class WarehouseController extends MainController
             ->with('success', __('hancms.sales.warehouse.messages.updated_success'));
     }
 
+    public function editVariant(string $variant): Response|RedirectResponse
+    {
+        $variantItem = $this->mainModel->get(['id' => $variant], ['task' => 'get-variant-item']);
+
+        if (! $variantItem) {
+            return redirect()->route($this->routeName.'index')->with('error', __('hancms.sales.warehouse.messages.product_not_found'));
+        }
+
+        $histories = InventoryAdjustmentHistory::query()
+            ->where('product_id', $variantItem->product_id)
+            ->latest()
+            ->limit(100)
+            ->with('user:id,first_name,last_name,email')
+            ->get()
+            ->filter(fn (InventoryAdjustmentHistory $history): bool => (int) data_get($history->meta, 'variant_id') === (int) $variantItem->id)
+            ->take(50)
+            ->values();
+
+        return Inertia::render($this->controllerView.'Edit', [
+            'warehouse_name' => __('hancms.sales.warehouse.default_name'),
+            'item' => new WarehouseResource($variantItem),
+            'histories' => WarehouseHistoryResource::collection($histories),
+        ]);
+    }
+
+    public function updateVariant(WarehouseAdjustRequest $request, string $variant): RedirectResponse
+    {
+        $variantItem = $this->mainModel->get(['id' => $variant], ['task' => 'get-variant-item']);
+
+        if (! $variantItem) {
+            return redirect()->route($this->routeName.'index')->with('error', __('hancms.sales.warehouse.messages.product_not_found'));
+        }
+
+        $params = $request->validated();
+        $params['variant_id'] = $variant;
+        $this->mainModel->save($params, ['task' => 'adjust-variant']);
+
+        if ((int) $request->input('undo', 0) === 1) {
+            return Redirect::to(route($this->routeName.'index'))
+                ->with('success', __('hancms.sales.warehouse.messages.updated_success'));
+        }
+
+        return Redirect::route($this->routeName.'variants.edit', $variant)
+            ->with('success', __('hancms.sales.warehouse.messages.updated_success'));
+    }
+
     public function toggleStock(Request $request, string $id): RedirectResponse
     {
         $product = $this->mainModel->find((int) $id);
@@ -108,6 +155,18 @@ class WarehouseController extends MainController
         }
 
         $this->mainModel->save(['id' => $id], ['task' => 'toggle-stock']);
+
+        return redirect()->route($this->routeName.'index')->with('success', __('hancms.sales.warehouse.messages.toggled_success'));
+    }
+
+    public function toggleVariantStock(Request $request, string $variant): RedirectResponse
+    {
+        $variantItem = $this->mainModel->get(['id' => $variant], ['task' => 'get-variant-item']);
+        if (! $variantItem) {
+            return redirect()->route($this->routeName.'index')->with('error', __('hancms.sales.warehouse.messages.product_not_found'));
+        }
+
+        $this->mainModel->save(['variant_id' => $variant], ['task' => 'toggle-variant-stock']);
 
         return redirect()->route($this->routeName.'index')->with('success', __('hancms.sales.warehouse.messages.toggled_success'));
     }

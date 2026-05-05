@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Sales;
 
+use App\Models\Catalog\Product;
 use App\Models\Sales\Order;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class OrderRequest extends FormRequest
 {
@@ -28,6 +30,7 @@ class OrderRequest extends FormRequest
                 ->map(function ($item) {
                     return [
                         'product_id' => $this->normalizeNullableInteger($item['product_id'] ?? null),
+                        'variant_id' => $this->normalizeNullableInteger($item['variant_id'] ?? null),
                         'quantity' => (int) ($item['quantity'] ?? 0),
                         'unit_price' => $this->normalizeMoney($item['unit_price'] ?? 0),
                     ];
@@ -72,13 +75,99 @@ class OrderRequest extends FormRequest
             'items.*.product_id' => [
                 'required',
                 'integer',
-                Rule::exists('products', 'id')->where(function ($query) {
-                    $query->where('quantity', '>', 0);
-                }),
+                Rule::exists('products', 'id'),
             ],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
             'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
             'undo' => ['nullable', 'integer', Rule::in([0, 1])],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $items = collect($this->input('items', []));
+                $productIds = $items->pluck('product_id')->filter()->unique()->values();
+
+                if ($productIds->isEmpty()) {
+                    return;
+                }
+
+                $products = Product::query()
+                    ->with(['variants:id,product_id,stock'])
+                    ->whereIn('id', $productIds)
+                    ->get()
+                    ->keyBy('id');
+
+                foreach ($items as $index => $item) {
+                    $product = $products->get((int) ($item['product_id'] ?? 0));
+                    if (! $product) {
+                        continue;
+                    }
+
+                    $quantity = (int) ($item['quantity'] ?? 0);
+
+                    if ($product->variants->isEmpty()) {
+                        if ((int) ($product->quantity ?? 0) <= 0) {
+                            $validator->errors()->add(
+                                "items.$index.product_id",
+                                __('validation.exists', ['attribute' => __('hancms.sales.orders.fields.product')])
+                            );
+                        }
+
+                        if ($quantity > (int) ($product->quantity ?? 0)) {
+                            $validator->errors()->add(
+                                "items.$index.quantity",
+                                __('validation.max.numeric', [
+                                    'attribute' => __('hancms.sales.orders.fields.quantity'),
+                                    'max' => (int) ($product->quantity ?? 0),
+                                ])
+                            );
+                        }
+
+                        continue;
+                    }
+
+                    $variantId = $item['variant_id'] ?? null;
+                    if (empty($variantId)) {
+                        $validator->errors()->add(
+                            "items.$index.variant_id",
+                            __('validation.required', ['attribute' => __('hancms.sales.orders.fields.variant')])
+                        );
+
+                        continue;
+                    }
+
+                    $variant = $product->variants->firstWhere('id', (int) $variantId);
+                    if (! $variant) {
+                        $validator->errors()->add(
+                            "items.$index.variant_id",
+                            __('validation.exists', ['attribute' => __('hancms.sales.orders.fields.variant')])
+                        );
+
+                        continue;
+                    }
+
+                    if ((int) ($variant->stock ?? 0) <= 0) {
+                        $validator->errors()->add(
+                            "items.$index.variant_id",
+                            __('validation.exists', ['attribute' => __('hancms.sales.orders.fields.variant')])
+                        );
+                    }
+
+                    if ($quantity > (int) ($variant->stock ?? 0)) {
+                        $validator->errors()->add(
+                            "items.$index.quantity",
+                            __('validation.max.numeric', [
+                                'attribute' => __('hancms.sales.orders.fields.quantity'),
+                                'max' => (int) ($variant->stock ?? 0),
+                            ])
+                        );
+                    }
+                }
+            },
         ];
     }
 

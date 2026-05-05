@@ -32,6 +32,7 @@ export default function EditPage() {
     placed_at: item?.placed_at ? String(item.placed_at).slice(0, 16) : '',
     items: (item?.items || []).map((entry: any) => ({
       product_id: entry.product_id || '',
+      variant_id: entry.variant_id || entry.meta?.variant?.id || '',
       quantity: entry.quantity || 1,
       unit_price: convertPriceToDisplay(entry.unit_price || 0, orderCurrency),
     })),

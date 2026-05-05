@@ -47,6 +47,8 @@ return new class extends Migration
             $table->unsignedInteger('priority')->default(100);
             $table->boolean('is_active')->default(true);
             $table->boolean('stackable')->default(false);
+            $table->enum('stock_scope', ['all', 'limited'])->default('all');
+            $table->unsignedInteger('stock_limit')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

@@ -26,8 +26,6 @@ class ProductResource extends JsonResource
             'sku' => $this->sku ?? null,
             'quantity' => $this->quantity ?? 0,
             'weight' => $this->weight ?? 0,
-            'brand' => $this->brand,
-            'base_price' => (float) ($this->base_price ?? $this->price ?? 0),
             'price' => $this->price ?? 0,
             'is_stock' => $this->is_stock ?? null,
             'is_coupon' => $this->is_coupon ?? null,

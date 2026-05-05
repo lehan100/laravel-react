@@ -19,8 +19,6 @@ class ProductRequest extends FormRequest
             'sku' => 'nullable|string|max:255',
             'quantity' => 'nullable|integer|min:0',
             'weight' => 'nullable|integer|min:0',
-            'brand' => 'nullable|string|max:255',
-            'base_price' => 'nullable|numeric|min:0',
             'price' => 'nullable|numeric|min:0',
             'status' => 'required|integer|in:0,1',
             'is_stock' => 'nullable|integer|in:0,1',
@@ -46,6 +44,8 @@ class ProductRequest extends FormRequest
             'translations.*.seo_description' => 'nullable|string|max:160',
             'variants' => 'nullable|array',
             'variants.*.id' => 'nullable|integer|exists:product_variants,id',
+            'variants.*.translations' => 'required_with:variants|array',
+            'variants.*.translations.*.name' => 'required|string|max:255',
             'variants.*.sku' => [
                 'required_with:variants',
                 'string',
@@ -58,7 +58,7 @@ class ProductRequest extends FormRequest
             'variants.*.image' => 'nullable|string|max:255',
             'variants.*.images' => 'nullable|array',
             'variants.*.images.*' => 'string|max:255',
-            'variants.*.attribute_value_ids' => 'required_with:variants|array|min:1',
+            'variants.*.attribute_value_ids' => 'nullable|array',
             'variants.*.attribute_value_ids.*' => 'integer|distinct|exists:attribute_values,id',
         ];
     }
@@ -85,12 +85,39 @@ class ProductRequest extends FormRequest
                     ->keyBy('id');
 
                 $seenCombinations = [];
+                $hasAnyAttributeValues = collect($variants)->contains(function (array $variant): bool {
+                    return collect($variant['attribute_value_ids'] ?? [])
+                        ->filter()
+                        ->isNotEmpty();
+                });
 
                 foreach ($variants as $variantIndex => $variant) {
+                    $translations = collect($variant['translations'] ?? [])
+                        ->filter(function ($value): bool {
+                            return is_array($value) && filled($value['name'] ?? null);
+                        });
+
+                    if ($translations->isEmpty()) {
+                        $validator->errors()->add(
+                            "variants.$variantIndex.translations",
+                            'Each variant must have at least one localized name.'
+                        );
+                    }
+
                     $valueIds = collect($variant['attribute_value_ids'] ?? [])
                         ->map(fn ($id) => (int) $id)
+                        ->filter()
                         ->sort()
                         ->values();
+
+                    if ($hasAnyAttributeValues && $valueIds->isEmpty()) {
+                        $validator->errors()->add(
+                            "variants.$variantIndex.attribute_value_ids",
+                            'Variant attribute combinations must be provided for all variants once one variant uses attributes.'
+                        );
+
+                        continue;
+                    }
 
                     $attributeIds = $valueIds
                         ->map(fn (int $id) => $attributeValues->get($id)?->attribute_id)
@@ -104,15 +131,17 @@ class ProductRequest extends FormRequest
                         );
                     }
 
-                    $combinationKey = $valueIds->implode('-');
-                    if (isset($seenCombinations[$combinationKey])) {
-                        $validator->errors()->add(
-                            "variants.$variantIndex.attribute_value_ids",
-                            'Variant attribute combinations must be unique.'
-                        );
-                    }
+                    if ($valueIds->isNotEmpty()) {
+                        $combinationKey = $valueIds->implode('-');
+                        if (isset($seenCombinations[$combinationKey])) {
+                            $validator->errors()->add(
+                                "variants.$variantIndex.attribute_value_ids",
+                                'Variant attribute combinations must be unique.'
+                            );
+                        }
 
-                    $seenCombinations[$combinationKey] = true;
+                        $seenCombinations[$combinationKey] = true;
+                    }
                 }
             },
         ];

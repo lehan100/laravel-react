@@ -35,15 +35,20 @@ export default function WarehouseEditPage() {
   const [undo, setUndo] = useState(0);
 
   const inputClass = (field: WarehouseFieldName) => `w-full rounded-md border px-3 py-2 text-sm ${errors[field] ? 'border-rose-500 bg-rose-50' : 'border-slate-300'}`;
+  const isVariant = item?.type === 'variant';
+  const updateRoute = isVariant ? route('warehouse.variants.update', item.id) : route('warehouse.update', item.id);
+  const title = isVariant
+    ? `${warehouse_name || trans('hancms.sales.warehouse.default_name')}: ${item?.product_name || item?.product_sku || ''} / ${item?.name || item?.sku || `#${item?.id}`}`
+    : `${warehouse_name || trans('hancms.sales.warehouse.default_name')}: ${item?.name || item?.sku || `#${item?.id}`}`;
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    put(route('warehouse.update', item.id));
+    put(updateRoute);
   };
 
   return (
     <div className="p-6 space-y-6">
-      <HeaderToolbar title={`${warehouse_name || trans('hancms.sales.warehouse.default_name')}: ${item?.name || item?.sku || `#${item?.id}`}`}>
+      <HeaderToolbar title={title}>
         <SaveButton
           loading={processing}
           undo={undo}
@@ -65,6 +70,12 @@ export default function WarehouseEditPage() {
             <div className="grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-sm">
               <div><span className="text-slate-500">SKU:</span> <span className="font-semibold">{item.sku}</span></div>
               <div><span className="text-slate-500">{trans('hancms.sales.warehouse.fields.current_stock')}:</span> <span className="font-semibold">{item.quantity}</span></div>
+              {isVariant && (
+                <>
+                  <div><span className="text-slate-500">{trans('hancms.catalog.product.tabs.variants')}:</span> <span className="font-semibold">{item.name || '-'}</span></div>
+                  <div><span className="text-slate-500">{trans('hancms.catalog.product.name')}:</span> <span className="font-semibold">{item.product_name || item.product_sku || '-'}</span></div>
+                </>
+              )}
             </div>
 
             <InputGroup label={trans('hancms.sales.warehouse.fields.update_method')}>

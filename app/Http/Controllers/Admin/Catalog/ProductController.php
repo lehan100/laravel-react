@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin\Catalog;
 
 use App\Http\Controllers\MainController;
 use App\Http\Requests\Catalog\ProductRequest;
+use App\Http\Resources\Catalog\AttributeResource;
 use App\Http\Resources\Catalog\ProductCollection;
 use App\Http\Resources\Catalog\ProductResource;
-use App\Models\Catalog\ProductAttribute;
 use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Product\ProductRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
@@ -63,10 +63,9 @@ class ProductController extends MainController
         return Inertia::render($this->controllerView.'Created', [
             'item' => null,
             'itemsCategoryActive' => $itemsCategoryActive,
-            'attributes' => ProductAttribute::query()
-                ->with('values:id,attribute_id,value')
-                ->orderBy('name')
-                ->get(['id', 'name']),
+            'attributes' => AttributeResource::collection(
+                $this->mainModel->getAttributeRows()
+            ),
         ]);
     }
 
@@ -99,10 +98,9 @@ class ProductController extends MainController
         return Inertia::render($this->controllerView.'Edit', [
             'item' => new ProductResource($item),
             'itemsCategoryActive' => $itemsCategoryActive,
-            'attributes' => ProductAttribute::query()
-                ->with('values:id,attribute_id,value')
-                ->orderBy('name')
-                ->get(['id', 'name']),
+            'attributes' => AttributeResource::collection(
+                $this->mainModel->getAttributeRows()
+            ),
         ]);
     }
 

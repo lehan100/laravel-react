@@ -3,6 +3,7 @@
 namespace App\Repositories\Order;
 
 use App\Models\Catalog\Product;
+use App\Models\Catalog\ProductVariant;
 use App\Models\Sales\Order;
 use App\Models\Sales\OrderItem;
 use App\Models\Sales\PaymentMethod;
@@ -300,7 +301,7 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
         $products = Product::query()
             ->with(['translations' => function ($query) use ($locale) {
                 $query->select(['id', 'product_id', 'locale', 'name'])->where('locale', $locale);
-            }])
+            }, 'variants.translations', 'variants.attributeValues.translations', 'variants.attributeValues.attribute.translations'])
             ->whereIn('id', collect($rawItems)->pluck('product_id')->filter()->all())
             ->get()
             ->keyBy('id');
@@ -315,19 +316,37 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
             $unitPrice = $rawItem['unit_price'] !== null && $rawItem['unit_price'] !== ''
                 ? $this->normalizeMoney($rawItem['unit_price'])
                 : $this->normalizeMoney($product->price);
+            $variant = ! empty($rawItem['variant_id'])
+                ? $product->variants->firstWhere('id', (int) $rawItem['variant_id'])
+                : null;
             $lineTotal = round($quantity * $unitPrice, 2);
             $productName = $product->translations->first()?->name ?? $product->sku ?? 'Product #'.$product->id;
+            $variantLabel = $variant ? $this->variantLabel($variant) : null;
 
             $items[] = [
                 'product_id' => $product->id,
-                'product_name' => $productName,
-                'product_sku' => $product->sku,
+                'product_name' => $variantLabel ? $productName.' - '.$variantLabel : $productName,
+                'product_sku' => $variant?->sku ?: $product->sku,
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
                 'line_total' => $lineTotal,
                 'meta' => [
-                    'available_quantity' => (int) ($product->quantity ?? 0),
+                    'available_quantity' => $variant
+                        ? (int) ($variant->stock ?? 0)
+                        : (int) ($product->quantity ?? 0),
                     'price_source' => $rawItem['unit_price'] !== null && $rawItem['unit_price'] !== '' ? 'manual' : 'product',
+                    'variant' => $variant ? [
+                        'id' => $variant->id,
+                        'sku' => $variant->sku,
+                        'name' => $variant->name,
+                        'label' => $variantLabel,
+                        'stock' => (int) ($variant->stock ?? 0),
+                        'attribute_values' => $variant->attributeValues->map(fn ($value): array => [
+                            'id' => $value->id,
+                            'attribute' => $value->attribute?->name,
+                            'value' => $value->value,
+                        ])->values()->all(),
+                    ] : null,
                 ],
             ];
 
@@ -353,11 +372,23 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
             ->select(['id', 'sku', 'price', 'quantity', 'is_stock'])
             ->with(['translations' => function ($query) use ($locale) {
                 $query->select(['id', 'product_id', 'locale', 'name'])->where('locale', $locale);
-            }])
+            }, 'variants.translations', 'variants.attributeValues.translations', 'variants.attributeValues.attribute.translations'])
             ->orderByDesc('id')
             ->limit(200)
             ->get()
             ->map(function (Product $product) {
+                $variants = $product->variants
+                    ->sortBy('id')
+                    ->map(fn (ProductVariant $variant): array => [
+                        'id' => $variant->id,
+                        'sku' => $variant->sku,
+                        'label' => $this->variantLabel($variant),
+                        'price' => (float) $variant->price,
+                        'stock' => (int) ($variant->stock ?? 0),
+                    ])
+                    ->values()
+                    ->all();
+
                 return [
                     'id' => $product->id,
                     'sku' => $product->sku,
@@ -365,9 +396,47 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     'price' => (float) $product->price,
                     'quantity' => (int) ($product->quantity ?? 0),
                     'is_stock' => (bool) $product->is_stock,
+                    'variants' => $variants,
+                    'has_variants' => $variants !== [],
+                    'available_quantity' => $variants !== []
+                        ? collect($variants)->sum('stock')
+                        : (int) ($product->quantity ?? 0),
                 ];
             })
             ->all();
+    }
+
+    private function variantLabel(ProductVariant $variant): string
+    {
+        $parts = [];
+
+        if (is_string($variant->name) && trim($variant->name) !== '') {
+            $parts[] = trim($variant->name);
+        }
+
+        $attributeValues = $variant->relationLoaded('attributeValues')
+            ? $variant->attributeValues
+            : collect();
+
+        $attributeLabel = $attributeValues
+            ->map(function ($value): string {
+                $attributeName = $value->attribute?->name;
+                $valueName = $value->value;
+
+                return trim(($attributeName ? $attributeName.': ' : '').(string) $valueName);
+            })
+            ->filter()
+            ->implode(' / ');
+
+        if ($attributeLabel !== '') {
+            $parts[] = $attributeLabel;
+        }
+
+        if ($parts === [] && is_string($variant->sku) && trim($variant->sku) !== '') {
+            $parts[] = trim($variant->sku);
+        }
+
+        return implode(' - ', array_unique($parts)) ?: 'Variant #'.$variant->id;
     }
 
     /**

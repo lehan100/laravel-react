@@ -4,6 +4,7 @@ namespace Database\Factories\Catalog;
 
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductVariant;
+use App\Models\Catalog\ProductVariantTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,6 +12,17 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ProductVariantFactory extends Factory
 {
+    public function configure(): static
+    {
+        return $this->afterCreating(function (ProductVariant $variant): void {
+            ProductVariantTranslation::query()->create([
+                'product_variant_id' => $variant->id,
+                'locale' => 'vi',
+                'name' => $this->faker->words(2, true),
+            ]);
+        });
+    }
+
     /**
      * Define the model's default state.
      *

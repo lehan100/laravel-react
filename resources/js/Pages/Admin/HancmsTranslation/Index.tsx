@@ -31,8 +31,10 @@ export default function IndexPage() {
 
   const { data, setData, errors, post, processing } = form;
   const [undo, setUndo] = useState(0);
+  const [editingField, setEditingField] = useState<string | null>(null);
 
   const localeCodes = useMemo(() => languageRows.map((language) => language.code), [languageRows]);
+  const translationErrors = errors as Record<string, string>;
 
   const handleUndo = (status: number) => {
     setUndo(status);
@@ -41,7 +43,13 @@ export default function IndexPage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    post(route('hancms-translations.store'));
+    post(route('hancms-translations.store'), {
+      preserveScroll: true,
+      preserveState: false,
+      onSuccess: () => {
+        setEditingField(null);
+      },
+    });
   };
 
   const updateTranslation = (locale: string, key: string, value: string) => {
@@ -52,6 +60,36 @@ export default function IndexPage() {
         [key]: value,
       },
     });
+  };
+
+  const renderEditableCell = (locale: string, key: string) => {
+    const fieldId = `${locale}-${key}`;
+    const isEditing = editingField === fieldId;
+    const cellValue = data.translations?.[locale]?.[key] || '';
+
+    return (
+      <input
+        key={fieldId}
+        type="text"
+        readOnly={!isEditing}
+        value={cellValue}
+        onFocus={() => setEditingField(fieldId)}
+        onBlur={() => setEditingField(null)}
+        onChange={(event) => updateTranslation(locale, key, event.target.value)}
+        autoFocus={isEditing}
+        className={`
+          block w-full rounded-none border-0 bg-transparent px-2 py-1.5 text-sm outline-none shadow-none transition duration-200
+          ${isEditing
+            ? 'cursor-text text-slate-900'
+            : 'cursor-pointer text-slate-600 hover:text-slate-900'
+          }
+        `}
+      />
+    );
+  };
+
+  const getTranslationError = (locale: string, key: string) => {
+    return translationErrors[`translations.${locale}.${key}`];
   };
 
   return (
@@ -103,16 +141,12 @@ export default function IndexPage() {
                       </td>
                       {localeCodes.map((locale) => (
                         <td key={`${locale}-${key}`} className="min-w-[320px] px-4 py-3 align-top">
-                          <input
-                            type="text"
-                            value={data.translations?.[locale]?.[key] || ''}
-                            onChange={(event) => updateTranslation(locale, key, event.target.value)}
-                            className={`w-full rounded-md border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${
-                              errors[`translations.${locale}.${key}`]
-                                ? 'border-rose-500 bg-rose-50'
-                                : 'border-slate-300 bg-white'
-                            }`}
-                          />
+                          <div className="px-1 py-1">
+                            {renderEditableCell(locale, key)}
+                          </div>
+                          {getTranslationError(locale, key) && (
+                            <p className="mt-2 text-xs text-rose-600">{getTranslationError(locale, key)}</p>
+                          )}
                         </td>
                       ))}
                     </tr>
