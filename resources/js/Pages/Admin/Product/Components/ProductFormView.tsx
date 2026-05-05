@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
-import { Globe, Save, Search, Sparkles } from 'lucide-react';
+import { Globe, Plus, RefreshCw, Save, Search, Sparkles, Trash2, X } from 'lucide-react';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import SaveButton from '@/Components/Button/SaveButton';
 import BackButton from '@/Components/Button/BackButton';
@@ -27,6 +27,7 @@ interface Props {
     langList: any[];
     langCode?: string;
     itemsCategoryActive: any[];
+    attributes: any[];
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     processing: boolean;
     undo: number;
@@ -45,6 +46,7 @@ const ProductFormView = ({
     langList = [],
     langCode,
     itemsCategoryActive = [],
+    attributes = [],
     onSubmit,
     processing,
     undo,
@@ -78,7 +80,30 @@ const ProductFormView = ({
     );
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tinyCallback, setTinyCallback] = useState<any>(null);
+    const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(null);
+    const [variantDraft, setVariantDraft] = useState<any>(null);
+    const [variantImageUploading, setVariantImageUploading] = useState(false);
     const [priceInput, setPriceInput] = useState(() => formatPriceInput(data.price, priceCurrency));
+    const [basePriceInput, setBasePriceInput] = useState(() => formatPriceInput(data.base_price ?? data.price, priceCurrency));
+    const [selectedValueIdsByAttribute, setSelectedValueIdsByAttribute] = useState<Record<string, number[]>>(() => {
+        const selected: Record<string, number[]> = {};
+        const variants = Array.isArray(data.variants) ? data.variants : [];
+
+        variants.forEach((variant: any) => {
+            (variant.attribute_value_ids || []).forEach((valueId: any) => {
+                const attribute = attributes.find((attr: any) =>
+                    (attr.values || []).some((value: any) => Number(value.id) === Number(valueId))
+                );
+
+                if (!attribute) return;
+
+                const key = String(attribute.id);
+                selected[key] = Array.from(new Set([...(selected[key] || []), Number(valueId)]));
+            });
+        });
+
+        return selected;
+    });
     const [aiSuggestingLocale, setAiSuggestingLocale] = useState<string | null>(null);
     const [aiSuggestionError, setAiSuggestionError] = useState('');
     const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
@@ -93,7 +118,190 @@ const ProductFormView = ({
 
     useEffect(() => {
         setPriceInput(formatPriceInput(data.price, priceCurrency));
+        setBasePriceInput(formatPriceInput(data.base_price ?? data.price, priceCurrency));
     }, [priceCurrency.code]);
+
+    const getVariantKey = (attributeValueIds: any[]) => attributeValueIds
+        .map((id) => Number(id))
+        .sort((a, b) => a - b)
+        .join('-');
+
+    const buildCombinations = (groups: number[][]): number[][] => {
+        if (groups.length === 0) return [];
+
+        return groups.reduce<number[][]>((result, group) => {
+            if (result.length === 0) {
+                return group.map((id) => [id]);
+            }
+
+            return result.flatMap((combination) => group.map((id) => [...combination, id]));
+        }, []);
+    };
+
+    const toggleAttributeValue = (attributeId: number, valueId: number) => {
+        setSelectedValueIdsByAttribute((prev) => {
+            const key = String(attributeId);
+            const current = prev[key] || [];
+            const nextValues = current.includes(valueId)
+                ? current.filter((id) => id !== valueId)
+                : [...current, valueId];
+
+            return {
+                ...prev,
+                [key]: nextValues,
+            };
+        });
+    };
+
+    const generateVariantRows = () => {
+        const groups = attributes
+            .map((attribute: any) => selectedValueIdsByAttribute[String(attribute.id)] || [])
+            .filter((values: number[]) => values.length > 0);
+        const combinations = buildCombinations(groups);
+        const existingVariants = Array.isArray(data.variants) ? data.variants : [];
+        const existingByKey = new Map(existingVariants.map((variant: any) => [
+            getVariantKey(variant.attribute_value_ids || []),
+            variant,
+        ]));
+        const baseSku = String(data.sku || 'VAR').trim() || 'VAR';
+
+        setData('variants', combinations.map((attributeValueIds) => {
+            const key = getVariantKey(attributeValueIds);
+            const existing = existingByKey.get(key);
+
+            if (existing) {
+                return existing;
+            }
+
+            return {
+                sku: `${baseSku}-${key}`,
+                price: data.base_price || data.price || 0,
+                stock: 0,
+                image: '',
+                image_url: '',
+                images: [],
+                image_urls: [],
+                attribute_value_ids: attributeValueIds,
+            };
+        }));
+    };
+
+    const updateVariant = (index: number, field: string, value: any) => {
+        const variants = Array.isArray(data.variants) ? [...data.variants] : [];
+        variants[index] = {
+            ...(variants[index] || {}),
+            [field]: value,
+        };
+        setData('variants', variants);
+    };
+
+    const openVariantModal = (index: number) => {
+        const variants = Array.isArray(data.variants) ? data.variants : [];
+        setEditingVariantIndex(index);
+        setVariantDraft({ ...(variants[index] || {}) });
+    };
+
+    const closeVariantModal = () => {
+        setEditingVariantIndex(null);
+        setVariantDraft(null);
+        setVariantImageUploading(false);
+    };
+
+    const saveVariantDraft = () => {
+        if (editingVariantIndex === null || !variantDraft) return;
+
+        const variants = Array.isArray(data.variants) ? [...data.variants] : [];
+        variants[editingVariantIndex] = {
+            ...(variants[editingVariantIndex] || {}),
+            ...variantDraft,
+        };
+        setData('variants', variants);
+        closeVariantModal();
+    };
+
+    const getVariantImagePreviewUrl = (variant: any, image?: string, imageIndex = 0) => {
+        const targetImage = image || variant?.image || variant?.images?.[0];
+        if (!targetImage) return '';
+        if (Array.isArray(variant?.image_urls) && variant.image_urls[imageIndex]) return variant.image_urls[imageIndex];
+        if (variant.image_url && (!image || image === variant.image)) return variant.image_url;
+        if (/^https?:\/\//.test(targetImage) || targetImage.startsWith('/')) return targetImage;
+
+        return `/${props.config_path?.temp || 'var/temp'}/${targetImage}`;
+    };
+
+    const handleVariantImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        setVariantImageUploading(true);
+        try {
+            const uploaded = await Promise.all(files.map(async (file) => {
+                const formData = new FormData();
+                formData.append('photo', file);
+                const response = await axios.post(route('product.upload'), formData);
+
+                return {
+                    fileName: response.data?.file_name || '',
+                    url: response.data?.url || '',
+                };
+            }));
+
+            const uploadedImages = uploaded.filter((item) => item.fileName);
+
+            if (uploadedImages.length > 0) {
+                setVariantDraft((prev: any) => ({
+                    ...(prev || {}),
+                    image: prev?.image || uploadedImages[0].fileName,
+                    image_url: prev?.image_url || uploadedImages[0].url,
+                    images: [
+                        ...((prev?.images || []) as string[]),
+                        ...uploadedImages.map((item) => item.fileName),
+                    ],
+                    image_urls: [
+                        ...((prev?.image_urls || []) as string[]),
+                        ...uploadedImages.map((item) => item.url),
+                    ],
+                }));
+            }
+        } finally {
+            setVariantImageUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const removeVariantDraftImage = (imageIndex: number) => {
+        setVariantDraft((prev: any) => {
+            const images = [...(prev?.images || [])];
+            const imageUrls = [...(prev?.image_urls || [])];
+            images.splice(imageIndex, 1);
+            imageUrls.splice(imageIndex, 1);
+
+            return {
+                ...(prev || {}),
+                images,
+                image_urls: imageUrls,
+                image: images[0] || '',
+                image_url: imageUrls[0] || '',
+            };
+        });
+    };
+
+    const removeVariant = (index: number) => {
+        const variants = Array.isArray(data.variants) ? [...data.variants] : [];
+        variants.splice(index, 1);
+        setData('variants', variants);
+    };
+
+    const getAttributeValueLabel = (valueId: number) => {
+        for (const attribute of attributes) {
+            const value = (attribute.values || []).find((item: any) => Number(item.id) === Number(valueId));
+            if (value) {
+                return `${attribute.name}: ${value.value}`;
+            }
+        }
+
+        return `#${valueId}`;
+    };
 
     const createSlug = (str: string) => {
         if (!str) return '';
@@ -272,6 +480,10 @@ const ProductFormView = ({
             return !!errors.photos || !!errors.default_photo_id;
         }
 
+        if (tabId === 'variants') {
+            return Object.keys(errors).some((key) => key.startsWith('variants.'));
+        }
+
         return false;
     };
 
@@ -304,6 +516,38 @@ const ProductFormView = ({
                             onChange={(e) => setData('quantity', e.target.value)}
                         />
                         {errors?.quantity && <MessageError>{errors.quantity}</MessageError>}
+                    </InputGroup>
+                    <InputGroup label={trans('hancms.column.brand') || 'Brand'}>
+                        <input
+                            type="text"
+                            className={inputClass('brand')}
+                            value={data.brand || ''}
+                            onChange={(e) => setData('brand', e.target.value)}
+                        />
+                        {errors?.brand && <MessageError>{errors.brand}</MessageError>}
+                    </InputGroup>
+                    <InputGroup label={trans('hancms.catalog.product.fields.base_price') || 'Base price'}>
+                        <div className="relative">
+                            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-semibold text-slate-500">
+                                {priceSymbol}
+                            </span>
+                            <input
+                                type="text"
+                                inputMode={priceCurrency.code === 'VND' || priceCurrency.code === 'JPY' || priceCurrency.code === 'KRW' ? 'numeric' : 'decimal'}
+                                className={`${inputClass('base_price')} pl-8`}
+                                value={basePriceInput}
+                                onChange={(e) => {
+                                    setBasePriceInput(e.target.value);
+                                    setData('base_price', e.target.value);
+                                }}
+                                onBlur={() => {
+                                    const formatted = formatPriceInput(basePriceInput, priceCurrency);
+                                    setBasePriceInput(formatted);
+                                    setData('base_price', formatted);
+                                }}
+                            />
+                        </div>
+                        {errors?.base_price && <MessageError>{errors.base_price}</MessageError>}
                     </InputGroup>
                     <InputGroup label={trans('hancms.column.price')}>
                         <div className="relative">
@@ -667,6 +911,209 @@ const ProductFormView = ({
         </div>
     );
 
+    const renderVariantsTab = () => {
+        const variants = Array.isArray(data.variants) ? data.variants : [];
+
+        return (
+            <div className="space-y-6">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h3 className="text-sm font-black uppercase text-slate-800">
+                                {trans('hancms.catalog.product.variants.attributes') || 'Variant attributes'}
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500">
+                                {trans('hancms.catalog.product.variants.attributes_hint') || 'Choose attribute values, then generate combinations.'}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={generateVariantRows}
+                            disabled={attributes.length === 0}
+                            className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-4 py-3 text-xs font-black uppercase text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                        >
+                            <RefreshCw size={15} />
+                            {trans('hancms.catalog.product.variants.generate') || 'Generate variants'}
+                        </button>
+                    </div>
+
+                    {attributes.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-500">
+                            {trans('hancms.catalog.product.variants.empty_attributes') || 'Create product attributes and values before generating variants.'}
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 lg:grid-cols-2">
+                            {attributes.map((attribute: any) => {
+                                const selectedValues = selectedValueIdsByAttribute[String(attribute.id)] || [];
+
+                                return (
+                                    <div key={attribute.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                                        <div className="mb-3 flex items-center justify-between gap-3">
+                                            <div className="text-sm font-bold text-slate-800">{attribute.name}</div>
+                                            <div className="text-xs font-semibold text-slate-400">
+                                                {selectedValues.length}/{attribute.values?.length || 0}
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {(attribute.values || []).map((value: any) => {
+                                                const checked = selectedValues.includes(Number(value.id));
+
+                                                return (
+                                                    <button
+                                                        key={value.id}
+                                                        type="button"
+                                                        onClick={() => toggleAttributeValue(Number(attribute.id), Number(value.id))}
+                                                        className={`rounded-md border px-3 py-2 text-xs font-bold transition ${checked
+                                                            ? 'border-slate-900 bg-slate-900 text-white'
+                                                            : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-400'
+                                                            }`}
+                                                    >
+                                                        {value.value}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4">
+                        <div>
+                            <h3 className="text-sm font-black uppercase text-slate-800">
+                                {trans('hancms.catalog.product.variants.name') || 'Product variants'}
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500">
+                                {variants.length} {trans('hancms.catalog.product.variants.rows') || 'rows'}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setData('variants', [
+                                ...variants,
+                                {
+                                    sku: data.sku ? `${data.sku}-${variants.length + 1}` : '',
+                                    price: data.base_price || data.price || 0,
+                                    stock: 0,
+                                    image: '',
+                                    image_url: '',
+                                    images: [],
+                                    image_urls: [],
+                                    attribute_value_ids: [],
+                                },
+                            ])}
+                            className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-3 text-xs font-black uppercase text-slate-700 transition hover:bg-slate-50"
+                        >
+                            <Plus size={15} />
+                            {trans('hancms.button.add') || 'Add'}
+                        </button>
+                    </div>
+
+                    {variants.length === 0 ? (
+                        <div className="px-4 py-10 text-center text-sm text-slate-500">
+                            {trans('hancms.catalog.product.variants.empty') || 'No variants yet.'}
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-[980px] w-full text-left text-sm">
+                                <thead className="bg-slate-50 text-xs font-black uppercase text-slate-500">
+                                    <tr>
+                                        <th className="px-4 py-3">{trans('hancms.column.attributes') || 'Attributes'}</th>
+                                        <th className="px-4 py-3">{trans('hancms.column.sku')}</th>
+                                        <th className="px-4 py-3">{trans('hancms.column.price')}</th>
+                                        <th className="px-4 py-3">{trans('hancms.column.stock') || 'Stock'}</th>
+                                        <th className="px-4 py-3">{trans('hancms.column.image') || 'Image'}</th>
+                                        <th className="px-4 py-3">{trans('hancms.column.action')}</th>
+                                        <th className="w-16 px-4 py-3" />
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {variants.map((variant: any, index: number) => {
+                                        const attributeValueIds = variant.attribute_value_ids || [];
+
+                                        return (
+                                            <tr key={variant.id || getVariantKey(attributeValueIds) || index} className="align-top">
+                                                <td className="px-4 py-4">
+                                                    <div className="flex max-w-[260px] flex-wrap gap-2">
+                                                        {attributeValueIds.length === 0 ? (
+                                                            <span className="rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">
+                                                                {trans('hancms.catalog.product.variants.manual') || 'Manual'}
+                                                            </span>
+                                                        ) : attributeValueIds.map((valueId: number) => (
+                                                            <span key={valueId} className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
+                                                                {getAttributeValueLabel(Number(valueId))}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    {errors?.[`variants.${index}.attribute_value_ids`] && (
+                                                        <MessageError>{errors[`variants.${index}.attribute_value_ids`]}</MessageError>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <div className="font-semibold text-slate-800">{variant.sku || '-'}</div>
+                                                    {errors?.[`variants.${index}.sku`] && <MessageError>{errors[`variants.${index}.sku`]}</MessageError>}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <div className="font-semibold text-slate-800">{variant.price ?? '-'}</div>
+                                                    {errors?.[`variants.${index}.price`] && <MessageError>{errors[`variants.${index}.price`]}</MessageError>}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <div className="font-semibold text-slate-800">{variant.stock ?? 0}</div>
+                                                    {errors?.[`variants.${index}.stock`] && <MessageError>{errors[`variants.${index}.stock`]}</MessageError>}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    {getVariantImagePreviewUrl(variant) ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <img
+                                                                src={getVariantImagePreviewUrl(variant)}
+                                                                alt={variant.sku || ''}
+                                                                className="h-12 w-12 rounded-md object-cover"
+                                                            />
+                                                            {(variant.images?.length || 0) > 1 && (
+                                                                <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-600">
+                                                                    +{variant.images.length - 1}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="h-12 w-12 rounded-md border border-dashed border-slate-300 bg-slate-50" />
+                                                    )}
+                                                    {errors?.[`variants.${index}.image`] && <MessageError>{errors[`variants.${index}.image`]}</MessageError>}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openVariantModal(index)}
+                                                        className="rounded-md border border-slate-300 px-3 py-2 text-xs font-black uppercase text-slate-700 transition hover:bg-slate-50"
+                                                    >
+                                                        {trans('hancms.button.edit') || 'Edit'}
+                                                    </button>
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeVariant(index)}
+                                                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-rose-200 bg-rose-50 text-rose-600 transition hover:bg-rose-100"
+                                                        aria-label="Remove variant"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     const renderTabContent = () => {
         switch (activeTab) {
             case 'general':
@@ -675,6 +1122,8 @@ const ProductFormView = ({
                 return renderContentTab();
             case 'photos':
                 return renderPhotosTab();
+            case 'variants':
+                return renderVariantsTab();
             default:
                 return null;
         }
@@ -701,7 +1150,7 @@ const ProductFormView = ({
                 <Card title={trans('hancms.catalog.product.admin.name')} className="mb-6">
                     <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
                         <div className="flex flex-wrap gap-3 overflow-x-auto pb-1">
-                            {['general', 'content', 'photos'].map((id) => {
+                            {['general', 'content', 'photos', 'variants'].map((id) => {
                                 const errorInTab = hasTabError(id);
                                 const active = activeTab === id;
 
@@ -734,6 +1183,175 @@ const ProductFormView = ({
                     </div>
                 </Card>
             </form>
+            {editingVariantIndex !== null && variantDraft && (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/55 px-4 py-6">
+                    <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+                        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                            <div>
+                                <h3 className="text-base font-black uppercase text-slate-900">
+                                    {trans('hancms.catalog.product.variants.modal_title') || 'Variant information'}
+                                </h3>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    {variantDraft.attribute_value_ids?.length
+                                        ? variantDraft.attribute_value_ids.map((valueId: number) => getAttributeValueLabel(Number(valueId))).join(' / ')
+                                        : (trans('hancms.catalog.product.variants.manual') || 'Manual')}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={closeVariantModal}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="grid gap-6 px-5 py-5 md:grid-cols-[160px_1fr]">
+                            <div className="space-y-3">
+                                <div className="text-xs font-black uppercase text-slate-500">
+                                    {trans('hancms.catalog.product.variants.images') || 'Variant images'}
+                                </div>
+
+                                <input
+                                    id={`variant-images-${editingVariantIndex}`}
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleVariantImageChange}
+                                />
+                                <label
+                                    htmlFor={`variant-images-${editingVariantIndex}`}
+                                    className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-center transition hover:border-indigo-400 hover:bg-indigo-50"
+                                >
+                                    {variantImageUploading ? (
+                                        <RefreshCw className="h-7 w-7 animate-spin text-indigo-500" />
+                                    ) : (
+                                        <>
+                                            <Plus className="h-7 w-7 text-slate-400" />
+                                            <span className="mt-2 text-xs font-black uppercase text-slate-600">
+                                                {trans('hancms.catalog.product.variants.upload_images') || 'Upload images'}
+                                            </span>
+                                        </>
+                                    )}
+                                </label>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    {(variantDraft.images || []).map((image: string, imageIndex: number) => (
+                                        <div key={`${image}-${imageIndex}`} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                                            <img
+                                                src={getVariantImagePreviewUrl(variantDraft, image, imageIndex)}
+                                                alt={image}
+                                                className="h-full w-full object-cover"
+                                            />
+                                            {imageIndex === 0 && (
+                                                <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-black uppercase text-white">
+                                                    {trans('hancms.default')}
+                                                </span>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => removeVariantDraftImage(imageIndex)}
+                                                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-rose-600 text-white opacity-0 transition group-hover:opacity-100"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {variantDraft.images?.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setVariantDraft((prev: any) => ({ ...(prev || {}), image: '', image_url: '', images: [], image_urls: [] }))}
+                                        className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 transition hover:bg-rose-100"
+                                    >
+                                        <Trash2 size={14} />
+                                        {trans('hancms.catalog.product.variants.clear_images') || 'Clear images'}
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <InputGroup label={trans('hancms.column.sku')}>
+                                    <input
+                                        type="text"
+                                        className={inputClass(`variants.${editingVariantIndex}.sku`)}
+                                        value={variantDraft.sku || ''}
+                                        onChange={(e) => setVariantDraft((prev: any) => ({ ...(prev || {}), sku: e.target.value }))}
+                                    />
+                                    {errors?.[`variants.${editingVariantIndex}.sku`] && (
+                                        <MessageError>{errors[`variants.${editingVariantIndex}.sku`]}</MessageError>
+                                    )}
+                                </InputGroup>
+
+                                <InputGroup label={trans('hancms.column.price')}>
+                                    <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        className={inputClass(`variants.${editingVariantIndex}.price`)}
+                                        value={variantDraft.price ?? ''}
+                                        onChange={(e) => setVariantDraft((prev: any) => ({ ...(prev || {}), price: e.target.value }))}
+                                    />
+                                    {errors?.[`variants.${editingVariantIndex}.price`] && (
+                                        <MessageError>{errors[`variants.${editingVariantIndex}.price`]}</MessageError>
+                                    )}
+                                </InputGroup>
+
+                                <InputGroup label={trans('hancms.column.stock') || 'Stock'}>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className={inputClass(`variants.${editingVariantIndex}.stock`)}
+                                        value={variantDraft.stock ?? 0}
+                                        onChange={(e) => setVariantDraft((prev: any) => ({ ...(prev || {}), stock: e.target.value }))}
+                                    />
+                                    {errors?.[`variants.${editingVariantIndex}.stock`] && (
+                                        <MessageError>{errors[`variants.${editingVariantIndex}.stock`]}</MessageError>
+                                    )}
+                                </InputGroup>
+
+                                <InputGroup label={trans('hancms.column.image') || 'Representative image'}>
+                                    <select
+                                        className={inputClass(`variants.${editingVariantIndex}.image`)}
+                                        value={variantDraft.image || ''}
+                                        onChange={(e) => setVariantDraft((prev: any) => ({
+                                            ...(prev || {}),
+                                            image: e.target.value,
+                                            image_url: getVariantImagePreviewUrl(prev, e.target.value, (prev?.images || []).indexOf(e.target.value)),
+                                        }))}
+                                    >
+                                        <option value="">{trans('hancms.placeholder.select')}</option>
+                                        {(variantDraft.images || []).map((image: string) => (
+                                            <option key={image} value={image}>{image}</option>
+                                        ))}
+                                    </select>
+                                    {errors?.[`variants.${editingVariantIndex}.image`] && (
+                                        <MessageError>{errors[`variants.${editingVariantIndex}.image`]}</MessageError>
+                                    )}
+                                </InputGroup>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 px-5 py-4">
+                            <button
+                                type="button"
+                                onClick={closeVariantModal}
+                                className="rounded-md border border-slate-300 px-4 py-3 text-xs font-black uppercase text-slate-600 transition hover:bg-slate-50"
+                            >
+                                {trans('hancms.button.cancel') || 'Cancel'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={saveVariantDraft}
+                                className="rounded-md bg-slate-900 px-4 py-3 text-xs font-black uppercase text-white transition hover:bg-slate-700"
+                            >
+                                {trans('hancms.button.save')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <MediaLibraryModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

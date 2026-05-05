@@ -7,7 +7,7 @@ import { buildInitialTranslations, convertPriceToBase, convertPriceToDisplay, fo
 
 function CreatedPage() {
     const { trans } = useTrans();
-    const { langs, itemsCategoryActive, item, locale }: any = usePage().props;
+    const { langs, itemsCategoryActive, item, locale, attributes }: any = usePage().props;
     const currentLocale = getLocaleCode(locale);
     const langList = langs?.data || (Array.isArray(langs) ? langs : Object.values(langs || {}));
     const initialTranslations = buildInitialTranslations(langList, item);
@@ -19,6 +19,8 @@ function CreatedPage() {
         sku: '',
         quantity: 0,
         weight: 0,
+        brand: '',
+        base_price: formatPriceInput(convertPriceToDisplay(0, productCurrency), productCurrency),
         price: formatPriceInput(convertPriceToDisplay(0, productCurrency), productCurrency),
         status: 0,
         is_stock: 0,
@@ -29,11 +31,19 @@ function CreatedPage() {
         default_photo_id: defaultPhotoId,
         delete_photo_ids: [],
         photos: [],
+        variants: [],
         translations: initialTranslations,
     });
     form.transform((payload: any) => ({
         ...payload,
+        base_price: convertPriceToBase(payload.base_price, productCurrency),
         price: convertPriceToBase(payload.price, productCurrency),
+        variants: Array.isArray(payload.variants)
+            ? payload.variants.map((variant: any) => ({
+                ...variant,
+                price: convertPriceToBase(variant.price, productCurrency),
+            }))
+            : [],
     }));
     const { data, setData, errors, post, processing } = form;
     const [undo, setUndo] = useState(0);
@@ -63,6 +73,7 @@ function CreatedPage() {
             langList={langList}
             langCode={locale}
             itemsCategoryActive={itemsCategoryActive || []}
+            attributes={attributes || []}
             onSubmit={handleSubmit}
             processing={processing}
             undo={undo}

@@ -7,7 +7,7 @@ import { buildInitialTranslations, convertPriceToBase, convertPriceToDisplay, fo
 
 function EditPage() {
     const { trans } = useTrans();
-    const { langs, item, itemsCategoryActive, locale }: any = usePage().props;
+    const { langs, item, itemsCategoryActive, locale, attributes }: any = usePage().props;
     const currentLocale = getLocaleCode(locale);
     const langList = langs?.data || (Array.isArray(langs) ? langs : Object.values(langs || {}));
     const initialTranslations = buildInitialTranslations(langList, item);
@@ -19,6 +19,8 @@ function EditPage() {
         sku: item?.sku || '',
         quantity: item?.quantity ?? 0,
         weight: item?.weight ?? 0,
+        brand: item?.brand || '',
+        base_price: formatPriceInput(convertPriceToDisplay(item?.base_price ?? item?.price ?? 0, productCurrency), productCurrency),
         price: formatPriceInput(convertPriceToDisplay(item?.price ?? 0, productCurrency), productCurrency),
         status: item?.status ?? 0,
         is_stock: item?.is_stock ? 1 : 0,
@@ -29,11 +31,31 @@ function EditPage() {
         default_photo_id: defaultPhotoId,
         delete_photo_ids: [],
         photos: [],
+        variants: Array.isArray(item?.variants)
+            ? item.variants.map((variant: any) => ({
+                id: variant.id,
+                sku: variant.sku || '',
+                price: formatPriceInput(convertPriceToDisplay(variant.price ?? 0, productCurrency), productCurrency),
+                stock: variant.stock ?? 0,
+                image: variant.image || '',
+                image_url: variant.image_url || '',
+                images: variant.images || (variant.image ? [variant.image] : []),
+                image_urls: variant.image_urls || (variant.image_url ? [variant.image_url] : []),
+                attribute_value_ids: variant.attribute_value_ids || [],
+            }))
+            : [],
         translations: initialTranslations,
     });
     form.transform((payload: any) => ({
         ...payload,
+        base_price: convertPriceToBase(payload.base_price, productCurrency),
         price: convertPriceToBase(payload.price, productCurrency),
+        variants: Array.isArray(payload.variants)
+            ? payload.variants.map((variant: any) => ({
+                ...variant,
+                price: convertPriceToBase(variant.price, productCurrency),
+            }))
+            : [],
     }));
     const { data, setData, errors, put, processing } = form;
     const [undo, setUndo] = useState(0);
@@ -63,6 +85,7 @@ function EditPage() {
             langList={langList}
             langCode={locale}
             itemsCategoryActive={itemsCategoryActive || []}
+            attributes={attributes || []}
             onSubmit={handleSubmit}
             processing={processing}
             undo={undo}

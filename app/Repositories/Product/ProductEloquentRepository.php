@@ -2,14 +2,12 @@
 
 namespace App\Repositories\Product;
 
-use Illuminate\Pipeline\Pipeline;
-use App\Pipelines\SortCategoriesByHierarchy;
+use App\Models\Catalog\Product;
 use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
-use Illuminate\Support\Facades\DB;
-use App\Models\Catalog\Product;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class ProductEloquentRepository extends EloquentRepository implements ProductRepositoryInterface
 {
@@ -18,6 +16,8 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         'sku',
         'quantity',
         'weight',
+        'brand',
+        'base_price',
         'price',
         'is_coupon',
         'is_stock',
@@ -25,8 +25,9 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         'order',
         'hit_viewer',
         'hit_order',
-        'created_at'
+        'created_at',
     ];
+
     protected $configPath;
 
     public function __construct()
@@ -34,7 +35,6 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         parent::__construct();
         $this->configPath = config('image.path.product');
     }
-
 
     public function getModel()
     {
@@ -47,7 +47,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         $task = $options['task'] ?? null;
 
         // Gom 2 task admin vào một luồng xử lý duy nhất
-        if (in_array($task, ["admin-list-items", "admin-list-items-active"])) {
+        if (in_array($task, ['admin-list-items', 'admin-list-items-active'])) {
 
             $query = $this->_model->with([
                 // 1. Bản dịch sản phẩm (Cần product_id để map)
@@ -66,14 +66,15 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 // 3. Ảnh đại diện (Cần disk để hiển thị URL)
                 'photos' => function ($q) {
                     $q->select(['id', 'product_id', 'filename', 'disk', 'order', 'is_default']);
-                }
+                },
+                'variants.attributeValues.attribute',
             ]);
 
             // Áp dụng các cột cần lấy và sắp xếp
             $query->select($this->FIELDSELECT)->orderBy('order', 'asc');
 
             // Nếu là task active thì thêm filter status = 1
-            if ($task == "admin-list-items-active") {
+            if ($task == 'admin-list-items-active') {
                 $query->where('status', 1);
             }
 
@@ -87,6 +88,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
     {
         if ($options['task'] == 'get-item') {
             $currentLocale = app()->getLocale();
+
             return $this->_model->with([
                 'photos',
                 'translations',
@@ -98,18 +100,25 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                                 ->where('locale', $currentLocale);
                         }]);
                 },
+                'variants.attributeValues.attribute',
             ])->find($params['id']);
         }
+
         return null;
     }
 
     public function save($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) return false;
-        if ($options['task'] == "admin-update-multi-status") {
+        if (! $task) {
+            return false;
+        }
+        if ($options['task'] == 'admin-update-multi-status') {
             $ids = $params['aid'] ?? [];
-            if (empty($ids)) return false;
+            if (empty($ids)) {
+                return false;
+            }
+
             return $this->_model->whereIn('id', $ids)->get()->each(function ($item) use ($params) {
                 $item->update(['status' => $params['value']]);
             });
@@ -119,8 +128,10 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
             $item = $this->_model->find($params['id']);
             if ($item) {
                 $item->status = ($item->status == 0) ? 1 : 0;
+
                 return $item->save();
             }
+
             return false;
         }
         DB::beginTransaction();
@@ -130,19 +141,22 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 ? new $this->_model
                 : $this->_model->find($params['id']);
 
-            if (!$item) {
+            if (! $item) {
                 DB::rollBack();
+
                 return false;
             }
             // 2. Lưu thông tin cơ bản (Bảng products)
-            $item->sku        = $params['sku'] ?? $item->sku;
-            $item->price      = $params['price'] ?? 0;
-            $item->quantity   = $params['quantity'] ?? 0;
-            $item->weight     = $params['weight'] ?? 0;
-            $item->status     = $params['status'] ?? 0;
-            $item->is_stock   = $params['is_stock'] ?? 0;
-            $item->is_coupon  = $params['is_coupon'] ?? 0;
-            $item->order      = $params['order'] ?? 0;
+            $item->sku = $params['sku'] ?? $item->sku;
+            $item->brand = $params['brand'] ?? null;
+            $item->base_price = $params['base_price'] ?? ($params['price'] ?? 0);
+            $item->price = $params['price'] ?? $item->base_price;
+            $item->quantity = $params['quantity'] ?? 0;
+            $item->weight = $params['weight'] ?? 0;
+            $item->status = $params['status'] ?? 0;
+            $item->is_stock = $params['is_stock'] ?? 0;
+            $item->is_coupon = $params['is_coupon'] ?? 0;
+            $item->order = $params['order'] ?? 0;
             $item->save();
             // 3. Lưu Bản dịch (Product Translations)
             $translationsData = $params['translations'] ?? [];
@@ -174,22 +188,22 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 $defaultPhotoTarget = $params['default_photo_id'] ?? null;
                 $newDefaultPhotoId = null;
                 foreach ($params['photos'] as $index => $photoFile) {
-                    if (!is_string($photoFile) || trim($photoFile) === '') {
+                    if (! is_string($photoFile) || trim($photoFile) === '') {
                         continue;
                     }
 
                     $isDefaultPhoto = false;
                     if (is_string($defaultPhotoTarget)) {
                         $isDefaultPhoto = $defaultPhotoTarget === $photoFile;
-                    } elseif (!$hasDefaultPhoto && $index === 0) {
+                    } elseif (! $hasDefaultPhoto && $index === 0) {
                         $isDefaultPhoto = true;
                     }
 
                     $createdPhoto = $item->photos()->create([
-                        'filename'   => $photoFile,
-                        'disk'       => 'public',
+                        'filename' => $photoFile,
+                        'disk' => 'public',
                         'is_default' => $isDefaultPhoto,
-                        'order'      => $existingCount + $index,
+                        'order' => $existingCount + $index,
                     ]);
                     if ($isDefaultPhoto) {
                         $hasDefaultPhoto = true;
@@ -202,40 +216,77 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                     $hasDefaultPhoto = true;
                 }
             }
-            if (!empty($params['default_photo_id']) && is_numeric($params['default_photo_id'])) {
+            if (! empty($params['default_photo_id']) && is_numeric($params['default_photo_id'])) {
                 $defaultPhotoTarget = $params['default_photo_id'];
                 $item->photos()->update(['is_default' => false]);
                 $item->photos()->where('id', $defaultPhotoTarget)->update(['is_default' => true]);
             }
-            if (!$item->photos()->where('is_default', true)->exists()) {
+            if (! $item->photos()->where('is_default', true)->exists()) {
                 $firstPhoto = $item->photos()->orderBy('order')->orderBy('id')->first();
                 if ($firstPhoto) {
                     $firstPhoto->update(['is_default' => true]);
                 }
             }
+            // 6. Lưu biến thể sản phẩm và các giá trị thuộc tính đi kèm.
+            if (array_key_exists('variants', $params)) {
+                $this->syncVariants($item, $params['variants'] ?? []);
+            }
             // 6. Xử lý Slugs qua Pipeline (Unicode, History, Redirects)
             app(Pipeline::class)
                 ->send([
                     'item' => $item,
-                    'translations' => $translationsData
+                    'translations' => $translationsData,
                 ])
                 ->through([
                     HandleSlugHistory::class,
                 ])
                 ->thenReturn();
             DB::commit();
+
             return $item;
         } catch (\Exception $e) {
             DB::rollBack();
-            logger("Error save product: " . $e->getMessage());
+            logger('Error save product: '.$e->getMessage());
+
             return false;
         }
+    }
+
+    private function syncVariants(Product $product, array $variants): void
+    {
+        $keptVariantIds = [];
+
+        foreach ($variants as $variantData) {
+            $variant = null;
+            if (! empty($variantData['id'])) {
+                $variant = $product->variants()->whereKey($variantData['id'])->first();
+            }
+
+            $variant ??= $product->variants()->make();
+            $variant->fill([
+                'sku' => $variantData['sku'],
+                'price' => $variantData['price'],
+                'stock' => $variantData['stock'],
+                'image' => $variantData['image'] ?? ($variantData['images'][0] ?? null),
+                'images' => array_values(array_filter($variantData['images'] ?? [])),
+            ]);
+            $variant->save();
+            $variant->attributeValues()->sync($variantData['attribute_value_ids'] ?? []);
+
+            $keptVariantIds[] = $variant->id;
+        }
+
+        $product->variants()
+            ->when($keptVariantIds !== [], fn ($query) => $query->whereNotIn('id', $keptVariantIds))
+            ->delete();
     }
 
     public function delete($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) return false;
+        if (! $task) {
+            return false;
+        }
         if ($options['task'] == 'delete-item') {
             $item = $this->_model->find($params['id']);
             if ($item) {
@@ -244,7 +295,8 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         }
 
         if ($options['task'] == 'delete-items') {
-            $ids = is_array($params['ids']) ? $params['ids'] : explode(",", $params['ids']);
+            $ids = is_array($params['ids']) ? $params['ids'] : explode(',', $params['ids']);
+
             return $this->_model->whereIn('id', $ids)->get()->each(function ($item) {
                 $item->delete();
             });
@@ -255,6 +307,7 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
                 return $item->forceDelete();
             }
         }
+
         return false;
     }
 }

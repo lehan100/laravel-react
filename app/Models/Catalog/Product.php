@@ -24,6 +24,8 @@ class Product extends Model implements TranslatableContract
         'sku',
         'quantity',
         'weight',
+        'brand',
+        'base_price',
         'price',
         'status',
         'is_coupon',
@@ -45,6 +47,7 @@ class Product extends Model implements TranslatableContract
     protected $casts = [
         'is_coupon' => 'boolean',
         'is_stock' => 'boolean',
+        'base_price' => 'decimal:2',
         'price' => 'decimal:2',
     ];
 
@@ -66,6 +69,11 @@ class Product extends Model implements TranslatableContract
     public function adjustmentHistories(): HasMany
     {
         return $this->hasMany(InventoryAdjustmentHistory::class, 'product_id');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 
     public function slugs(): MorphMany

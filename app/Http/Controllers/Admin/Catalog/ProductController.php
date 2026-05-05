@@ -6,6 +6,7 @@ use App\Http\Controllers\MainController;
 use App\Http\Requests\Catalog\ProductRequest;
 use App\Http\Resources\Catalog\ProductCollection;
 use App\Http\Resources\Catalog\ProductResource;
+use App\Models\Catalog\ProductAttribute;
 use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Product\ProductRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
@@ -62,13 +63,17 @@ class ProductController extends MainController
         return Inertia::render($this->controllerView.'Created', [
             'item' => null,
             'itemsCategoryActive' => $itemsCategoryActive,
+            'attributes' => ProductAttribute::query()
+                ->with('values:id,attribute_id,value')
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 
     public function store(ProductRequest $request)
     {
         try {
-            $params = $request->all();
+            $params = $request->validated();
             $product = $this->mainModel->save($params, ['task' => 'add-item']);
 
             if (($params['undo'] ?? 0) == 1) {
@@ -94,13 +99,17 @@ class ProductController extends MainController
         return Inertia::render($this->controllerView.'Edit', [
             'item' => new ProductResource($item),
             'itemsCategoryActive' => $itemsCategoryActive,
+            'attributes' => ProductAttribute::query()
+                ->with('values:id,attribute_id,value')
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 
     public function update(ProductRequest $request, string $id)
     {
         try {
-            $params = $request->all();
+            $params = $request->validated();
             $params['id'] = $id;
             $product = $this->mainModel->save($params, ['task' => 'edit-item']);
 
