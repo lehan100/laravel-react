@@ -204,6 +204,8 @@ vendor/bin/sail npm run dev
 vendor/bin/sail npm run build
 ```
 
+Không chạy `npm run grod` hoặc `vendor/bin/sail npm run grod` trong project này.
+
 Nếu user không thấy thay đổi ngoài UI, nguyên nhân phổ biến là chưa chạy `npm run dev` hoặc `npm run build`.
 
 ## 5. Chạy test đúng cách bằng Sail
@@ -406,6 +408,12 @@ vendor/bin/sail npm run dev
 
 ```bash
 vendor/bin/sail npm run build
+```
+
+Không chạy:
+
+```bash
+vendor/bin/sail npm run grod
 ```
 
 ### Route list
