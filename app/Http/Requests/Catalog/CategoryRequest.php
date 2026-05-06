@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Catalog;
 
+use App\Models\Catalog\Category;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,9 +25,29 @@ class CategoryRequest extends FormRequest
      */
     public function rules()
     {
+        $currentCategoryPageId = null;
+        $categoryId = $this->route('category');
+
+        if ($categoryId !== null) {
+            $currentCategoryPageId = Category::query()
+                ->whereKey($categoryId)
+                ->value('page_id');
+        }
+
         return [
             'status' => 'required|integer|in:0,1',
             'type' => ['required', 'string', Rule::in(['product', 'news', 'blog', 'page', 'contact'])],
+            'page_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('pages', 'id')->where(function ($query) use ($currentCategoryPageId): void {
+                    $query->where('status', true);
+
+                    if ($currentCategoryPageId !== null) {
+                        $query->orWhere('id', $currentCategoryPageId);
+                    }
+                }),
+            ],
             'photo' => 'nullable|string',
             'undo' => 'nullable|integer',
             'product_ids' => 'nullable|array',
@@ -51,6 +72,7 @@ class CategoryRequest extends FormRequest
         return [
             'translations.*.name' => mb_strtolower(__('hancms.column.name')),
             'translations.*.slug' => mb_strtolower(__('hancms.column.slug')),
+            'page_id' => mb_strtolower(__('hancms.catalog.category.page')),
         ];
     }
 }

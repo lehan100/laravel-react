@@ -2,24 +2,28 @@
 
 namespace App\Pipelines;
 
+use App\Models\Slug;
 use Closure;
 use Illuminate\Support\Str;
-use App\Models\Slug;
 
 class HandleSlugHistory
 {
     public function handle($content, Closure $next)
     {
         $item = $content['item'];
-        // $item->unsetRelation('slugs'); 
+        // $item->unsetRelation('slugs');
         $translations = $content['translations'] ?? [];
 
         foreach ($translations as $locale => $data) {
-            if (empty($data['slug'])) continue;
+            if (empty($data['slug'])) {
+                continue;
+            }
 
             // 1. Process Unicode Slug (Japanese, Vietnamese, etc.)
             $slugBase = $this->sanitizeSlug($data['slug']);
-            if ($slugBase === '') continue;
+            if ($slugBase === '') {
+                continue;
+            }
 
             $newSlug = $slugBase;
 
@@ -33,7 +37,7 @@ class HandleSlugHistory
                 ->first();
 
             // Only proceed if slug has changed
-            if (!$currentDefault || $currentDefault->slug !== $newSlug) {
+            if (! $currentDefault || $currentDefault->slug !== $newSlug) {
 
                 // STEP A: Deactivate current default slug
                 if ($currentDefault) {
@@ -49,17 +53,17 @@ class HandleSlugHistory
                 if ($historySlug) {
                     // Re-activate old history record
                     $historySlug->update([
-                        'is_default'  => true,
+                        'is_default' => true,
                         'redirect_to' => null,
-                        'status'      => 1
+                        'status' => 1,
                     ]);
                 } else {
                     // Create a brand new slug record
                     $item->slugs()->create([
-                        'slug'        => $newSlug,
-                        'locale'      => $locale,
-                        'is_default'  => true,
-                        'status'      => 1,
+                        'slug' => $newSlug,
+                        'locale' => $locale,
+                        'is_default' => true,
+                        'status' => 1,
                         'redirect_to' => null,
                     ]);
                 }
@@ -81,8 +85,18 @@ class HandleSlugHistory
      */
     private function sanitizeSlug($string)
     {
-        $slug = preg_replace('/[^\p{L}\p{N}]+/u', '-', trim($string));
+        $slug = strtolower(trim((string) $string));
+
+        if (class_exists(\Normalizer::class)) {
+            $slug = \Normalizer::normalize($slug, \Normalizer::FORM_D) ?: $slug;
+            $slug = preg_replace('/[\x{0300}-\x{036f}]/u', '', $slug);
+        }
+
+        $slug = str_replace(['đ', 'Đ'], ['d', 'd'], $slug);
+        $slug = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $slug);
+        $slug = preg_replace('/(\s+)/u', '-', $slug);
         $slug = mb_strtolower($slug, 'UTF-8');
+
         return trim(preg_replace('/-+/', '-', $slug), '-');
     }
 
@@ -103,7 +117,7 @@ class HandleSlugHistory
             ->exists()
         ) {
             // Option 1: Append counter (e.g., tokyo-cake-1)
-            $slug = $originalSlug . '-' . $i++;
+            $slug = $originalSlug.'-'.$i++;
 
             // Option 2 (Cleaner for SEO): Append ID if available
             // $slug = $originalSlug . '-' . ($item->id ?? Str::random(4));

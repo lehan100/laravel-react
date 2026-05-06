@@ -25,6 +25,13 @@ class CategoryResource extends JsonResource
             'type' => $this->type ?? 'product',
             'status' => $this->status,
             'order' => $this->order,
+            'page_id' => $this->page_id ?? null,
+            'page' => $this->whenLoaded('page', function () {
+                return [
+                    'id' => $this->page?->id,
+                    'title' => $this->page?->title,
+                ];
+            }),
             'products_count' => $this->whenCounted('products'),
             'tree_products_count' => $this->tree_products_count ?? $this->whenCounted('products'),
             'product_ids' => $this->whenLoaded('products', function () {

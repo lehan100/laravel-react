@@ -53,6 +53,7 @@ export interface Category {
   order: number;
   type?: string;
   photo: string;
+  page_id?: number | null;
   parent_id: number | null;
   translations: Record<string, CategoryTranslation>;
   created_at?: string;

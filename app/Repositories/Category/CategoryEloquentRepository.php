@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryEloquentRepository extends EloquentRepository implements CategoryRepositoryInterface
 {
-    private $FIELDSELECT = ['id', 'photo', 'parent_id', 'type', 'status', 'order'];
+    private $FIELDSELECT = ['id', 'photo', 'page_id', 'parent_id', 'type', 'status', 'order'];
 
     protected $configPath;
 
@@ -80,7 +80,7 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
     public function get($params = null, $options = null)
     {
         if ($options['task'] == 'get-item') {
-            return $this->_model->with(['translations', 'slugs'])->find($params['id']);
+            return $this->_model->with(['translations', 'slugs', 'page:id,title'])->find($params['id']);
         }
 
         return null;
@@ -139,6 +139,9 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
             $item->order = $itemOrder;
             $item->type = $params['type'] ?? 'product';
             $item->photo = $params['photo'] ?? null;
+            $item->page_id = array_key_exists('page_id', $params) && ! in_array($params['page_id'], [null, '', 0, '0'], true)
+                ? (int) $params['page_id']
+                : null;
             if ($parentId) {
                 $parent = $this->_model->find($parentId);
                 $item->parent_id = $parent && ($parent->type ?? 'product') === ($item->type ?? 'product') ? $parentId : null;

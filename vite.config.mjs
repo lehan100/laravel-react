@@ -4,6 +4,11 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import i18n from 'laravel-react-i18n/vite';
 import fs from 'fs';
+
+const httpsKeyPath = './certs/ukimua-dev.com-key.pem';
+const httpsCertPath = './certs/ukimua-dev.com.pem';
+const useHttps = fs.existsSync(httpsKeyPath) && fs.existsSync(httpsCertPath);
+
 export default defineConfig({
     plugins: [
         laravel(['resources/js/app.tsx', 'resources/css/app.css']),
@@ -17,10 +22,12 @@ export default defineConfig({
         cors: {
             origin: '*',
         },
-        https: {
-            key: fs.readFileSync('./certs/ukimua-dev.com-key.pem'),
-            cert: fs.readFileSync('./certs/ukimua-dev.com.pem'),
-        },
+        ...(useHttps ? {
+            https: {
+                key: fs.readFileSync(httpsKeyPath),
+                cert: fs.readFileSync(httpsCertPath),
+            },
+        } : {}),
         hmr: {
             host: 'ukimua-dev.com',
         },

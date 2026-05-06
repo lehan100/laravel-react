@@ -9,6 +9,8 @@ use App\Http\Requests\Catalog\CategoryRequest;
 use App\Http\Resources\Catalog\CategoryCollection;
 use App\Http\Resources\Catalog\CategoryResource;
 use App\Models\Catalog\Category;
+use App\Models\FieldGroup;
+use App\Models\Page;
 use App\Repositories\Category\CategoryRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -67,6 +69,8 @@ class CategoryController extends MainController
         return Inertia::render($this->controllerView.'Created', [
             'itemsCategoryActive' => $itemsCategoryActive,
             'itemsSelectedProducts' => [],
+            'pages' => $this->availablePages(),
+            'pageSchemas' => $this->pageSchemas(),
         ]);
     }
 
@@ -104,7 +108,7 @@ class CategoryController extends MainController
     public function edit(Category $category): Response
     {
         //
-        $category->load(['products:id'])->loadCount('products');
+        $category->load(['products:id', 'page.translations'])->loadCount('products');
         $itemsCategoryActive = $this->mainModel->lists(null, [
             'task' => 'admin-list-items-active',
         ]);
@@ -116,6 +120,8 @@ class CategoryController extends MainController
             'item' => new CategoryResource($category),
             'itemsCategoryActive' => $itemsCategoryActive,
             'itemsSelectedProducts' => $itemsSelectedProducts,
+            'pages' => $this->availablePages($category->page_id),
+            'pageSchemas' => $this->pageSchemas(),
         ]);
     }
 
@@ -187,5 +193,61 @@ class CategoryController extends MainController
             'status' => true,
             'message' => __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.catalog.category.name'))]),
         ]);
+    }
+
+    /**
+     * @return array<int, array{id: int, label: string, title: string, schema_title: string, has_content: bool, edit_url: string}>
+     */
+    private function availablePages(?int $selectedPageId = null): array
+    {
+        return Page::query()
+            ->with([
+                'fieldGroup:id,title',
+                'translations' => function ($query): void {
+                    $query->select(['id', 'page_id', 'locale', 'title'])
+                        ->where('locale', app()->getLocale());
+                },
+            ])
+            ->where(function ($query) use ($selectedPageId): void {
+                $query->where('status', true);
+
+                if ($selectedPageId !== null) {
+                    $query->orWhere('id', $selectedPageId);
+                }
+            })
+            ->orderByDesc('id')
+            ->get(['id', 'title', 'field_group_id', 'acf_data', 'status'])
+            ->map(function (Page $page): array {
+                $pageName = $page->translations?->first()?->title ?: $page->title ?: "#{$page->id}";
+                $schemaTitle = $page->fieldGroup?->title ?? '';
+
+                return [
+                    'id' => $page->id,
+                    'label' => $pageName,
+                    'name' => $pageName,
+                    'title' => $page->title,
+                    'schema_title' => $schemaTitle,
+                    'has_content' => $page->hasContent(),
+                    'edit_url' => route('pages.edit', $page),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: int, title: string}>
+     */
+    private function pageSchemas(): array
+    {
+        return FieldGroup::query()
+            ->where('status', true)
+            ->orderBy('id')
+            ->get(['id', 'title'])
+            ->map(fn (FieldGroup $fieldGroup): array => [
+                'id' => $fieldGroup->id,
+                'title' => $fieldGroup->title,
+            ])
+            ->all();
     }
 }

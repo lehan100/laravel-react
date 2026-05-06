@@ -2,58 +2,113 @@
 
 namespace App\Http\Controllers\Admin\PageManager;
 
-use App\Http\Controllers\MainController;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\DestroyManyPagesRequest;
+use App\Http\Requests\StorePageRequest;
+use App\Http\Requests\UpdatePageRequest;
+use App\Models\Page;
+use App\Repositories\Page\PageRepositoryInterface as RepositoryInterface;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
-class PageController extends MainController
+class PageController extends Controller
 {
-    public function index(): never
+    public function __construct(private readonly RepositoryInterface $repository) {}
+
+    public function index(Request $request): Response
     {
-        $this->unavailable();
+        return Inertia::render('Admin/PageManager/Index', [
+            'pages' => $this->repository->lists($request->only(['search']), ['task' => 'admin-list-items']),
+            'filters' => $request->only(['search']),
+            'translations' => $this->repository->translations(),
+        ]);
     }
 
-    public function create(): never
+    public function create(): Response
     {
-        $this->unavailable();
+        return Inertia::render('Admin/PageManager/Create', $this->repository->getFormProps());
     }
 
-    public function store(Request $request): never
+    public function store(StorePageRequest $request): RedirectResponse
     {
-        $this->unavailable();
+        $this->repository->save($request->validated(), ['task' => 'add-item']);
+
+        return redirect()->route('pages.index')->with('success', __('hancms.page.messages.created'));
     }
 
-    public function show(string $id): never
+    public function quickStore(StorePageRequest $request): JsonResponse
     {
-        $this->unavailable();
+        $page = $this->repository->save($request->validated(), ['task' => 'add-item']);
+
+        if (! $page instanceof Page) {
+            return response()->json([
+                'message' => __('hancms.page.messages.create_failed'),
+            ], 422);
+        }
+
+        $page->load(['fieldGroup', 'translations', 'slugs']);
+        $currentLocale = app()->getLocale();
+        $pageTranslation = $page->translations?->firstWhere('locale', $currentLocale)
+            ?? $page->translations?->first();
+
+        return response()->json([
+            'page' => [
+                'id' => $page->id,
+                'title' => $page->title,
+                'label' => $pageTranslation?->title ?: $page->title ?: "#{$page->id}",
+                'name' => $pageTranslation?->title ?: $page->title ?: "#{$page->id}",
+                'schema_title' => $page->fieldGroup?->title ?? '',
+                'has_content' => $page->hasContent(),
+                'edit_url' => route('pages.edit', $page),
+            ],
+        ]);
     }
 
-    public function edit(string $id): never
+    public function show(Page $page): Response
     {
-        $this->unavailable();
+        $page->load(['fieldGroup', 'translations', 'slugs']);
+
+        return Inertia::render('Admin/PageManager/Show', array_merge(
+            $this->repository->getFormProps(['page' => $page]),
+            ['page' => $page]
+        ));
     }
 
-    public function update(Request $request, string $id): never
+    public function edit(Page $page): Response
     {
-        $this->unavailable();
+        $page->load(['fieldGroup', 'translations', 'slugs']);
+
+        return Inertia::render('Admin/PageManager/Edit', $this->repository->getFormProps(['page' => $page]));
     }
 
-    public function destroy(string $id): never
+    public function update(UpdatePageRequest $request, Page $page): RedirectResponse
     {
-        $this->unavailable();
+        $this->repository->save([...$request->validated(), 'id' => $page->id], ['task' => 'edit-item']);
+
+        return redirect()->route('pages.edit', $page)->with('success', __('hancms.page.messages.updated'));
     }
 
-    public function destroyMany(Request $request): never
+    public function destroy(Page $page): RedirectResponse
     {
-        $this->unavailable();
+        $this->repository->delete(['id' => $page->id], ['task' => 'delete-item']);
+
+        return redirect()->route('pages.index')->with('success', __('hancms.page.messages.deleted'));
     }
 
-    public function toggleStatus(string $id): never
+    public function destroyMany(DestroyManyPagesRequest $request): RedirectResponse
     {
-        $this->unavailable();
+        $this->repository->delete($request->validated(), ['task' => 'delete-items']);
+
+        return redirect()->route('pages.index')->with('success', __('hancms.page.messages.deleted'));
     }
 
-    private function unavailable(): never
+    public function toggleStatus(Page $page): RedirectResponse
     {
-        abort(404);
+        $this->repository->save(['id' => $page->id], ['task' => 'change-status']);
+
+        return back()->with('success', __('hancms.page.messages.updated'));
     }
 }

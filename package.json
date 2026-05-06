@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prod": "vite build"
+    "prod": "composer run dev"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

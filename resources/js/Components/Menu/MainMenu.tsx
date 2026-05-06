@@ -24,6 +24,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
     dashboard: ['dashboard'],
     users: ['roles', 'users'],
     catalog: ['category', 'product', 'attribute', 'post'],
+    content: ['page-schemas', 'page-values'],
     media: ['media-position', 'media-banner'],
     reports: ['report-revenue', 'report-product', 'report-inventory', 'report-promotion'],
     sales: ['warehouse', 'orders', 'payment-methods', 'shipping-methods'],
@@ -135,6 +136,36 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
                 />
               </li>
             )}
+          </ul>
+        </BsFace>
+      )}
+      {(can('field-groups.index') || can('pages.index')) && (
+        <BsFace
+          mobile={mobile}
+          title={trans('hancms.page.menu_name')}
+          id="menu-8"
+          index={routers.content.indexOf(routeIndex)}
+          icon={<LayoutTemplate size={20} />}
+        >
+          <ul className={classNames(mobile ? 'ps-2' : 'ps-3')}>
+            <li>
+                <MainMenuItem
+                  mobile={mobile}
+                  onNavigate={onNavigate}
+                  text={trans('hancms.content.field_design')}
+                  link="page-schemas.index"
+                  icon={<FolderKanban size={20} />}
+                />
+              </li>
+            <li>
+              <MainMenuItem
+                mobile={mobile}
+                onNavigate={onNavigate}
+                text={trans('hancms.content.field_values')}
+                link="page-values.index"
+                icon={<FileText size={20} />}
+              />
+            </li>
           </ul>
         </BsFace>
       )}

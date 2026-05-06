@@ -2,6 +2,7 @@
 
 namespace App\Models\Catalog;
 
+use App\Models\Page;
 use App\Models\Slug;
 use App\Traits\HasImageFile;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -30,6 +31,7 @@ class Category extends Model implements TranslatableContract
         'parent_id',
         'type',
         'photo',
+        'page_id',
     ];
 
     public $translatedAttributes = [
@@ -74,6 +76,11 @@ class Category extends Model implements TranslatableContract
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'category_product');
+    }
+
+    public function page(): BelongsTo
+    {
+        return $this->belongsTo(Page::class);
     }
 
     // protected static function booted()

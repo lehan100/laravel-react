@@ -1,7 +1,134 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::quickStore
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:43
+* @route '/admin123/pages/quick-store'
+*/
+export const quickStore = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: quickStore.url(options),
+    method: 'post',
+})
+
+quickStore.definition = {
+    methods: ["post"],
+    url: '/admin123/pages/quick-store',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::quickStore
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:43
+* @route '/admin123/pages/quick-store'
+*/
+quickStore.url = (options?: RouteQueryOptions) => {
+    return quickStore.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::quickStore
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:43
+* @route '/admin123/pages/quick-store'
+*/
+quickStore.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: quickStore.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/page-values'
+*/
+const index9164e9249fd166146864f43fcd1f6506 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index9164e9249fd166146864f43fcd1f6506.url(options),
+    method: 'get',
+})
+
+index9164e9249fd166146864f43fcd1f6506.definition = {
+    methods: ["get","head"],
+    url: '/admin123/page-values',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/page-values'
+*/
+index9164e9249fd166146864f43fcd1f6506.url = (options?: RouteQueryOptions) => {
+    return index9164e9249fd166146864f43fcd1f6506.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/page-values'
+*/
+index9164e9249fd166146864f43fcd1f6506.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index9164e9249fd166146864f43fcd1f6506.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/page-values'
+*/
+index9164e9249fd166146864f43fcd1f6506.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: index9164e9249fd166146864f43fcd1f6506.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/pages'
+*/
+const index103d80f5cccbc6810db50d59162c9ab3 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index103d80f5cccbc6810db50d59162c9ab3.url(options),
+    method: 'get',
+})
+
+index103d80f5cccbc6810db50d59162c9ab3.definition = {
+    methods: ["get","head"],
+    url: '/admin123/pages',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/pages'
+*/
+index103d80f5cccbc6810db50d59162c9ab3.url = (options?: RouteQueryOptions) => {
+    return index103d80f5cccbc6810db50d59162c9ab3.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/pages'
+*/
+index103d80f5cccbc6810db50d59162c9ab3.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index103d80f5cccbc6810db50d59162c9ab3.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\PageManager\PageController::index
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:22
+* @route '/admin123/pages'
+*/
+index103d80f5cccbc6810db50d59162c9ab3.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: index103d80f5cccbc6810db50d59162c9ab3.url(options),
+    method: 'head',
+})
+
+export const index = {
+    '/admin123/page-values': index9164e9249fd166146864f43fcd1f6506,
+    '/admin123/pages': index103d80f5cccbc6810db50d59162c9ab3,
+}
+
+/**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::destroyMany
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:45
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:98
 * @route '/admin123/pages/destroy-many'
 */
 export const destroyMany = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -16,7 +143,7 @@ destroyMany.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::destroyMany
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:45
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:98
 * @route '/admin123/pages/destroy-many'
 */
 destroyMany.url = (options?: RouteQueryOptions) => {
@@ -25,7 +152,7 @@ destroyMany.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::destroyMany
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:45
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:98
 * @route '/admin123/pages/destroy-many'
 */
 destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -35,7 +162,7 @@ destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> =>
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::toggleStatus
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:50
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:105
 * @route '/admin123/pages/{id}/toggle-status'
 */
 export const toggleStatus = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -50,7 +177,7 @@ toggleStatus.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::toggleStatus
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:50
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:105
 * @route '/admin123/pages/{id}/toggle-status'
 */
 toggleStatus.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -77,7 +204,7 @@ toggleStatus.url = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::toggleStatus
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:50
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:105
 * @route '/admin123/pages/{id}/toggle-status'
 */
 toggleStatus.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -86,52 +213,8 @@ toggleStatus.put = (args: { id: string | number } | [id: string | number ] | str
 })
 
 /**
-* @see \App\Http\Controllers\Admin\PageManager\PageController::index
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:10
-* @route '/admin123/pages'
-*/
-export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: index.url(options),
-    method: 'get',
-})
-
-index.definition = {
-    methods: ["get","head"],
-    url: '/admin123/pages',
-} satisfies RouteDefinition<["get","head"]>
-
-/**
-* @see \App\Http\Controllers\Admin\PageManager\PageController::index
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:10
-* @route '/admin123/pages'
-*/
-index.url = (options?: RouteQueryOptions) => {
-    return index.definition.url + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\Admin\PageManager\PageController::index
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:10
-* @route '/admin123/pages'
-*/
-index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: index.url(options),
-    method: 'get',
-})
-
-/**
-* @see \App\Http\Controllers\Admin\PageManager\PageController::index
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:10
-* @route '/admin123/pages'
-*/
-index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: index.url(options),
-    method: 'head',
-})
-
-/**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::create
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:15
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:31
 * @route '/admin123/pages/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +229,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::create
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:15
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:31
 * @route '/admin123/pages/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -155,7 +238,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::create
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:15
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:31
 * @route '/admin123/pages/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -165,7 +248,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::create
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:15
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:31
 * @route '/admin123/pages/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -175,7 +258,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::store
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:20
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:36
 * @route '/admin123/pages'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -190,7 +273,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::store
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:20
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:36
 * @route '/admin123/pages'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -199,7 +282,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::store
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:20
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:36
 * @route '/admin123/pages'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -209,10 +292,10 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::show
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:25
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:67
 * @route '/admin123/pages/{page}'
 */
-export const show = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const show = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -224,12 +307,16 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::show
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:25
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:67
 * @route '/admin123/pages/{page}'
 */
-show.url = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions) => {
+show.url = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { page: args }
+    }
+
+    if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+        args = { page: args.id }
     }
 
     if (Array.isArray(args)) {
@@ -241,7 +328,9 @@ show.url = (args: { page: string | number } | [page: string | number ] | string 
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-        page: args.page,
+        page: typeof args.page === 'object'
+        ? args.page.id
+        : args.page,
     }
 
     return show.definition.url
@@ -251,30 +340,30 @@ show.url = (args: { page: string | number } | [page: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::show
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:25
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:67
 * @route '/admin123/pages/{page}'
 */
-show.get = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+show.get = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::show
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:25
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:67
 * @route '/admin123/pages/{page}'
 */
-show.head = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+show.head = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),
     method: 'head',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::edit
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:30
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:77
 * @route '/admin123/pages/{page}/edit'
 */
-export const edit = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const edit = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: edit.url(args, options),
     method: 'get',
 })
@@ -286,12 +375,16 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::edit
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:30
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:77
 * @route '/admin123/pages/{page}/edit'
 */
-edit.url = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions) => {
+edit.url = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { page: args }
+    }
+
+    if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+        args = { page: args.id }
     }
 
     if (Array.isArray(args)) {
@@ -303,7 +396,9 @@ edit.url = (args: { page: string | number } | [page: string | number ] | string 
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-        page: args.page,
+        page: typeof args.page === 'object'
+        ? args.page.id
+        : args.page,
     }
 
     return edit.definition.url
@@ -313,30 +408,30 @@ edit.url = (args: { page: string | number } | [page: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::edit
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:30
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:77
 * @route '/admin123/pages/{page}/edit'
 */
-edit.get = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+edit.get = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: edit.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::edit
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:30
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:77
 * @route '/admin123/pages/{page}/edit'
 */
-edit.head = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+edit.head = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: edit.url(args, options),
     method: 'head',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::update
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:35
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:84
 * @route '/admin123/pages/{page}'
 */
-export const update = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -348,12 +443,16 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::update
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:35
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:84
 * @route '/admin123/pages/{page}'
 */
-update.url = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions) => {
+update.url = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { page: args }
+    }
+
+    if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+        args = { page: args.id }
     }
 
     if (Array.isArray(args)) {
@@ -365,7 +464,9 @@ update.url = (args: { page: string | number } | [page: string | number ] | strin
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-        page: args.page,
+        page: typeof args.page === 'object'
+        ? args.page.id
+        : args.page,
     }
 
     return update.definition.url
@@ -375,30 +476,30 @@ update.url = (args: { page: string | number } | [page: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::update
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:35
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:84
 * @route '/admin123/pages/{page}'
 */
-update.put = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::update
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:35
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:84
 * @route '/admin123/pages/{page}'
 */
-update.patch = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+update.patch = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::destroy
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:40
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:91
 * @route '/admin123/pages/{page}'
 */
-export const destroy = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -410,12 +511,16 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::destroy
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:40
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:91
 * @route '/admin123/pages/{page}'
 */
-destroy.url = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions) => {
+destroy.url = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { page: args }
+    }
+
+    if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+        args = { page: args.id }
     }
 
     if (Array.isArray(args)) {
@@ -427,7 +532,9 @@ destroy.url = (args: { page: string | number } | [page: string | number ] | stri
     args = applyUrlDefaults(args)
 
     const parsedArgs = {
-        page: args.page,
+        page: typeof args.page === 'object'
+        ? args.page.id
+        : args.page,
     }
 
     return destroy.definition.url
@@ -437,14 +544,14 @@ destroy.url = (args: { page: string | number } | [page: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\PageController::destroy
-* @see app/Http/Controllers/Admin/PageManager/PageController.php:40
+* @see app/Http/Controllers/Admin/PageManager/PageController.php:91
 * @route '/admin123/pages/{page}'
 */
-destroy.delete = (args: { page: string | number } | [page: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { page: number | { id: number } } | [page: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
 
-const PageController = { destroyMany, toggleStatus, index, create, store, show, edit, update, destroy }
+const PageController = { quickStore, index, destroyMany, toggleStatus, create, store, show, edit, update, destroy }
 
 export default PageController

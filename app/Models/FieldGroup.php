@@ -13,12 +13,14 @@ class FieldGroup extends Model
     protected $fillable = [
         'title',
         'fields_schema',
+        'status',
     ];
 
     protected function casts(): array
     {
         return [
             'fields_schema' => 'array',
+            'status' => 'boolean',
         ];
     }
 

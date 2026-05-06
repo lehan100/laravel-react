@@ -8,8 +8,10 @@ use App\Models\Catalog\Post;
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductAttribute;
 use App\Models\Catalog\ProductPhoto;
+use App\Models\FieldGroup;
 use App\Models\Media\MediaBanner;
 use App\Models\Media\MediaBannerTranslation;
+use App\Models\Page;
 use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
@@ -17,9 +19,11 @@ use App\Models\Sales\Order;
 use App\Observers\AttributeObserver;
 use App\Observers\AttributeValueObserver;
 use App\Observers\CategoryObserver;
+use App\Observers\FieldGroupObserver;
 use App\Observers\ImageFileObserver;
 use App\Observers\MediaBannerObserver;
 use App\Observers\OrderObserver;
+use App\Observers\PageObserver;
 use App\Observers\PostObserver;
 use App\Observers\ProductObserver;
 use App\Observers\PromotionBuyToGiftObserver;
@@ -35,6 +39,8 @@ use App\Repositories\Coupon\CouponEloquentRepository;
 use App\Repositories\Coupon\CouponRepositoryInterface;
 use App\Repositories\Dashboard\DashboardEloquentRepository;
 use App\Repositories\Dashboard\DashboardRepositoryInterface;
+use App\Repositories\FieldGroup\FieldGroupEloquentRepository;
+use App\Repositories\FieldGroup\FieldGroupRepositoryInterface;
 use App\Repositories\Language\LanguageEloquentRepository;
 use App\Repositories\Language\LanguageRepositoryInterface;
 use App\Repositories\Location\LocationEloquentRepository;
@@ -45,6 +51,8 @@ use App\Repositories\Media\MediaPositionEloquentRepository;
 use App\Repositories\Media\MediaPositionRepositoryInterface;
 use App\Repositories\Order\OrderEloquentRepository;
 use App\Repositories\Order\OrderRepositoryInterface;
+use App\Repositories\Page\PageEloquentRepository;
+use App\Repositories\Page\PageRepositoryInterface;
 use App\Repositories\PaymentMethod\PaymentMethodEloquentRepository;
 use App\Repositories\PaymentMethod\PaymentMethodRepositoryInterface;
 use App\Repositories\Post\PostEloquentRepository;
@@ -155,6 +163,14 @@ class AppServiceProvider extends ServiceProvider
             DashboardRepositoryInterface::class,
             DashboardEloquentRepository::class
         );
+        $this->app->singleton(
+            PageRepositoryInterface::class,
+            PageEloquentRepository::class
+        );
+        $this->app->singleton(
+            FieldGroupRepositoryInterface::class,
+            FieldGroupEloquentRepository::class
+        );
     }
 
     /**
@@ -186,6 +202,8 @@ class AppServiceProvider extends ServiceProvider
         PromotionCoupon::observe(PromotionCouponObserver::class);
         PromotionSaleOffer::observe(PromotionSaleOfferObserver::class);
         PromotionBuyToGiftOffer::observe(PromotionBuyToGiftObserver::class);
+        Page::observe(PageObserver::class);
+        FieldGroup::observe(FieldGroupObserver::class);
         // Login Api
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip())->response(function (Request $request, array $headers) {

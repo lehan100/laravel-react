@@ -1,1008 +1,943 @@
 <?php
 
-return array (
-  'loading' => '保存中...',
-  'dashboard' => 
-  array (
-    'main' => 'ダッシュボード',
-    'hello' => 'こんにちは、:name',
-    'quick_actions' => 'クイック操作',
-    'revenue_chart' => '14日間の売上',
-    'order_status' => '注文ステータス',
-    'top_products' => '注目商品',
-    'stock_alerts' => '在庫アラート',
-    'recent_orders' => '最近の注文',
-    'operations' => '運用概要',
-    'view_products' => '商品一覧へ',
-    'view_categories' => 'カテゴリツリーを整理',
-    'view_orders' => '注文を見る',
-    'view_reports' => '売上レポートを見る',
-    'empty' => 'データがありません。',
-    'summary' => 
-    array (
-      'products' => '商品',
-      'active_products' => '有効',
-      'categories' => 'カテゴリ',
-      'users' => 'ユーザー',
-      'active_promotions' => '実行中プロモーション',
-      'out_of_stock' => '在庫切れ',
-    ),
-    'metrics' => 
-    array (
-      'revenue' => '売上',
-      'revenue_hint' => '直近14日間',
-      'orders' => '有効注文',
-      'orders_hint' => 'キャンセル除外',
-      'paid' => '支払い済み',
-      'paid_hint' => '入金済み注文',
-      'low_stock' => '低在庫',
-      'low_stock_hint' => '在庫1-5',
-    ),
-  ),
-  'users' => 
-  array (
-    'main' => 'ユーザー',
-    'admin' => 
-    array (
-      'name' => 'ユーザー一覧',
-    ),
-    'name' => 'ユーザー',
-    'created' => 'ユーザー作成',
-    'edit' => 'ユーザー編集',
-    'profile' => 'プロフィール',
-    'manage' => 'ユーザー管理',
-    'logout' => 'ログアウト',
-  ),
-  'settings' => 
-  array (
-    'main' => '設定',
-    'locations' => 
-    array (
-      'name' => '省・区管理',
-      'summary' => 
-      array (
-        'provinces' => '省・市',
-        'wards' => '区・町村',
-      ),
-    ),
-  ),
-  'translation' => 
-  array (
-    'name' => '翻訳の設定',
-    'admin' => 
-    array (
-      'name' => '翻訳マネージャーの設定',
-    ),
-    'messages' => 
-    array (
-      'saved' => '設定翻訳が保存されました。',
-      'empty' => '翻訳がありません。',
-    ),
-  ),
-  'sidebar' => 
-  array (
-    'show' => 'サイドバーを表示',
-    'hide' => 'サイドバーを非表示',
-  ),
-  'roles' => 
-  array (
-    'name' => 'ロール',
-    'created' => 'ロール作成',
-    'edit' => 'ロール編集',
-  ),
-  'permissions' => '権限',
-  'assign_permissions' => 
-  array (
-    'name' => '権限の割り当て',
-    'error' => 
-    array (
-      'message' => '権限が選択されていません。',
-    ),
-  ),
-  'media' => 
-  array (
-    'name' => 'メディア',
-    'position' => 
-    array (
-      'name' => '掲載位置',
-      'created' => '役職作成',
-      'edit' => '役職編集',
-    ),
-    'banner' => 
-    array (
-      'name' => 'バナー',
-    ),
-  ),
-  'report' => 
-  array (
-    'name' => 'レポート',
-    'center' => 'レポートセンター',
-    'from_date' => '開始日',
-    'to_date' => '終了日',
-    'filter' => '絞り込み',
-    'trend' => 'トレンド',
-    'ai_insight' => 'AIインサイト',
-    'ai_analyze' => 'AI分析',
-    'ai_empty' => 'AI分析が返されませんでした。',
-    'ai_failed' => '現在AI分析を実行できません。',
-    'ai_rate_limited' => 'AIのレート制限中です。後でもう一度お試しください。',
-    'ai_hint' => 'AI分析をクリックすると、現在のデータからインサイトと推奨アクションを取得できます。',
-    'details' => '詳細データ',
-    'empty_chart' => 'グラフデータがありません。',
-    'empty_rows' => 'この期間のデータはありません。',
-    'columns' => 
-    array (
-      'date' => '日付',
-      'orders' => '注文',
-      'quantity' => '数量',
-      'revenue' => '売上',
-      'product' => '商品',
-      'sku' => 'SKU',
-      'sold_quantity' => '販売数',
-      'stock' => '在庫',
-      'status' => 'ステータス',
-      'type' => '種類',
-      'code' => 'コード',
-      'name' => '名称',
-    ),
-    'status_labels' => 
-    array (
-      'active' => '実行中',
-      'inactive' => '停止中/期限切れ',
-      'out_of_stock' => '在庫切れ',
-      'low_stock' => '在庫僅少',
-      'healthy' => '正常',
-    ),
-    'campaigns' => 
-    array (
-      'coupon' => 'クーポン',
-      'sale_offer' => 'セールオファー',
-      'buy_to_gift' => '購入特典',
-    ),
-    'revenue' => 
-    array (
-      'name' => '売上レポート',
-      'description' => '売上、注文、支払い状況、日別トレンドを追跡します。',
-      'metrics' => 
-      array (
-        'revenue' => '売上',
-        'paid' => '支払い済み',
-        'valid_orders' => '有効注文',
-        'average_order_value' => '平均注文額',
-      ),
-    ),
-    'product' => 
-    array (
-      'name' => '商品レポート',
-      'description' => '売れ筋商品、商品別売上、カタログ状況を分析します。',
-      'metrics' => 
-      array (
-        'sold_products' => '販売商品数',
-        'sold_quantity' => '販売数量',
-        'top_revenue' => '上位売上',
-        'active_catalog' => '有効カタログ',
-      ),
-    ),
-    'inventory' => 
-    array (
-      'name' => '在庫レポート',
-      'description' => '低在庫、在庫切れ、在庫調整の変動を追跡します。',
-      'metrics' => 
-      array (
-        'total_stock' => '総在庫',
-        'low_stock' => '低在庫',
-        'out_of_stock' => '在庫切れ',
-        'adjustments' => '調整数',
-      ),
-    ),
-    'promotion' => 
-    array (
-      'name' => 'プロモーションレポート',
-      'description' => 'クーポン、セールオファー、購入特典キャンペーンの効果を集計します。',
-      'metrics' => 
-      array (
-        'active' => '実行中',
-        'coupon_used' => '使用済みクーポン',
-        'discount_total' => '割引合計',
-        'campaign_total' => 'キャンペーン合計',
-      ),
-    ),
-  ),
-  'promotion' => 
-  array (
-    'name' => 'プロモーション設定',
-    'saleoffer' => 
-    array (
-      'name' => 'セールオファー',
-      'conditions' => '条件',
-      'apply_scope' => '適用範囲',
-      'apply_scope_hint' => '商品を選択しない場合、このオファーはすべての商品に適用されます。',
-      'options' => 
-      array (
-        'percent' => 'パーセント',
-        'fixed' => '固定金額',
-      ),
-      'fields' => 
-      array (
-        'discount_type' => '割引タイプ',
-        'discount_value' => '割引値',
-        'max_discount_amount' => '最大割引額',
-        'starts_at' => '開始日時',
-        'ends_at' => '終了日時',
-        'priority' => '優先度',
-        'stackable' => '併用可',
-        'apply_products' => '適用商品',
-      ),
-      'columns' => 
-      array (
-        'discount' => '割引',
-        'final_price' => '割引後価格',
-      ),
-    ),
-    'coupon' => 
-    array (
-      'name' => 'クーポン',
-      'conditions' => '条件',
-      'apply_scope' => '適用範囲',
-      'apply_scope_hint' => 'カテゴリまたは商品を選択しない場合、このクーポンはすべてに適用されます。',
-      'options' => 
-      array (
-        'percent' => 'パーセント',
-        'fixed' => '固定金額',
-      ),
-      'fields' => 
-      array (
-        'discount_type' => '割引タイプ',
-        'discount_value' => '割引値',
-        'max_discount_amount' => '最大割引額',
-        'min_order_amount' => '最低注文金額',
-        'max_order_amount' => '最高注文金額',
-        'usage_limit_total' => '総利用回数上限',
-        'usage_limit_per_user' => 'ユーザーごとの利用上限',
-        'first_order_only' => '初回注文のみ',
-        'is_public' => '公開クーポン',
-        'stackable' => '併用可',
-        'starts_at' => '開始日時',
-        'ends_at' => '終了日時',
-        'apply_categories' => '適用カテゴリ',
-        'apply_products' => '適用商品',
-        'products_count' => '商品数',
-      ),
-    ),
-    'buytogift' => 
-    array (
-      'name' => '購入特典',
-      'conditions' => '条件',
-      'apply_scope' => '適用範囲',
-      'options' => 
-      array (
-        'order_amount' => '注文金額条件',
-        'buy_product' => '商品購入で特典付与',
-        'stock_scope_all' => '在庫制限なし',
-        'stock_scope_limited' => '在庫制限あり',
-      ),
-      'summary' => 
-      array (
-        'rule' => 'ルール',
-        'buy' => '購入',
-        'gift' => '特典',
-        'min_order_amount' => '最低注文金額',
-        'product_short' => '商品',
-        'more_rules' => '件の追加ルール',
-      ),
-      'fields' => 
-      array (
-        'condition_type' => '条件タイプ',
-        'buy_products' => '購入条件商品',
-        'buy_qty' => '購入数量',
-        'gift_products' => '特典商品',
-        'gift_qty' => '特典数量',
-        'min_order_amount' => '特典適用の最低注文金額',
-        'max_sets_per_order' => '1注文あたりの特典セット上限',
-        'stock_scope' => '在庫適用範囲',
-        'stock_limit' => '在庫適用数量',
-        'starts_at' => '開始日時',
-        'ends_at' => '終了日時',
-        'priority' => '優先度',
-        'stackable' => '併用可',
-      ),
-    ),
-  ),
-  'sales' => 
-  array (
-    'name' => '販売',
-    'warehouse' => 
-    array (
-      'name' => '在庫管理',
-      'default_name' => 'デフォルト在庫',
-      'placeholders' => 
-      array (
-        'search' => 'SKU または商品名を検索...',
-        'reason' => '調整理由を入力...',
-      ),
-      'messages' => 
-      array (
-        'product_not_found' => '商品が見つかりません。',
-        'updated_success' => '更新に成功しました。',
-        'toggled_success' => '在庫状態を更新しました。',
-        'delete_not_supported' => '在庫の削除はサポートされていません。',
-        'bulk_delete_not_supported' => '在庫の一括削除はサポートされていません。',
-        'toggle_reason' => '在庫管理画面から在庫状態を更新しました。',
-      ),
-      'actions' => 
-      array (
-        'update_stock' => '在庫更新',
-        'mark_in_stock' => '在庫ありにする',
-        'mark_out_stock' => '在庫切れにする',
-        'save_stock' => '在庫を保存',
-      ),
-      'fields' => 
-      array (
-        'current_stock' => '現在の在庫',
-        'update_method' => '更新方法',
-        'set_new_stock' => '新しい在庫数を設定',
-        'adjust_delta' => '数量を増減',
-        'new_stock' => '新しい在庫数',
-        'delta' => '増減数',
-        'reason' => '理由',
-        'set_label' => '設定',
-        'adjust_label' => '調整',
-      ),
-      'titles' => 
-      array (
-        'update_stock' => '在庫更新',
-        'recent_history' => '最近の履歴',
-      ),
-      'empty_history' => '在庫調整履歴はまだありません。',
-      'system_user' => 'システム',
-    ),
-    'orders' => 
-    array (
-      'name' => '注文',
-      'created' => '注文を追加',
-      'edit' => '注文を編集',
-      'placeholders' => 
-      array (
-        'search' => '注文番号、顧客名、電話番号を検索...',
-        'order_number' => '注文番号を入力...',
-        'product' => '商品を選択',
-        'province_first' => '先に都道府県 / 市を選択してください',
-      ),
-      'sections' => 
-      array (
-        'customer' => '顧客情報',
-        'status' => '注文ステータス',
-        'items' => '注文商品',
-        'history' => '処理履歴',
-      ),
-      'actions' => 
-      array (
-        'add_item' => '商品を追加',
-      ),
-      'empty_items' => 'まだ商品が追加されていません。',
-      'empty_history' => '処理履歴はまだありません。',
-      'history' => 
-      array (
-        'system_user' => 'システム',
-        'event_labels' => 
-        array (
-          'created' => '注文を作成',
-          'updated' => '注文を更新',
-          'deleted' => '注文を削除',
-          'order_status_changed' => '注文ステータス変更',
-          'payment_status_changed' => '支払いステータス更新',
-          'shipping_status_changed' => '配送ステータス更新',
-          'payment_method_changed' => '支払い方法変更',
-        ),
-        'messages' => 
-        array (
-          'created' => '注文を作成しました。ステータスは :order_status、支払いは :payment_status、配送は :shipping_status です。',
-          'updated' => '注文情報を更新しました。',
-          'deleted' => '顧客 :customer_name の注文 :order_number を削除しました。',
-          'order_status_changed' => '注文ステータスが :from から :to に変更されました。',
-          'payment_status_changed' => '支払いステータスが :from から :to に変更されました。',
-          'shipping_status_changed' => '配送ステータスが :from から :to に変更されました。',
-          'payment_method_changed' => '支払い方法が :from から :to に変更されました。',
-        ),
-      ),
-      'fields' => 
-      array (
-        'order_number' => '注文番号',
-        'customer_name' => '顧客名',
-        'customer_phone' => '電話番号',
-        'customer_email' => 'メールアドレス',
-        'payment_method' => '支払い方法',
-        'province' => '都道府県 / 市',
-        'ward' => '区 / 町村',
-        'customer_address' => '配送先住所',
-        'note' => '備考',
+return [
+    'loading' => '保存中...',
+    'dashboard' => [
+        'main' => 'ダッシュボード',
+        'hello' => 'こんにちは、:name',
+        'quick_actions' => 'クイック操作',
+        'revenue_chart' => '14日間の売上',
         'order_status' => '注文ステータス',
-        'payment_status' => '支払いステータス',
-        'shipping_status' => '配送ステータス',
-        'discount_total' => '割引額',
-        'shipping_total' => '送料',
-        'subtotal' => '小計',
-        'grand_total' => '合計',
-        'product' => '商品',
-        'variant' => 'バリエーション',
-        'no_variant' => 'バリエーションなし',
-        'available_stock' => '利用可能在庫',
+        'top_products' => '注目商品',
+        'stock_alerts' => '在庫アラート',
+        'recent_orders' => '最近の注文',
+        'operations' => '運用概要',
+        'view_products' => '商品一覧へ',
+        'view_categories' => 'カテゴリツリーを整理',
+        'view_orders' => '注文を見る',
+        'view_reports' => '売上レポートを見る',
+        'empty' => 'データがありません。',
+        'summary' => [
+            'products' => '商品',
+            'active_products' => '有効',
+            'categories' => 'カテゴリ',
+            'users' => 'ユーザー',
+            'active_promotions' => '実行中プロモーション',
+            'out_of_stock' => '在庫切れ',
+        ],
+        'metrics' => [
+            'revenue' => '売上',
+            'revenue_hint' => '直近14日間',
+            'orders' => '有効注文',
+            'orders_hint' => 'キャンセル除外',
+            'paid' => '支払い済み',
+            'paid_hint' => '入金済み注文',
+            'low_stock' => '低在庫',
+            'low_stock_hint' => '在庫1-5',
+        ],
+    ],
+    'users' => [
+        'main' => 'ユーザー',
+        'admin' => [
+            'name' => 'ユーザー一覧',
+        ],
+        'name' => 'ユーザー',
+        'created' => 'ユーザー作成',
+        'edit' => 'ユーザー編集',
+        'profile' => 'プロフィール',
+        'manage' => 'ユーザー管理',
+        'logout' => 'ログアウト',
+    ],
+    'settings' => [
+        'main' => '設定',
+        'locations' => [
+            'name' => '省・区管理',
+            'summary' => [
+                'provinces' => '省・市',
+                'wards' => '区・町村',
+            ],
+        ],
+    ],
+    'translation' => [
+        'name' => '翻訳の設定',
+        'admin' => [
+            'name' => '翻訳マネージャーの設定',
+        ],
+        'messages' => [
+            'saved' => '設定翻訳が保存されました。',
+            'empty' => '翻訳がありません。',
+        ],
+    ],
+    'sidebar' => [
+        'show' => 'サイドバーを表示',
+        'hide' => 'サイドバーを非表示',
+    ],
+    'roles' => [
+        'name' => 'ロール',
+        'created' => 'ロール作成',
+        'edit' => 'ロール編集',
+    ],
+    'permissions' => '権限',
+    'assign_permissions' => [
+        'name' => '権限の割り当て',
+        'error' => [
+            'message' => '権限が選択されていません。',
+        ],
+    ],
+    'media' => [
+        'name' => 'メディア',
+        'position' => [
+            'name' => '掲載位置',
+            'created' => '役職作成',
+            'edit' => '役職編集',
+        ],
+        'banner' => [
+            'name' => 'バナー',
+        ],
+    ],
+    'report' => [
+        'name' => 'レポート',
+        'center' => 'レポートセンター',
+        'from_date' => '開始日',
+        'to_date' => '終了日',
+        'filter' => '絞り込み',
+        'trend' => 'トレンド',
+        'ai_insight' => 'AIインサイト',
+        'ai_analyze' => 'AI分析',
+        'ai_empty' => 'AI分析が返されませんでした。',
+        'ai_failed' => '現在AI分析を実行できません。',
+        'ai_rate_limited' => 'AIのレート制限中です。後でもう一度お試しください。',
+        'ai_hint' => 'AI分析をクリックすると、現在のデータからインサイトと推奨アクションを取得できます。',
+        'details' => '詳細データ',
+        'empty_chart' => 'グラフデータがありません。',
+        'empty_rows' => 'この期間のデータはありません。',
+        'columns' => [
+            'date' => '日付',
+            'orders' => '注文',
+            'quantity' => '数量',
+            'revenue' => '売上',
+            'product' => '商品',
+            'sku' => 'SKU',
+            'sold_quantity' => '販売数',
+            'stock' => '在庫',
+            'status' => 'ステータス',
+            'type' => '種類',
+            'code' => 'コード',
+            'name' => '名称',
+        ],
+        'status_labels' => [
+            'active' => '実行中',
+            'inactive' => '停止中/期限切れ',
+            'out_of_stock' => '在庫切れ',
+            'low_stock' => '在庫僅少',
+            'healthy' => '正常',
+        ],
+        'campaigns' => [
+            'coupon' => 'クーポン',
+            'sale_offer' => 'セールオファー',
+            'buy_to_gift' => '購入特典',
+        ],
+        'revenue' => [
+            'name' => '売上レポート',
+            'description' => '売上、注文、支払い状況、日別トレンドを追跡します。',
+            'metrics' => [
+                'revenue' => '売上',
+                'paid' => '支払い済み',
+                'valid_orders' => '有効注文',
+                'average_order_value' => '平均注文額',
+            ],
+        ],
+        'product' => [
+            'name' => '商品レポート',
+            'description' => '売れ筋商品、商品別売上、カタログ状況を分析します。',
+            'metrics' => [
+                'sold_products' => '販売商品数',
+                'sold_quantity' => '販売数量',
+                'top_revenue' => '上位売上',
+                'active_catalog' => '有効カタログ',
+            ],
+        ],
+        'inventory' => [
+            'name' => '在庫レポート',
+            'description' => '低在庫、在庫切れ、在庫調整の変動を追跡します。',
+            'metrics' => [
+                'total_stock' => '総在庫',
+                'low_stock' => '低在庫',
+                'out_of_stock' => '在庫切れ',
+                'adjustments' => '調整数',
+            ],
+        ],
+        'promotion' => [
+            'name' => 'プロモーションレポート',
+            'description' => 'クーポン、セールオファー、購入特典キャンペーンの効果を集計します。',
+            'metrics' => [
+                'active' => '実行中',
+                'coupon_used' => '使用済みクーポン',
+                'discount_total' => '割引合計',
+                'campaign_total' => 'キャンペーン合計',
+            ],
+        ],
+    ],
+    'promotion' => [
+        'name' => 'プロモーション設定',
+        'saleoffer' => [
+            'name' => 'セールオファー',
+            'conditions' => '条件',
+            'apply_scope' => '適用範囲',
+            'apply_scope_hint' => '商品を選択しない場合、このオファーはすべての商品に適用されます。',
+            'options' => [
+                'percent' => 'パーセント',
+                'fixed' => '固定金額',
+            ],
+            'fields' => [
+                'discount_type' => '割引タイプ',
+                'discount_value' => '割引値',
+                'max_discount_amount' => '最大割引額',
+                'starts_at' => '開始日時',
+                'ends_at' => '終了日時',
+                'priority' => '優先度',
+                'stackable' => '併用可',
+                'apply_products' => '適用商品',
+            ],
+            'columns' => [
+                'discount' => '割引',
+                'final_price' => '割引後価格',
+            ],
+        ],
+        'coupon' => [
+            'name' => 'クーポン',
+            'conditions' => '条件',
+            'apply_scope' => '適用範囲',
+            'apply_scope_hint' => 'カテゴリまたは商品を選択しない場合、このクーポンはすべてに適用されます。',
+            'options' => [
+                'percent' => 'パーセント',
+                'fixed' => '固定金額',
+            ],
+            'fields' => [
+                'discount_type' => '割引タイプ',
+                'discount_value' => '割引値',
+                'max_discount_amount' => '最大割引額',
+                'min_order_amount' => '最低注文金額',
+                'max_order_amount' => '最高注文金額',
+                'usage_limit_total' => '総利用回数上限',
+                'usage_limit_per_user' => 'ユーザーごとの利用上限',
+                'first_order_only' => '初回注文のみ',
+                'is_public' => '公開クーポン',
+                'stackable' => '併用可',
+                'starts_at' => '開始日時',
+                'ends_at' => '終了日時',
+                'apply_categories' => '適用カテゴリ',
+                'apply_products' => '適用商品',
+                'products_count' => '商品数',
+            ],
+        ],
+        'buytogift' => [
+            'name' => '購入特典',
+            'conditions' => '条件',
+            'apply_scope' => '適用範囲',
+            'options' => [
+                'order_amount' => '注文金額条件',
+                'buy_product' => '商品購入で特典付与',
+                'stock_scope_all' => '在庫制限なし',
+                'stock_scope_limited' => '在庫制限あり',
+            ],
+            'summary' => [
+                'rule' => 'ルール',
+                'buy' => '購入',
+                'gift' => '特典',
+                'min_order_amount' => '最低注文金額',
+                'product_short' => '商品',
+                'more_rules' => '件の追加ルール',
+            ],
+            'fields' => [
+                'condition_type' => '条件タイプ',
+                'buy_products' => '購入条件商品',
+                'buy_qty' => '購入数量',
+                'gift_products' => '特典商品',
+                'gift_qty' => '特典数量',
+                'min_order_amount' => '特典適用の最低注文金額',
+                'max_sets_per_order' => '1注文あたりの特典セット上限',
+                'stock_scope' => '在庫適用範囲',
+                'stock_limit' => '在庫適用数量',
+                'starts_at' => '開始日時',
+                'ends_at' => '終了日時',
+                'priority' => '優先度',
+                'stackable' => '併用可',
+            ],
+        ],
+    ],
+    'sales' => [
+        'name' => '販売',
+        'warehouse' => [
+            'name' => '在庫管理',
+            'default_name' => 'デフォルト在庫',
+            'placeholders' => [
+                'search' => 'SKU または商品名を検索...',
+                'reason' => '調整理由を入力...',
+            ],
+            'messages' => [
+                'product_not_found' => '商品が見つかりません。',
+                'updated_success' => '更新に成功しました。',
+                'toggled_success' => '在庫状態を更新しました。',
+                'delete_not_supported' => '在庫の削除はサポートされていません。',
+                'bulk_delete_not_supported' => '在庫の一括削除はサポートされていません。',
+                'toggle_reason' => '在庫管理画面から在庫状態を更新しました。',
+            ],
+            'actions' => [
+                'update_stock' => '在庫更新',
+                'mark_in_stock' => '在庫ありにする',
+                'mark_out_stock' => '在庫切れにする',
+                'save_stock' => '在庫を保存',
+            ],
+            'fields' => [
+                'current_stock' => '現在の在庫',
+                'update_method' => '更新方法',
+                'set_new_stock' => '新しい在庫数を設定',
+                'adjust_delta' => '数量を増減',
+                'new_stock' => '新しい在庫数',
+                'delta' => '増減数',
+                'reason' => '理由',
+                'set_label' => '設定',
+                'adjust_label' => '調整',
+            ],
+            'titles' => [
+                'update_stock' => '在庫更新',
+                'recent_history' => '最近の履歴',
+            ],
+            'empty_history' => '在庫調整履歴はまだありません。',
+            'system_user' => 'システム',
+        ],
+        'orders' => [
+            'name' => '注文',
+            'created' => '注文を追加',
+            'edit' => '注文を編集',
+            'placeholders' => [
+                'search' => '注文番号、顧客名、電話番号を検索...',
+                'order_number' => '注文番号を入力...',
+                'product' => '商品を選択',
+                'province_first' => '先に都道府県 / 市を選択してください',
+            ],
+            'sections' => [
+                'customer' => '顧客情報',
+                'status' => '注文ステータス',
+                'items' => '注文商品',
+                'history' => '処理履歴',
+            ],
+            'actions' => [
+                'add_item' => '商品を追加',
+            ],
+            'empty_items' => 'まだ商品が追加されていません。',
+            'empty_history' => '処理履歴はまだありません。',
+            'history' => [
+                'system_user' => 'システム',
+                'event_labels' => [
+                    'created' => '注文を作成',
+                    'updated' => '注文を更新',
+                    'deleted' => '注文を削除',
+                    'order_status_changed' => '注文ステータス変更',
+                    'payment_status_changed' => '支払いステータス更新',
+                    'shipping_status_changed' => '配送ステータス更新',
+                    'payment_method_changed' => '支払い方法変更',
+                ],
+                'messages' => [
+                    'created' => '注文を作成しました。ステータスは :order_status、支払いは :payment_status、配送は :shipping_status です。',
+                    'updated' => '注文情報を更新しました。',
+                    'deleted' => '顧客 :customer_name の注文 :order_number を削除しました。',
+                    'order_status_changed' => '注文ステータスが :from から :to に変更されました。',
+                    'payment_status_changed' => '支払いステータスが :from から :to に変更されました。',
+                    'shipping_status_changed' => '配送ステータスが :from から :to に変更されました。',
+                    'payment_method_changed' => '支払い方法が :from から :to に変更されました。',
+                ],
+            ],
+            'fields' => [
+                'order_number' => '注文番号',
+                'customer_name' => '顧客名',
+                'customer_phone' => '電話番号',
+                'customer_email' => 'メールアドレス',
+                'payment_method' => '支払い方法',
+                'province' => '都道府県 / 市',
+                'ward' => '区 / 町村',
+                'customer_address' => '配送先住所',
+                'note' => '備考',
+                'order_status' => '注文ステータス',
+                'payment_status' => '支払いステータス',
+                'shipping_status' => '配送ステータス',
+                'discount_total' => '割引額',
+                'shipping_total' => '送料',
+                'subtotal' => '小計',
+                'grand_total' => '合計',
+                'product' => '商品',
+                'variant' => 'バリエーション',
+                'no_variant' => 'バリエーションなし',
+                'available_stock' => '利用可能在庫',
+                'quantity' => '数量',
+                'unit_price' => '単価',
+                'line_total' => '金額',
+                'placed_at' => '注文日時',
+                'total_quantity' => '合計数量',
+            ],
+            'payment_methods' => [
+                'cod_label' => '代金引換',
+            ],
+            'statuses' => [
+                'order' => [
+                    'pending' => '保留中',
+                    'confirmed' => '確認済み',
+                    'processing' => '処理中',
+                    'completed' => '完了',
+                    'cancelled' => 'キャンセル済み',
+                ],
+                'payment' => [
+                    'unpaid' => '未払い',
+                    'paid' => '支払い済み',
+                    'refunded' => '返金済み',
+                    'failed' => '失敗',
+                ],
+                'shipping' => [
+                    'pending' => '保留中',
+                    'ready_to_ship' => '発送準備完了',
+                    'shipping' => '配送中',
+                    'delivered' => '配達済み',
+                    'returned' => '返品済み',
+                ],
+            ],
+            'print' => [
+                'confirmation_title' => '注文確認',
+                'confirmation_note' => '上記の内容が正しいことを確認し、この注文内容に同意します。',
+                'confirmation_document' => '注文確認書',
+                'date_line' => '日付 :day 年 :month 月 :year',
+                'sign_hint' => '署名と氏名を記入してください',
+                'prepared_by' => '作成者',
+                'stock_keeper' => '在庫担当',
+                'customer_label' => '顧客',
+                'labels' => [
+                    'hotline' => 'ホットライン',
+                    'website' => 'ウェブサイト',
+                    'address' => '住所',
+                    'number' => '番号',
+                    'date' => '日付',
+                    'name' => '氏名',
+                    'phone_short' => '電話',
+                    'placed_date' => '注文日',
+                    'no' => '番号',
+                    'unit' => '単位',
+                    'item_unit' => '個',
+                ],
+                'sections' => [
+                    'fulfillment' => '配送情報',
+                ],
+            ],
+        ],
+        'payment_methods' => [
+            'name' => '支払い方法',
+            'sections' => [
+                'gateway_settings' => 'ゲートウェイ設定',
+            ],
+            'actions' => [
+                'enable' => '有効化',
+                'disable' => '無効化',
+            ],
+            'providers' => [
+                'cash_on_delivery' => '代金引換 (COD)',
+                'momo' => 'MoMo',
+                'zalopay' => 'ZaloPay',
+                'vnpay' => 'VNPay',
+                'paypal' => 'PayPal',
+            ],
+            'fields' => [
+                'instructions' => '案内内容',
+                'cod_fee' => '代引き手数料（必要な場合）',
+                'partner_code' => 'パートナーコード',
+                'access_key' => 'アクセスキー',
+                'secret_key' => 'シークレットキー',
+                'endpoint' => 'エンドポイント',
+                'return_url' => '戻り先URL',
+                'ipn_url' => 'IPN URL',
+                'app_id' => 'App ID',
+                'key1' => 'キー 1',
+                'key2' => 'キー 2',
+                'callback_url' => 'コールバックURL',
+                'tmn_code' => 'TMNコード',
+                'hash_secret' => 'ハッシュシークレット',
+                'client_id' => 'クライアントID',
+                'client_secret' => 'クライアントシークレット',
+                'mode' => 'モード (sandbox/live)',
+                'webhook_id' => 'Webhook ID',
+            ],
+        ],
+        'shipping_methods' => [
+            'name' => '配送方法',
+            'sections' => [
+                'gateway_settings' => '配送API設定',
+            ],
+            'actions' => [
+                'enable' => '有効化',
+                'disable' => '無効化',
+            ],
+            'providers' => [
+                'ghn' => 'GHN',
+                'ghtk' => 'GHTK',
+                'viettel_post' => 'Viettel Post',
+                'jnt' => 'J&T Express',
+                'ninja_van' => 'Ninja Van',
+            ],
+            'fields' => [
+                'token' => 'トークン',
+                'shop_id' => 'Shop ID',
+                'username' => 'ユーザー名',
+                'password' => 'パスワード',
+                'client_id' => 'Client ID',
+                'client_secret' => 'Client Secret',
+                'endpoint' => 'Endpoint',
+                'webhook_url' => 'Webhook URL',
+            ],
+            'messages' => [
+                'method_not_found' => '配送方法が見つかりません。',
+                'updated_success' => '更新に成功しました。',
+                'toggled_success' => '配送方法の状態を更新しました。',
+                'delete_not_supported' => '配送方法の削除はサポートされていません。',
+                'bulk_delete_not_supported' => '配送方法の一括削除はサポートされていません。',
+                'toggle_reason' => '配送管理画面から配送方法の状態を更新しました。',
+            ],
+        ],
+    ],
+    'catalog' => [
+        'name' => 'カタログ管理',
+        'menu_name' => 'カタログ',
+        'category' => [
+            'name' => 'カテゴリー',
+            'created' => 'カテゴリーを追加',
+            'edit' => 'カテゴリーを編集',
+            'page' => 'ページ',
+            'quick_create_page' => 'クイック作成',
+            'quick_page_title_required' => 'ページタイトルを入力してください。',
+            'quick_page_schema_required' => 'ページスキーマを選択してください。',
+            'quick_page_created' => 'クイックページを作成しました。',
+            'page_no_content_warning' => 'このページにはまだコンテンツがありません。先に内容を入力してください。',
+            'page_input_content' => '内容を入力',
+            'products' => 'カテゴリーの商品',
+            'products_hint' => 'このカテゴリーに属する商品を選択してください。',
+            'tree_structure' => 'カテゴリー樹形図',
+            'tree_drag' => 'ドラッグして並び替え',
+            'no_data' => 'カテゴリーデータがありません。',
+            'select_to_view' => '詳細を表示するにはカテゴリーを選択してください',
+            'instruction_text' => '左側の項目をクリックして情報を編集するか、SEOを設定してください。',
+            'select' => '--- ルートカテゴリーを選択 ---',
+            'ai' => [
+                'suggest_seo' => 'AIでSEO提案',
+                'generating' => '生成中...',
+                'missing_input' => '生成前にカテゴリー名・内容・キーワードのいずれかを入力してください。',
+                'empty_response' => 'AIがSEO内容を返しませんでした。もう一度お試しください。',
+                'failed' => '現在AI SEOを生成できません。しばらくしてから再試行してください。',
+            ],
+            'type' => [
+                'label' => 'カテゴリータイプ',
+                'options' => [
+                    'select' => 'タイプを選択',
+                    'product' => '商品',
+                    'news' => 'ニュース',
+                    'blog' => 'ブログ',
+                    'page' => 'ページ',
+                    'contact' => 'お問い合わせ',
+                ],
+            ],
+        ],
+        'product' => [
+            'admin' => [
+                'name' => '商品一覧',
+            ],
+            'name' => '商品',
+            'created' => '商品を追加',
+            'edit' => '商品を編集',
+            'ai' => [
+                'suggest_content' => 'AIで内容提案',
+                'suggest_seo' => 'AIでSEO提案',
+                'generating' => '生成中...',
+                'processing' => '処理中...',
+                'missing_input' => '生成前に商品名・説明・キーワードのいずれかを入力してください。',
+                'empty_response' => 'AIが内容を返しませんでした。もう一度お試しください。',
+                'rate_limited' => 'AIリクエストが混雑しています。数秒待ってから再試行してください。',
+                'failed' => '現在AIコンテンツを生成できません。しばらくしてから再試行してください。',
+            ],
+            'photo_hint' => '商品に複数の写真をアップロードできます。デフォルト写真が最初に表示されます。',
+            'upload_photos' => '画像をアップロード',
+            'add_photos' => '写真を追加',
+            'existing_photos' => '既存の写真',
+            'new_photos' => '新しい写真',
+            'no_photo' => '写真がまだありません。',
+            'no_new_photo' => '新しい写真がまだありません。',
+            'fields' => [
+                'base_price' => '基本価格',
+                'stock_available' => '在庫あり',
+                'stock_out' => '在庫切れ',
+                'coupon_allowed' => 'クーポン利用可',
+                'coupon_disallowed' => 'クーポン利用不可',
+            ],
+            'variants' => [
+                'name' => '商品バリエーション',
+                'attributes' => 'バリエーション属性',
+                'attributes_hint' => '属性値を選択して、組み合わせを生成します。',
+                'generate' => 'バリエーション生成',
+                'create_attribute' => '属性を作成',
+                'quick_attribute_hint' => '商品画面から直接、新しい属性を素早く作成します。',
+                'localized_name_hint' => '値をすべての言語で同時に入力してください。',
+                'images_hint' => 'バリエーション画像を横一列でアップロードします。画像をクリックするとカバーに設定できます。',
+                'set_cover' => 'カバーに設定',
+                'empty_attributes' => '生成する前に属性と属性値を作成してください。',
+                'empty' => 'バリエーションはまだありません。',
+                'rows' => '行',
+                'manual' => '手動',
+                'modal_title' => 'バリエーション情報',
+                'images' => 'バリエーション画像',
+                'upload_images' => '画像をアップロード',
+                'clear_images' => 'すべての画像を削除',
+            ],
+            'tabs' => [
+                'general' => '基本情報',
+                'content' => '内容',
+                'categories' => 'カテゴリー',
+                'photos' => '画像',
+                'variants' => 'バリエーション',
+            ],
+        ],
+        'attribute' => [
+            'admin' => [
+                'name' => '属性一覧',
+            ],
+            'name' => '属性',
+            'created' => '属性を作成',
+            'edit' => '属性を編集',
+            'create_hint' => '多言語名、コード、値を持つ新しい属性を作成します。',
+            'edit_hint' => '翻訳、値、表示タイプを更新します。',
+            'uploading' => '画像をアップロード中...',
+            'empty' => '属性はまだありません。',
+            'empty_hint' => 'テキスト、画像、色の値を管理するために属性を作成してください。',
+            'sections' => [
+                'information' => '基本情報',
+                'translations' => '翻訳',
+                'values' => '値',
+            ],
+            'fields' => [
+                'code' => 'コード',
+                'code_placeholder' => 'brand, color, size',
+                'type' => '種類',
+                'text' => 'テキスト',
+                'image' => '画像',
+                'color' => 'カラー',
+                'active' => '有効',
+                'inactive' => '無効',
+                'add_value' => '値を追加',
+                'remove' => '削除',
+                'image_upload' => '画像',
+                'language' => '言語',
+                'value' => '値',
+                'localized_name_hint' => '属性名をすべての言語で同時に入力してください。',
+                'localized_value_hint' => '値をすべての言語で同時に入力してください。',
+                'code_hint' => '`brand`、`color`、`size` のような安定したコードを使ってください。',
+                'type_hint' => '値の表示方法を選択してください。',
+                'image_hint' => 'クリックして値の画像をアップロードします。',
+                'color_hint' => '値を表す色を選択してください。',
+            ],
+            'errors' => [
+                'value_translation_required' => '各属性値には少なくとも1つの翻訳ラベルが必要です。',
+                'value_image_required' => '画像タイプの属性は、各値に画像が必要です。',
+                'value_color_required' => 'カラータイプの属性は、各値に色が必要です。',
+            ],
+            'messages' => [
+                'created' => '属性を作成しました。',
+                'updated' => '属性を更新しました。',
+                'deleted' => '属性を削除しました。',
+                'create_failed' => '属性を作成できませんでした。',
+                'update_failed' => '属性を更新できませんでした。',
+                'save_failed' => '属性を保存できませんでした。',
+                'delete_failed' => '属性を削除できませんでした。',
+            ],
+        ],
+        'post' => [
+            'admin' => [
+                'name' => '記事一覧',
+            ],
+            'name' => '記事',
+            'created' => '記事を追加',
+            'edit' => '記事を編集',
+            'ai' => [
+                'suggest_content' => 'AIで内容提案',
+                'suggest_seo' => 'AIでSEO提案',
+                'generating' => '生成中...',
+                'processing' => '処理中...',
+                'missing_input' => '生成前に記事名・説明・キーワードのいずれかを入力してください。',
+                'empty_response' => 'AIが内容を返しませんでした。もう一度お試しください。',
+                'failed' => '現在AIコンテンツを生成できません。しばらくしてから再試行してください。',
+            ],
+            'tabs' => [
+                'general' => '基本情報',
+                'content' => '内容',
+            ],
+            'type' => [
+                'label' => '記事タイプ',
+                'options' => [
+                    'select' => 'タイプを選択',
+                    'primary' => 'メイン',
+                    'footer' => 'フッター',
+                    'sidebar' => 'サイドバー',
+                ],
+            ],
+        ],
+    ],
+    'languages' => [
+        'admin' => [
+            'name' => '言語一覧',
+        ],
+        'name' => '言語',
+        'created' => '言語作成',
+        'edit' => '言語編集',
+    ],
+    'label' => [
+        'admin' => [
+            'name' => 'ラベル一覧',
+        ],
+        'name' => 'ラベル',
+        'created' => 'ラベル作成',
+        'edit' => 'ラベル編集',
+        'msg_newline' => '「+」をクリックして行を追加...',
+        'msg_placeholder' => 'キーを入力（例：welcome_msg）',
+        'msg_verify' => 'キーを入力してください。',
+        'confirm_delete_title' => '削除の確認',
+        'confirm_delete' => 'このラベルを削除してもよろしいですか？この操作を行うとすべての言語のデータが削除され、保存後は元に戻すことはできません。',
+    ],
+    'layout' => [
+        'admin' => [
+            'name' => 'レイアウト管理',
+        ],
+        'name' => 'レイアウト',
+        'tabs' => [
+            'home' => 'ホーム',
+            'general' => '基本設定',
+            'content' => 'コンテンツ',
+        ],
+        'items' => [
+            'logo' => 'システムロゴ',
+            'favicon' => 'ファビコン',
+            'meta_title' => 'メタタイトル',
+            'meta_keyword' => 'メタキーワード',
+            'meta_description' => 'メタディスクリプション',
+            'company' => '会社名',
+            'phone' => '電話番号',
+            'address' => '住所',
+            'tax' => '登録番号 / 登録番号',
+            'copyright' => 'コピーライト / 著作権',
+        ],
+    ],
+    'tabs' => 'タブ',
+    'section' => 'セクション',
+    'default' => 'デフォルト',
+    'seo' => [
+        'name' => '検索エンジン最適化 (SEO)',
+        'slug' => 'スラッグ / URL',
+        'character' => '文字',
+        'field' => [
+            'title' => 'SEOタイトル',
+            'keyword' => 'SEOキーワード',
+            'description' => 'SEO説明文',
+        ],
+        'review' => [
+            'title' => 'Google検索結果のプレビュー',
+            'description' => 'SEO説明を入力するか、同期ボタンをクリックしてGoogleでの表示を確認してください...',
+        ],
+        'placeholder' => [
+            'description' => 'ウェブサイトの内容を簡潔に説明してください...',
+        ],
+    ],
+    'button' => [
+        'add' => '追加',
+        'created' => '新規作成',
+        'delete' => '削除',
+        'delete_selected' => '選択を削除',
+        'edit' => '編集',
+        'view' => '詳細',
+        'print' => '印刷',
+        'filter' => '絞り込み',
+        'open' => '開く',
+        'save' => '保存',
+        'back' => '戻る',
+        'choose_image' => '画像を選択',
+        'new_line' => '行追加',
+        'confirm' => '確認',
+        'cancel' => 'キャンセル',
+        'close' => '閉じる',
+    ],
+    'view' => '詳細',
+    'open' => '開く',
+    'current_tab' => '現在のタブ',
+    'ready' => '準備完了',
+    'needs_attention' => '要確認',
+    'column' => [
+        'name' => '名前',
+        'slug' => 'ナメクジ',
+        'guard' => 'ガード',
+        'action' => '操作',
+        'first_name' => '名',
+        'last_name' => '姓',
+        'status' => 'ステータス',
+        'search' => '検索',
+        'sku' => 'SKU',
         'quantity' => '数量',
-        'unit_price' => '単価',
-        'line_total' => '金額',
-        'placed_at' => '注文日時',
-        'total_quantity' => '合計数量',
-      ),
-      'payment_methods' => 
-      array (
-        'cod_label' => '代金引換',
-      ),
-      'statuses' => 
-      array (
-        'order' => 
-        array (
-          'pending' => '保留中',
-          'confirmed' => '確認済み',
-          'processing' => '処理中',
-          'completed' => '完了',
-          'cancelled' => 'キャンセル済み',
-        ),
-        'payment' => 
-        array (
-          'unpaid' => '未払い',
-          'paid' => '支払い済み',
-          'refunded' => '返金済み',
-          'failed' => '失敗',
-        ),
-        'shipping' => 
-        array (
-          'pending' => '保留中',
-          'ready_to_ship' => '発送準備完了',
-          'shipping' => '配送中',
-          'delivered' => '配達済み',
-          'returned' => '返品済み',
-        ),
-      ),
-      'print' => 
-      array (
-        'confirmation_title' => '注文確認',
-        'confirmation_note' => '上記の内容が正しいことを確認し、この注文内容に同意します。',
-        'confirmation_document' => '注文確認書',
-        'date_line' => '日付 :day 年 :month 月 :year',
-        'sign_hint' => '署名と氏名を記入してください',
-        'prepared_by' => '作成者',
-        'stock_keeper' => '在庫担当',
-        'customer_label' => '顧客',
-        'labels' => 
-        array (
-          'hotline' => 'ホットライン',
-          'website' => 'ウェブサイト',
-          'address' => '住所',
-          'number' => '番号',
-          'date' => '日付',
-          'name' => '氏名',
-          'phone_short' => '電話',
-          'placed_date' => '注文日',
-          'no' => '番号',
-          'unit' => '単位',
-          'item_unit' => '個',
-        ),
-        'sections' => 
-        array (
-          'fulfillment' => '配送情報',
-        ),
-      ),
-    ),
-    'payment_methods' => 
-    array (
-      'name' => '支払い方法',
-      'sections' => 
-      array (
-        'gateway_settings' => 'ゲートウェイ設定',
-      ),
-      'actions' => 
-      array (
-        'enable' => '有効化',
-        'disable' => '無効化',
-      ),
-      'providers' => 
-      array (
-        'cash_on_delivery' => '代金引換 (COD)',
-        'momo' => 'MoMo',
-        'zalopay' => 'ZaloPay',
-        'vnpay' => 'VNPay',
-        'paypal' => 'PayPal',
-      ),
-      'fields' => 
-      array (
-        'instructions' => '案内内容',
-        'cod_fee' => '代引き手数料（必要な場合）',
-        'partner_code' => 'パートナーコード',
-        'access_key' => 'アクセスキー',
-        'secret_key' => 'シークレットキー',
-        'endpoint' => 'エンドポイント',
-        'return_url' => '戻り先URL',
-        'ipn_url' => 'IPN URL',
-        'app_id' => 'App ID',
-        'key1' => 'キー 1',
-        'key2' => 'キー 2',
-        'callback_url' => 'コールバックURL',
-        'tmn_code' => 'TMNコード',
-        'hash_secret' => 'ハッシュシークレット',
-        'client_id' => 'クライアントID',
-        'client_secret' => 'クライアントシークレット',
-        'mode' => 'モード (sandbox/live)',
-        'webhook_id' => 'Webhook ID',
-      ),
-    ),
-    'shipping_methods' => 
-    array (
-      'name' => '配送方法',
-      'sections' => 
-      array (
-        'gateway_settings' => '配送API設定',
-      ),
-      'actions' => 
-      array (
-        'enable' => '有効化',
-        'disable' => '無効化',
-      ),
-      'providers' => 
-      array (
-        'ghn' => 'GHN',
-        'ghtk' => 'GHTK',
-        'viettel_post' => 'Viettel Post',
-        'jnt' => 'J&T Express',
-        'ninja_van' => 'Ninja Van',
-      ),
-      'fields' => 
-      array (
-        'token' => 'トークン',
-        'shop_id' => 'Shop ID',
-        'username' => 'ユーザー名',
+        'weight' => '重さ',
+        'brand' => 'ブランド',
+        'price' => '価格',
+        'order' => '並び順',
+        'coupon' => 'クーポン',
+        'stock' => '在庫',
         'password' => 'パスワード',
-        'client_id' => 'Client ID',
-        'client_secret' => 'Client Secret',
-        'endpoint' => 'Endpoint',
-        'webhook_url' => 'Webhook URL',
-      ),
-      'messages' => 
-      array (
-        'method_not_found' => '配送方法が見つかりません。',
-        'updated_success' => '更新に成功しました。',
-        'toggled_success' => '配送方法の状態を更新しました。',
-        'delete_not_supported' => '配送方法の削除はサポートされていません。',
-        'bulk_delete_not_supported' => '配送方法の一括削除はサポートされていません。',
-        'toggle_reason' => '配送管理画面から配送方法の状態を更新しました。',
-      ),
-    ),
-  ),
-  'catalog' => 
-  array (
-    'name' => 'カタログ管理',
-    'menu_name' => 'コンテンツ管理',
-    'category' => 
-    array (
-      'name' => 'カテゴリー',
-      'created' => 'カテゴリーを追加',
-      'edit' => 'カテゴリーを編集',
-      'products' => 'カテゴリーの商品',
-      'products_hint' => 'このカテゴリーに属する商品を選択してください。',
-      'tree_structure' => 'カテゴリー樹形図',
-      'tree_drag' => 'ドラッグして並び替え',
-      'no_data' => 'カテゴリーデータがありません。',
-      'select_to_view' => '詳細を表示するにはカテゴリーを選択してください',
-      'instruction_text' => '左側の項目をクリックして情報を編集するか、SEOを設定してください。',
-      'select' => '--- ルートカテゴリーを選択 ---',
-      'ai' => 
-      array (
-        'suggest_seo' => 'AIでSEO提案',
-        'generating' => '生成中...',
-        'missing_input' => '生成前にカテゴリー名・内容・キーワードのいずれかを入力してください。',
-        'empty_response' => 'AIがSEO内容を返しませんでした。もう一度お試しください。',
-        'failed' => '現在AI SEOを生成できません。しばらくしてから再試行してください。',
-      ),
-      'type' => 
-      array (
-        'label' => 'カテゴリータイプ',
-        'options' => 
-        array (
-          'select' => 'タイプを選択',
-          'product' => '商品',
-          'news' => 'ニュース',
-          'blog' => 'ブログ',
-          'page' => 'ページ',
-          'contact' => 'お問い合わせ',
-        ),
-      ),
-    ),
-    'product' => 
-    array (
-      'admin' => 
-      array (
-        'name' => '商品一覧',
-      ),
-      'name' => '商品',
-      'created' => '商品を追加',
-      'edit' => '商品を編集',
-      'ai' => 
-      array (
-        'suggest_content' => 'AIで内容提案',
-        'suggest_seo' => 'AIでSEO提案',
-        'generating' => '生成中...',
-        'processing' => '処理中...',
-        'missing_input' => '生成前に商品名・説明・キーワードのいずれかを入力してください。',
-        'empty_response' => 'AIが内容を返しませんでした。もう一度お試しください。',
-        'rate_limited' => 'AIリクエストが混雑しています。数秒待ってから再試行してください。',
-        'failed' => '現在AIコンテンツを生成できません。しばらくしてから再試行してください。',
-      ),
-      'photo_hint' => '商品に複数の写真をアップロードできます。デフォルト写真が最初に表示されます。',
-      'upload_photos' => '画像をアップロード',
-      'add_photos' => '写真を追加',
-      'existing_photos' => '既存の写真',
-      'new_photos' => '新しい写真',
-      'no_photo' => '写真がまだありません。',
-      'no_new_photo' => '新しい写真がまだありません。',
-      'fields' => 
-      array (
-        'base_price' => '基本価格',
-        'stock_available' => '在庫あり',
-        'stock_out' => '在庫切れ',
-        'coupon_allowed' => 'クーポン利用可',
-        'coupon_disallowed' => 'クーポン利用不可',
-      ),
-      'variants' => 
-      array (
-        'name' => '商品バリエーション',
-        'attributes' => 'バリエーション属性',
-        'attributes_hint' => '属性値を選択して、組み合わせを生成します。',
-        'generate' => 'バリエーション生成',
-        'create_attribute' => '属性を作成',
-        'quick_attribute_hint' => '商品画面から直接、新しい属性を素早く作成します。',
-        'localized_name_hint' => '値をすべての言語で同時に入力してください。',
-        'images_hint' => 'バリエーション画像を横一列でアップロードします。画像をクリックするとカバーに設定できます。',
-        'set_cover' => 'カバーに設定',
-        'empty_attributes' => '生成する前に属性と属性値を作成してください。',
-        'empty' => 'バリエーションはまだありません。',
-        'rows' => '行',
-        'manual' => '手動',
-        'modal_title' => 'バリエーション情報',
-        'images' => 'バリエーション画像',
-        'upload_images' => '画像をアップロード',
-        'clear_images' => 'すべての画像を削除',
-      ),
-      'tabs' => 
-      array (
-        'general' => '基本情報',
-        'content' => '内容',
-        'categories' => 'カテゴリー',
-        'photos' => '画像',
-        'variants' => 'バリエーション',
-      ),
-    ),
-    'attribute' => 
-    array (
-      'admin' => 
-      array (
-        'name' => '属性一覧',
-      ),
-      'name' => '属性',
-      'created' => '属性を作成',
-      'edit' => '属性を編集',
-      'create_hint' => '多言語名、コード、値を持つ新しい属性を作成します。',
-      'edit_hint' => '翻訳、値、表示タイプを更新します。',
-      'uploading' => '画像をアップロード中...',
-      'empty' => '属性はまだありません。',
-      'empty_hint' => 'テキスト、画像、色の値を管理するために属性を作成してください。',
-      'sections' => 
-      array (
-        'information' => '基本情報',
-        'translations' => '翻訳',
-        'values' => '値',
-      ),
-      'fields' => 
-      array (
-        'code' => 'コード',
-        'code_placeholder' => 'brand, color, size',
-        'type' => '種類',
-        'text' => 'テキスト',
+        'password_confirm' => 'パスワード(確認)',
+        'account_name' => 'アカウント名',
+        'assign_group' => 'グループ割り当て',
+        'group' => 'ユーザーグループ',
         'image' => '画像',
-        'color' => 'カラー',
+        'image_edit' => '変更',
+        'images' => '画像',
+        'attributes' => '属性',
+        'categories' => 'カテゴリー',
+        'type' => '種類',
+        'value' => '値',
+        'email' => 'メールアドレス',
+        'code' => 'コード',
+        'full_name' => '正式名称',
+        'administrative_unit' => '行政区分',
+        'province' => '省・市',
+        'ward_count' => '区・町村数',
+        'provider' => '提供者',
+        'currency' => '通貨',
+        'key' => 'キー',
+        'content' => 'コンテンツ',
+        'description' => '短い説明',
+        'seo_title' => 'SEOタイトル',
+        'seo_keyword' => 'SEOキーワード',
+        'seo_description' => 'SEO説明文',
+        'default' => 'デフォルト',
+        'upload' => 'アップロード',
+    ],
+    'placeholder' => [
+        'select' => '選択してください...',
+    ],
+    'title' => [
+        'infomation' => '情報',
+        'setting' => '設定',
+        'success' => '成功',
+        'error' => 'エラー',
+    ],
+    'filter' => [
+        'all' => 'すべて',
+        'search' => '検索...',
+        'reset' => 'リセット',
+    ],
+    'status' => [
         'active' => '有効',
         'inactive' => '無効',
-        'add_value' => '値を追加',
-        'remove' => '削除',
-        'image_upload' => '画像',
-        'language' => '言語',
-        'value' => '値',
-        'localized_name_hint' => '属性名をすべての言語で同時に入力してください。',
-        'localized_value_hint' => '値をすべての言語で同時に入力してください。',
-        'code_hint' => '`brand`、`color`、`size` のような安定したコードを使ってください。',
-        'type_hint' => '値の表示方法を選択してください。',
-        'image_hint' => 'クリックして値の画像をアップロードします。',
-        'color_hint' => '値を表す色を選択してください。',
-      ),
-      'errors' => 
-      array (
-        'value_translation_required' => '各属性値には少なくとも1つの翻訳ラベルが必要です。',
-        'value_image_required' => '画像タイプの属性は、各値に画像が必要です。',
-        'value_color_required' => 'カラータイプの属性は、各値に色が必要です。',
-      ),
-      'messages' => 
-      array (
-        'created' => '属性を作成しました。',
-        'updated' => '属性を更新しました。',
-        'deleted' => '属性を削除しました。',
-        'create_failed' => '属性を作成できませんでした。',
-        'update_failed' => '属性を更新できませんでした。',
-        'save_failed' => '属性を保存できませんでした。',
-        'delete_failed' => '属性を削除できませんでした。',
-      ),
-    ),
-    'post' => 
-    array (
-      'admin' => 
-      array (
-        'name' => '記事一覧',
-      ),
-      'name' => '記事',
-      'created' => '記事を追加',
-      'edit' => '記事を編集',
-      'ai' => 
-      array (
-        'suggest_content' => 'AIで内容提案',
-        'suggest_seo' => 'AIでSEO提案',
-        'generating' => '生成中...',
-        'processing' => '処理中...',
-        'missing_input' => '生成前に記事名・説明・キーワードのいずれかを入力してください。',
-        'empty_response' => 'AIが内容を返しませんでした。もう一度お試しください。',
-        'failed' => '現在AIコンテンツを生成できません。しばらくしてから再試行してください。',
-      ),
-      'tabs' => 
-      array (
-        'general' => '基本情報',
-        'content' => '内容',
-      ),
-      'type' => 
-      array (
-        'label' => '記事タイプ',
-        'options' => 
-        array (
-          'select' => 'タイプを選択',
-          'primary' => 'メイン',
-          'footer' => 'フッター',
-          'sidebar' => 'サイドバー',
-        ),
-      ),
-    ),
-  ),
-  'languages' => 
-  array (
-    'admin' => 
-    array (
-      'name' => '言語一覧',
-    ),
-    'name' => '言語',
-    'created' => '言語作成',
-    'edit' => '言語編集',
-  ),
-  'label' => 
-  array (
-    'admin' => 
-    array (
-      'name' => 'ラベル一覧',
-    ),
-    'name' => 'ラベル',
-    'created' => 'ラベル作成',
-    'edit' => 'ラベル編集',
-    'msg_newline' => '「+」をクリックして行を追加...',
-    'msg_placeholder' => 'キーを入力（例：welcome_msg）',
-    'msg_verify' => 'キーを入力してください。',
-    'confirm_delete_title' => '削除の確認',
-    'confirm_delete' => 'このラベルを削除してもよろしいですか？この操作を行うとすべての言語のデータが削除され、保存後は元に戻すことはできません。',
-  ),
-  'layout' => 
-  array (
-    'admin' => 
-    array (
-      'name' => 'レイアウト管理',
-    ),
-    'name' => 'レイアウト',
-    'tabs' => 
-    array (
-      'home' => 'ホーム',
-      'general' => '基本設定',
-      'content' => 'コンテンツ',
-    ),
-    'items' => 
-    array (
-      'logo' => 'システムロゴ',
-      'favicon' => 'ファビコン',
-      'meta_title' => 'メタタイトル',
-      'meta_keyword' => 'メタキーワード',
-      'meta_description' => 'メタディスクリプション',
-      'company' => '会社名',
-      'phone' => '電話番号',
-      'address' => '住所',
-      'tax' => '登録番号 / 登録番号',
-      'copyright' => 'コピーライト / 著作権',
-    ),
-  ),
-  'tabs' => 'タブ',
-  'section' => 'セクション',
-  'default' => 'デフォルト',
-  'seo' => 
-  array (
-    'name' => '検索エンジン最適化 (SEO)',
-    'slug' => 'スラッグ / URL',
-    'character' => '文字',
-    'field' => 
-    array (
-      'title' => 'SEOタイトル',
-      'keyword' => 'SEOキーワード',
-      'description' => 'SEO説明文',
-    ),
-    'review' => 
-    array (
-      'title' => 'Google検索結果のプレビュー',
-      'description' => 'SEO説明を入力するか、同期ボタンをクリックしてGoogleでの表示を確認してください...',
-    ),
-    'placeholder' => 
-    array (
-      'description' => 'ウェブサイトの内容を簡潔に説明してください...',
-    ),
-  ),
-  'button' => 
-  array (
-    'add' => '追加',
-    'created' => '新規作成',
-    'delete' => '削除',
-    'delete_selected' => '選択を削除',
-    'edit' => '編集',
-    'view' => '詳細',
-    'print' => '印刷',
-    'filter' => '絞り込み',
-    'open' => '開く',
-    'save' => '保存',
-    'back' => '戻る',
-    'choose_image' => '画像を選択',
-    'new_line' => '行追加',
-    'confirm' => '確認',
-    'cancel' => 'キャンセル',
-    'close' => '閉じる',
-  ),
-  'view' => '詳細',
-  'open' => '開く',
-  'current_tab' => '現在のタブ',
-  'ready' => '準備完了',
-  'needs_attention' => '要確認',
-  'column' => 
-  array (
-    'name' => '名前',
-    'slug' => 'ナメクジ',
-    'guard' => 'ガード',
-    'action' => '操作',
-    'first_name' => '名',
-    'last_name' => '姓',
-    'status' => 'ステータス',
-    'search' => '検索',
-    'sku' => 'SKU',
-    'quantity' => '数量',
-    'weight' => '重さ',
-    'brand' => 'ブランド',
-    'price' => '価格',
-    'order' => '並び順',
-    'coupon' => 'クーポン',
-    'stock' => '在庫',
-    'password' => 'パスワード',
-    'password_confirm' => 'パスワード(確認)',
-    'account_name' => 'アカウント名',
-    'assign_group' => 'グループ割り当て',
-    'group' => 'ユーザーグループ',
-    'image' => '画像',
-    'image_edit' => '変更',
-    'images' => '画像',
-    'attributes' => '属性',
-    'categories' => 'カテゴリー',
-    'type' => '種類',
-    'value' => '値',
-    'email' => 'メールアドレス',
-    'code' => 'コード',
-    'full_name' => '正式名称',
-    'administrative_unit' => '行政区分',
-    'province' => '省・市',
-    'ward_count' => '区・町村数',
-    'provider' => '提供者',
-    'currency' => '通貨',
-    'key' => 'キー',
-    'content' => 'コンテンツ',
-    'description' => '短い説明',
-    'seo_title' => 'SEOタイトル',
-    'seo_keyword' => 'SEOキーワード',
-    'seo_description' => 'SEO説明文',
-    'default' => 'デフォルト',
-    'upload' => 'アップロード',
-  ),
-  'placeholder' => 
-  array (
-    'select' => '選択してください...',
-  ),
-  'title' => 
-  array (
-    'infomation' => '情報',
-    'setting' => '設定',
-    'success' => '成功',
-    'error' => 'エラー',
-  ),
-  'filter' => 
-  array (
-    'all' => 'すべて',
-    'search' => '検索...',
-    'reset' => 'リセット',
-  ),
-  'status' => 
-  array (
-    'active' => '有効',
-    'inactive' => '無効',
-  ),
-  'message' => 
-  array (
-    'selected' => '選択済み',
-    'nodata' => 'データがありません。',
-    'empty' => 'データがありません。',
-    'edit_slug' => '* この言語ではスラッグを手動で編集できます。',
-    'dashboard' => 
-    array (
-      'welcome' => '管理システムの準備が整いました。データの管理と運用をスムーズに開始できます。',
-    ),
-    'destroy' => ':name を削除してもよろしいですか？',
-    'destroys' => '選択したすべての項目を削除してもよろしいですか？',
-    'security_notice' => '別の端末でログインされています。',
-    'error' => 
-    array (
-      'required' => ':name は必須項目です。',
-      'password_confirm' => 'パスワードが一致しません。',
-      'created' => ':name の作成に失敗しました。',
-      'edit' => ':name の編集に失敗しました。',
-      'deleted' => '削除するデータが見つかりません。',
-    ),
-    'success' => 
-    array (
-      'created' => ':name を作成しました。',
-      'edit' => ':name を更新しました。',
-      'deleted' => ':name を削除しました。',
-      'restored' => ':name を復元しました。',
-    ),
-  ),
-  'tinymce' => 
-  array (
-    'name' => '画像ライブラリ',
-    'button' => 
-    array (
-      'upload_image' => '画像をアップロード',
-      'create_folder' => 'フォルダ作成',
-      'save' => '保存',
-      'cancel' => 'キャンセル',
-      'close' => '閉じる',
-    ),
-    'label' => 
-    array (
-      'folder' => 'フォルダ',
-      'file' => 'ファイル',
-      'new_name' => '新しい名前を入力:',
-    ),
-    'message' => 
-    array (
-      'delete' => 'この :name を削除しますか？',
-      'data_warning' => 'データを処理中...',
-      'folder_empty' => 'フォルダは空です',
-      'error' => 
-      array (
-        'move' => 'ファイルを移動できません！',
-        'create_folder' => 'フォルダ作成エラー',
-        'delete' => '削除エラー！',
-        'rename' => '名前変更エラー！',
-      ),
-    ),
-  ),
-);
+    ],
+    'message' => [
+        'selected' => '選択済み',
+        'nodata' => 'データがありません。',
+        'empty' => 'データがありません。',
+        'edit_slug' => '* この言語ではスラッグを手動で編集できます。',
+        'dashboard' => [
+            'welcome' => '管理システムの準備が整いました。データの管理と運用をスムーズに開始できます。',
+        ],
+        'destroy' => ':name を削除してもよろしいですか？',
+        'destroys' => '選択したすべての項目を削除してもよろしいですか？',
+        'security_notice' => '別の端末でログインされています。',
+        'error' => [
+            'required' => ':name は必須項目です。',
+            'password_confirm' => 'パスワードが一致しません。',
+            'created' => ':name の作成に失敗しました。',
+            'edit' => ':name の編集に失敗しました。',
+            'deleted' => '削除するデータが見つかりません。',
+        ],
+        'success' => [
+            'created' => ':name を作成しました。',
+            'edit' => ':name を更新しました。',
+            'deleted' => ':name を削除しました。',
+            'restored' => ':name を復元しました。',
+        ],
+    ],
+    'page' => [
+        'title' => 'ページ',
+        'menu_name' => 'ページ管理',
+        'subtitle' => 'スキーマを作成し、多言語コンテンツを入力できます。',
+        'create' => 'ページ作成',
+        'edit' => 'ページ編集',
+        'content' => 'コンテンツデータ',
+        'page_title' => 'ページタイトル',
+        'locale_title' => '言語別タイトル',
+        'group_title' => 'スキーマ名',
+        'slug_preview' => 'パス',
+        'page_count' => 'ページ',
+        'field_builder' => 'ページスキーマビルダー',
+        'field_builder_note' => 'text、image、textarea、editorMCE、Relation New、Product、Banner Position を追加できます。',
+        'add_field' => 'フィールド追加',
+        'multi_select_hint' => '複数項目を選択できます。',
+        'required' => '必須',
+        'translatable' => '多言語',
+        'field_count' => 'フィールド数',
+        'in_use' => '使用中',
+        'usage_status' => '利用状況',
+        'updated_at' => '更新日',
+        'not_in_use' => '未使用',
+        'select_schema_hint' => 'スキーマを選んで、そこから作成されたページ数を確認できます。',
+        'shared_fields' => '共通フィールド',
+        'shared_fields_note' => 'これらの値はすべての言語で共有されます。',
+        'pick_image' => '画像を選択',
+        'field_types' => [
+            'text' => 'Text',
+            'image' => 'Image',
+            'textarea' => 'Textarea',
+            'editor' => 'EditorMCE',
+            'relation_new' => 'Post',
+            'product' => 'Product',
+            'banner_position' => 'Banner Position',
+        ],
+        'messages' => [
+            'created' => 'ページを作成しました。',
+            'updated' => 'ページを更新しました。',
+            'deleted' => 'ページを削除しました。',
+            'slug_taken' => 'このパスはすでに存在します。',
+        ],
+    ],
+    'content' => [
+        'menu_name' => 'コンテンツ管理',
+        'field_design' => 'ページスキーマ',
+        'field_values' => 'ページ値',
+    ],
+    'field_group' => [
+        'messages' => [
+            'in_use' => 'このフィールドグループは使用中のため削除できません。',
+            'in_use_short' => '使用中',
+        ],
+    ],
+    'tinymce' => [
+        'name' => '画像ライブラリ',
+        'button' => [
+            'upload_image' => '画像をアップロード',
+            'create_folder' => 'フォルダ作成',
+            'save' => '保存',
+            'cancel' => 'キャンセル',
+            'close' => '閉じる',
+        ],
+        'label' => [
+            'folder' => 'フォルダ',
+            'file' => 'ファイル',
+            'new_name' => '新しい名前を入力:',
+        ],
+        'message' => [
+            'delete' => 'この :name を削除しますか？',
+            'data_warning' => 'データを処理中...',
+            'folder_empty' => 'フォルダは空です',
+            'error' => [
+                'move' => 'ファイルを移動できません！',
+                'create_folder' => 'フォルダ作成エラー',
+                'delete' => '削除エラー！',
+                'rename' => '名前変更エラー！',
+            ],
+        ],
+    ],
+];

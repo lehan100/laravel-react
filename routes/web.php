@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ExchangeRateController;
 use App\Http\Controllers\Admin\Media\MediaBannerController;
 use App\Http\Controllers\Admin\Media\MediaPositionController;
 use App\Http\Controllers\Admin\Media\TinyMCEController;
+use App\Http\Controllers\Admin\PageManager\FieldGroupController;
 use App\Http\Controllers\Admin\PageManager\PageController;
 use App\Http\Controllers\Admin\Promotion\BuyToGiftController;
 use App\Http\Controllers\Admin\Promotion\CouponController;
@@ -117,6 +118,7 @@ Route::prefix($prefixAdmin)->group(function () {
         Route::get('coupon/products-picker', [CouponController::class, 'productsPicker'])->name('coupon.products-picker');
         Route::get('buytogift/products-picker', [BuyToGiftController::class, 'productsPicker'])->name('buytogift.products-picker');
         Route::get('category/products-picker', [CategoryController::class, 'productsPicker'])->name('category.products-picker');
+        Route::post('pages/quick-store', [PageController::class, 'quickStore'])->name('pages.quick-store');
         // Media & Resource
         $resources = [
             'media-position' => MediaPositionController::class,
@@ -129,6 +131,7 @@ Route::prefix($prefixAdmin)->group(function () {
             'attribute' => AttributeController::class,
             'product' => ProductController::class,
             'post' => PostController::class,
+            'page-schemas' => FieldGroupController::class,
             'saleoffer' => SaleOfferController::class,
             'coupon' => CouponController::class,
             'buytogift' => BuyToGiftController::class,
@@ -138,6 +141,7 @@ Route::prefix($prefixAdmin)->group(function () {
             'shipping-methods' => ShippingMethodController::class,
             'pages' => PageController::class,
         ];
+        Route::get('page-values', [PageController::class, 'index'])->name('page-values.index');
         Route::post('attribute/quick-save', [AttributeController::class, 'quickSave'])->name('attribute.quick-save');
 
         Route::get('report-revenue', [ReportRevenueController::class, 'index'])->name('report-revenue.index');
@@ -159,7 +163,11 @@ Route::prefix($prefixAdmin)->group(function () {
 
             Route::delete("$uri/destroy-many", [$controller, 'destroyMany'])->name("$uri.destroy-many");
             Route::put("$uri/{id}/toggle-status", [$controller, 'toggleStatus'])->name("$uri.toggle-status");
-            Route::resource($uri, $controller);
+            $resource = Route::resource($uri, $controller);
+
+            if ($uri === 'page-schemas') {
+                $resource->parameters(['page-schemas' => 'field_group']);
+            }
         }
     });
 });
