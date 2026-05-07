@@ -25,7 +25,9 @@ type CategoryNode = {
     type?: string;
     order?: number;
     products_count?: number;
+    posts_count?: number;
     tree_products_count?: number;
+    tree_posts_count?: number;
     translations?: Record<string, { name?: string }>;
     children?: CategoryNode[];
 };
@@ -93,6 +95,29 @@ function resolveTreeProductCount(node: CategoryNode): number {
     const childrenCount = (node.children || []).reduce((total, child) => total + resolveTreeProductCount(child), 0);
 
     return directCount + childrenCount;
+}
+
+function resolveTreePostCount(node: CategoryNode): number {
+    const directCount = Number(node.posts_count ?? 0);
+    const childrenCount = (node.children || []).reduce((total, child) => total + resolveTreePostCount(child), 0);
+
+    return directCount + childrenCount;
+}
+
+function resolveTreeCount(node: CategoryNode): number {
+    if ((node.type ?? 'product') === 'news') {
+        return Number(node.tree_posts_count ?? resolveTreePostCount(node));
+    }
+
+    return Number(node.tree_products_count ?? resolveTreeProductCount(node));
+}
+
+function resolveCountLabelKey(type?: string): string {
+    if ((type ?? 'product') === 'news') {
+        return 'hancms.catalog.category.tree_count.news';
+    }
+
+    return 'hancms.catalog.category.tree_count.product';
 }
 
 const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
@@ -201,7 +226,8 @@ const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
             const typeMeta = getTypeMeta(node.type);
             const TypeIcon = typeMeta.icon;
             const isInactive = node.status === 0;
-            const productCount = Number(node.tree_products_count ?? resolveTreeProductCount(node));
+            const treeCount = resolveTreeCount(node);
+            const countLabelKey = resolveCountLabelKey(node.type);
             const isDragging = draggingId === node.id;
             const isDropTarget = dropTarget?.id === node.id && draggingId !== null && draggingId !== node.id;
             const showDropBefore = isDropTarget && dropTarget?.position === 'before';
@@ -298,9 +324,9 @@ const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
 
                                 <span
                                     className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
-                                    title="Số lượng sản phẩm"
+                                    title={trans(countLabelKey)}
                                 >
-                                    {productCount}
+                                    {treeCount}
                                 </span>
 
                                 {isInactive && (

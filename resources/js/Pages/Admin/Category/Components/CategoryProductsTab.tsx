@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import ProductPickerModal from '@/Components/Common/ProductPickerModal';
 import MessageError from '@/Components/Form/MessageError';
 import { formatProductPrice, getProductCurrencyFromLocale, loadProductCurrency, type ProductCurrency } from '@/Pages/Admin/Product/productUtils';
+import { productsPicker } from '@/actions/App/Http/Controllers/Admin/Catalog/CategoryController';
+import { edit as editProduct } from '@/actions/App/Http/Controllers/Admin/Catalog/ProductController';
 
 type ProductRow = {
     id: number;
@@ -88,7 +91,7 @@ export default function CategoryProductsTab({ data, setData, errors, itemsSelect
         const timeout = setTimeout(async () => {
             setLoading(true);
             try {
-                const response = await axios.get(route('category.products-picker'), {
+                const response = await axios.get(productsPicker.url(), {
                     params: {
                         search,
                         page,
@@ -185,14 +188,23 @@ export default function CategoryProductsTab({ data, setData, errors, itemsSelect
                                         {product.sku || `#${product.id}`}
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => removeSelectedProduct(Number(product.id))}
-                                    className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-500"
-                                >
-                                    <Trash2 size={14} />
-                                    {trans('hancms.button.delete') || 'Xóa'}
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <Link
+                                        href={editProduct.url(product.id)}
+                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                                    >
+                                        <Pencil size={14} />
+                                        {trans('hancms.button.edit') || 'Sửa'}
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeSelectedProduct(Number(product.id))}
+                                        className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-500"
+                                    >
+                                        <Trash2 size={14} />
+                                        {trans('hancms.button.delete') || 'Xóa'}
+                                    </button>
+                                </div>
                             </div>
                         ))
                     ) : (

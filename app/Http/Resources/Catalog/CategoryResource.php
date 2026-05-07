@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Catalog;
 
+use App\Models\Catalog\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -34,8 +35,24 @@ class CategoryResource extends JsonResource
             }),
             'products_count' => $this->whenCounted('products'),
             'tree_products_count' => $this->tree_products_count ?? $this->whenCounted('products'),
+            'tree_posts_count' => $this->tree_posts_count ?? $this->whenCounted('posts'),
             'product_ids' => $this->whenLoaded('products', function () {
                 return $this->products->pluck('id')->values()->all();
+            }),
+            'posts_count' => $this->whenCounted('posts'),
+            'posts' => $this->whenLoaded('posts', function () {
+                return $this->posts->map(function (Post $post): array {
+                    $translation = $post->translations
+                        ->firstWhere('locale', app()->getLocale())
+                        ?? $post->translations->first();
+
+                    return [
+                        'id' => $post->id,
+                        'name' => $translation?->name ?? ('#'.$post->id),
+                        'status' => $post->status,
+                        'order' => $post->order,
+                    ];
+                })->values()->all();
             }),
             'photo' => $this->photo ?? '',
             'photo_url' => $this->photo ? rtrim($baseUrl, '/').'/'.trim($path, '/').'/'.$this->photo : null,

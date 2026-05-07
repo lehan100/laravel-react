@@ -15,7 +15,6 @@ function CreatedPage() {
     const { trans } = useTrans();
     const { itemsCategory, locale }: any = usePage().props;
     const currentLocale = (locale as string) || 'vi';
-
     const { langs, item, config_path, languageConfigPath, itemsCategoryActive, pages, pageSchemas }: any = usePage<{
         item: Category;
     }>().props;
@@ -45,7 +44,7 @@ function CreatedPage() {
         undo: item?.undo ?? 0,
         translations: initialTranslations,
     });
-    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive, itemsSelectedProducts: [], pages: pages || [], pageSchemas: pageSchemas || [] };
+    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive, itemsSelectedProducts: [], itemsSelectedNews: [], pages: pages || [], pageSchemas: pageSchemas || [] };
     const [activeId, setActiveId] = useState<number | null>(null);
     const [undo, setUndo] = useState(0);
     const handleUndo = (status: number) => setUndo(status);
@@ -84,7 +83,6 @@ function CreatedPage() {
                         </div>
                     </Card>
                 </div>
-
                 <div className="col-span-12 lg:col-span-8">
                     <form id='my-form' noValidate onSubmit={handleSubmit}>
                         <CategoryFormView {...commonProps} langList={langList} />

@@ -518,6 +518,10 @@ return [
             'products' => 'カテゴリーの商品',
             'products_hint' => 'このカテゴリーに属する商品を選択してください。',
             'tree_structure' => 'カテゴリー樹形図',
+            'tree_count' => [
+                'product' => '商品数',
+                'news' => 'ニュース数',
+            ],
             'tree_drag' => 'ドラッグして並び替え',
             'no_data' => 'カテゴリーデータがありません。',
             'select_to_view' => '詳細を表示するにはカテゴリーを選択してください',
@@ -541,6 +545,10 @@ return [
                     'contact' => 'お問い合わせ',
                 ],
             ],
+            'news_add' => 'ニュースを追加',
+            'news_hint' => 'このカテゴリーに属する記事です。',
+            'news_empty' => 'このカテゴリーにはまだニュースがありません。',
+            'news_manage_note' => 'ニュース記事は記事一覧で管理します。',
         ],
         'product' => [
             'admin' => [

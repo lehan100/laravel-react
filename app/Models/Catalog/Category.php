@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property-read Collection<int, Product> $products
+ * @property-read Collection<int, Post> $posts
  */
 class Category extends Model implements TranslatableContract
 {
@@ -76,6 +77,11 @@ class Category extends Model implements TranslatableContract
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'category_product');
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class, 'category_id')->orderBy('order');
     }
 
     public function page(): BelongsTo

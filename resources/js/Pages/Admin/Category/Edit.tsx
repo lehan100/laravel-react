@@ -46,7 +46,7 @@ function CreatedPage() {
         undo: item?.undo ?? 0,
         translations: initialTranslations,
     });
-    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive, itemsSelectedProducts: itemsSelectedProducts || [], pages: pages || [], pageSchemas: pageSchemas || [] };
+    const commonProps = { data, setData, trans, config_path, languageConfigPath, errors, langCode: currentLocale, itemsCategoryActive: itemsCategoryActive, itemsSelectedProducts: itemsSelectedProducts || [], itemsSelectedNews: item?.posts || [], pages: pages || [], pageSchemas: pageSchemas || [] };
     const [activeId, setActiveId] = useState<number | null>(data.id);
     const [undo, setUndo] = useState(0);
     const handleUndo = (status: number) => setUndo(status);

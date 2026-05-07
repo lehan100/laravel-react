@@ -518,6 +518,10 @@ return [
             'products' => 'Sản phẩm của danh mục',
             'products_hint' => 'Chọn các sản phẩm thuộc danh mục này.',
             'tree_structure' => 'Cấu trúc cây danh mục',
+            'tree_count' => [
+                'product' => 'Số lượng sản phẩm',
+                'news' => 'Số lượng tin tức',
+            ],
             'tree_drag' => 'Kéo để sắp xếp',
             'no_data' => 'Chưa có dữ liệu cây danh mục.',
             'select_to_view' => 'Vui lòng chọn một danh mục để xem chi tiết',
@@ -541,6 +545,10 @@ return [
                     'contact' => 'Liên hệ',
                 ],
             ],
+            'news_add' => 'Thêm tin tức',
+            'news_hint' => 'Các bài viết thuộc danh mục này.',
+            'news_empty' => 'Chưa có tin tức nào trong danh mục này.',
+            'news_manage_note' => 'Bài viết tin tức được quản lý ở mục Bài viết.',
         ],
         'product' => [
             'admin' => [

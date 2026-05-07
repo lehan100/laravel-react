@@ -518,6 +518,10 @@ return [
             'products' => 'Category Products',
             'products_hint' => 'Select the products that belong to this category.',
             'tree_structure' => 'Category Tree Structure',
+            'tree_count' => [
+                'product' => 'Product count',
+                'news' => 'News count',
+            ],
             'tree_drag' => 'Drag to reorder',
             'no_data' => 'No category tree data available.',
             'select_to_view' => 'Please select a category to view details',
@@ -541,6 +545,10 @@ return [
                     'contact' => 'Contact',
                 ],
             ],
+            'news_add' => 'Add news',
+            'news_hint' => 'Posts that belong to this category.',
+            'news_empty' => 'No news in this category yet.',
+            'news_manage_note' => 'News posts are managed in the Posts section.',
         ],
         'product' => [
             'admin' => [

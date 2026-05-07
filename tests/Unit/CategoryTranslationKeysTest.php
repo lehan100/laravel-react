@@ -14,6 +14,8 @@ class CategoryTranslationKeysTest extends TestCase
             'vi' => [
                 'hancms.catalog.category.products' => 'Sản phẩm của danh mục',
                 'hancms.catalog.category.products_hint' => 'Chọn các sản phẩm thuộc danh mục này.',
+                'hancms.catalog.category.news_add' => 'Thêm tin tức',
+                'hancms.catalog.category.news_hint' => 'Các bài viết thuộc danh mục này.',
                 'hancms.catalog.category.ai.suggest_seo' => 'AI gợi ý SEO',
                 'hancms.catalog.category.ai.generating' => 'Đang tạo...',
                 'hancms.message.empty' => 'Không có dữ liệu.',
@@ -21,6 +23,8 @@ class CategoryTranslationKeysTest extends TestCase
             'en' => [
                 'hancms.catalog.category.products' => 'Category Products',
                 'hancms.catalog.category.products_hint' => 'Select the products that belong to this category.',
+                'hancms.catalog.category.news_add' => 'Add news',
+                'hancms.catalog.category.news_hint' => 'Posts that belong to this category.',
                 'hancms.catalog.category.ai.suggest_seo' => 'AI Suggest SEO',
                 'hancms.catalog.category.ai.generating' => 'Generating...',
                 'hancms.message.empty' => 'No data.',
@@ -28,6 +32,8 @@ class CategoryTranslationKeysTest extends TestCase
             'ja' => [
                 'hancms.catalog.category.products' => 'カテゴリーの商品',
                 'hancms.catalog.category.products_hint' => 'このカテゴリーに属する商品を選択してください。',
+                'hancms.catalog.category.news_add' => 'ニュースを追加',
+                'hancms.catalog.category.news_hint' => 'このカテゴリーに属する記事です。',
                 'hancms.catalog.category.ai.suggest_seo' => 'AIでSEO提案',
                 'hancms.catalog.category.ai.generating' => '生成中...',
                 'hancms.message.empty' => 'データがありません。',

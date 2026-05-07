@@ -9,6 +9,7 @@ use App\Http\Resources\Catalog\PostResource;
 use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Post\PostRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
@@ -55,15 +56,17 @@ class PostController extends MainController
         ]);
     }
 
-    public function create()
+    public function create(HttpRequest $request)
     {
         $itemsCategoryActive = $this->categoryModel->lists(null, [
             'task' => 'admin-list-items-active',
             'type' => self::CATEGORY_TYPES,
         ]);
+        $categoryId = $request->integer('category_id');
+        $item = $categoryId > 0 ? ['category_id' => $categoryId] : null;
 
         return Inertia::render($this->controllerView.'Created', [
-            'item' => null,
+            'item' => $item,
             'itemsCategoryActive' => $itemsCategoryActive,
         ]);
     }

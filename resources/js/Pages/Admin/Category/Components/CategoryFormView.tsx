@@ -12,12 +12,13 @@ import axios from 'axios';
 import CategorySelector from './CategorySelector';
 import CategoryTypeSelector from './CategoryTypeSelector';
 import CategoryProductsTab from './CategoryProductsTab';
+import CategoryNewsTab from './CategoryNewsTab';
 import { getLanguageByLocale } from '@/Pages/Admin/Product/productUtils';
 import { quickStore as quickCreatePage } from '@/actions/App/Http/Controllers/Admin/PageManager/PageController';
 
-const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive, itemsSelectedProducts = [], pages = [], pageSchemas = [] }: any) => {
+const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive, itemsSelectedProducts = [], itemsSelectedNews = [], pages = [], pageSchemas = [] }: any) => {
     const [currentTab, setCurrentTab] = useState(langCode || 'vi');
-    const [contentTab, setContentTab] = useState<'content' | 'products'>('content');
+    const [contentTab, setContentTab] = useState<'content' | 'products' | 'news'>('content');
     const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
     const { props }: any = usePage();
@@ -188,11 +189,37 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
         if (!currentType) return false;
         return String(category.type || 'product') === String(currentType);
     });
+    const contentRelationTab: 'products' | 'news' | null = data.type === 'product'
+        ? 'products'
+        : data.type === 'news'
+            ? 'news'
+            : null;
+    const contentTabs: Array<{ id: 'content' | 'products' | 'news'; label: string }> = contentRelationTab
+        ? [
+            { id: 'content' as const, label: trans('hancms.column.content') },
+            {
+                id: contentRelationTab,
+                label: contentRelationTab === 'products'
+                    ? trans('hancms.catalog.product.name')
+                    : trans('hancms.catalog.category.type.options.news') || 'Tin tức',
+            },
+        ]
+        : [];
     const currentLanguage = getLanguageByLocale(langList, currentTab);
     const selectedPage = useMemo(
         () => pageOptions.find((page) => String(page.id) === String(data.page_id)) || null,
         [data.page_id, pageOptions]
     );
+
+    useEffect(() => {
+        if (contentRelationTab && contentTab !== 'content' && contentTab !== contentRelationTab) {
+            setContentTab('content');
+        }
+
+        if (!contentRelationTab && contentTab !== 'content') {
+            setContentTab('content');
+        }
+    }, [contentRelationTab, contentTab]);
 
     useEffect(() => {
         setPageOptions(pages || []);
@@ -408,30 +435,30 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             </Card>
             <Card title={trans('hancms.layout.tabs.content')}>
                 <div className="space-y-6 p-6">
-                    <div className="flex flex-wrap gap-2 border-b pb-4">
-                        {[
-                            { id: 'content' as const, label: trans('hancms.column.content') },
-                            { id: 'products' as const, label: trans('hancms.catalog.product.name') },
-                        ].map((tab) => {
-                            const active = contentTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    type="button"
-                                    onClick={() => setContentTab(tab.id)}
-                                    className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                                        active
-                                            ? 'bg-slate-950 text-white shadow-sm'
-                                            : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                    }`}
-                                >
-                                    {tab.label}
-                                </button>
-                            );
-                        })}
-                    </div>
+                    {contentTabs.length > 1 ? (
+                        <div className="flex flex-wrap gap-2 border-b pb-4">
+                            {contentTabs.map((tab) => {
+                                const active = contentTab === tab.id;
 
-                    {contentTab === 'content' ? (
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        type="button"
+                                        onClick={() => setContentTab(tab.id)}
+                                        className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                                            active
+                                                ? 'bg-slate-950 text-white shadow-sm'
+                                                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ) : null}
+
+                    {contentTab === 'content' || !contentRelationTab ? (
                         <>
                             <div className="flex gap-3 mb-6 border-b pb-6 pl-1 overflow-x-auto">
                                 {langList.map((lang: any) => {
@@ -610,7 +637,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                 </InputGroup>
                             </div>
                         </>
-                    ) : (
+                    ) : contentRelationTab === 'products' ? (
                         <CategoryProductsTab
                             data={data}
                             setData={setData}
@@ -619,6 +646,12 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                             trans={trans}
                             langCode={currentTab}
                             currentLanguage={currentLanguage}
+                        />
+                    ) : (
+                        <CategoryNewsTab
+                            data={data}
+                            itemsSelectedNews={itemsSelectedNews}
+                            trans={trans}
                         />
                     )}
 

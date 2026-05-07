@@ -232,12 +232,100 @@ class CategoryTreeCountTest extends TestCase
         $this->assertSame(8, (int) ($childTwo->tree_products_count ?? 0));
     }
 
+    #[Test]
+    public function it_aggregates_news_count_for_parent_categories(): void
+    {
+        $now = now();
+
+        $parentId = DB::table('categories')->insertGetId([
+            'status' => 1,
+            'order' => 1,
+            'parent_id' => null,
+            'type' => 'news',
+            'photo' => null,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $childId = DB::table('categories')->insertGetId([
+            'status' => 1,
+            'order' => 1,
+            'parent_id' => $parentId,
+            'type' => 'news',
+            'photo' => null,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $this->seedCategoryTranslation($parentId, 'Tin tức cha');
+        $this->seedCategoryTranslation($childId, 'Tin tức con');
+
+        foreach (range(1, 3) as $index) {
+            $postId = DB::table('posts')->insertGetId([
+                'category_id' => $parentId,
+                'photo' => null,
+                'type' => 'primary',
+                'status' => 1,
+                'order' => $index,
+                'hit_viewer' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+            $this->seedPostTranslation($postId, "Bài viết cha {$index}");
+        }
+
+        foreach (range(1, 2) as $index) {
+            $postId = DB::table('posts')->insertGetId([
+                'category_id' => $childId,
+                'photo' => null,
+                'type' => 'primary',
+                'status' => 1,
+                'order' => $index,
+                'hit_viewer' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+            $this->seedPostTranslation($postId, "Bài viết con {$index}");
+        }
+
+        /** @var CategoryEloquentRepository $repository */
+        $repository = app(CategoryEloquentRepository::class);
+        $categories = $repository->lists(null, ['task' => 'admin-list-items']);
+
+        $parent = $categories->firstWhere('id', $parentId);
+        $child = $categories->firstWhere('id', $childId);
+
+        $this->assertNotNull($parent);
+        $this->assertSame(5, (int) ($parent->tree_posts_count ?? 0));
+        $this->assertSame(2, (int) ($child->tree_posts_count ?? 0));
+    }
+
     private function seedCategoryTranslation(int $categoryId, string $name): void
     {
         $now = now();
 
         DB::table('category_translations')->insert([
             'category_id' => $categoryId,
+            'locale' => 'vi',
+            'name' => $name,
+            'description' => null,
+            'content' => null,
+            'seo_title' => null,
+            'seo_keyword' => null,
+            'seo_description' => null,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+
+    private function seedPostTranslation(int $postId, string $name): void
+    {
+        $now = now();
+
+        DB::table('post_translations')->insert([
+            'post_id' => $postId,
             'locale' => 'vi',
             'name' => $name,
             'description' => null,

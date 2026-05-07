@@ -43,7 +43,7 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
                     $q->select(['id', 'category_id', 'locale', 'name'])
                         ->where('locale', $currentLocale);
                 },
-            ])->withCount('products');
+            ])->withCount(['products', 'posts']);
 
             if (! empty($options['type'])) {
                 if (is_array($options['type'])) {
@@ -406,13 +406,15 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
                 return 0;
             }
 
-            $total = (int) ($category->products_count ?? 0);
+            $countField = ($category->type ?? 'product') === 'news' ? 'posts_count' : 'products_count';
+            $treeCountField = ($category->type ?? 'product') === 'news' ? 'tree_posts_count' : 'tree_products_count';
+            $total = (int) ($category->{$countField} ?? 0);
             foreach ($childrenByParent[$categoryId] ?? [] as $childId) {
                 $total += $resolve((int) $childId);
             }
 
             $cache[$categoryId] = $total;
-            $category->setAttribute('tree_products_count', $total);
+            $category->setAttribute($treeCountField, $total);
 
             return $total;
         };

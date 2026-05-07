@@ -55,9 +55,20 @@ export interface Category {
   photo: string;
   page_id?: number | null;
   parent_id: number | null;
+  product_ids?: number[];
+  posts_count?: number;
+  tree_products_count?: number;
+  tree_posts_count?: number;
+  posts?: CategoryNewsItem[];
   translations: Record<string, CategoryTranslation>;
   created_at?: string;
   updated_at?: string;
+}
+export interface CategoryNewsItem {
+  id: number;
+  name: string;
+  order?: number;
+  status?: number | boolean;
 }
 export interface CategoryTranslation {
   name: string;
