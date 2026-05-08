@@ -4,6 +4,7 @@ namespace App\Models\Promotion;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -17,6 +18,7 @@ class PromotionBuyToGiftOffer extends Model
         'code',
         'name',
         'description',
+        'campaign_id',
         'starts_at',
         'ends_at',
         'priority',
@@ -31,6 +33,11 @@ class PromotionBuyToGiftOffer extends Model
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
     ];
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(PromotionCampaign::class, 'campaign_id');
+    }
 
     public function rules(): HasMany
     {

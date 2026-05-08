@@ -1,0 +1,115 @@
+.single-tuyen_dung 
+	.header
+		.header-right
+			.header-bottom
+				.header-nav
+					li
+						&.menu-item-582
+							&>a
+								@apply text-Neutral-White bg-Primary-1  
+						
+
+.recruitment-detail-1	 
+	@apply xl:rem:pb-[136px] pb-10
+	.recruitment-detail-main
+		@screen -lg
+			@apply flex-col
+	.container
+		@screen -2xl
+			@apply max-w-[94rem]
+	.recruitment-detail-tab-item
+		@apply flex items-center gap-3 border-b border-[#E4E5E6] pb-5 rem:min-h-[70px]
+		.recruitment-location
+			text-align: unset
+			@apply rem:w-[160px] font-bold
+		.recruitment-location-position
+			@apply flex-1
+	.col-left
+		@screen -lg
+			@apply w-full
+		.content
+			@apply rounded-5
+			h1
+				@apply border-b-[#B0B5BE]
+			h3
+				@apply border-b-[#B0B5BE]
+			@screen -2xl
+				.recruitment-detail-tabs 
+					.recruitment-detail-tab-left
+						@apply w-2/4
+						.recruitment-detail-tab-item
+							.recruitment-location
+								@apply w-2/4
+							.recruitment-location-position
+								@apply w-2/4
+					.recruitment-detail-tab-right
+						@apply w-2/4
+						.recruitment-detail-tab-item
+							.recruitment-location
+								@apply w-2/4
+							.recruitment-location-position
+								@apply w-2/4
+			@screen -lg
+				@apply p-[12px]
+				.recruitment-detail-tabs 
+					.recruitment-detail-tab-right
+						@apply flex-1
+				.recruitment-detail-tab-item
+					@apply gap-[12px]
+			@screen -md
+				@apply p-4
+				.recruitment-detail-tabs 
+					@apply gap-5 flex-col
+					.recruitment-detail-tab-left
+						@apply w-full border-b border-b-[#B0B5BE]
+					.recruitment-detail-tab-right
+						@apply w-full
+		
+	.col-right
+		@screen -lg
+			@apply w-full
+		.button
+			a
+				@apply rounded-full
+			.button-link 
+				a
+					@apply text-lg font-bold rounded-full
+		.box-info
+			@apply border border-[#DCDCDC] rounded-5 overflow-hidden
+		.box-info-item
+			@apply p-6 flex flex-col rem:gap-[18px]
+			h3
+				@apply text-xl text-Neutral-950 font-bold leading-7
+			& + .box-info-item
+				@apply border-t border-t-[#DCDCDC]
+		.box-info-date
+			@apply flex items-center gap-[10px] text-base
+			i
+				@apply text-Primary-1 font-normal
+		.box-info-date > span.title
+			@apply text-Primary-1
+#form-requirement
+	@apply lg:rem:w-[850px] w-full  relative  p-10 
+	.carousel__button
+		position: absolute !important
+		top: 0.5rem !important
+		right: 0.5rem !important
+		@apply w-8 h-8 z-100 cursor-pointer bg-Primary-1
+		svg
+			@apply rem:w-[16px] rem:h-[16px]
+	h3
+		@apply text-6xl text-Primary-1 text-center font-bold mb-5 #{!important}
+	form.wpcf7-form.submitting
+		button
+			&[type="submit"]
+				@apply pointer-events-none cursor-not-allowed
+	.form-group
+		@apply relative cursor-pointer
+		&:focus
+			outline: none !important
+		input
+			@apply w-full px-6 py-3 border border-neutral-300 text-black rem:text-[16px] leading-6 font-normal  rounded-full
+			&:focus
+				outline: none !important
+	.form-submit
+		@apply flex items-center justify-center

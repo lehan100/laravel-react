@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Plus, Trash2, ArrowLeft, Image as ImageIcon } from 'lucide-react';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
+import { resolveMediaUrl } from '@/Components/Common/mediaUrl';
 
 export type PageFieldType = 'text' | 'image' | 'textarea' | 'editorMCE' | 'relation_new' | 'product' | 'banner_position';
 
@@ -231,7 +232,7 @@ function PageFormView({
             return;
         }
 
-        updateContentValue(imageTarget.locale, imageTarget.key, url);
+        updateContentValue(imageTarget.locale, imageTarget.key, resolveMediaUrl(url) ?? url);
         setImageTarget(null);
         setIsImagePickerOpen(false);
     };
@@ -296,31 +297,27 @@ function PageFormView({
         }
 
         if (field.type === 'image') {
+            const imageSrc = resolveMediaUrl(value);
+
             return (
                 <div key={buildLocaleKey(locale, field.key)}>
                     <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
                     <div className="mt-2 flex items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-3">
                         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
-                            {value ? (
-                                <img src={value} alt={field.label || field.key} className="h-full w-full object-cover" />
+                            {imageSrc ? (
+                                <img src={imageSrc} alt={field.label || field.key} className="h-full w-full object-cover" />
                             ) : (
                                 <ImageIcon className="h-7 w-7 text-slate-300" />
                             )}
                         </div>
                         <div className="flex-1">
-                            <input
-                                value={value}
-                                onChange={(event) => updateContentValue(locale, field.key, event.target.value)}
-                                className={baseInputClass}
-                                placeholder="/storage/..."
-                            />
                             <button
                                 type="button"
                                 onClick={() => {
                                     setImageTarget({ locale, key: field.key });
                                     setIsImagePickerOpen(true);
                                 }}
-                                className="mt-2 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
+                                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
                             >
                                 <ImageIcon className="h-4 w-4" />
                                 {trans('hancms.page.pick_image')}

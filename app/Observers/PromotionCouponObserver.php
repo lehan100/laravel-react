@@ -12,7 +12,7 @@ class PromotionCouponObserver
      */
     public function creating(PromotionCoupon $coupon): void
     {
-        if (!empty($coupon->code)) {
+        if (! empty($coupon->code)) {
             $coupon->code = mb_strtoupper(trim((string) $coupon->code));
         }
     }
@@ -22,9 +22,20 @@ class PromotionCouponObserver
      */
     public function updating(PromotionCoupon $coupon): void
     {
-        if (!empty($coupon->code)) {
+        if (! empty($coupon->code)) {
             $coupon->code = mb_strtoupper(trim((string) $coupon->code));
         }
+    }
+
+    public function deleting(PromotionCoupon $coupon): void
+    {
+        if ($coupon->campaign_id === null) {
+            return;
+        }
+
+        $coupon->newQuery()
+            ->whereKey($coupon->getKey())
+            ->update(['campaign_id' => null]);
     }
 
     public function created(PromotionCoupon $coupon): void

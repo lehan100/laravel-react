@@ -122,6 +122,46 @@ register.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
+* @see routes/web.php:60
+* @route '/'
+*/
+export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: home.url(options),
+    method: 'get',
+})
+
+home.definition = {
+    methods: ["get","head"],
+    url: '/',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see routes/web.php:60
+* @route '/'
+*/
+home.url = (options?: RouteQueryOptions) => {
+    return home.definition.url + queryParams(options)
+}
+
+/**
+* @see routes/web.php:60
+* @route '/'
+*/
+home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: home.url(options),
+    method: 'get',
+})
+
+/**
+* @see routes/web.php:60
+* @route '/'
+*/
+home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: home.url(options),
+    method: 'head',
+})
+
+/**
 * @see \App\Http\Controllers\Admin\Dashboard\DashboardController::dashboard
 * @see app/Http/Controllers/Admin/Dashboard/DashboardController.php:19
 * @route '/admin123/dashboard'

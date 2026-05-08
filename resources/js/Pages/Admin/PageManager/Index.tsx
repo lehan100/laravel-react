@@ -53,7 +53,7 @@ export default function Index() {
     const { trans } = useTrans();
     const { pages, filters } = usePage().props as unknown as PageProps;
     const rows = pages?.data || [];
-    const paginationLinks = pages?.links || pages?.meta?.links || [];
+    const paginationLinks = pages?.meta?.links || [];
     const [selectedIds, setSelectedIds] = useState('');
 
     const selectedIdList = useMemo(

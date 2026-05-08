@@ -1,0 +1,55 @@
++ProductBannerSection()
+section.product(class="section-py")
+	.container
+		.heading-wrapper(class="flex items-center justify-between rem:mb-[46px]") 
+			.heading(class="flex items-center gap-6")
+				.icon(class="rem:w-[50px]") 
+					a(href="#" class="img-ratio") 
+						img(src="./img/4.svg", alt="")
+				h2(class="title-40") Giải pháp cây trồng
+			.heading-right(class="flex items-center rem:gap-[13px]")
+				.filter
+					.icon(class="flex items-center rem:gap-[13px]") 
+						<i class="fa-regular fa-bars-filter"></i>
+						span Sắp xếp theo
+				.select-view 
+					.select-view-item(class="relative ")
+						select#view(name="view") 
+							option(value="12") Tất cả
+							option(value="12") 24
+							option(value="12") 36 
+							option(value="12") 48 
+						.icon(class="absolute right-3 top-2/4 -translate-y-2/4 cursor-pointer pointer-events-none text-Primary-New-1") 
+							i.fa-regular.fa-chevron-down
+		.filter-product-mobile(class="lg:hidden sticky top-[var(--header-height)] z-[99]")
+				.toggle-filter(class="flex items-center justify-between w-fit  px-3 py-2 cursor-pointer")
+					.group-left(class="flex items-center gap-2 bg-Primary-1 p-2 text-Neutral-White")
+						i.fa-light.fa-filter.subheader-24
+						.label Bộ lọc
+		.wrapper-main(class="flex gap-11")
+			
+			.col-left(class="rem:max-w-[240px] w-full")
+				.btn-close-filter-product-mobile
+					i.fa-light.fa-xmark.subheader-24
+				-for(var j = 0; j < 5; j++)
+					.product-category
+						.product-category-heading(class="flex items-center justify-between")
+							.title(class="text-xl font-semibold") Phân bón gốc
+							.icon 
+								<i class="fa-regular fa-chevron-down"></i>
+						.product-main 
+							.facetwp-facet
+								-for(var i = 0; i < 5; i++)
+									.facetwp-checkbox
+										.facetwp-display-value Phân hữu cơ
+			.col-right(class="flex-1")
+				.product-lists(class="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5")
+					-for(var i = 0; i < 8; i++)
+						+ProductItem()
+				.pagination(class="mt-base flex-center")
+					.facetwp-facet 
+						.facetwp-pager
+							a(href="#" class="facetwp-page") 1
+							a(href="#" class="facetwp-page") 2
+							a(href="#" class="facetwp-page") 3
+

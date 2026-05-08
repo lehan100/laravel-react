@@ -9,16 +9,27 @@ class PromotionBuyToGiftObserver
 {
     public function creating(PromotionBuyToGiftOffer $offer): void
     {
-        if (!empty($offer->code)) {
+        if (! empty($offer->code)) {
             $offer->code = mb_strtoupper(trim((string) $offer->code));
         }
     }
 
     public function updating(PromotionBuyToGiftOffer $offer): void
     {
-        if (!empty($offer->code)) {
+        if (! empty($offer->code)) {
             $offer->code = mb_strtoupper(trim((string) $offer->code));
         }
+    }
+
+    public function deleting(PromotionBuyToGiftOffer $offer): void
+    {
+        if ($offer->campaign_id === null) {
+            return;
+        }
+
+        $offer->newQuery()
+            ->whereKey($offer->getKey())
+            ->update(['campaign_id' => null]);
     }
 
     public function created(PromotionBuyToGiftOffer $offer): void
@@ -31,4 +42,3 @@ class PromotionBuyToGiftObserver
         ]);
     }
 }
-

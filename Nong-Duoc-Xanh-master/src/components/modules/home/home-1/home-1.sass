@@ -1,0 +1,73 @@
+.home-1
+	@apply pb-0
+	.col-right
+		.wrapper-deal
+			@apply max-h-full xl:pr-0
+			&::-webkit-scrollbar
+				@apply w-[calc(4/1920*100rem)]
+			&::-webkit-scrollbar-track
+				@apply bg-Neutral-200
+			&::-webkit-scrollbar-thumb
+				@apply bg-Primary-1
+			.item
+				a
+					@apply pt-[56.5%]
+			@screen -md
+				@apply flex-row
+	.col-left
+		.top
+			.pagination
+				@apply absolute bottom-5 left-8   rem:mt-[22px] flex items-center z-10 w-full
+				@screen -md
+					@apply left-0 pl-5
+				.swiper-pagination-bullet	
+					@apply bg-transparent rem:w-[12px] rem:h-[12px] mx-1 
+					&::before
+						content: "\f111"				
+						@apply bg-transparent opacity-100  font-awesome text-Neutral-White rem:text-[12px] font-normal
+					&-active
+						&::before							
+							content: "\f192"
+		.bottom
+			.col-left
+				@screen -md
+					@apply p-3
+				.list
+					@screen -3xl
+						@apply gap-x-12
+					@screen -md
+						@apply gap-[12px]
+				.item
+					
+					@screen -md
+						@apply flex-col
+					.icon
+						a
+							img
+								@apply object-contain
+				.content
+					h2
+						@apply text-Primary-4
+			.col-right
+				.item
+					@apply text-Neutral-White flex items-center gap-3 relative
+					.icon
+						@apply sq-10 rounded-full inline-flex items-center justify-center
+						@apply border border-white
+					.content
+						a
+							@apply text-xl font-bold
+				.wrapper
+					@apply w-auto
+			
+@screen -xl
+	.home-1
+		.wrapper
+			@apply flex-col
+			>.col-left
+				@apply max-w-full
+@screen -md
+	.home-1
+		.col-left
+			.bottom-wrapper
+				@apply flex-col

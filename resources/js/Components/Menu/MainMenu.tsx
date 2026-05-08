@@ -28,7 +28,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
     media: ['media-position', 'media-banner'],
     reports: ['report-revenue', 'report-product', 'report-inventory', 'report-promotion'],
     sales: ['warehouse', 'orders', 'payment-methods', 'shipping-methods'],
-    promotion: ['saleoffer', 'coupon', 'buytogift'],
+    promotion: ['promotion-campaign', 'saleoffer', 'coupon', 'buytogift'],
     settings: ['languages', 'labels', 'hancms-translations', 'locations', 'layout'],
   };
   const { can } = usePermission();
@@ -169,7 +169,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
           </ul>
         </BsFace>
       )}
-      {(can('saleoffer.index') || can('coupon.index') || can('buytogift.index')) && (
+      {(can('saleoffer.index') || can('coupon.index') || can('buytogift.index') || can('promotion-campaign.index')) && (
         <BsFace
           mobile={mobile}
           title={trans('hancms.promotion.name')}
@@ -178,6 +178,17 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
           icon={<BadgePercent size={20} />}
         >
           <ul className={classNames(mobile ? 'ps-2' : 'ps-3')}>
+            {can('promotion-campaign.index') && (
+              <li>
+                <MainMenuItem
+                  mobile={mobile}
+                  onNavigate={onNavigate}
+                  text={trans('hancms.promotion.campaign.name')}
+                  link="promotion-campaign.index"
+                  icon={<FolderKanban size={20} />}
+                />
+              </li>
+            )}
             {can('saleoffer.index') && (
               <li>
                 <MainMenuItem
@@ -419,7 +430,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
                 <MainMenuItem
                   mobile={mobile}
                   onNavigate={onNavigate}
-                  text={trans('hancms.layout.admin.name')}
+                  text={trans('hancms.settings.layout.admin.name')}
                   link="layout.index"
                   icon={<LayoutDashboard size={20} />}
                 />

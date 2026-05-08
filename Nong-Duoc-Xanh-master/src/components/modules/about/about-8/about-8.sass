@@ -1,0 +1,47 @@
+.about-8
+	h2
+		@screen -md
+			@apply mb-6
+	.wrapper
+		.col-left
+			.wrap-item-toggle 
+				.item-toggle
+					&:first-child
+						@apply border-t border-t-[#d9d9d9]
+					
+				.title
+					.left
+						.number
+							@apply transition-all
+						span
+							@apply transition-all
+						.icon
+							i
+								@apply transition-all
+					&.active
+						.left
+							.number
+								@apply text-Primary-1 font-bold
+							span
+								@apply text-Primary-1 font-bold
+						.icon
+							i
+								@apply text-Primary-1 rotate-180
+					&:hover
+						.left
+							.number
+								@apply text-Primary-1 font-bold
+							span
+								@apply text-Primary-1 font-bold
+						.icon
+							i
+								@apply text-Primary-1
+		.col-right
+			.img
+				@apply hidden
+				&.active
+					@apply block
+@screen -lg
+	.about-8
+		.col-left, .col-right
+			@apply col-span-full

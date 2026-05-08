@@ -1,0 +1,87 @@
+
+.recruitment-table
+	table
+		@apply rounded-5 border-separate border-spacing-0 overflow-hidden
+	thead
+		@apply bg-Primary-1
+		tr
+			@apply whitespace-nowrap
+			td
+				@apply py-3 px-5 border border-neutral-300 text-Neutral-White text-xl font-medium leading-7 
+				&:first-child
+					@screen -md
+						@apply w-[80px]
+				&:nth-child(2)
+					@apply rem:w-[700px]
+					@screen -md
+						@apply w-[280px]
+	tbody
+		tr:nth-child(even)
+			@apply bg-neutral-100 px-3 py-5
+		tr
+			@apply bg-Neutral-White
+			td
+				@apply py-3 px-5 border border-neutral-300 
+				a				
+					@apply xl:rem:text-[16px] text-[15px]	
+					&:hover
+						@apply text-Primary-1
+			td:nth-child(1)
+				@apply text-Primary-1 font-semibold rem:leading-[26px] text-lg
+.recruitment-1 
+	.recruitment-1-heading
+		@apply mt-base
+		h2
+			@apply text-Primary-1 xl:rem:text-[64px] text-4xl  tracking-normal font-playBall italic
+			@apply whitespace-nowrap
+			@screen -md
+				@apply whitespace-normal
+		.desc
+			@apply flex flex-col gap-3
+			p
+				@apply text-lg
+.recruitment-2
+	background-size: cover
+	background-position: center center
+	@apply bg-Secondary-Light-Grey pb-0
+	.recruitment-list 
+		@apply rounded-5 overflow-hidden
+	.item-service-primary	
+		@apply relative ease-in-out transition-500 flex flex-col justify-end
+		&::before
+			content: ''
+			transition: opacity 0.5s ease
+			background: linear-gradient(180deg, rgba(0, 0, 0, 0.00) 60%, rgba(0, 0, 0, 0.80) 100%)
+			@apply absolute top-0 left-0 w-full h-full pointer-events-none 
+		&:hover
+			&::after
+				@apply opacity-100
+		&:not(.active):hover
+			&::before
+				background: linear-gradient(180deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%)
+				
+			.content
+				transform: translateY(0)
+				@apply pointer-events-auto
+				.desc
+					@apply opacity-100
+					.content-desc
+						@apply text-Neutral-White mb-base
+				h3
+					@apply text-Neutral-White border-Neutral-White
+		.content
+			transform: translateY(var(--height-ele))
+			@apply transition-500 lg:px-10 px-[16px] lg:rem:pt-[160px] pt-[40px] pointer-events-none
+			@screen -md
+				@apply p-5
+			.desc
+				@apply transition-500
+				@apply opacity-0
+				@screen -md
+					@apply opacity-100
+			@screen -md
+				@apply static transform-none pointer-events-auto bg-Primary-1
+.recruitment-3
+	.heading
+		h2
+			@apply rem:text-[37px] text-Primary-1 text-left #{!important}

@@ -1,0 +1,128 @@
+@layer base
+	html
+		scroll-padding-top: 100px
+		scroll-behavior: smooth
+		-webkit-text-size-adjust: 100%
+	html, body
+		font-size: 16px
+		@screen md
+			font-size: 16px
+		@screen xl
+			font-size: 1vw
+	input[type="number"]
+		font-size: inherit
+	.table-responsive
+		@apply overflow-auto
+		@media (max-width: 1023.98px)
+			table
+				width: 900px !important
+	.img-full
+		img
+			@apply w-full h-full object-cover
+	.ratio-contain
+		position: relative
+		display: block
+		height: 0
+		overflow: hidden
+		padding-top: 100%
+		img,iframe
+			@apply absolute top-0 left-0 w-full h-full object-contain transition-all duration-300
+	.img-ratio
+		position: relative
+		display: block
+		height: 0
+		overflow: hidden
+		padding-top: 100%
+		img,iframe
+			@apply absolute top-0 left-0 w-full h-full object-cover transition-all duration-300
+	.img-ratio-center
+		position: relative
+		height: 0
+		overflow: hidden
+		padding-top: 100%
+		@apply flex-center
+		img,iframe
+			@apply absolute top-1/2 left-1/2 w-auto h-auto object-contain transition-all duration-300 max-w-full max-h-full -translate-x-1/2 -translate-y-1/2
+	.div-ratio
+		position: relative
+		display: block
+		height: 0
+		overflow: hidden
+		padding-top: 100%
+		&>div
+			@apply absolute top-0 left-0 w-full h-full transition-all duration-300
+	body
+		font-family: "Inter Display", sans-serif
+		@apply text-Neutral-950 text-base 
+	.row
+		@apply flex flex-wrap -mx-[7.5px] lg:-mx-5
+	.col
+		@apply px-[7.5px] lg:px-5 w-full
+	h1
+		@apply text-3xl font-bold
+
+	h2
+		@apply text-2xl font-bold
+
+	h3
+		@apply text-xl font-bold
+
+	h4
+		@apply text-lg font-bold
+
+	img
+		@apply inline max-w-none
+
+	a
+		@apply transition-all ease-linear duration-200
+
+	p
+		@apply empty:hidden
+	input
+		@apply outline-offset-0 shadow-none ring-0 #{!important}
+	.section
+		@apply py-12.5 lg:py-20
+	.section-40
+		@apply lg:py-10 py-6
+	.margin-p
+		p
+			&+p
+				@apply mt-5
+	.overflow-scroll-1
+		&::-webkit-scrollbar
+			@apply w-[calc(3/1920*100rem)] rem:h-[3px]
+		&::-webkit-scrollbar-track
+			background-color: rgba(#e5e5e5,.5 )
+		&::-webkit-scrollbar-thumb
+			@apply bg-Primary-1
+	body.disable-scroll
+		@apply overflow-hidden
+	.format-content
+		p
+			@apply mb-5 last:mb-0
+			img
+				@apply max-w-full
+		img
+			@apply max-w-full
+		ul
+			@apply list-disc pl-5  
+	.overlay-black
+		@apply relative z-2
+		&::before
+			content: ''
+			background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.75) 100%)
+			@apply absolute top-0 left-0 w-full h-full -z-1 pointer-events-none
+	.size-full
+		@apply w-full h-full
+	.mb-base
+		@apply lg:mb-10 mb-8
+	.mt-base
+		@apply lg:mt-10 mt-8
+	.gap-base
+		@apply lg:gap-10 gap-8
+	.aligncenter
+		@apply block ml-auto mr-auto
+	.stretched-link
+		&::before
+			content: ''
+			@apply absolute-full z-1 pointer-events-auto

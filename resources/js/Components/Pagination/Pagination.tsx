@@ -2,19 +2,21 @@ import { Link } from '@inertiajs/react';
 import classNames from 'classnames';
 
 interface PaginationProps {
-  links: PaginationItem[];
+  links?: PaginationItem[] | null;
 }
 
 export default function Pagination({ links = [] }: PaginationProps) {
+  const items = Array.isArray(links) ? links : [];
+
   /**
    * If there are only 3 links, it means there are no previous or next pages.
    * So, we don't need to render the pagination.
    */
-  if (links.length === 3) return null;
+  if (items.length === 3) return null;
 
   return (
     <div className="flex flex-wrap mb-4 mt-5 px-3 justify-center">
-      {links?.map(link => {
+      {items.map(link => {
         return link?.url === null ? (
           <PageInactive key={link.label} label={link.label} />
         ) : (

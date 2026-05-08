@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Editor } from '@tinymce/tinymce-react';
-import { Image as ImageIcon, Save } from 'lucide-react';
+import { Image as ImageIcon, Save, Sparkles } from 'lucide-react';
+import axios from 'axios';
 import BackButton from '@/Components/Button/BackButton';
 import SaveButton from '@/Components/Button/SaveButton';
 import Card from '@/Components/Main/Card';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
 import StatusBadge from '@/Components/Status/StatusBadge';
+import { resolveMediaUrl } from '@/Components/Common/mediaUrl';
+import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
 
 type PageFieldType = 'text' | 'image' | 'textarea' | 'editorMCE' | 'relation_new' | 'product' | 'banner_position';
 
@@ -78,6 +81,18 @@ function cloneContent(content: Record<string, Record<string, any>>): Record<stri
         carry[locale] = { ...(content[locale] || {}) };
         return carry;
     }, {});
+}
+
+function getFirstTranslatedValue(fields: Record<string, any>, keys: string[]): string {
+    for (const key of keys) {
+        const value = String(fields[key] || '').trim();
+
+        if (value !== '') {
+            return value;
+        }
+    }
+
+    return '';
 }
 
 function createSlug(value: string): string {
@@ -152,6 +167,8 @@ export default function PageValueFormView({
     const [selectedFieldGroupId, setSelectedFieldGroupId] = useState<string | number>(
         data.field_group_id || ''
     );
+    const [aiTranslating, setAiTranslating] = useState(false);
+    const [aiTranslateError, setAiTranslateError] = useState('');
 
     const selectedFieldGroup = useMemo(
         () => fieldGroups.find((fieldGroup) => String(fieldGroup.id) === String(selectedFieldGroupId)) || null,
@@ -163,7 +180,9 @@ export default function PageValueFormView({
     const previewPath = previewOrigin ? `${previewOrigin}/${previewSlug}` : `/${previewSlug}`;
 
     const translatableFields = useMemo(
-        () => selectedFieldGroup?.fields_schema?.filter((field) => field.translatable) || [],
+        () => selectedFieldGroup?.fields_schema?.filter((field) => (
+            field.translatable && ['text', 'textarea', 'editorMCE'].includes(field.type)
+        )) || [],
         [selectedFieldGroup]
     );
     const sharedFields = useMemo(
@@ -304,12 +323,180 @@ export default function PageValueFormView({
         }));
     };
 
+    const applyAiTranslations = (translations: Record<string, any>): void => {
+        const nextTranslations = { ...(data.translations || {}) };
+        const targetLocales = languages
+            .map((language) => language.code)
+            .filter((locale) => locale !== activeLocale);
+
+        targetLocales.forEach((locale) => {
+            const translatedFields = (translations[locale] || {}) as Record<string, any>;
+            const translatedTitle = getFirstTranslatedValue(translatedFields, ['title', 'name']);
+            const targetTranslation = {
+                ...(nextTranslations[locale] || { title: '', slug: '' }),
+                ...(translatedTitle !== '' ? { title: translatedTitle } : {}),
+            };
+
+            if (translatedTitle !== '') {
+                const shouldAutofillSlug = (slugLocked[locale] ?? true) || String(targetTranslation.slug || '').trim() === '';
+                if (shouldAutofillSlug) {
+                    targetTranslation.slug = createSlug(translatedTitle);
+                }
+            }
+
+            nextTranslations[locale] = targetTranslation;
+        });
+
+        (setData as any)((current: ValueFormData) => ({
+            ...current,
+            translations: nextTranslations,
+        }));
+    };
+
+    const applyContentAiTranslations = (translations: Record<string, any>): void => {
+        const nextContent = cloneContent(data.content || {});
+        const targetLocales = languages
+            .map((language) => language.code)
+            .filter((locale) => locale !== activeLocale);
+
+        targetLocales.forEach((locale) => {
+            const translatedFields = (translations[locale] || {}) as Record<string, any>;
+            const currentLocaleContent = nextContent[locale] || {};
+            const nextLocaleContent = { ...currentLocaleContent };
+
+            translatableFields.forEach((field) => {
+                const value = String(translatedFields[field.key] || '').trim();
+
+                if (value !== '') {
+                    nextLocaleContent[field.key] = value;
+                }
+            });
+
+            nextContent[locale] = nextLocaleContent;
+        });
+
+        (setData as any)((current: ValueFormData) => ({
+            ...current,
+            content: nextContent,
+        }));
+    };
+
+    const handleAiTranslate = async (): Promise<void> => {
+        const sourceTranslation = (data.translations?.[activeLocale] || {}) as Record<string, any>;
+        const targetLocales = languages
+            .map((language) => language.code)
+            .filter((locale) => locale !== activeLocale);
+
+        setAiTranslateError('');
+
+        if (!targetLocales.length) {
+            setAiTranslateError(trans('hancms.page.ai.no_target_languages') || 'No target languages available.');
+            return;
+        }
+
+        const hasSourceContent = Boolean(String(sourceTranslation.title || '').trim());
+
+        if (!hasSourceContent) {
+            setAiTranslateError(trans('hancms.page.ai.missing_input') || 'Please enter the current language title or content before translating.');
+            return;
+        }
+
+        setAiTranslating(true);
+
+        try {
+            const fields: Record<string, string> = {
+                title: String(sourceTranslation.title || '').trim(),
+            };
+
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'page',
+                    source_locale: activeLocale,
+                    target_locales: targetLocales,
+                    fields,
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+
+            if (!Object.keys(translations).length) {
+                setAiTranslateError(trans('hancms.page.ai.empty_response') || 'AI did not return any translations.');
+                return;
+            }
+
+            applyAiTranslations(translations);
+        } catch (error: any) {
+            setAiTranslateError(error?.response?.data?.message || trans('hancms.page.ai.failed') || 'Unable to translate automatically right now.');
+        } finally {
+            setAiTranslating(false);
+        }
+    };
+
+    const handleContentAiTranslate = async (): Promise<void> => {
+        const sourceContent = (data.content?.[activeLocale] || {}) as Record<string, any>;
+        const targetLocales = languages
+            .map((language) => language.code)
+            .filter((locale) => locale !== activeLocale);
+
+        setAiTranslateError('');
+
+        if (!targetLocales.length) {
+            setAiTranslateError(trans('hancms.page.ai.no_target_languages') || 'No target languages available.');
+            return;
+        }
+
+        const hasSourceContent = translatableFields.some((field) => String(sourceContent[field.key] || '').trim() !== '');
+
+        if (!hasSourceContent) {
+            setAiTranslateError(trans('hancms.page.ai.missing_input') || 'Please enter the current language title or content before translating.');
+            return;
+        }
+
+        setAiTranslating(true);
+
+        try {
+            const fields: Record<string, string> = {};
+
+            translatableFields.forEach((field) => {
+                const value = String(sourceContent[field.key] || '').trim();
+
+                if (value !== '') {
+                    fields[field.key] = value;
+                }
+            });
+
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'page',
+                    source_locale: activeLocale,
+                    target_locales: targetLocales,
+                    fields,
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+
+            if (!Object.keys(translations).length) {
+                setAiTranslateError(trans('hancms.page.ai.empty_response') || 'AI did not return any translations.');
+                return;
+            }
+
+            applyContentAiTranslations(translations);
+        } catch (error: any) {
+            setAiTranslateError(error?.response?.data?.message || trans('hancms.page.ai.failed') || 'Unable to translate automatically right now.');
+        } finally {
+            setAiTranslating(false);
+        }
+    };
+
     const handleImageSelected = (url: string): void => {
         if (!imageTarget) {
             return;
         }
 
-        updateContentValue(imageTarget.locale, imageTarget.key, url);
+        updateContentValue(imageTarget.locale, imageTarget.key, resolveMediaUrl(url) ?? url);
         setImageTarget(null);
         setIsImagePickerOpen(false);
     };
@@ -494,31 +681,27 @@ export default function PageValueFormView({
         }
 
         if (field.type === 'image') {
+            const imageSrc = resolveMediaUrl(value);
+
             return (
                 <div key={`${locale}-${field.key}`}>
                     <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
                     <div className="mt-2 flex items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-3">
                         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
-                            {value ? (
-                                <img src={value} alt={field.label || field.key} className="h-full w-full object-cover" />
+                            {imageSrc ? (
+                                <img src={imageSrc} alt={field.label || field.key} className="h-full w-full object-cover" />
                             ) : (
                                 <ImageIcon className="h-7 w-7 text-slate-300" />
                             )}
                         </div>
                         <div className="flex-1">
-                            <input
-                                value={value}
-                                onChange={(event) => updateContentValue(locale, field.key, event.target.value)}
-                                className={baseInputClass}
-                                placeholder="/media/..."
-                            />
                             <button
                                 type="button"
                                 onClick={() => {
                                     setImageTarget({ locale, key: field.key });
                                     setIsImagePickerOpen(true);
                                 }}
-                                className="mt-2 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
+                                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
                             >
                                 <ImageIcon className="h-4 w-4" />
                                 {trans('hancms.page.pick_image')}
@@ -592,23 +775,48 @@ export default function PageValueFormView({
                 <section className="space-y-6">
                     <Card title={trans('hancms.page.locale_title')} contentClassName="overflow-visible">
                         <div className="space-y-4 p-6">
-                            <div className="flex flex-wrap gap-2">
-                                {languages.map((language) => (
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex flex-wrap gap-2">
+                                    {languages.map((language) => (
+                                        <button
+                                            key={language.code}
+                                            type="button"
+                                            onClick={() => setActiveLocale(language.code)}
+                                            className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
+                                                activeLocale === language.code
+                                                    ? 'bg-slate-900 text-white'
+                                                    : 'border border-slate-200 bg-white text-slate-600'
+                                            }`}
+                                        >
+                                            {renderLanguageBadge(language)}
+                                            <span>{language.name}</span>
+                                            <span className="uppercase opacity-70">{language.code}</span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="flex flex-col items-end gap-2">
                                     <button
-                                        key={language.code}
                                         type="button"
-                                        onClick={() => setActiveLocale(language.code)}
-                                        className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
-                                            activeLocale === language.code
-                                                ? 'bg-slate-900 text-white'
-                                                : 'border border-slate-200 bg-white text-slate-600'
+                                        onClick={handleAiTranslate}
+                                        disabled={aiTranslating || languages.length < 2}
+                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
+                                            aiTranslating || languages.length < 2
+                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
                                         }`}
                                     >
-                                        {renderLanguageBadge(language)}
-                                        <span>{language.name}</span>
-                                        <span className="uppercase opacity-70">{language.code}</span>
+                                        <Sparkles size={14} />
+                                        {aiTranslating
+                                            ? (trans('hancms.page.ai.generating') || 'Translating...')
+                                            : (trans('hancms.page.ai.translate_button') || 'AI translate title')}
                                     </button>
-                                ))}
+                                    {aiTranslateError && (
+                                        <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                            {aiTranslateError}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
@@ -671,7 +879,27 @@ export default function PageValueFormView({
                         </Card>
                     ) : null}
 
-                    <Card title={trans('hancms.page.content')} contentClassName="overflow-visible">
+                    <Card
+                        title={trans('hancms.page.content')}
+                        contentClassName="overflow-visible"
+                        action={(
+                            <button
+                                type="button"
+                                onClick={handleContentAiTranslate}
+                                disabled={aiTranslating || languages.length < 2}
+                                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
+                                    aiTranslating || languages.length < 2
+                                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                }`}
+                            >
+                                <Sparkles size={14} />
+                                {aiTranslating
+                                    ? (trans('hancms.page.ai.generating') || 'Translating...')
+                                    : (trans('hancms.page.ai.translate_content_button') || 'AI translate content')}
+                            </button>
+                        )}
+                    >
                         <div className="space-y-6 p-6">
                             <div className="flex flex-wrap gap-2">
                                 {languages.map((language) => (

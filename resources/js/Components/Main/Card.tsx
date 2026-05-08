@@ -2,6 +2,7 @@ import { useTrans } from '@/Hooks/useTrans';
 
 type CardProps = {
     title?: string;
+    action?: React.ReactNode;
     children: React.ReactNode;
     className?: string;
     contentClassName?: string;
@@ -12,6 +13,7 @@ type CardProps = {
 
 export default function Card({
     title,
+    action,
     children,
     className,
     contentClassName,
@@ -29,16 +31,22 @@ export default function Card({
 
     return (
         <div className={rootClassName}>
-            {title && <div className="border-b border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-900 px-5 py-4 text-white">
-                <div className="text-[11px] uppercase tracking-[0.28em] text-cyan-200/80">{trans('hancms.section')}</div>
-                <div className="mt-1 text-sm font-semibold tracking-wide">
-                {title}
+            {title ? (
+                <div className="border-b border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-900 px-5 py-4 text-white">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <div className="text-[11px] uppercase tracking-[0.28em] text-cyan-200/80">
+                                {trans('hancms.section')}
+                            </div>
+                            <div className="mt-1 text-sm font-semibold tracking-wide">{title}</div>
+                        </div>
+                        {action ? <div className="shrink-0">{action}</div> : null}
+                    </div>
                 </div>
-                </div>
-            }
+            ) : null}
             <div className={`${contentOverflowClassName} ${contentClassName || ''}`}>
                 {children}
             </div>
         </div>
-    )
+    );
 }

@@ -5,11 +5,15 @@ import { Editor } from '@tinymce/tinymce-react';
 import SingleUpload from "@/Components/ImageUpload/SingleUpload";
 import { usePage } from '@inertiajs/react';
 import MessageError from '@/Components/Form/MessageError';
+import { Sparkles } from 'lucide-react';
+import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
 
 const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any) => {
     const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
     const [previewUrls, setPreviewUrls] = useState<Record<string, string | null>>({});
     const [activeLocale, setActiveLocale] = useState<string>(langList?.[0]?.code || 'vi');
+    const [aiTranslating, setAiTranslating] = useState(false);
+    const [aiTranslateError, setAiTranslateError] = useState('');
     const { props } = usePage();
     const currentLang = (props.locale as string) || 'vi';
     const editorLangCode = (currentLang === 'vn') ? 'vi' : currentLang;
@@ -48,6 +52,85 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
         }
     };
 
+    const applyAiTranslations = (translations: Record<string, any>) => {
+        setData((prev: any) => {
+            const nextTranslations = { ...(prev.translations || {}) };
+
+            Object.entries(translations).forEach(([locale, fields]) => {
+                const translatedFields = fields as Record<string, any>;
+                const currentData = nextTranslations[locale] || {};
+                const nextLocaleData = { ...currentData };
+
+                ['name', 'description', 'content'].forEach((field) => {
+                    const value = String(translatedFields[field] || '').trim();
+
+                    if (value !== '') {
+                        nextLocaleData[field] = value;
+                    }
+                });
+
+                nextTranslations[locale] = nextLocaleData;
+            });
+
+            return {
+                ...prev,
+                translations: nextTranslations,
+            };
+        });
+    };
+
+    const handleAiTranslate = async () => {
+        const sourceTranslation = data.translations?.[activeLocale] || {};
+        const targetLocales = langList
+            .map((lang: any) => lang.code)
+            .filter((locale: string) => locale !== activeLocale);
+
+        setAiTranslateError('');
+
+        if (!targetLocales.length) {
+            setAiTranslateError(trans('hancms.catalog.media_banner.ai.no_target_languages') || 'No target languages available.');
+            return;
+        }
+
+        const hasSourceContent = ['name', 'description', 'content'].some((field) => String(sourceTranslation?.[field] || '').trim() !== '');
+
+        if (!hasSourceContent) {
+            setAiTranslateError(trans('hancms.catalog.media_banner.ai.missing_input') || 'Please enter content in the current language first.');
+            return;
+        }
+
+        setAiTranslating(true);
+
+        try {
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'media-banner',
+                    source_locale: activeLocale,
+                    target_locales: targetLocales,
+                    fields: {
+                        name: sourceTranslation.name || '',
+                        description: sourceTranslation.description || '',
+                        content: sourceTranslation.content || '',
+                    },
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+
+            if (!Object.keys(translations).length) {
+                setAiTranslateError(trans('hancms.catalog.media_banner.ai.empty_response') || 'AI did not return translations.');
+                return;
+            }
+
+            applyAiTranslations(translations);
+        } catch (error: any) {
+            setAiTranslateError(error?.response?.data?.message || trans('hancms.catalog.media_banner.ai.failed') || 'Unable to translate media banner content right now.');
+        } finally {
+            setAiTranslating(false);
+        }
+    };
+
     React.useEffect(() => {
         if (!langList?.some((lang: any) => lang.code === activeLocale) && langList?.[0]?.code) {
             setActiveLocale(langList[0].code);
@@ -62,8 +145,9 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
     return (
         <div className="space-y-6">
             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_30px_-24px_rgba(15,23,42,0.35)]">
-                <div className="flex flex-wrap gap-3 border-b border-slate-200 px-4 py-4 sm:px-5">
-                    {langList.map((lang: any) => {
+                <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-4 py-4 sm:px-5">
+                    <div className="flex flex-wrap gap-3">
+                        {langList.map((lang: any) => {
                         const active = activeLocale === lang.code;
                         const errorInTab = Object.keys(errors || {}).some((key) => key.startsWith(`translations.${lang.code}.`));
 
@@ -93,7 +177,27 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
                                 )}
                             </button>
                         );
-                    })}
+                        })}
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                        <button
+                            type="button"
+                            onClick={handleAiTranslate}
+                            disabled={aiTranslating || langList.length < 2}
+                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiTranslating || langList.length < 2
+                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                            }`}
+                        >
+                            <Sparkles size={14} />
+                            {aiTranslating ? (trans('hancms.catalog.media_banner.ai.generating') || 'Generating...') : 'AI dịch tự động'}
+                        </button>
+                        {aiTranslateError && (
+                            <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                {aiTranslateError}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="space-y-5 p-5 sm:p-6">

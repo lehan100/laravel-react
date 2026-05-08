@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prod": "composer run dev"
+    "prod": "echo 'DỪNG LẠI! Không được chạy lệnh này trong môi trường này.' && exit 1",
+    "build": "echo 'DỪNG LẠI! Không được chạy lệnh này trong môi trường này.' && exit 1"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

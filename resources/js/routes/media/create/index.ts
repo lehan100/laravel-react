@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::folder
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:88
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:97
 * @route '/admin123/media-create-folder'
 */
 export const folder = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ folder.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::folder
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:88
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:97
 * @route '/admin123/media-create-folder'
 */
 folder.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ folder.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::folder
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:88
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:97
 * @route '/admin123/media-create-folder'
 */
 folder.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

@@ -5,6 +5,7 @@ namespace App\Models\Promotion;
 use App\Models\Catalog\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,6 +19,7 @@ class PromotionSaleOffer extends Model
         'code',
         'name',
         'description',
+        'campaign_id',
         'discount_type',
         'discount_value',
         'max_discount_amount',
@@ -37,6 +39,11 @@ class PromotionSaleOffer extends Model
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
     ];
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(PromotionCampaign::class, 'campaign_id');
+    }
 
     public function products(): BelongsToMany
     {

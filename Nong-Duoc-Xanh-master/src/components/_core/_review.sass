@@ -1,0 +1,29 @@
+#review_form_wrapper
+	// .wrap-attaddsend
+	// 	@apply hidden
+	.form-submit
+		@apply cursor-pointer
+		#submit
+			@apply bg-Primary-1 cursor-pointer #{!important}
+			&:hover
+				@apply bg-Primary-2 #{!important}
+.woocommerce #reviews #comments ol.commentlist #respond input
+	@apply w-auto #{!important}
+div#review_form_wrapper button.fancybox-button.fancybox-close-small
+	@apply bg-Primary-1
+.comment-form-cookies-consent
+	@apply flex items-center gap-1
+#reviews
+	i.devvn-star
+		&::before				
+			content: "\f005" !important
+			@apply font-awesome #{!important}
+	.devvn_review_row
+		.devvn_stars_value
+			@apply flex items-center justify-center
+			i
+				@apply w-4 h-4 inline-flex items-center justify-end ml-2
+		&:last-child
+			.devvn_stars_value
+				i
+					@apply ml-[9px]

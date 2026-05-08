@@ -9,6 +9,7 @@ use App\Http\Resources\Promotion\CouponCollection;
 use App\Http\Resources\Promotion\CouponResource;
 use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Coupon\CouponRepositoryInterface as RepositoryInterface;
+use App\Repositories\PromotionCampaign\PromotionCampaignRepositoryInterface as CampaignRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,13 +28,17 @@ class CouponController extends MainController
 
     protected CategoryRepositoryInterface $categoryModel;
 
+    protected CampaignRepositoryInterface $campaignModel;
+
     public function __construct(
         RepositoryInterface $repository,
-        CategoryRepositoryInterface $categoryModel
+        CategoryRepositoryInterface $categoryModel,
+        CampaignRepositoryInterface $campaignModel
     ) {
         parent::__construct();
         $this->mainModel = $repository;
         $this->categoryModel = $categoryModel;
+        $this->campaignModel = $campaignModel;
     }
 
     public function index(): Response
@@ -52,10 +57,12 @@ class CouponController extends MainController
             'task' => 'admin-list-items-active',
             'type' => 'product',
         ]);
+        $itemsCampaignActive = $this->campaignModel->activeOptions();
 
         return Inertia::render($this->controllerView.'Created', [
             'item' => null,
             'itemsCategoryActive' => $itemsCategoryActive,
+            'itemsCampaignActive' => $itemsCampaignActive,
             'itemsSelectedProducts' => [],
         ]);
     }
@@ -122,12 +129,22 @@ class CouponController extends MainController
             'task' => 'admin-list-items-active',
             'type' => 'product',
         ]);
+        $itemsCampaignActive = $this->campaignModel->activeOptions();
+        if ($item?->campaign && ! $itemsCampaignActive->firstWhere('id', (int) $item->campaign->id)) {
+            $itemsCampaignActive->prepend([
+                'id' => (int) $item->campaign->id,
+                'name' => $item->campaign->name ?? optional($item->campaign->translations->first())->name ?? ('#'.$item->campaign->id),
+                'starts_at' => optional($item->campaign->starts_at)->format('Y-m-d\\TH:i'),
+                'ends_at' => optional($item->campaign->ends_at)->format('Y-m-d\\TH:i'),
+            ]);
+        }
         $selectedProductIds = $item?->products?->pluck('id')->values()->all() ?? [];
         $itemsSelectedProducts = $this->categoryModel->getSelectedProductRows($selectedProductIds);
 
         return Inertia::render($this->controllerView.'Edit', [
             'item' => new CouponResource($item),
             'itemsCategoryActive' => $itemsCategoryActive,
+            'itemsCampaignActive' => $itemsCampaignActive,
             'itemsSelectedProducts' => $itemsSelectedProducts,
         ]);
     }

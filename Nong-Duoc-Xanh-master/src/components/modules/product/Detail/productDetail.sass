@@ -1,0 +1,461 @@
+.single-product
+	.global-breadcrumb
+		@apply bg-Secondary-Light-Grey
+.product-detail-1
+	.box
+		@screen -md
+			@apply px-2
+	.col-left
+		.main
+			.swiper
+				@apply rem:rounded-[32px]
+				.swiper-slide
+					>a
+						@apply rem:rounded-[32px]
+		.thumb
+			.swiper
+				.swiper-slide
+					.img
+						@apply border border-transparent rounded-1
+						@apply transition-all ease-in-out
+				.swiper-slide-thumb-active
+					.img
+						@apply border-Primary-1
+	.col-right
+		.product-info
+			@apply flex items-center flex-wrap gap-2 mb-5 
+			.item
+				@apply flex items-center gap-1 border-r pr-2  border-r-Neutral-200 last:border-none
+				span
+					@apply text-sm
+				.number
+					@apply text-sm text-Primary-1 underline
+				.title
+					@apply text-sm
+				.name-brand
+					@apply text-Primary-1 underline
+				&.rating
+					.icon
+						i
+							@apply text-Secondary-3
+					span
+						text-decoration-line: underline
+						text-decoration-style: solid
+						text-decoration-skip-ink: none
+						text-decoration-thickness: auto
+						text-underline-offset: auto
+
+						@apply text-Primary-1 underline text-sm
+		.product-price
+			@apply flex gap-6 
+			.label
+				@apply text-lg text-Neutral-Black font-bold flex items-center
+				@screen -md
+					@apply items-start mt-[9px]
+			.price
+				@apply mt-0
+				.product-price
+					.label
+						@apply hidden
+			.price-sale
+				@apply flex gap-1 items-center
+				>bdi
+					@apply flex items-center gap-1
+				.woocommerce-Price-currencySymbol
+					@apply text-Primary-7
+				bdi
+					@apply text-32 text-Primary-7 font-bold flex items-center
+					span.woocommerce-Price-amount
+						&:last-child
+							bdi
+								@apply  font-bold 
+				span
+					
+					@apply text-xl flex items-end  text-Neutral-700
+			.price-old
+				@apply flex items-center rem:gap-[10px]
+				bdi
+					font-size: calc(24 / 1920 * 100rem)
+					@apply line-through font-normal
+					
+					span
+						@apply text-black
+				span
+					font-size: calc(24 / 1920 * 100rem)
+					@apply text-Primary-1 
+					
+				.woocommerce-Price-amount 
+					@apply text-Neutral-950
+		
+		.specification
+			.label
+				@apply text-lg font-bold text-Neutral-Black mb-3
+			.specification-wrap
+				@apply grid lg:grid-cols-2 grid-cols-1 gap-5 mb-6
+				.item
+					@apply border border-Neutral-100 rounded-xl bg-Neutral-White p-3 relative
+					&.active
+						@apply bg-Secondary-Light-Grey border-Primary-1
+					.tag-sale
+						@apply absolute rem:top-[-12px] right-0 bg-Primary-7
+						@apply rounded-t-xl rounded-bl-xl
+						span
+							@apply text-Neutral-White rem:px-[10px] text-sm
+					.facetwp-facet						
+						.facetwp-checkbox						
+							background-image: none
+							@apply flex font-normal items-center  gap-3
+							@apply cursor-pointer transition-all mb-0 w-full
+							.facetwp-display-name
+								@apply text-Primary-1 mb-2 font-bold
+							
+							&:hover
+								@apply text-Primary-1
+								&::before
+									content: '\e119'
+									@apply text-Primary-1 font-awesome font-black
+							&.checked
+								@apply text-Primary-1
+								.item
+									@apply border-Primary-1
+								&::before
+									content: '\e119'
+									@apply text-Primary-1 font-black
+							&::before
+								content: '\f111'
+								@apply font-awesome text-Neutral-300 font-light transition-all text-lg
+		.box-offer
+			@apply rem:mb-[30px]
+			.title
+				@apply rem:py-[10px] px-5 bg-[#D3E3FF] rounded-t-xl
+				@apply italic text-Primary-1 font-bold
+			.offer-list
+				@apply py-3 px-5 bg-Secondary-Light-Grey
+				@apply flex flex-col gap-2
+				.item-offer
+					@apply flex items-center gap-3
+					.icon
+						i
+							@apply text-Primary-2
+		
+		.hotline
+			p
+				@apply italic font-normal text-Neutral-Black
+				a
+					@apply text-Primary-7 underline
+.product-detail-2
+	.wrapper
+		@screen -md
+			@apply p-5
+		.item
+			@screen -md
+				@apply flex-col
+			.icon
+				img
+					@apply w-full h-full object-contain
+.product-detail-3
+	.manufacturer-wrap 
+		@screen -md
+			@apply flex-col
+	@apply pb-5
+	.col-left
+		@apply text-Neutral-Black
+		.item
+			@apply border-b border-b-Neutral-200 mb-4 pb-4
+			.format-content
+				@apply text-lg
+				@screen -md					
+					@apply text-[16px]
+			ul.tabslet-tab
+				@apply mb-5 pb-3
+				&::-webkit-scrollbar
+					@apply w-[calc(3/1920*100rem)] 
+				&::-webkit-scrollbar-track
+					background-color: rgba(#e5e5e5,.5 )
+				&::-webkit-scrollbar-thumb
+					@apply bg-Primary-1
+			.tabslet-content
+				.format-content					
+					overflow: hidden
+					transition: max-height 0.3s ease
+					@apply rem:max-h-[0px]
+					&.expanded
+						max-height: 9999px
+				.view-more
+					@apply mt-0 bg-Primary-2 rem:h-[36px] inline-flex items-center justify-center rounded-full px-5 mb-3 gap-2
+					@screen -md
+						@apply h-[40px]
+					span
+						@apply text-Neutral-White
+						@screen -md
+							@apply text-[15px]
+					.icon
+						@screen -md
+							@apply text-[15px]
+						i
+							@apply text-Neutral-White
+					&:hover
+						@apply bg-Primary-1
+		h2
+			@apply mb-4 text-2xl
+			@screen -md
+				@apply text-[18px]
+		p
+			@apply mb-4
+	.col-right
+		.manufacturer
+			@screen -md
+				@apply p-5
+		.info-product
+			.format-content
+				@apply text-lg
+				@screen -md
+					@apply text-[15px]
+			table
+				@apply w-full table-fixed mt-3 rounded-bl-5 overflow-hidden border-spacing-0
+				tbody
+					tr
+						&:first-child
+							@apply border-t border-t-[#D9D9D9]
+						td
+							@apply rem:py-[6px] rem:text-[15px] px-3 border-b border-b-[#D9D9D9] bg-Neutral-White w-auto #{!important}
+							&:first-child
+								@apply bg-[#D3E3FF] rem:text-[15px] font-bold text-Primary-1 rem:w-[140px] #{!important}
+								@screen -md
+									@apply w-[8.2rem] text-[15px] #{!important}
+							@screen -md
+								@apply text-[15px]
+			.box-info
+				.format-content
+					@apply  p-0 text-lg
+					@screen -md
+						@apply text-[15px]
+					p
+						@apply mb-0 px-3
+						&:first-child
+							@apply pt-3
+						&:last-child
+							@apply pb-3
+			.info-product-buy
+				.product-price-wrap
+					@apply flex
+				.product-price
+					@apply flex gap-2 w-full  justify-between
+					.price
+						@apply mt-0
+						.product-price
+							.label
+								@apply hidden
+							.price-wrap
+								.price-old
+									span
+										@apply text-Primary-1
+					.label
+						@apply font-bold text-lg
+					.price-wrap
+						@apply flex justify-between flex-1
+						.price-old
+							@apply flex flex-col items-end
+							bdi
+								@apply rem:text-[15px] text-neutral-500 font-normal line-through
+							span
+								@apply  font-secondary text-neutral-500
+							
+				.price-sale
+					bdi
+						font-size: calc(24 / 1920 * 100rem)
+						@apply  font-bold text-Primary-7
+					span
+						@apply text-xl text-Neutral-700
+						&.woocommerce-Price-currencySymbol
+							@apply text-Primary-7
+				.price-save
+					@apply text-right
+					.price
+						bdi
+							@apply text-sm text-Neutral-500* line-through
+							@screen -md
+								@apply text-[15px]
+					.save-of
+						@apply text-sm text-Primary-1
+						@screen -md
+							@apply text-[15px]
+			.specification
+				.label
+					@apply text-lg font-bold text-Neutral-Black mb-3
+				.specification-wrap
+					@apply grid lg:grid-cols-2 grid-cols-1 gap-5 mb-6
+					.item
+						@apply border border-Neutral-100 rounded-xl bg-Neutral-White py-3 px-2 relative
+						&.active
+							@apply bg-Secondary-Light-Grey border-Primary-1
+						.tag-sale
+							@apply absolute rem:top-[-12px] right-0 bg-Primary-7
+							@apply rounded-t-xl rounded-bl-xl
+							@screen -md
+								@apply h-auto
+							span
+								@apply text-Neutral-White rem:px-[10px] text-sm
+						.facetwp-facet						
+							.facetwp-checkbox						
+								background-image: none
+								@apply flex font-normal items-center  gap-3
+								@apply cursor-pointer transition-all mb-0 w-full
+								.facetwp-display-name
+									@apply text-Primary-1 mb-2 font-bold
+								.facetwp-display-value
+									@apply text-sm
+								&:hover					
+									@apply text-Primary-1
+									&::before
+										content: '\e119'
+										@apply text-Primary-1 font-awesome font-black
+								&.checked
+									@apply text-Primary-1
+									.item
+										@apply border-Primary-1
+									&::before
+										content: '\e119'
+										@apply text-Primary-1 font-black
+								&::before
+									content: '\f111'
+									@apply font-awesome text-Neutral-300 font-light transition-all
+.product-detail-4
+	@apply bg-Secondary-Light-Grey
+	.devvn_prod_cmt
+		@apply rem:max-w-[1400px] hidden
+		form
+			.devvn_cmt_submit
+				button
+					@apply bg-Primary-1 text-white #{!important}
+	.wrapper
+		@apply grid lg:grid-cols-1 gap-base
+	.box
+		@apply hidden
+		h2
+			@apply text-Primary-1 text-xl font-bold
+	#reviews
+		@apply rem:max-w-[1400px]  bg-Neutral-White p-5 rounded-5 #{!important}
+		h2.woocommerce-Reviews-title
+			@apply text-xl text-Primary-1 font-bold
+		.star_box
+			.star_box_left
+				.devvn_num_reviews
+					@apply text-Primary-1
+			.star_box_right
+				@apply w-auto
+				a.btn-reviews-now
+					@apply bg-Primary-2 py-3 px-10 rounded-full text-Neutral-White w-max
+					@apply text-lg font-medium inline-flex items-center justify-center
+.product-detail-5
+	@apply bg-Secondary-Light-Grey pb-5
+	.box
+		@screen -md
+			@apply p-2
+	.wrap-item-toggle
+		.item-toggle
+			&:first-child
+				@apply border-t border-t-Neutral-200
+			&.active
+				@apply py-3
+			>.title
+				@apply font-bold
+				@screen -md
+					@apply text-[16px]
+				.number
+					@apply text-Neutral-950 font-bold #{!important}
+				&.active
+					.number
+						@apply text-Primary-1 font-bold #{!important}
+					span
+						@apply text-Primary-1 font-bold
+					i
+						&::before
+							content: "\f068"
+							@apply  font-awesome text-Primary-1
+			.content
+				@apply  pt-2
+				.title
+					@screen -md
+						@apply text-[15px]
+				.format-content
+					ul
+						li
+							@apply list-disc marker:text-Neutral-400
+.product-detail-6
+	@apply bg-Secondary-Light-Grey
+	.swiper
+		@apply p-2
+		.swiper-slide
+			@apply flex flex-col h-auto 
+			.product-item
+				.content
+					.top
+						.button-add-cart 
+							@apply hidden
+	.wrap-button-slide
+		.btn-prev
+			@apply ml-[-3rem] #{!important}
+		.btn-next
+			@apply mr-[-3rem] #{!important}
+.form-contact-product 
+	@apply lg:rem:w-[920px] w-full  relative  lg:p-10 p-5 rem:rounded-[32px]
+	.carousel__button
+		position: absolute !important
+		top: 0.5rem !important
+		right: 0.5rem !important
+		@apply w-8 h-8 z-100 cursor-pointer bg-Primary-1
+		svg
+			@apply rem:w-[16px] rem:h-[16px]
+	h3
+		@apply text-32 text-Primary-1 text-center font-bold mb-5 #{!important}
+	form.wpcf7-form.submitting
+		button
+			&[type="submit"]
+				@apply pointer-events-none cursor-not-allowed
+	.wrap-form
+		@screen -lg
+			@apply grid-cols-1
+	form.wpcf7-form
+		&.submitting
+			.form-submit
+				@apply relative
+				button.btn-primary
+					span
+						@apply opacity-0 pointer-events-none invisible hidden
+					.icon
+						@apply animate-spin
+						&::before
+							content: "\f3f4"
+							@apply font-awesome text-white absolute top-2/4 left-2/4
+							@apply -translate-y-2/4 -translate-x-2/4 
+	.form-group
+		@apply relative cursor-pointer
+		&:focus
+			outline: none !important
+		input
+			@apply w-full px-5 text-black rem:text-[16px] leading-6 font-normal rem:h-[50px] bg-[#f6f6f6] rounded-full
+			&:focus
+				outline: none !important
+		&.product-name
+			@apply col-span-full
+			.input-product-name
+				@apply w-full px-5 text-black rem:text-[16px] leading-6 font-normal rem:h-[50px] bg-[#dcdcdc] rounded-full flex items-center
+	.form-submit
+		@apply flex items-center justify-center relative
+@screen -2xl
+	.product-detail-3
+		.wrapper
+			.col-left
+				@apply w-[33.958333rem]
+@screen -lg
+	.product-detail-1
+		.wrapper
+			.col-left
+				@apply max-w-full
+	.product-detail-3
+		.wrapper
+			@apply flex-col
+			.col-left, .col-right
+				@apply w-full
+	

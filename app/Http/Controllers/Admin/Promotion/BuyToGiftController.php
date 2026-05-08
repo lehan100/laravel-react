@@ -9,6 +9,7 @@ use App\Http\Resources\Promotion\BuyToGiftCollection;
 use App\Http\Resources\Promotion\BuyToGiftResource;
 use App\Repositories\BuyToGift\BuyToGiftRepositoryInterface as RepositoryInterface;
 use App\Repositories\Category\CategoryRepositoryInterface;
+use App\Repositories\PromotionCampaign\PromotionCampaignRepositoryInterface as CampaignRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,13 +28,17 @@ class BuyToGiftController extends MainController
 
     protected CategoryRepositoryInterface $categoryModel;
 
+    protected CampaignRepositoryInterface $campaignModel;
+
     public function __construct(
         RepositoryInterface $repository,
-        CategoryRepositoryInterface $categoryModel
+        CategoryRepositoryInterface $categoryModel,
+        CampaignRepositoryInterface $campaignModel
     ) {
         parent::__construct();
         $this->mainModel = $repository;
         $this->categoryModel = $categoryModel;
+        $this->campaignModel = $campaignModel;
     }
 
     public function index(): Response
@@ -53,11 +58,13 @@ class BuyToGiftController extends MainController
             'type' => 'product',
         ]);
         $itemsProductActive = $this->categoryModel->getActiveProductRows();
+        $itemsCampaignActive = $this->campaignModel->activeOptions();
 
         return Inertia::render($this->controllerView.'Created', [
             'item' => null,
             'itemsCategoryActive' => $itemsCategoryActive,
             'itemsProductActive' => $itemsProductActive,
+            'itemsCampaignActive' => $itemsCampaignActive,
             'itemsSelectedBuyProducts' => [],
             'itemsSelectedGiftProducts' => [],
         ]);
@@ -107,12 +114,22 @@ class BuyToGiftController extends MainController
             'type' => 'product',
         ]);
         $itemsProductActive = $this->categoryModel->getActiveProductRows();
+        $itemsCampaignActive = $this->campaignModel->activeOptions();
+        if ($item?->campaign && ! $itemsCampaignActive->firstWhere('id', (int) $item->campaign->id)) {
+            $itemsCampaignActive->prepend([
+                'id' => (int) $item->campaign->id,
+                'name' => $item->campaign->name ?? optional($item->campaign->translations->first())->name ?? ('#'.$item->campaign->id),
+                'starts_at' => optional($item->campaign->starts_at)->format('Y-m-d\\TH:i'),
+                'ends_at' => optional($item->campaign->ends_at)->format('Y-m-d\\TH:i'),
+            ]);
+        }
         $selectedProductIds = $this->collectAllRuleProductIds($item);
 
         return Inertia::render($this->controllerView.'Edit', [
             'item' => new BuyToGiftResource($item),
             'itemsCategoryActive' => $itemsCategoryActive,
             'itemsProductActive' => $itemsProductActive,
+            'itemsCampaignActive' => $itemsCampaignActive,
             'itemsSelectedBuyProducts' => $this->categoryModel->getSelectedProductRows($selectedProductIds),
             'itemsSelectedGiftProducts' => $this->categoryModel->getSelectedProductRows($selectedProductIds),
         ]);

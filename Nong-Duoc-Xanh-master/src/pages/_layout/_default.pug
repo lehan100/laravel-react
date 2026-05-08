@@ -1,0 +1,30 @@
+block var
+	const plugins = '../../../../plugins'
+block mixin
+	include ../../components/mixin.pug
+doctype html
+
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		meta(http-equiv="X-UA-Compatible", content="ie=edge")
+		link(rel="stylesheet", href="")
+		link(rel="preconnect", href="https://fonts.googleapis.com")
+		link(rel="preconnect", href="https://fonts.gstatic.com", crossorigin)
+		link(rel="stylesheet", href="./css/core.min.css")
+		link(href="https://fonts.googleapis.com/css?family=Manrope:200,300,regular,500,600,700,800", rel="stylesheet")
+		link(href="https://fonts.googleapis.com/css?family=Playball:regular", rel="stylesheet")
+		link(rel="stylesheet", href="./css/main.min.css")
+		title #{title}
+	body(class=bodyClass)
+		block header
+			include ../../components/global/Header/Header.pug
+		block banner
+		div(data-scroll-container)
+			main
+				block main
+				block footer
+					include ../../components/global/Footer/Footer.pug
+		script(src="./js/core.min.js")
+		script(src="./js/main.min.js")

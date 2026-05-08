@@ -1,0 +1,18 @@
+section.home-2(class="section-40 bg-Secondary-Light-Grey")
+	.container 
+		+HeadingGlobal()
+		.slide(class="relative mt-6")
+			.swiper 
+				.swiper-wrapper 
+					-for(var i = 0; i < 10; i++)
+						.swiper-slide 
+							.item(class="rounded-5 bg-Neutral-White p-2 zoom-img group")
+								.img 
+									a(href="#" class="img-ratio") 
+										+PugImg("./img/3.png")
+								.content(class="mt-3 text-center")
+									.title(class="font-semibold text-Neutral-Black group-hover:text-Primary-2")
+										a(href="#") Sầu riêng 
+			.wrap-button-slide.drop
+				.btn.btn-prev.btn-sw-1
+				.btn.btn-next.btn-sw-1

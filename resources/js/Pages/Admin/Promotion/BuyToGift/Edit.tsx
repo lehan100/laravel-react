@@ -6,7 +6,7 @@ import BuyToGiftFormView from './Components/BuyToGiftFormView';
 
 export default function EditPage() {
   const { trans } = useTrans();
-  const { item, itemsCategoryActive, itemsSelectedBuyProducts, itemsSelectedGiftProducts }: any = usePage().props;
+  const { item, itemsCategoryActive, itemsCampaignActive, itemsSelectedBuyProducts, itemsSelectedGiftProducts }: any = usePage().props;
 
   const rulesFromItem = Array.isArray(item?.rules) && item.rules.length > 0
     ? item.rules
@@ -27,6 +27,7 @@ export default function EditPage() {
     code: item?.code || '',
     name: item?.name || '',
     description: item?.description || '',
+    campaign_id: item?.campaign_id || '',
     condition_type: item?.condition_type || 'order_amount',
     min_order_amount: item?.min_order_amount ?? '',
     max_sets_per_order: item?.max_sets_per_order ?? '',
@@ -63,6 +64,7 @@ export default function EditPage() {
       errors={errors as any}
       processing={processing}
       itemsCategoryActive={itemsCategoryActive || []}
+      itemsCampaignActive={itemsCampaignActive || []}
       itemsSelectedBuyProducts={itemsSelectedBuyProducts || []}
       itemsSelectedGiftProducts={itemsSelectedGiftProducts || []}
       undo={undo}

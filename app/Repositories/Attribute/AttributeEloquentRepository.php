@@ -4,6 +4,7 @@ namespace App\Repositories\Attribute;
 
 use App\Models\Catalog\AttributeValue;
 use App\Models\Catalog\ProductAttribute;
+use App\Models\Settings\Language;
 use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -28,21 +29,18 @@ class AttributeEloquentRepository extends EloquentRepository implements Attribut
     public function lists($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        $currentLocale = app()->getLocale();
 
         if (in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
             $query = $this->_model->query()
                 ->select($this->FIELDSELECT)
                 ->with([
-                    'translations' => function ($query) use ($currentLocale) {
-                        $query->select(['id', 'attribute_id', 'locale', 'name'])
-                            ->where('locale', $currentLocale);
+                    'translations' => function ($query) {
+                        $query->select(['id', 'attribute_id', 'locale', 'name']);
                     },
-                    'values' => function ($query) use ($currentLocale) {
+                    'values' => function ($query) {
                         $query->select(['id', 'attribute_id', 'value', 'image', 'color', 'order'])
-                            ->with(['translations' => function ($sq) use ($currentLocale) {
-                                $sq->select(['id', 'attribute_value_id', 'locale', 'value'])
-                                    ->where('locale', $currentLocale);
+                            ->with(['translations' => function ($sq) {
+                                $sq->select(['id', 'attribute_value_id', 'locale', 'value']);
                             }])
                             ->orderBy('order', 'asc')
                             ->orderBy('id', 'asc');
@@ -55,7 +53,7 @@ class AttributeEloquentRepository extends EloquentRepository implements Attribut
                 $query->where('status', 1);
             }
 
-            return $query->get();
+            return $this->normalizeAttributeLocales($query->get());
         }
 
         return collect();
@@ -64,7 +62,7 @@ class AttributeEloquentRepository extends EloquentRepository implements Attribut
     public function get($params = null, $options = null)
     {
         if (($options['task'] ?? null) === 'get-item') {
-            return $this->_model->query()
+            $attribute = $this->_model->query()
                 ->with([
                     'translations',
                     'values' => function ($query) {
@@ -73,6 +71,12 @@ class AttributeEloquentRepository extends EloquentRepository implements Attribut
                     },
                 ])
                 ->find($params['id']);
+
+            if (! $attribute) {
+                return null;
+            }
+
+            return $this->normalizeAttributeLocale($attribute);
         }
 
         return null;
@@ -302,8 +306,16 @@ class AttributeEloquentRepository extends EloquentRepository implements Attribut
             return null;
         }
 
+        if (str_starts_with($image, '/') || str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+            return $image;
+        }
+
         $path = parse_url($image, PHP_URL_PATH);
         $path = is_string($path) && $path !== '' ? $path : $image;
+
+        if (str_contains($path, '/')) {
+            return ltrim($path, '/');
+        }
 
         $fileName = basename($path);
 
@@ -319,6 +331,88 @@ class AttributeEloquentRepository extends EloquentRepository implements Attribut
         $color = trim($color);
 
         return $color !== '' ? Str::of($color)->upper()->value() : null;
+    }
+
+    private function normalizeAttributeLocales(iterable $attributes): iterable
+    {
+        $activeLocales = $this->activeLocaleCodes();
+
+        return collect($attributes)->map(function (ProductAttribute $attribute) use ($activeLocales) {
+            return $this->normalizeAttributeLocale($attribute, $activeLocales);
+        });
+    }
+
+    private function normalizeAttributeLocale(ProductAttribute $attribute, ?array $activeLocales = null): ProductAttribute
+    {
+        $activeLocales ??= $this->activeLocaleCodes();
+
+        if ($attribute->relationLoaded('translations')) {
+            $attribute->setRelation(
+                'translations',
+                $attribute->translations->map(function ($translation) use ($activeLocales) {
+                    $translation->locale = $this->normalizeLocaleKey((string) $translation->locale, $activeLocales);
+
+                    return $translation;
+                })->values()
+            );
+        }
+
+        if ($attribute->relationLoaded('values')) {
+            $attribute->setRelation(
+                'values',
+                $attribute->values->map(function (AttributeValue $value) use ($activeLocales) {
+                    if ($value->relationLoaded('translations')) {
+                        $value->setRelation(
+                            'translations',
+                            $value->translations->map(function ($translation) use ($activeLocales) {
+                                $translation->locale = $this->normalizeLocaleKey((string) $translation->locale, $activeLocales);
+
+                                return $translation;
+                            })->values()
+                        );
+                    }
+
+                    return $value;
+                })->values()
+            );
+        }
+
+        return $attribute;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function activeLocaleCodes(): array
+    {
+        return Language::query()
+            ->where('status', 1)
+            ->orderBy('id', 'asc')
+            ->pluck('code')
+            ->map(fn (string $code): string => $this->normalizeLocaleKey($code, []))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, string>  $activeLocales
+     */
+    private function normalizeLocaleKey(string $locale, array $activeLocales): string
+    {
+        $normalized = strtolower(trim($locale));
+
+        if ($normalized === '') {
+            return $normalized;
+        }
+
+        if (ctype_digit($normalized)) {
+            $index = (int) $normalized;
+
+            return $activeLocales[$index] ?? $normalized;
+        }
+
+        return str_replace('_', '-', $normalized);
     }
 
     private function normalizeCodeValue(mixed $code): ?string

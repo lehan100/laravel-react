@@ -1,0 +1,85 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.recruitment-1(class="section-py relative overflow-hidden") 
+	.container 
+		.recruitment-1-heading(class="relative")
+			h2(class="title-64") Sống trọn đam mê cùng TT Capital
+			.format-content(class="text-lg font-normal  text-neutral-900 mt-base") 
+				p Với bề dày kinh nghiệm và uy tín trên thị trường, Megabuild tự hào là một môi trường làm việc chuyên nghiệp, nơi bạn có thể phát huy tối đa khả năng của mình. Chúng tôi tin rằng thành công của công ty chính là sự thành công của từng cá nhân. Bằng việc cung cấp một môi trường làm việc hiện đại, chúng tôi cam kết sẽ hỗ trợ bạn phát triển sự nghiệp một cách bền vững. Hãy cùng Megabuild kiến tạo nên những công trình vĩ đại và những giá trị bền vững cho cộng đồng.
+section.recruitment-2(class="py-20  max-lg:py-10" setBackground="./img/bg-phucloi.png")
+	.container
+		.heading(class="text-Neutral-White") 
+			h2(class="title-40 uppercase") Chế độ phúc lợi
+		.recruitment-list(class="mt-base grid lg:grid-cols-3 md:grid-cols-2 gap-base md:gap-0")
+			-for(var i = 0; i < 6; i++)
+				.item-service-primary(class="overflow-hidden zoom-img")
+					a.img(class="img-ratio ratio:pt-[340_465]" href="")
+						+PugImg()
+					.content(class="absolute bottom-0 left-0 w-full wrap-item-height z-10 p-6")
+						h3.title(class="text-white text-xl md:text-2xl") CHÍNH SÁCH LƯƠNG THƯỞNG HẤP DẪN
+						.desc(class="item-var-height")
+							.text-white Kiến tạo văn hóa đầu tư
+section.recruitment-3(class="section-py bg-Secondary-Light-Grey") 
+	.bg(class="left-[-2rem] -z-2")
+	.container 
+		.heading(class="mb-10") 
+			h2 Chinh phục công việc mơ ước tại TT Capital
+		.recruitment-table(class="max-md:overflow-x-auto") 
+			table(class="w-full border-collapse max-md:overflow-x-hidden max-md:w-[520px]") 
+				thead 
+					tr 
+						td(class="text-center") STT
+						td(class="w-[700px] max-lg:w-[400px] max-md:w-[150px]") VỊ TRÍ TUYỂN DỤNG
+						td(class="text-center") KHU VỰC
+						td(class="text-center") HẠN NỘP HỒ SƠ
+				tbody 
+					tr 
+						td(class="text-center p-3") 01
+						td
+							a(href="./recruimentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024
+					tr 
+						td(class="text-center p-3") 02
+						td
+							a(href="./recruimentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024
+					tr.hidden 
+						td(class="text-center p-3") 03
+						td
+							a(href="./recruitmentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024
+					tr.hidden  
+						td(class="text-center p-3") 04
+						td
+							a(href="./recruitmentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024
+					tr.hidden  
+						td(class="text-center p-3") 04
+						td
+							a(href="./recruitmentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024
+					tr.hidden  
+						td(class="text-center p-3") 04
+						td
+							a(href="./recruitmentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024			
+					tr.hidden  
+						td(class="text-center p-3") 04
+						td
+							a(href="./recruitmentDetail.html") Nhân viên Marketing 
+						td(class="text-center") TP. Hồ Chí Minh
+						td(class="text-center") 20.06.2024			
+		.more(class="flex-center mt-base relative z-50 cursor-pointer")
+			a(href="" class='btn-primary btn green ')
+				span Xem tất cả

@@ -1,0 +1,523 @@
+.header
+	@apply bg-Neutral-White  z-[100]
+	@screen -xl
+		@apply sticky top-0 left-0 
+	.header-nav-mobile
+		@apply xl:hidden block
+	.header-top
+		transition: transform 0.3s ease
+		@apply transition-all duration-300 ease-in-out
+		.header-top-wrapper
+			@apply h-20
+			.header-top-search 
+				@apply flex-1
+				&.loading
+					.searchform
+						.wrap-form
+							button
+								&::before
+									content: none
+								i
+									@apply animate-spin
+									&::before
+										content: "\f3f4"
+										@apply font-awesome text-Primary-1
+				.product-search-box
+					@apply relative
+					input
+						@apply bg-Neutral-White rounded-full pl-10 rem:h-[44px] w-full text-lg text-Primary-500
+						&::placeholder
+							@apply text-Primary-500
+					button
+						@apply absolute top-2/4 -translate-y-2/4 left-3 flex
+						i
+							@apply text-xl text-Primary-500 font-normal
+			.header-top-right
+				.header-right-auth 
+					.header-language
+						@apply flex items-center md:gap-3 gap-1 relative
+						>ul
+							@apply py-[2px] 
+							>li
+								@apply relative
+								>a
+									@apply relative flex items-center
+									&::after
+										content: '\f078'
+										@apply font-awesome text-sm transition-300 text-black ml-2 font-black
+									span
+										@apply text-blue-700 text-lg font-normal
+							&:hover
+								>ul			
+									@apply opacity-100 visible block
+							>ul
+								@apply absolute left-0 top-full bg-red-700 opacity-0 invisible hidden z-10 w-full px-2 py-[2px]
+								li
+									a
+										span
+											@apply text-black
+						&:hover
+							.wpml-ls
+								&>ul>li>a
+									@apply bg-Primary-1 text-white
+									&::after
+										@apply rotate-180 text-white
+								&>ul>li>ul
+									@apply opacity-100 translate-y-0 pointer-events-auto
+						.wpml-ls
+							@apply max-w-none w-auto
+							&>ul
+								@apply static
+								&>li
+									&>a
+										@apply rounded-1 h-8 
+										@apply px-3 py-1 text-black rem:text-[15px] flex items-center gap-1
+										@apply transition-300
+										&::after
+											content: '\f107'
+											@apply font-awesome text-base transition-300 text-black
+											@apply border-none static #{!important}
+									&>ul
+										@apply absolute top-full left-0 w-full
+										@apply  rounded-1 overflow-hidden
+										@apply opacity-0 pointer-events-none -translate-y-2 transition-300 bg-white
+										li
+											a
+												@apply px-3 py-1 flex items-center w-full bg-white
+												@apply hover:bg-gray-700 hover:text-white transition-300 border-none
+				.header-cart
+					@apply xl:hidden flex
+				.header-search
+					@apply xl:hidden flex
+
+				.header-auth-item 
+					@apply p-3 transition-all ease-in-out
+					a
+						@apply flex items-center gap-2 rem:text-[20px] text-Neutral-White font-normal  transition-all ease-in-out
+						
+					&:hover
+						.icon
+							svg
+								path
+									@apply fill-Primary-2
+	.header-bottom 
+		transition: top 0.3s ease
+		@apply bg-[#C9DEFC]
+		@apply shadow-Dropshadow-Light	
+		&.is-fixed
+			@apply fixed top-0 left-0 right-0 z-100
+		.header-bottom-wrapper
+			@apply h-14	flex items-center justify-between
+			.header-cart
+				@apply cursor-pointer
+				.icon
+					@apply relative
+					.count-cart
+						@apply absolute rem:top-[-10px] rem:right-[-13px] bg-Primary-7 rem:min-w-[20px] h-5  rem:text-[12px] px-1
+						@apply inline-flex items-center justify-center text-Neutral-White rounded-full
+					i
+						@apply text-xl
+					.cart-quantity
+						@apply sq-5 rounded-full bg-Primary-7 text-Neutral-White absolute rem:right-[-10px] rem:top-[-7px] text-center rem:text-[12px] inline-flex items-center justify-center
+			.header-cart-mobile
+				@apply w-12 h-12 flex-shrink-0 
+				@apply inline-flex xl:hidden items-center justify-center 
+				@apply text-Primary-1 bg-Neutral-White text-2xl rounded-1
+				.icon
+					@apply relative
+					i
+						@apply text-xl
+					.cart-quantity
+						@apply h-5 min-w-[20px] px-1 rounded-full bg-Primary-7 text-Neutral-White absolute rem:right-[-10px] rem:top-[-7px] text-center rem:text-[12px] inline-flex items-center justify-center
+	.header-menu
+		@apply h-full flex items-center
+		@screen -xl
+			height: calc(100dvh - var(--header-height))					
+			@apply fixed top-[var(--header-height)] left-0 w-full bg-Neutral-50 z-[100]
+			@apply flex flex-col justify-between px-[15px] overflow-y-auto
+			@apply opacity-0 translate-x-full transition-all duration-700		
+			&>ul.header-nav
+				@apply flex flex-col gap-3 mt-[26px] w-full
+				li
+					a
+						@apply text-[18px] font-medium text-Neutral-900 flex gap-3 justify-between
+						@apply pb-3 border-b border-b-Neutral-900 border-opacity-20 items-center
+						.icon
+							@apply w-[120px] h-[60px] hidden
+						span
+							i
+								@apply hidden
+					&.menu-item-has-children				
+						&>a
+							@apply relative flex items-center 
+							&.dropdown-active
+								&::after
+									@apply rotate-180
+							&::after
+								content: '\f078'
+								@apply font-awesome font-black text-lg
+						>ul
+							@apply bg-Primary-1/85
+							>li
+								>a
+									@apply border-none p-[8px] text-Neutral-White
+								&[class*='current']
+									&>a
+										@apply text-Primary-1
+		@screen xl
+			ul.header-nav
+				@apply flex justify-center items-center gap-1 h-full
+				>li
+					@apply flex items-center h-full relative 
+					&:not(:last-child)
+						&::after
+							content: ""
+							@apply w-[1px] h-3 bg-Neutral-400/40 mx-4
+					>a
+						i
+							@apply transition-all ease-in-out
+					&:hover
+						>a
+							i
+								@apply rotate-180
+					&.dropdown-product
+						a
+							@apply text-Primary-1
+						.menu-mega-main
+							@apply opacity-0 pointer-events-none transition-all duration-300 z-100 overflow-hidden
+							&.active
+								@apply opacity-100 pointer-events-auto
+						.dropdown-product-list
+							@apply absolute top-full left-0 right-0 w-[58rem] overflow-hidden bg-white rounded-b-lg shadow-lg flex 
+							.close
+								@apply absolute top-2 right-2 p-4 rem:w-[30px] rem:h-[30px] flex-center bg-[#FEF9F1] rounded-full hover:bg-Primary-1 transition-all duration-300 cursor-pointer
+								&:hover
+									&::before
+										@apply text-white
+								&::before
+									content: '\f00d'
+									@apply font-awesome rem:text-[15px] text-Primary-1
+							.tab-content-menu
+								@apply h-full flex flex-col
+							.menu-list
+								@apply w-[20%] border-r border-Neutral-200 bg-[#F3F6FB] 
+								ul
+									@apply flex flex-col
+									li
+										&[class*='current']
+											a
+												@apply text-Neutral-White bg-Primary-1
+										a
+											@apply  gap-2 hover:text-Neutral-White transition-all duration-300 text-[#757679] flex py-3 pl-3 text-base
+											@apply hover:bg-Primary-1 hover:border-none border-none
+											&.active
+												@apply text-Neutral-White bg-Primary-1
+											.icon
+												i
+													@apply text-Primary-2 text-lg
+											span
+												@apply rem:text-[16px]
+							.menu-content
+								@apply w-[80%] p-7 flex flex-col gap-5
+								&::-webkit-scrollbar
+									@apply w-[calc(3/1920*100rem)] rem:h-[3px]
+								&::-webkit-scrollbar-track
+									background-color: rgba(#e5e5e5,.5 )
+								&::-webkit-scrollbar-thumb
+									@apply bg-Primary-1
+								.tab-content
+									@apply w-full grid grid-cols-3 gap-15
+								.menu-sub-list
+									@apply rem:rounded-[8px]
+									ul
+										@apply w-full
+									li
+										&[class*='current']
+											a
+												@apply text-Primary-1 font-bold
+										a
+											@apply block py-3 rem:text-[16px] font-light text-[#4A4A4A] hover:font-bold transition-all duration-300 hover:text-Primary-1 border-b border-Neutral-200 
+										&:first-child
+											a
+												@apply border-t border-t-Neutral-200
+						.tab-content-sub
+							background: transparent
+							@apply px-8 py-6 rounded-r-lg pl-4
+							.menu-sub-child-list
+								@apply w-[40%] pr-4 lg:max-h-[45vh] lg:overflow-y-auto overflow-scroll-1
+								ul
+									@apply flex flex-col gap-5
+									li
+										&[class*='current']
+											a
+												@apply text-Primary-1
+										a
+											@apply font-light text-[#757679] transition-all duration-300 hover:text-Primary-1 hover:underline
+							.menu-sub-child-content
+								@apply w-[60%]
+						.item-news-content
+							@apply flex flex-col h-full
+							.content
+								@apply flex-1
+								.btn-style-primary
+									@apply mt-auto
+					a
+						line-height: calc( 26 / 18 )
+						@apply rem:text-[20px] font-semibold text-Primary-7  flex items-center gap-3 
+						.icon-bar
+							@apply w-6 h-6 inline-flex items-center
+							img
+								@apply w-full h-full object-contain
+						span
+							@apply border-b border-b-transparent transition-300 flex items-center gap-2 rem:text-[20px] 
+						&:hover
+							span
+								@apply border-b-Primary-1
+					&.sale
+						a
+							span
+								@apply text-Primary-7
+					&[class*='current']
+						&>a
+							@apply border-b-Primary-1
+					&.menu-item-has-children:not(.dropdown-product)
+						
+						@apply relative					
+						>a
+							@apply flex items-center gap-2
+							&::before
+								content: "\f107"
+								@apply  -right-5 font-awesome text-[#818181] rem:text-[15px] font-light inline-block
+						>ul.sub-menu
+							box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.04)
+							@apply flex flex-col  opacity-0 invisible transition-300 z-[120] absolute top-full left-0 w-max pointer-events-none overflow-hidden bg-Neutral-White
+							@apply rounded-bl-xl rounded-br-xl
+							>li
+								>a
+									@apply font-semibold text-lg p-3 text-Neutral-950
+									
+								&:hover,&[class*='current']
+									>a
+										@apply text-Primary-1
+						&:hover
+							ul.sub-menu
+								@apply opacity-100 pointer-events-auto visible
+
+	.header-bar
+		@apply w-12 h-12 flex-shrink-0 
+		@apply inline-flex xl:hidden items-center justify-center 
+		@apply text-Primary-1 bg-Neutral-White text-2xl rounded-1
+@media (max-width: 1279.98px)
+	.header
+		background-image: none
+		@apply bg-Neutral-White
+		.search-bar-container
+			padding: 1.5rem 16px
+		.header-nav-mobile
+			height: calc(100dvh - var(--header-height))		
+			@apply fixed top-[var(--header-height)] right-0 w-full bg-Neutral-50 z-[100]
+			@apply flex flex-col justify-between px-[15px] overflow-y-auto
+			@apply opacity-0 translate-x-full transition-all duration-700	
+			@apply w-[85vw]
+			&>ul
+				@apply flex flex-col w-full 
+				li
+					>.menu-item
+						@apply flex items-center relative 
+					.icon-arrow
+						@apply absolute top-0 right-0 h-full flex-center text-xl font-normal
+						&::before
+							content: '\f078'
+							transform-origin: center center
+							will-change: transform
+							@apply font-awesome text-[20px] font-light ml-2
+							@apply transition-300
+					// &.active
+					// 	.icon-arrow
+					// 		&::before
+					// 			@apply rotate-180
+					a
+						@apply text-[18px] font-medium text-Neutral-900 flex gap-3 justify-between py-3
+						@apply pb-3  border-opacity-20 items-center
+						.icon
+							@apply w-[120px] h-[60px] hidden
+						span
+							i
+								@apply hidden
+					&#menu-item-2596
+						a
+							@apply justify-start gap-2
+							img
+								@apply w-6 flex-shrink-0 mr-0 #{!important}
+					&#menu-item-2595
+						a
+							@apply justify-start gap-2
+							img
+								@apply w-6 flex-shrink-0 mr-0 #{!important}
+					&#menu-item-2599
+						a
+							@apply justify-start gap-2
+							img
+								@apply w-6 flex-shrink-0 mr-0 #{!important}
+					>ul
+						@apply bg-[#dae0ee] rounded-xl border-gray-200 pb-2 
+						>li
+							@apply  last:border-none 
+							.menu-item
+								@apply mx-[12px]
+							.icon-arrow
+								@apply px-3
+							>a
+								@apply px-4 py-3 text-[16px]
+							>ul
+								@apply mx-[12px] bg-[#e5e9f3]
+								>li
+									>a
+										@apply text-[15px]
+									>ul
+										@apply bg-[#f2f4f9]  
+										>li
+											>a
+												@apply py-2 text-[15px]
+// Minicart
+.mini-cart-wrapper
+	@apply fixed top-0 right-0 w-full bg-white h-full z-[160] flex flex-col transition-all duration-300 translate-x-full shadow-Dropshadow-Light
+	@apply rem:max-w-[480px]
+	// @apply translate-x-0
+	// & + .mini-cart-overlay
+	// 	@apply pointer-events-auto opacity-100
+	.wrap-price 
+		@apply text-left #{!important}
+
+	&.active
+		@apply translate-x-0
+		& + .mini-cart-overlay
+			@apply pointer-events-auto opacity-100
+	.wrapper
+		@apply px-4 xl:pl-10 xl:pr-8 rem:pb-[30px] h-full flex flex-col flex-1 overflow-hidden
+	.middle
+		@apply flex flex-col overflow-hidden
+		>.title
+			@apply text-2xl font-bold
+	.woocommerce-mini-cart__empty-message
+		@apply py-4 text-Primary-1
+	.bottom
+		@apply pr-2 flex flex-col
+	.bottom-wrapper
+		@apply py-5 border-t border-t-neutral-200 space-y-3 flex-1
+	.bundle-contents
+		@apply flex flex-wrap gap-2
+		.bundle-content
+			@apply text-sm
+			@apply p-1 rounded-1 bg-orange-300
+	.mini-cart-item
+		@apply grid grid-cols-12 gap-4
+		@apply items-center relative
+		.remove-item
+			@apply w-8 h-8 absolute top-3 right-0
+			@apply cursor-pointer flex items-center justify-center
+			@apply rounded-1 bg-neutral-100 transition-all
+			&:hover
+				@apply bg-Primary-1 text-white
+		.price
+			@apply  font-bold text-Primary-1
+			@apply mt-2
+			.quantity
+				@apply text-black mr-1
+		.img
+			@apply col-span-3
+			@apply border border-neutral-50
+		.content
+			@apply col-span-9 pr-10
+			.title
+				@apply text-xl text-Primary-1
+				a
+					@apply line-clamp-2
+		& + .mini-cart-item
+			@apply border-t border-Neutral-400
+			@apply mt-3 pt-3
+.backdrop-overlay
+	@apply bg-black/50
+	@apply transition-all duration-300 pointer-events-none opacity-0
+.header-overlay
+	position: fixed
+	opacity: 0
+	transition: 0.3s all ease-in-out
+	pointer-events: none
+	top: 0
+	left: 0
+	width: 100%
+	height: 100%
+	background-color: rgba(0, 0, 0, 0.5)
+	z-index: 50
+body.isOpenMenu
+	.header-overlay
+		@apply opacity-100 pointer-events-auto
+	.header-menu
+		@apply opacity-100 translate-x-0 #{!important}
+	.header-nav-mobile
+		@apply opacity-100 translate-x-0 #{!important}
+body.isOpenSearch
+	.header-search-form
+		@apply opacity-100 pointer-events-auto translate-y-0
+@screen -xl
+	.header
+		.header-top
+			@apply hidden
+		.header-bottom
+			@apply bg-Primary-1 
+			.header-top-search 
+				@apply flex-1
+				&.loading
+					.searchform
+						.wrap-form
+							button
+								&::before
+									content: none
+								i
+									@apply animate-spin
+									&::before
+										content: "\f3f4"
+										@apply font-awesome text-Primary-1
+				.product-search-box
+					@apply relative
+					input
+						@apply bg-Neutral-White rounded-full pl-10 rem:h-[44px] w-full text-lg text-Primary-500
+						&::placeholder
+							@apply text-Primary-500
+					button
+						@apply absolute top-2/4 -translate-y-2/4 left-3 flex
+						i
+							@apply text-xl text-Primary-500 font-normal
+			.header-cart
+				@apply hidden
+			.header-bottom-wrapper
+				@apply h-[80px] gap-5
+				.header-logo-mobile
+					a
+						img
+							@apply w-full h-full object-cover
+				.wrapper
+					@apply flex gap-2
+					.header-auth-item
+						a
+							@apply inline-flex items-center justify-center text-center flex-col
+							span
+								@apply text-Neutral-White
+					.header-search				
+						@apply w-12 h-12 flex-shrink-0 
+						@apply inline-flex items-center justify-center 
+						@apply text-Primary-1 bg-Neutral-White text-2xl rounded-1
+		.header-top-right
+			@apply flex items-center gap-2
+			
+			.header-cart
+				@apply w-12 h-12 flex-shrink-0 
+				@apply inline-flex xl:hidden items-center justify-center 
+				@apply text-Primary-1 bg-Neutral-White text-2xl rounded-1
+				.icon
+					@apply relative
+					i
+						@apply text-xl
+					.cart-quantity
+						@apply sq-5 rounded-full bg-Primary-7 text-Neutral-White absolute rem:right-[-10px] rem:top-[-7px] text-center rem:text-[12px] inline-flex items-center justify-center

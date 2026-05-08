@@ -1,0 +1,298 @@
+header.header
+	.header-top(class="bg-Primary-1")
+		.container 
+			.header-top-wrapper(class="flex items-center justify-between")
+				.header-top-left(class="rem:max-w-[560px] w-full flex items-center rem:gap-[63px]")
+					.header-logo(class="rem:w-[139px]")
+						a(href="#" class="img-ratio ratio:pt-[55_139]") 
+							+PugImg("./img/logo.svg")
+					.header-top-search(class="xl:block hidden")
+						form(action="") 
+							.product-search-box
+								input(type="text" placeholder="Bạn tìm gì...")
+								button 
+									<i class="fa-light fa-magnifying-glass"></i>
+				.header-top-right(class="flex-1 w-full flex justify-end")
+					.header-cart(class="flex items-center gap-3")
+						.icon(class="text-xl text-Primary-1") 
+							<i class="fa-regular fa-cart-shopping"></i>
+							.cart-quantity 1
+			
+					.header-search 
+						i.fa-regular.fa-magnifying-glass
+					.header-bar 
+						i.fa-solid.fa-bars
+					.header-right-auth(class="xl:flex hidden items-center gap-3")
+						-for(var i = 0; i < 3;i++)
+							.header-auth-item(class="group")
+								a(href="#") 
+									.icon(class="rem:w-[32px]  [&>svg]:rem:h-[32px] transition-all") 
+										img(src="./img/1.svg", alt="" class="img-svg")
+									span(class="group-hover:text-Primary-2 transition-all") Đăng nhập
+	.header-bottom 
+		.container 
+			.header-bottom-wrapper
+				.header-logo-mobile(class="rem:w-[139px] xl:hidden block")
+					a(href="#" class="img-ratio ratio:pt-[55_139]") 
+						+PugImg("./img/logo.svg")
+				.wrapper(class="xl:hidden flex")
+					.header-cart-mobile(class="flex items-center gap-3")
+						.icon(class="text-xl text-Primary-1") 
+							<i class="fa-regular fa-cart-shopping"></i>
+							.cart-quantity 1			
+					.header-search 
+						i.fa-regular.fa-magnifying-glass
+					.header-bar 
+						i.fa-solid.fa-bars
+				.header-menu 
+					ul.header-nav
+						li.dropdown-product.menu-item-has-children
+							a(href="#") 
+								.icon-bar 
+									img(src="./img/bar.png", alt="")
+								span Danh mục sản phẩm
+								<i class="fa-solid fa-angle-down"></i>
+							.dropdown-product-list.menu-mega-main
+								.close
+								.menu-list 
+									ul 
+										li 
+											a(href="#tab-1", data-tab="#tab-1", class="tab-item")
+												.icon 
+													<i class="fa-regular fa-seedling"></i>
+												span Phân bón
+										li 
+											a(href="#tab-2", data-tab="#tab-2", class="tab-item")
+												.icon 
+													<i class="fa-regular fa-seedling"></i>
+												span Thuốc bảo vệ thực vật
+										li 
+											a(href="#tab-3", data-tab="#tab-3", class="tab-item")
+												.icon 
+													<i class="fa-regular fa-seedling"></i>
+												span Giải pháp cây trồng
+								.menu-content
+									.tab-content-menu#tab-1
+										
+										.tab-content
+											-for(var i = 0; i < 3; i++)
+												
+												.menu-sub-list
+													.title-style-primary(class="rem:text-[24px] text-Primary-1 font-bold mb-3") Thuốc bảo vệ thực vật
+													ul 
+														li 
+															a(href="#", class="tab-item") Thuốc trừ bệnh
+														li 
+															a(href="#", class="tab-item") Thuốc trừ sâu
+														li 
+															a(href="#", class="tab-item") Thuốc diệt cỏ
+									.tab-content-menu#tab-2(style="display: none;")
+										.title-style-primary(class="rem:text-[24px] text-Primary-1 font-bold mb-3") Thuốc bảo vệ thực vật
+										.tab-content
+											-for(var i = 0; i < 3; i++)
+												.menu-sub-list
+													ul 
+														li 
+															a(href="#", class="tab-item") Thuốc trừ bệnh
+														li 
+															a(href="#", class="tab-item") Thuốc trừ sâu
+														li 
+															a(href="#", class="tab-item") Thuốc diệt cỏ
+						li.menu-item-has-children   
+							a(href="#") 
+								.icon(class="rem:h-[24px] rem:w-[24px]") 
+									img(src="./img/2.svg", alt="" class="img-svg w-full h-full object-cover")
+								span Phân bón
+									<i class="fa-solid fa-chevron-down"></i>
+
+							ul.sub-menu 
+								li 
+									a(href="./about-us.html") 
+										.icon 
+											.img 
+												+PugImg("./img/phanbon.svg")
+										span Phân NPK
+											
+								li 
+									a(href="./about-us.html") 
+										.icon 
+											.img 
+												+PugImg("./img/phanbon.svg")
+										span Phân NPK
+								li 
+									a(href="./about-us.html") 
+										.icon 
+											.img 
+												+PugImg("./img/phanbon.svg")
+										span Phân NPK
+						li 
+							a(href="#") 
+								.icon(class="rem:h-[24px]") 
+									img(src="./img/2.svg", alt="" class="img-svg w-full h-full object-cover")
+								span Thuốc bảo vệ thực vật
+						li 
+							a(href="#") 
+								.icon(class="rem:h-[24px]") 
+									img(src="./img/2.svg", alt="" class="img-svg w-full h-full object-cover")
+								span Giải pháp cây trồng
+						li.sale
+							a(href="#") 
+								.icon(class="rem:h-[24px]") 
+									img(src="./img/2.svg", alt="" class="img-svg w-full h-full object-cover")
+								span Mua chung giá tốt
+				.header-cart(class="flex items-center gap-3")
+					.icon(class="text-xl text-Primary-1") 
+						<i class="fa-regular fa-cart-shopping"></i>
+						.cart-quantity 1
+					span(class="text-xl font-semibold text-Primary-1") Giỏ hàng
+	.header-nav-mobile
+		ul
+			li.menu-item-has-children
+				a(href="./home.html") Trang chủ
+				ul.sub-menu 
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+			li.menu-item-has-children
+				a(href="./about.html") Giới thiệu
+				ul.sub-menu 
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+			li.menu-item-has-children
+				a(href="./about.html") Lĩnh vực hoạt động
+				ul.sub-menu 
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+			li.menu-item-has-children
+				a(href="./sustainable.html") Phát triển bền vững
+				ul.sub-menu 
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+			li.menu-item-has-children
+				a(href="./sustainable.html") Phát triển bền vững
+				ul.sub-menu 
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+			li.menu-item-has-children
+				a(href="./sustainable.html") Phát triển bền vững
+				ul.sub-menu 
+					li  
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+					li 
+						a(href="#") Thuoc 1
+			li
+				a(href="./newsList.html") Tin tức
+			li
+				a(href="./careerList.html") Tuyển dụng
+			li
+				a(href="./contact.html") Liên hệ
+.header-search-form
+	.close.flex.items-center.justify-center.absolute.top-0.right-0.bg-white.text-3xl.cursor-pointer(class="w-12.5 h-12.5")
+		i.fa-light.fa-xmark
+	.container
+		.wrap-form-search-product
+			.productsearchbox
+				input(type="text" placeholder="Tìm kiếm thông tin")
+				button
+					i.fa-light.fa-magnifying-glass
+.header-menu-mobile(data-step-index="0")
+	.header-title-close(class="flex items-center justify-between h-[50px] border-b border-neutral-100 gradient-primary")
+		.title(class="text-white text-2xl uppercase pl-[15px]") Danh mục
+		.close(class="cursor-pointer h-[50px] w-[50px] flex-center bg-Primary-#06 text-white text-4xl ")
+			i.fa-light.fa-chevron-left
+.mini-cart-wrapper(class="fixed top-0 right-0 w-full bg-neutral-50 h-full z-[160] px-4 py-6 flex flex-col transition-all duration-300 translate-x-full shadow-light" id="mini-cart-wrapper")
+	.top.relative
+		.close-mini-cart(class="w-10 h-10 flex items-center justify-center absolute left-0 top-1/2 -translate-y-1/2 group bg-Primary-1 hover:bg-Primary-Brown transition-300 cursor-pointer")
+			<i class="fa-regular fa-arrow-left text-Neutral-White text-xl font-bold group-hover:text-white"></i>
+		.title(class="rem:text-[28px] uppercase font-bold text-center") Giỏ hàng
+	.middle(class="border-t border-t-neutral-200 mt-3 py-3 flex-1 h-full flex flex-col overflow-hidden")
+		.list(class="overflow-auto")
+			<p class="woocommerce-mini-cart__empty-message">No products in the cart.</p>
+			.mini-cart-item
+				.img 
+					a(href="#" class="img-ratio")
+						+PugImg()
+				.content
+					.remove-item
+						<i class="fa-regular fa-trash-can"></i>
+					.title Thực phẩm chay
+					.price-wrapper 
+						.quantity 1x
+						.price 30.000 đ
+			.mini-cart-item
+				.img 
+					a(href="#" class="img-ratio")
+						+PugImg()
+				.content
+					.remove-item
+						<i class="fa-regular fa-trash-can"></i>
+					.title Thực phẩm chay
+					.price-wrapper 
+						.quantity 1x
+						.price 30.000 đ
+	.bottom(class="pt-3 border-t border-t-neutral-200 space-y-4")
+		.cart-quantity(class="flex items-center justify-between gap-2")
+			.title(class="text-xl font-bold") Số lượng
+			.ctn(class="font-medium") 3 sản phẩm
+		.total(class="flex items-center justify-between gap-2")
+			.title(class="subheader-20 font-bold") Tổng thanh toán
+			.ctn(class="font-medium") 250.000 đ
+		.checkout(class="border-t border-t-neutral-200 pt-3 flex items-center justify-center")
+			a.btn.btn-primary(href="#" class=" w-full") 
+				span Xem giỏ hàng 
+.backdrop-overlay.mini-cart-overlay(class="fixed inset-0 z-[158]")

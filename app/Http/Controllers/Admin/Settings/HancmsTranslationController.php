@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Settings;
 
 use App\Http\Controllers\MainController;
 use App\Http\Requests\Settings\HancmsTranslationRequest;
+use App\Jobs\Settings\SyncFrontendTranslationBundles;
 use App\Services\Settings\HancmsTranslationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
@@ -37,6 +38,7 @@ class HancmsTranslationController extends MainController
     {
         try {
             $this->translationService->saveTranslations($request->validated('translations'));
+            SyncFrontendTranslationBundles::dispatchAfterResponse();
 
             return Redirect::back()->with('success', __('hancms.translation.messages.saved'));
         } catch (\Throwable $th) {

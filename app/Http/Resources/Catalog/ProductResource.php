@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources\Catalog;
 
+use App\Http\Resources\Concerns\LoadsRelationCollections;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
+    use LoadsRelationCollections;
+
     /**
      * Transform the resource into an array.
      *
@@ -19,7 +22,11 @@ class ProductResource extends JsonResource
         $baseUrl = url('/');
         $path = $configPath['path'] ?? 'uploads';
         $fullPath = public_path(trim($path, '/'));
-        $defaultPhoto = $this->photos->where('is_default', true)->first() ?? $this->photos->first();
+        $photos = $this->loadedCollection('photos');
+        $categories = $this->loadedCollection('categories');
+        $translations = $this->loadedCollection('translations');
+        $slugs = $this->loadedCollection('slugs');
+        $defaultPhoto = $photos->where('is_default', true)->first() ?? $photos->first();
 
         return [
             'id' => $this->id,
@@ -35,16 +42,20 @@ class ProductResource extends JsonResource
             'photo_url' => $defaultPhoto
                 ? rtrim($baseUrl, '/').'/'.trim($path, '/').'/'.$defaultPhoto->filename
                 : null,
-            'category_ids' => $this->categories->pluck('id')->values(),
-            'categories' => $this->categories->map(function ($category) {
+            'category_ids' => $categories->pluck('id')->values(),
+            'categories' => $categories->map(function ($category) {
+                $translationName = $category->relationLoaded('translations')
+                    ? ($category->translations->first()?->name ?? null)
+                    : null;
+
                 return [
                     'id' => $category->id,
-                    'name' => $category->translations->first()->name ?? ('#'.$category->id),
-                    'name_with_depth' => $category->name_with_depth ?? ($category->translations->first()->name ?? ('#'.$category->id)),
+                    'name' => $translationName ?? ('#'.$category->id),
+                    'name_with_depth' => $category->name_with_depth ?? ($translationName ?? ('#'.$category->id)),
                 ];
             })->values(),
-            'translations' => $this->translations->mapWithKeys(function ($item) {
-                $slugLocale = $this->slugs->where('locale', $item->locale)->whereNull('redirect_to')->where('is_default', true)->first();
+            'translations' => $translations->mapWithKeys(function ($item) use ($slugs) {
+                $slugLocale = $slugs->where('locale', $item->locale)->whereNull('redirect_to')->where('is_default', true)->first();
 
                 return [$item->locale => [
                     'name' => $item->name ?? '',
@@ -56,7 +67,7 @@ class ProductResource extends JsonResource
                     'seo_description' => $item->seo_description ?? '',
                 ]];
             }),
-            'photos' => $this->photos->map(function ($p) use ($baseUrl, $path, $fullPath) {
+            'photos' => $photos->map(function ($p) use ($baseUrl, $path, $fullPath) {
                 $filePath = rtrim($fullPath, '/').'/'.ltrim($p->filename, '/');
                 $dimensions = is_file($filePath) ? @getimagesize($filePath) : false;
                 $fileSize = is_file($filePath) ? @filesize($filePath) : false;

@@ -1,0 +1,35 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.gallery(class="section-py")
+	.container 
+		h2(class="title-40 rem:mb-[35px] uppercase") hỗ trợ
+		.policy-links 
+			ul 
+				li 
+					a(href="./faq.html") FAQs
+				li 
+					a(href="#") Chính sách
+				li 
+					a(href="./gallery.html") Thư viện ảnh
+				li 
+					a(href="./gallery-video.html") Thư viện Video
+		.wrapper-list(class="grid md:grid-cols-3 grid-cols-2 md:gap-base gap-5 rem:mt-[45px]")
+			-for(var i = 0; i < 9; i++)
+				.item(class="group") 
+					.img 
+						a(href="#" class="img-ratio ratio:pt-[248_440] zoom-img rounded-lg") 
+							+PugImg()
+					.content(class="rem:mt-[22px]") 
+						.title(class="text-xl group-hover:text-Primary-1")
+							a(href="#") Album 4
+		.pagination(class="mt-base flex-center")
+			.facetwp-facet 
+				.facetwp-pager
+					a(href="#" class="facetwp-page") 1
+					a(href="#" class="facetwp-page") 2
+					a(href="#" class="facetwp-page") 3

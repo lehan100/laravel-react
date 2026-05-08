@@ -15,6 +15,7 @@ import MultiUpload from '@/Components/ImageUpload/MultiUpload';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
 import CategoryMultiSelect from './CategoryMultiSelect';
 import { formatPriceInput, getProductCurrencyFromLocale } from '../productUtils';
+import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
 
 interface Props {
     title: string;
@@ -170,6 +171,8 @@ const ProductFormView = ({
     const [aiSuggestionError, setAiSuggestionError] = useState('');
     const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
+    const [aiTranslating, setAiTranslating] = useState(false);
+    const [aiTranslateError, setAiTranslateError] = useState('');
     useEffect(() => {
         setAttributeList(attributes || []);
     }, [attributes]);
@@ -1006,6 +1009,100 @@ const ProductFormView = ({
         }
     };
 
+    const applyAiTranslations = (translations: Record<string, any>) => {
+        setData((prev: any) => {
+            const nextTranslations = { ...(prev.translations || {}) };
+
+            Object.entries(translations).forEach(([locale, fields]) => {
+                const translatedFields = fields as Record<string, any>;
+                const translatedName = String(translatedFields.name || '').trim();
+                const currentData = nextTranslations[locale] || {};
+                const nextLocaleData = {
+                    ...currentData,
+                    ...Object.fromEntries(
+                        ['name', 'description', 'content', 'seo_title', 'seo_keyword', 'seo_description']
+                            .map((field) => {
+                                const value = String(translatedFields[field] || '').trim();
+                                return value !== '' ? [field, value] : null;
+                            })
+                            .filter((entry): entry is [string, string] => entry !== null)
+                    ),
+                };
+
+                if (translatedName !== '' && (slugLocked[locale] !== false || String(nextLocaleData.slug || '').trim() === '')) {
+                    nextLocaleData.slug = createSlug(translatedName);
+                }
+
+                nextTranslations[locale] = nextLocaleData;
+            });
+
+            return {
+                ...prev,
+                translations: nextTranslations,
+            };
+        });
+    };
+
+    const handleAiTranslate = async () => {
+        const sourceTranslation = data.translations?.[currentTab] || {};
+        const targetLocales = langList
+            .map((item: any) => item.code)
+            .filter((code: string) => code !== currentTab);
+
+        setAiTranslateError('');
+
+        if (!targetLocales.length) {
+            setAiTranslateError(trans('hancms.catalog.product.ai.no_target_languages') || 'No target languages available.');
+            return;
+        }
+
+        const hasSourceContent = ['name', 'description', 'content', 'seo_title', 'seo_keyword', 'seo_description']
+            .some((field) => String(sourceTranslation?.[field] || '').trim() !== '');
+
+        if (!hasSourceContent) {
+            setAiTranslateError(trans('hancms.catalog.product.ai.missing_input') || 'Please enter content in the current language first.');
+            return;
+        }
+
+        setAiTranslating(true);
+
+        try {
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'product',
+                    source_locale: currentTab,
+                    target_locales: targetLocales,
+                    fields: {
+                        name: sourceTranslation.name || '',
+                        description: sourceTranslation.description || '',
+                        content: sourceTranslation.content || '',
+                        seo_title: sourceTranslation.seo_title || '',
+                        seo_keyword: sourceTranslation.seo_keyword || '',
+                        seo_description: sourceTranslation.seo_description || '',
+                    },
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+
+            if (!Object.keys(translations).length) {
+                setAiTranslateError(trans('hancms.catalog.product.ai.empty_response') || 'AI did not return translations.');
+                return;
+            }
+
+            applyAiTranslations(translations);
+        } catch (error: any) {
+            setAiTranslateError(
+                error?.response?.data?.message
+                || trans('hancms.catalog.product.ai.failed')
+                || 'Unable to translate product content right now.'
+            );
+        } finally {
+            setAiTranslating(false);
+        }
+    };
+
     const hasTabError = (tabId: string) => {
         if (!errors) return false;
 
@@ -1152,38 +1249,62 @@ const ProductFormView = ({
         const isSlugLocked = !!slugLocked[locale];
         return (
             <div className="space-y-6">
-                <div className="flex flex-wrap gap-3 overflow-x-auto border-b border-slate-200 pb-6">
-                    {langList.map((item: any) => {
-                        const active = currentTab === item.code;
-                        const errorInTab = Object.keys(errors || {}).some((key) => key.startsWith(`translations.${item.code}.`));
+                <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-6">
+                    <div className="flex flex-wrap items-start gap-3">
+                        {langList.map((item: any) => {
+                            const active = currentTab === item.code;
+                            const errorInTab = Object.keys(errors || {}).some((key) => key.startsWith(`translations.${item.code}.`));
 
-                        return (
-                            <button
-                                key={item.code}
-                                type="button"
-                                onClick={() => setCurrentTab(item.code)}
-                                className={`flex items-center gap-2 rounded-md border-2 px-4 py-3 text-[12px] font-black uppercase transition-all ${active
-                                    ? 'bg-indigo-900 text-white shadow-lg border-indigo-900 scale-105'
-                                    : errorInTab
-                                        ? 'border-red-300 bg-red-50 text-red-600 shadow-sm'
-                                        : 'border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                    }`}
-                            >
-                                <img
-                                    src={`/${props.languageConfigPath.path}/${item.photo}`}
-                                    className="h-4 w-4 rounded-full object-cover"
-                                    alt={item.name}
-                                />
-                                {item.name}
-                                {errorInTab && (
-                                    <span className="relative ml-1 flex h-2 w-2">
-                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600 border border-white" />
-                                    </span>
-                                )}
-                            </button>
-                        );
-                    })}
+                            return (
+                                <button
+                                    key={item.code}
+                                    type="button"
+                                    onClick={() => setCurrentTab(item.code)}
+                                    className={`flex items-center gap-2 rounded-md border-2 px-4 py-3 text-[12px] font-black uppercase transition-all ${active
+                                        ? 'bg-indigo-900 text-white shadow-lg border-indigo-900 scale-105'
+                                        : errorInTab
+                                            ? 'border-red-300 bg-red-50 text-red-600 shadow-sm'
+                                            : 'border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    <img
+                                        src={`/${props.languageConfigPath.path}/${item.photo}`}
+                                        className="h-4 w-4 rounded-full object-cover"
+                                        alt={item.name}
+                                    />
+                                    {item.name}
+                                    {errorInTab && (
+                                        <span className="relative ml-1 flex h-2 w-2">
+                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600 border border-white" />
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div className="flex flex-col items-end gap-2">
+                        <button
+                            type="button"
+                            onClick={handleAiTranslate}
+                            disabled={aiTranslating || langList.length < 2}
+                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiTranslating || langList.length < 2
+                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                }`}
+                        >
+                            <Sparkles size={14} />
+                            {aiTranslating
+                                ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
+                                : (trans('hancms.catalog.product.ai.translate_button') || 'AI dịch tự động')}
+                        </button>
+                        {aiTranslateError && (
+                            <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                {aiTranslateError}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="border-t border-slate-200 pt-6">

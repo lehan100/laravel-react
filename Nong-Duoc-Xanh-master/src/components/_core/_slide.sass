@@ -1,0 +1,142 @@
+.wrap-button-slide
+	display: flex
+	align-items: center
+	justify-content: center
+	@apply gap-5 xl:gap-0
+	&.half-static
+		.btn-prev,.btn-next
+			@apply absolute top-1/2 -translate-y-1/2
+		.btn-prev
+			@apply left-0 right-auto -translate-x-[40%]
+		.btn-next
+			@apply right-0 left-auto translate-x-[40%]
+	&.in-static
+		.btn-prev,.btn-next
+			@apply absolute top-1/2 -translate-y-1/2
+		.btn-prev
+			@apply left-0 ml-5 lg:ml-10 right-auto #{!important}
+		.btn-next
+			@apply right-0 mr-5 lg:mr-10 left-auto #{!important}
+	&.drop
+		@media (max-width: 1199.98px)
+			@apply flex-center gap-3 mt-base #{!important}
+			.btn
+				@apply static translate-y-0 #{!important}
+	&.arrow-vertical
+		@apply static
+		.button-prev,.button-next
+			@apply left-1/2 -translate-x-1/2
+			@apply translate-y-0  w-full
+			@apply absolute mt-0 ml-0
+			&::after
+				@apply bg-none text-black md:rem:text-[32px] text-2xl
+				@apply font-awesome font-light rem:h-[24px]
+				@apply flex items-center justify-center
+		.button-prev
+			@apply top-0
+			&::after
+				content: '\f077'
+		.button-next
+			top: unset
+			@apply bottom-0 
+			&::after
+				content: '\f078'
+	&.none-static
+		.btn-prev,.btn-next
+			position: absolute !important
+			top: 50%
+			transform: translateY(-50%)
+			@media (max-width: 1199.98px)
+				margin: 0 !important
+		.btn-prev
+			@media (max-width: 1023.98px)
+				right: 94%
+			@media (max-width: 575.98px)
+				right: auto
+				left: 10px
+		.btn-next
+			@media (max-width: 1023.98px)
+				left: 94%
+			@media (max-width: 575.98px)
+				left: auto
+				right: 10px
+	.btn-prev,.btn-next
+		z-index: 9
+		position: static
+		cursor: pointer
+		position: absolute !important
+		top: 50%
+		transform: translateY(-50%)
+		&.swiper-button-lock
+			@apply hidden
+	.btn-prev
+		@apply left-0 ml-5 lg:ml-[-4.5rem] right-auto #{!important}	
+	.btn-next
+		@apply right-0 mr-5 lg:mr-[-4.5rem] left-auto #{!important}
+	
+.swiper-column-auto
+	--mr: 15px
+	--spv: 1
+	@screen xl
+		--mr: calc(40/1920*100rem)
+	&[data-time='0']
+		.swiper-wrapper
+			transition-timing-function: linear
+	.swiper-slide.swiper-slide
+		@apply overflow-visible
+	.swiper-slide
+		width: calc(calc(100% - calc(var(--mr) * calc(var(--spv) - 1)))/var(--spv))
+		@apply h-auto
+		&:not(:last-child)
+			margin-right: var(--mr)
+	&.auto-2-column
+		.swiper-slide
+			@screen md
+				--spv: 2
+	&.auto-3-column
+		.swiper-slide
+			--spv: 1.2
+			@screen md
+				--spv: 2
+			@screen lg
+				--spv: 3
+		&.show-half-mobile
+			@media (max-width: 767.98px)
+				.swiper-slide
+					width: 80%
+	&.auto-4-column
+		.swiper-slide
+			--spv: 1.5
+			@screen sm
+				--spv: 2.5
+			@screen lg
+				--spv: 3.5
+			@screen xl
+				--spv: 4
+	&.auto-5-column
+		.swiper-slide
+			@screen sm
+				--spv: 2
+			@screen md
+				--spv: 3
+			@screen lg
+				--spv: 4
+			@screen xl
+				--spv: 5
+	&.show-half-mobile
+		@media (max-width: 575.98px)
+			.swiper-slide
+				width: 80%
+	&.allow-touchMove
+		.swiper-slide
+			@apply cursor-grab
+.swiper-column-1,.swiper-column-2,.swiper-xl-3,.swiper-xl-4
+	.swiper-slide
+		@apply h-auto
+.swiper-center
+	.swiper-wrapper
+		@apply w-fit mx-auto
+.swiper-pagination-progressbar
+	@apply static bg-red-500 mt-5
+	.swiper-pagination-progressbar-fill
+		@apply bg-red-500

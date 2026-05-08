@@ -11,12 +11,14 @@ import CreatedButton from '@/Components/Button/CreatedButton';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import Card from '@/Components/Main/Card';
 import StatusBadge from '@/Components/Status/StatusBadge';
+import PromotionStatusBadge from '@/Components/Status/PromotionStatusBadge';
 import { formatPriceInput, getLocaleCode, getProductCurrencyFromLocale } from '../../Product/productUtils';
 
 export default function IndexPage() {
   const { trans } = useTrans();
   const { locale, items }: any = usePage().props;
   const currentLocale = getLocaleCode(locale || 'vi');
+  const uiLocale = currentLocale === 'vi' ? 'vi-VN' : currentLocale === 'ja' ? 'ja-JP' : currentLocale === 'en' ? 'en-US' : currentLocale;
   const discountCurrency = getProductCurrencyFromLocale(currentLocale);
   const { data, setData } = useForm({
     ids: '',
@@ -25,11 +27,37 @@ export default function IndexPage() {
   const rows = items?.data || [];
   const links = items?.meta?.links || [];
 
+  const formatDateTimeByLocale = (value?: string | null) => {
+    if (!value) {
+      return '---';
+    }
+
+    const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+    const date = new Date(normalized);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat(uiLocale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+
   const columns = useMemo(
     () => [
       { label: 'ID', name: 'id' },
       { label: trans('hancms.column.code'), name: 'code' },
       { label: trans('hancms.column.name'), name: 'name' },
+      {
+        label: trans('hancms.promotion.coupon.fields.ends_at'),
+        name: 'ends_at',
+        renderCell: (row: any) => formatDateTimeByLocale(row.ends_at),
+      },
       {
         label: trans('hancms.promotion.coupon.fields.discount_value'),
         name: 'discount_display',
@@ -50,6 +78,21 @@ export default function IndexPage() {
         ),
       },
       {
+        label: trans('hancms.promotion.status'),
+        name: 'promotion_status',
+        renderCell: (row: any) => (
+          <PromotionStatusBadge
+            value={row.promotion_status}
+            labels={{
+              active: trans('hancms.promotion.statuses.active'),
+              upcoming: trans('hancms.promotion.statuses.upcoming'),
+              expired: trans('hancms.promotion.statuses.expired'),
+              inactive: trans('hancms.promotion.statuses.inactive'),
+            }}
+          />
+        ),
+      },
+      {
         label: trans('hancms.column.action'),
         name: 'action',
         renderCell: (row: any) => (
@@ -62,7 +105,7 @@ export default function IndexPage() {
         ),
       },
     ],
-    [discountCurrency.code, discountCurrency.locale, trans]
+    [discountCurrency.code, discountCurrency.locale, trans, uiLocale]
   );
 
   function destroy(id: number) {

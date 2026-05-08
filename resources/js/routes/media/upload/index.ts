@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::tinymce
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:12
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:15
 * @route '/admin123/upload-tinymce'
 */
 export const tinymce = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ tinymce.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::tinymce
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:12
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:15
 * @route '/admin123/upload-tinymce'
 */
 tinymce.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ tinymce.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::tinymce
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:12
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:15
 * @route '/admin123/upload-tinymce'
 */
 tinymce.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

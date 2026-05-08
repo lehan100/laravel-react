@@ -9,16 +9,27 @@ class PromotionSaleOfferObserver
 {
     public function creating(PromotionSaleOffer $saleOffer): void
     {
-        if (!empty($saleOffer->code)) {
+        if (! empty($saleOffer->code)) {
             $saleOffer->code = mb_strtoupper(trim((string) $saleOffer->code));
         }
     }
 
     public function updating(PromotionSaleOffer $saleOffer): void
     {
-        if (!empty($saleOffer->code)) {
+        if (! empty($saleOffer->code)) {
             $saleOffer->code = mb_strtoupper(trim((string) $saleOffer->code));
         }
+    }
+
+    public function deleting(PromotionSaleOffer $saleOffer): void
+    {
+        if ($saleOffer->campaign_id === null) {
+            return;
+        }
+
+        $saleOffer->newQuery()
+            ->whereKey($saleOffer->getKey())
+            ->update(['campaign_id' => null]);
     }
 
     public function created(PromotionSaleOffer $saleOffer): void
@@ -31,4 +42,3 @@ class PromotionSaleOfferObserver
         ]);
     }
 }
-

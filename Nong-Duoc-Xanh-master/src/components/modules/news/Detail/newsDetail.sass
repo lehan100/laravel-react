@@ -1,0 +1,42 @@
+.news-detail
+	.col-left
+		@screen -md
+			@apply col-span-full
+		.share-wrapper 
+			@screen -md
+				@apply h-auto hidden
+			.share
+				a
+					i
+						@apply text-Primary-1 font-bold text-xl
+		.info
+			.line
+				@apply bg-Primary-1 h-[1px] flex-1
+		.format-content
+			p
+				@apply font-medium text-lg
+			h2
+				@apply text-2xl font-semibold mt-4 mb-2
+			@screen -md
+				@apply text-[16px]
+			table
+				@apply border-collapse table-fixed
+				tbody
+					tr
+						@apply border-Primary-1 border
+						td
+							@apply border-r border-r-Primary-1 p-2
+	.col-right
+		@screen -md
+			@apply col-span-full
+		>h2
+			font-size: calc(24 / 1920 * 100rem)
+			@apply  text-Primary-2 font-bold mb-5
+		.news-list
+			.news-wrapper
+				.img
+					@apply w-[8.25rem] 
+				.content
+					h2
+						@screen -md
+							@apply text-[15px]

@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LocationPermissionSeeder::class,
             HancmsTranslationPermissionSeeder::class,
+            PromotionCampaignPermissionSeeder::class,
             VietnameseAdministrativeUnitsSeeder::class,
             CatalogSampleSeeder::class,
         ]);

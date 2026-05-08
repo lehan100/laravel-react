@@ -12,6 +12,7 @@ import MessageError from '@/Components/Form/MessageError';
 import StatusSwitch from '@/Components/Status/StatusSwitch';
 import SingleUpload from '@/Components/ImageUpload/SingleUpload';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
+import { translate as translatePostAi } from '@/actions/App/Http/Controllers/Ai/PostAiController';
 
 interface Props {
     title: string;
@@ -59,6 +60,8 @@ const PostFormView = ({
     const [aiSuggestionError, setAiSuggestionError] = useState('');
     const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
+    const [aiTranslating, setAiTranslating] = useState(false);
+    const [aiTranslateError, setAiTranslateError] = useState('');
 
     const imagePath = props.config_path?.path || 'media/photo';
     const languageImagePath = props.languageConfigPath?.path || 'media/photo';
@@ -236,6 +239,94 @@ const PostFormView = ({
         }
     };
 
+    const applyAiTranslations = (translations: Record<string, any>) => {
+        setData((prev: any) => {
+            const nextTranslations = { ...(prev.translations || {}) };
+
+            Object.entries(translations).forEach(([locale, fields]) => {
+                const currentData = nextTranslations[locale] || {};
+                const translatedFields = fields as Record<string, any>;
+                const translatedName = String(translatedFields.name || '').trim();
+                const nextLocaleData = { ...currentData };
+
+                ['name', 'description', 'content', 'seo_title', 'seo_keyword', 'seo_description'].forEach((field) => {
+                    const value = String(translatedFields[field] || '').trim();
+
+                    if (value !== '') {
+                        nextLocaleData[field] = value;
+                    }
+                });
+
+                if (translatedName !== '') {
+                    nextLocaleData.slug = createSlug(translatedName);
+                }
+
+                nextTranslations[locale] = nextLocaleData;
+            });
+
+            return {
+                ...prev,
+                translations: nextTranslations,
+            };
+        });
+    };
+
+    const handleAiTranslate = async () => {
+        const sourceTranslation = data.translations?.[currentLocale] || {};
+        const targetLocales = langList
+            .map((item: any) => item.code)
+            .filter((code: string) => code !== currentLocale);
+
+        setAiTranslateError('');
+
+        if (!targetLocales.length) {
+            setAiTranslateError(trans('hancms.catalog.post.ai.no_target_languages') || 'No target languages available.');
+            return;
+        }
+
+        const hasSourceContent = ['name', 'description', 'content', 'seo_title', 'seo_keyword', 'seo_description']
+            .some((field) => String(sourceTranslation?.[field] || '').trim() !== '');
+
+        if (!hasSourceContent) {
+            setAiTranslateError(trans('hancms.catalog.post.ai.missing_input') || 'Please enter content in the current language first.');
+            return;
+        }
+
+        setAiTranslating(true);
+
+        try {
+            const response = await axios.request({
+                ...translatePostAi(),
+                data: {
+                    source_locale: currentLocale,
+                    target_locales: targetLocales,
+                    name: sourceTranslation.name || '',
+                    description: sourceTranslation.description || '',
+                    content: sourceTranslation.content || '',
+                    seo_title: sourceTranslation.seo_title || '',
+                    seo_keyword: sourceTranslation.seo_keyword || '',
+                    seo_description: sourceTranslation.seo_description || '',
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+
+            if (!Object.keys(translations).length) {
+                setAiTranslateError(trans('hancms.catalog.post.ai.empty_response') || 'AI did not return translations.');
+                return;
+            }
+
+            applyAiTranslations(translations);
+        } catch (error: any) {
+            const message = error?.response?.data?.message
+                || trans('hancms.catalog.post.ai.failed')
+                || 'Cannot translate right now.';
+            setAiTranslateError(message);
+        } finally {
+            setAiTranslating(false);
+        }
+    };
+
     const inputClass = (fieldName: string) => `
         w-full rounded-2xl border bg-white px-4 py-3 text-sm outline-none transition-all focus:ring-4
         ${(errors?.[fieldName])
@@ -332,38 +423,60 @@ const PostFormView = ({
 
         return (
             <div className="space-y-6">
-                <div className="flex flex-wrap gap-3 overflow-x-auto border-b border-slate-200 pb-6">
-                    {langList.map((item: any) => {
-                        const active = currentLocale === item.code;
-                        const errorInTab = Object.keys(errors || {}).some((key) => key.startsWith(`translations.${item.code}.`));
+                <div className="border-b border-slate-200 pb-6">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-wrap gap-3">
+                            {langList.map((item: any) => {
+                                const active = currentLocale === item.code;
+                                const errorInTab = Object.keys(errors || {}).some((key) => key.startsWith(`translations.${item.code}.`));
 
-                        return (
+                                return (
+                                    <button
+                                        key={item.code}
+                                        type="button"
+                                        onClick={() => setCurrentLocale(item.code)}
+                                        className={`flex items-center gap-2 rounded-md border-2 px-4 py-3 text-[12px] font-black uppercase transition-all ${active
+                                            ? 'bg-indigo-900 text-white shadow-lg border-indigo-900 scale-105'
+                                            : errorInTab
+                                                ? 'border-red-300 bg-red-50 text-red-600 shadow-sm'
+                                                : 'border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        <img
+                                            src={`/${languageImagePath}/${item.photo}`}
+                                            className="h-4 w-4 rounded-full object-cover"
+                                            alt={item.name}
+                                        />
+                                        {item.name}
+                                        {errorInTab && (
+                                            <span className="relative ml-1 flex h-2 w-2">
+                                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                                                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600 border border-white" />
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
                             <button
-                                key={item.code}
                                 type="button"
-                                onClick={() => setCurrentLocale(item.code)}
-                                className={`flex items-center gap-2 rounded-md border-2 px-4 py-3 text-[12px] font-black uppercase transition-all ${active
-                                    ? 'bg-indigo-900 text-white shadow-lg border-indigo-900 scale-105'
-                                    : errorInTab
-                                        ? 'border-red-300 bg-red-50 text-red-600 shadow-sm'
-                                        : 'border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                    }`}
+                                onClick={handleAiTranslate}
+                                disabled={aiTranslating || langList.length < 2}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-[12px] font-black uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                <img
-                                    src={`/${languageImagePath}/${item.photo}`}
-                                    className="h-4 w-4 rounded-full object-cover"
-                                    alt={item.name}
-                                />
-                                {item.name}
-                                {errorInTab && (
-                                    <span className="relative ml-1 flex h-2 w-2">
-                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600 border border-white" />
-                                    </span>
-                                )}
+                                <Sparkles size={14} />
+                                {aiTranslating
+                                    ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
+                                    : (trans('hancms.catalog.post.ai.translate_button') || 'AI dịch tự động')}
                             </button>
-                        );
-                    })}
+                            {aiTranslateError && (
+                                <div className="max-w-[20rem] text-right text-xs font-semibold text-rose-600">
+                                    {aiTranslateError}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid gap-6">
@@ -407,7 +520,7 @@ const PostFormView = ({
                     </InputGroup>
 
                     <InputGroup label={trans('hancms.column.content')}>
-                        <div className="mb-2 flex flex-wrap items-center justify-end gap-2">
+                        <div className="mb-2 flex flex-col items-end gap-2">
                             <button
                                 type="button"
                                 onClick={() => handleAiSuggestContent(locale)}
@@ -419,8 +532,12 @@ const PostFormView = ({
                                     ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
                                     : (trans('hancms.catalog.post.ai.suggest_content') || 'AI suggest content')}
                             </button>
+                            {aiSuggestionError && (
+                                <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                    {aiSuggestionError}
+                                </div>
+                            )}
                         </div>
-                        {aiSuggestionError && <div className="mb-2 text-xs text-rose-600">{aiSuggestionError}</div>}
                         <Editor
                             tinymceScriptSrc="/js/tinymce/tinymce.min.js"
                             licenseKey="gpl"
@@ -451,23 +568,29 @@ const PostFormView = ({
                     </InputGroup>
 
                     <div className="bg-gray-100 p-5 rounded-xl border border-gray-200 space-y-6">
-                        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+                        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
                             <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase">
                                 <Search size={16} /> {trans('hancms.seo.name') || 'Search Engine Optimization'}
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => handleAiSuggestSeo(locale)}
-                                disabled={aiSeoSuggestingLocale === locale}
-                                className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                                <Sparkles size={14} />
-                                {aiSeoSuggestingLocale === locale
-                                    ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
-                                    : (trans('hancms.catalog.post.ai.suggest_seo') || 'AI suggest SEO')}
-                            </button>
+                            <div className="flex flex-col items-end gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => handleAiSuggestSeo(locale)}
+                                    disabled={aiSeoSuggestingLocale === locale}
+                                    className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    <Sparkles size={14} />
+                                    {aiSeoSuggestingLocale === locale
+                                        ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
+                                        : (trans('hancms.catalog.post.ai.suggest_seo') || 'AI suggest SEO')}
+                                </button>
+                                {aiSeoSuggestionError && (
+                                    <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                        {aiSeoSuggestionError}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        {aiSeoSuggestionError && <div className="text-xs text-rose-600">{aiSeoSuggestionError}</div>}
                         <InputGroup label={trans('hancms.seo.field.title')}>
                             <input
                                 type="text"
@@ -554,7 +677,7 @@ const PostFormView = ({
             <form id="post-form" onSubmit={onSubmit} noValidate className="text-sm">
                 <Card title={trans('hancms.catalog.post.name')}>
                     <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
-                        <div className="flex flex-wrap gap-3 overflow-x-auto pb-1">
+                        <div className="flex flex-wrap items-start gap-3 pb-1">
                             {['general', 'content'].map((id) => {
                                 const active = activeTab === id;
                                 const errorInTab = hasTabError(id);

@@ -1,0 +1,32 @@
+.home-3
+	.deal-hot
+		.btn-more
+			.icon
+				@apply hidden
+			@screen -xl
+				@apply hidden
+	.box
+		.heading
+			@screen -md
+				@apply flex-col gap-2 items-start
+		.left
+			h2
+				@screen -md
+					@apply text-[17px]
+		.right
+			@apply flex items-center gap-5
+			@screen -md
+				@apply gap-2
+			.label
+				@apply text-xl text-Neutral-White font-bold
+				@screen -md
+					@apply text-sm
+			.countdown
+				@apply flex items-center gap-2
+				@screen -md
+					@apply gap-1
+				span
+					@apply sq-10 inline-flex items-center justify-center rounded-lg bg-Neutral-White
+					@apply text-Primary-7 font-bold text-base
+					@screen -md
+						@apply sq-8 text-sm

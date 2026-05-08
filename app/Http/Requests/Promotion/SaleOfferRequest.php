@@ -58,6 +58,7 @@ class SaleOfferRequest extends FormRequest
             'max_discount_amount' => ['nullable', 'numeric', 'min:0'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'campaign_id' => ['nullable', 'integer', 'exists:promotion_campaigns,id'],
             'priority' => ['nullable', 'integer', 'min:0'],
             'product_ids' => ['nullable', 'array'],
             'product_ids.*' => ['integer', 'exists:products,id'],
@@ -89,6 +90,7 @@ class SaleOfferRequest extends FormRequest
 
         if ($decimalIndex === -1) {
             $numeric = preg_replace('/[^\d-]/u', '', $cleaned);
+
             return $numeric === null || $numeric === '' ? null : (float) $numeric;
         }
 

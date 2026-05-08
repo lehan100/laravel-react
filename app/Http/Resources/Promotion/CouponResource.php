@@ -2,10 +2,13 @@
 
 namespace App\Http\Resources\Promotion;
 
+use App\Http\Resources\Concerns\ResolvesPromotionStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CouponResource extends JsonResource
 {
+    use ResolvesPromotionStatus;
+
     public function toArray($request): array
     {
         return [
@@ -24,11 +27,13 @@ class CouponResource extends JsonResource
             'used_count' => $this->used_count,
             'starts_at' => optional($this->starts_at)->format('Y-m-d\\TH:i'),
             'ends_at' => optional($this->ends_at)->format('Y-m-d\\TH:i'),
+            'campaign_id' => $this->campaign_id,
             'is_active' => (bool) $this->is_active,
+            'promotion_status' => $this->resolvePromotionStatus((bool) $this->is_active, $this->starts_at, $this->ends_at),
             'is_public' => (bool) $this->is_public,
             'stackable' => (bool) $this->stackable,
-            'category_ids' => $this->whenLoaded('categories', fn() => $this->categories->pluck('id')->values(), []),
-            'product_ids' => $this->whenLoaded('products', fn() => $this->products->pluck('id')->values(), []),
+            'category_ids' => $this->whenLoaded('categories', fn () => $this->categories->pluck('id')->values(), []),
+            'product_ids' => $this->whenLoaded('products', fn () => $this->products->pluck('id')->values(), []),
             'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
         ];
     }

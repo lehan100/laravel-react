@@ -1,0 +1,89 @@
+.header-hambuger
+	@apply flex flex-col gap-2 ml-5 cursor-pointer z-10 relative xl:hidden
+	@apply mr-[8px]
+	.icon
+		@apply text-2xl text-Neutral-White
+	#pulseMe
+		transform-origin: center center
+		@apply pointer-events-none
+		@apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[38px] h-[38px] absolute
+		@apply bg-red-600 -z-1
+		.bar
+			box-shadow: 0 0 0 #ffffff,0 0 1px #ffffff,0 0 1px #ffffff,0 0 4px #ffffff
+			@apply absolute bg-white
+			&.left
+				animation: leftBar 2s linear infinite
+				@apply w-[1px]
+			&.top
+				animation: topBar 2s linear infinite
+				@apply h-[1px] w-0
+			&.right
+				animation: rightBar 2s linear infinite
+				@apply w-[1px]
+			&.bottom
+				animation: bottomBar 2s linear infinite
+				@apply h-[1px]
+body.isOpenMenu
+	header
+		.header-hambuger
+			span
+				&:nth-child(1)
+					rotate: 45deg
+					translate: rr(4px) rr(3px)
+				&:nth-child(2)
+					@apply opacity-0
+				&:nth-child(3)
+					rotate: -45deg
+					translate: rr(4px) rr(-1px)
+@keyframes leftBar
+	0%
+		height: 0
+		left: 0
+		top: 100%
+	20%
+		height: 100%
+		left: 0
+		top: 0
+	40%
+		height: 0
+		left: 0
+		top: 0
+@keyframes topBar
+	0%, 20%
+		left: 0
+		top: 0
+		width: 0
+	40%
+		left: 0
+		top: 0
+		width: 100%
+	60%
+		left: calc(100% - 1px)
+		top: 0
+		width: 0
+@keyframes rightBar
+	0%, 40%
+		height: 0
+		left: calc(100% - 1px)
+		top: 0
+	60%
+		height: 100%
+		left: calc(100% - 1px)
+		top: 0
+	80%
+		height: 0
+		left: calc(100% - 1px)
+		top: 100%
+@keyframes bottomBar
+	0%, 60%
+		left: 100%
+		top: 100%
+		width: 0
+	80%
+		left: 0
+		top: 100%
+		width: 100%
+	100%
+		left: 0
+		top: 100%
+		width: 0

@@ -1,0 +1,132 @@
+.product
+	// .filter-product-mobile 
+	// 	@screen -xl
+	// 		@apply hidden
+	.heading-wrapper
+		@screen -xl
+			@apply mb-4
+	.heading-right
+		.filter
+			@screen -xl
+				@apply hidden
+			.icon
+				span
+					@apply whitespace-nowrap font-semibold text-xl
+				i
+					@apply text-xl font-bold
+		.select-view
+			@apply flex items-center gap-3 relative  rem:w-[163px]
+			.select-view-item 
+				@apply w-full
+			label
+				@apply text-xl font-normal  flex-shrink-0
+				@media (max-width: 767.98px)
+					@apply w-[80px]
+			select
+				appearance: none
+				-webkit-appearance: none
+				-moz-appearance: none
+				@apply border border-Neutral-100  rounded-xl px-5 cursor-pointer w-full relative bg-transparent rem:h-[44px] rem:max-w-[163px]
+			.select-view-item 
+				@apply w-full
+	.wrapper-main
+		.col-left
+			@apply pt-3 border-t border-t-Neutral-100
+			.product-category-title
+				@apply mb-3
+			ul.product-category-list
+				@apply flex flex-col gap-3 pb-3 border-b border-b-Neutral-100 mb-3
+				li
+					&:hover
+						a
+							@apply text-Primary-1
+					&.active
+						a
+							@apply text-Primary-1
+					a
+						font-size: calc(16 / 1920 * 100rem)
+			.btn-close-filter-product-mobile
+				@apply hidden
+			.product-category
+				@apply border-b border-b-Neutral-100 pb-3 mb-3 
+			.product-category-heading 
+				@apply mb-3
+				&.no-mb
+					@apply mb-0
+				.icon
+					i
+						@apply text-xl
+			.product-main				
+				.facetwp-facet
+					@apply flex flex-col gap-3
+					.facetwp-checkbox						
+						background-image: none
+						@apply flex font-normal 
+						@apply cursor-pointer transition-all mb-0 w-full pl-0
+						.facetwp-display-value
+							font-size: calc(16 / 1920 * 100rem)
+							@apply rem:mx-[10px]
+							@screen -md
+								@apply text-[15px]
+						.facetwp-counter
+							font-size: calc(16 / 1920 * 100rem)
+							@screen -md
+								@apply text-[15px]
+						&:hover
+							@apply text-Primary-1
+							&::before
+								@apply text-Primary-1
+						&.checked
+							@apply text-Primary-1
+							&::before
+								content: '\f14a'
+								@apply text-Primary-1 font-black
+						&::before
+							content: '\f0c8'
+							@apply font-awesome text-Neutral-300 font-light transition-all		
+		.col-right
+			.product-lists
+				@screen -md
+					@apply grid-cols-2 gap-[8px]
+				.product-item
+					.image
+						.button-add-cart
+							@apply hidden
+					.content
+						.button-add-cart
+							@apply mt-auto
+							
+						.added_to_cart
+							@apply hidden
+						.btn-add-cart
+							&.loading
+								.icon
+									@apply animate-spin
+									i
+										&::before
+											content: "\f3f4"
+
+@media (max-width: 1023.98px)
+	.product
+		.wrapper-main
+			@apply gap-[8px]
+			.col-right
+				@apply w-full
+			.col-left
+				max-width: 375px
+				transition-duration: .5s
+				transition-property: transform
+				transition-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1)
+				height: calc(100dvh - var(--header-height))
+				transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)
+				@apply overflow-y-auto p-[20px] flex flex-col gap-[20px] w-full fixed top-[var(--header-height)] left-0 z-[150] bg-Neutral-White pointer-events-none -translate-x-full
+				&.active
+					@apply pointer-events-auto translate-x-0
+				.btn-close-filter-product-mobile
+					@apply w-[25px] h-[25px] flex-shrink-0 inline-flex items-center justify-center bg-Primary-1 text-white  ml-auto rounded-1
+			.filter-product-mobile 
+				@apply top-0 static
+
+@media (max-width: 767.98px)
+	.heading-wrapper
+		@apply flex-col items-start gap-3 mb-6

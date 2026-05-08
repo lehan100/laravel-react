@@ -1,0 +1,77 @@
+section.home-7(class="section-40 bg-Secondary-Light-Grey")
+	.container 
+		.wrapper(class="flex rem:gap-[18px]")
+			.col-left(class="rem:max-w-[1022px] w-full" data-toggle="tabslet")
+				+HeadingGlobal()
+				.heading-wrapper(class="flex items-center justify-between rem:mb-[26px]")
+					.wrap
+						ul.tabslet-tab(class="")
+							li.active
+								a(href="#tab1") Nổi bật
+							li
+								a(href="#tab2") Phân NPK
+							li
+								a(href="#tab3") Phân hòa tan
+							li
+								a(href="#tab4") Phân hữu cơ
+					.btn-view-more 	
+						a(href="" class='btn-primary btn view-more')
+							span Khám phá thêm
+							.icon 
+								<i class="fa-regular fa-arrow-right"></i>
+				.tabslet-content.active#tab1
+					.home-7-list(class="grid grid-cols-12 rem:gap-[18px]")
+						.col-left(class="col-span-7 pr-7")
+							.item(class="group")
+								.img 
+									a(href="#" class="img-ratio ratio:pt-[293_560] zoom-img-1 rounded-t-5") 
+										+PugImg()
+								.content(class="p-5 bg-Neutral-White rounded-b-5")
+									h2(class="text-xl font-bold group-hover:text-Primary-1") 
+										a(href="#") Hướng dẫn sử dụng thuốc bảo vệ thực vật an toàn và hiệu quả
+									.desc(class="text-Neutral-600 font-normal my-2")
+										p Nấm đối kháng là chủng nấm vi sinh tiêu diệt, ngăn chặn sự phát triển các loại nấm gây bệnh, không cho xâm nhập vào vùng rễ, thân, và lá sầu riêng khu vực Đồng Nai và 
+									.date(class="flex items-center gap-2")
+										date(class="text-neutral-500 text-sm") 03.06.2024
+										.category(class="text-Primary-1 font-medium") Kỹ thuật cây trồng
+									.bottom(class="flex items-center justify-between text-Neutral-600 mt-3")
+										.view(class="flex items-center gap-2")
+											.icon 
+												<i class="fa-regular fa-eye"></i>
+											span 15.000
+										.author(class="flex items-center gap-2") 
+											.label Tác giả:
+											.name Ks. Minh Trí
+						.col-right(class="col-span-5 rounded-5 bg-Neutral-White p-5")
+							.news-list(class="flex flex-col gap-3")
+								-for(var i = 0; i < 5; i++) 
+									.news-wrapper(class="flex items-center gap-3")
+										.img(class="rem:w-[120px]")
+											a(href="#" class="img-ratio ratio:pt-[80_120] zoom-img-1 rounded-xl") 
+												+PugImg()
+										.content(class="flex-1")
+											h2(class="rem:text-[16px] font-normal line-clamp-2 mb-1")
+												a(href="#") Hướng dẫn sử dụng thuốc bảo vệ thực vật an toàn và...
+											.date(class="flex items-center gap-2")
+												date(class="text-neutral-500 text-sm") 03.06.2024
+												.category(class="text-Primary-1 font-medium text-sm") Kỹ thuật cây trồng
+				.tabslet-content.active#tab2
+					p 22
+			.col-right(class="flex-1")
+				.heading(class="flex items-center gap-6")
+					.icon(class="rem:w-[50px]") 
+						a(href="#" class="img-ratio") 
+							img(src="./img/4.svg", alt="")
+					h2(class="title-40") Tin tức - Sự kiện
+				.box-list(class="bg-Neutral-White rounded-5 p-8 ")
+					.wrapper(class="flex flex-col gap-3")
+						-for(var i = 0; i < 5; i++) 
+							.news-item 
+								h2(class="text-lg font-normal mb-1")
+									a(href="#") Hướng dẫn sử dụng thuốc bảo vệ thực vật an toàn và hiệu quả
+								.date(class="text-sm font-normal text-neutral-500") 03.06.2024
+					.btn-view-more(class="flex rem:mt-[33px]")
+						a(href="" class='btn-primary btn view-more')
+							span Khám phá thêm
+							.icon 
+								<i class="fa-regular fa-arrow-right"></i>

@@ -6,6 +6,8 @@ use App\Repositories\EloquentRepositoryInterface;
 
 interface FieldGroupRepositoryInterface extends EloquentRepositoryInterface
 {
+    public function isInUse(int $id): bool;
+
     /**
      * @return array<string, mixed>
      */

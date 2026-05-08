@@ -2,17 +2,20 @@
 
 namespace App\Http\Resources\Promotion;
 
+use App\Http\Resources\Concerns\ResolvesPromotionStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BuyToGiftResource extends JsonResource
 {
+    use ResolvesPromotionStatus;
+
     public function toArray($request): array
     {
         $rule = null;
         $rules = collect();
         if ($this->relationLoaded('rules') && $this->rules->isNotEmpty()) {
             $rules = $this->rules
-                ->sortBy(fn($item) => sprintf('%010d-%010d', (int) ($item->priority ?? 100), (int) $item->id))
+                ->sortBy(fn ($item) => sprintf('%010d-%010d', (int) ($item->priority ?? 100), (int) $item->id))
                 ->values();
             $rule = $rules->first();
         }
@@ -35,6 +38,7 @@ class BuyToGiftResource extends JsonResource
             'code' => $this->code,
             'name' => $this->name,
             'description' => $this->description,
+            'campaign_id' => $this->campaign_id,
             'condition_type' => $rule?->condition_type ?? 'order_amount',
             'min_order_amount' => $rule?->min_order_amount !== null ? (float) $rule->min_order_amount : null,
             'max_sets_per_order' => $rule?->max_sets_per_order !== null ? (int) $rule->max_sets_per_order : null,
@@ -42,6 +46,7 @@ class BuyToGiftResource extends JsonResource
             'ends_at' => optional($this->ends_at)->format('Y-m-d\\TH:i'),
             'priority' => (int) ($this->priority ?? 100),
             'is_active' => (bool) $this->is_active,
+            'promotion_status' => $this->resolvePromotionStatus((bool) $this->is_active, $this->starts_at, $this->ends_at),
             'stackable' => (bool) $this->stackable,
             'buy_product_ids' => $buyProducts->pluck('id')->values(),
             'gift_product_ids' => $giftProducts->pluck('id')->values(),

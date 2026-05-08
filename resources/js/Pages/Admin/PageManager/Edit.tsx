@@ -6,6 +6,19 @@ import { update } from '@/actions/App/Http/Controllers/Admin/PageManager/PageCon
 import { index } from '@/routes/pages';
 import PageValueFormView from './Components/PageValueFormView';
 
+function createSlug(value: string): string {
+    return value
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[đĐ]/g, 'd')
+        .replace(/[^\p{L}\p{N}\s-]/gu, '')
+        .replace(/(\s+)/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
+
 type PageManagerProps = {
     page: {
         id: number;
@@ -46,9 +59,10 @@ export default function Edit() {
         field_group_id: props.page?.field_group_id || props.fieldGroup?.id || '',
         translations: (props.languages || []).reduce((carry: Record<string, { title: string; slug: string }>, language: any) => {
             const translation = props.pageTranslations?.[language.code] || {};
+            const title = translation.title || '';
             carry[language.code] = {
-                title: translation.title || '',
-                slug: translation.slug || '',
+                title,
+                slug: createSlug(translation.slug || title),
             };
             return carry;
         }, {}),

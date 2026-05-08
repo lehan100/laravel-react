@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin\Settings;
 
 use App\Http\Controllers\MainController;
+use App\Services\Settings\EnvironmentSettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Redirect;
@@ -27,11 +29,13 @@ class LayoutController extends MainController
         Inertia::share(['config_path' => $configPath]);
     }
 
-    public function index()
+    public function index(EnvironmentSettingsService $environmentSettingsService)
     {
         //
         $sharedLangs = Inertia::getShared('langs');
         $languages = is_callable($sharedLangs) ? $sharedLangs() : $sharedLangs;
+        $pages = [];
+
         foreach ($languages as $lang) {
             $pages[$lang['code']] = is_array(Lang::get('page', [], $lang['code']))
                 ? Lang::get('page', [], $lang['code'])
@@ -42,15 +46,20 @@ class LayoutController extends MainController
             'layout_items_home' => config('hancms.layout.items.home'),
             'layout_items_general' => config('hancms.layout.items.general'),
             'pages' => $pages,
+            'ai_settings' => $environmentSettingsService->currentAiSettings(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, EnvironmentSettingsService $environmentSettingsService)
     {
         //
         try {
-            // code...
-            $pages = $request->pages;
+            $validated = $request->validate([
+                'pages' => ['required', 'array'],
+                'ai_settings' => ['sometimes', 'array'],
+            ]);
+
+            $pages = $validated['pages'];
             foreach ($pages as $lang => $content) {
                 $dir = lang_path($lang);
                 $filePath = "$dir/page.php";
@@ -70,10 +79,15 @@ class LayoutController extends MainController
                 }
             }
 
-            return Redirect::back()->with('success', __('hancms.message.success.edit', ['name' => __('hancms.layout.name')]));
+            if (! empty($validated['ai_settings'] ?? [])) {
+                $environmentSettingsService->updateValues($validated['ai_settings']);
+                Artisan::call('config:clear');
+            }
+
+            return Redirect::back()->with('success', __('hancms.message.success.edit', ['name' => __('hancms.settings.layout.name')]));
         } catch (\Throwable $th) {
             // throw $th;
-            return Redirect::to(route('layout'))->with('error', __('hancms.message.error.edit', ['name' => __('hancms.layout.name')]));
+            return Redirect::to(route('layout.index'))->with('error', __('hancms.message.error.edit', ['name' => __('hancms.settings.layout.name')]));
         }
     }
 

@@ -1,0 +1,86 @@
+.deal-1
+	.btn-more
+		a
+			@apply flex items-center gap-3
+body.home
+	.deal-hot
+		.container
+			>.heading
+				@apply hidden
+.deal-hot
+	.container
+		@screen -md
+			@apply px-[6px]
+	.swiper
+		@apply p-2 mt-5
+		@screen -md
+			@apply mt-0 p-0
+		.swiper-slide
+			@apply flex flex-col h-auto
+	.wrapper
+		.product-item-sale
+			.content
+				.info
+					@apply mb-3
+	.btn-more
+		@screen -xl
+			@apply hidden
+		button
+			@apply flex items-center gap-2 px-5
+.deal-upcoming
+	.swiper
+		@apply p-2
+	.wrapper
+		.product-item-sale
+			.content
+				@apply bg-white
+				.info
+					@apply mb-3
+	.btn-more
+		@screen -xl
+			@apply hidden
+.deal-completed
+	.swiper
+		@apply p-1
+	.btn-more
+		@screen -xl
+			@apply hidden
+.form-register-product
+	@apply lg:rem:w-[920px] w-full  relative  p-12 rem:rounded-[32px]
+	.carousel__button
+		position: absolute !important
+		top: 0.5rem !important
+		right: 0.5rem !important
+		@apply w-8 h-8 z-100 cursor-pointer bg-Primary-1
+		svg
+			@apply rem:w-[16px] rem:h-[16px]
+	h3
+		@apply rem:text-[32px] text-Primary-1 text-center font-extrabold mb-8 #{!important}
+	form.wpcf7-form.submitting
+		button
+			&[type="submit"]
+				@apply pointer-events-none cursor-not-allowed
+	.wrap-form
+		.form-group
+			@apply relative cursor-pointer
+			&:focus
+				outline: none !important
+			input
+				@apply w-full px-5 text-Neutral-500*  font-normal rounded-full text-lg
+				@apply rem:h-[50px] flex items-center justify-center bg-Neutral-50
+				&:focus
+					outline: none !important
+				&::placeholder
+					@apply text-Neutral-500* font-normal
+			&.title
+				input
+					@apply bg-Neutral-200 text-lg
+					&::placeholder
+						@apply text-black font-bold
+		.form-submit
+			@apply flex items-center justify-center
+.buy-deal-going
+	.swiper
+		@apply p-1
+		.swiper-slide
+			@apply flex flex-col h-auto

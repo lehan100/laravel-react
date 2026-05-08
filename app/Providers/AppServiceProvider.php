@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Jobs\Settings\EnsureFrontendTranslationBundles;
 use App\Models\Catalog\AttributeValue;
 use App\Models\Catalog\Category;
 use App\Models\Catalog\Post;
@@ -59,6 +60,8 @@ use App\Repositories\Post\PostEloquentRepository;
 use App\Repositories\Post\PostRepositoryInterface;
 use App\Repositories\Product\ProductEloquentRepository;
 use App\Repositories\Product\ProductRepositoryInterface;
+use App\Repositories\PromotionCampaign\PromotionCampaignEloquentRepository;
+use App\Repositories\PromotionCampaign\PromotionCampaignRepositoryInterface;
 use App\Repositories\SaleOffer\SaleOfferEloquentRepository;
 use App\Repositories\SaleOffer\SaleOfferRepositoryInterface;
 use App\Repositories\ShippingMethod\ShippingMethodEloquentRepository;
@@ -67,6 +70,7 @@ use App\Repositories\User\UserEloquentRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Warehouse\WarehouseEloquentRepository;
 use App\Repositories\Warehouse\WarehouseRepositoryInterface;
+use App\Services\Settings\FrontendTranslationBundleService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -132,6 +136,10 @@ class AppServiceProvider extends ServiceProvider
             CouponEloquentRepository::class
         );
         $this->app->singleton(
+            PromotionCampaignRepositoryInterface::class,
+            PromotionCampaignEloquentRepository::class
+        );
+        $this->app->singleton(
             SaleOfferRepositoryInterface::class,
             SaleOfferEloquentRepository::class
         );
@@ -183,6 +191,7 @@ class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
         Schema::defaultStringLength(535);
         $this->bootRoute();
+        $this->ensureFrontendTranslationBundles();
         // ------
         MediaBanner::observe(MediaBannerObserver::class);
         MediaBannerTranslation::observe(ImageFileObserver::class);
@@ -217,6 +226,24 @@ class AppServiceProvider extends ServiceProvider
                     ->with('message', $message);
             });
         });
+    }
+
+    /**
+     * Dispatch a queue job to rebuild frontend translation bundles when they are missing.
+     */
+    private function ensureFrontendTranslationBundles(): void
+    {
+        if ($this->app->runningInConsole() || $this->app->runningUnitTests()) {
+            return;
+        }
+
+        $service = $this->app->make(FrontendTranslationBundleService::class);
+
+        if ($service->missingGeneratedBundles() === []) {
+            return;
+        }
+
+        EnsureFrontendTranslationBundles::dispatchAfterResponse();
     }
 
     public function bootRoute(): void

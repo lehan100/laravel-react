@@ -108,7 +108,13 @@ class CategoryController extends MainController
     public function edit(Category $category): Response
     {
         //
-        $category->load(['products:id', 'posts.translations', 'page.translations'])->loadCount(['products', 'posts']);
+        $category->load([
+            'translations',
+            'slugs',
+            'products:id',
+            'posts.translations',
+            'page.translations',
+        ])->loadCount(['products', 'posts']);
         $itemsCategoryActive = $this->mainModel->lists(null, [
             'task' => 'admin-list-items-active',
         ]);

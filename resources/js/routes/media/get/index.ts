@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::images
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 export const images = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ images.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::images
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 images.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ images.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::images
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 images.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ images.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::images
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 images.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

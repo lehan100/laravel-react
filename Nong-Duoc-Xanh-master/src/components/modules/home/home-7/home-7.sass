@@ -1,0 +1,120 @@
+.home-7
+	.col-left
+		.home-7-list
+			.col-left
+				@apply flex 
+				.item
+					.content
+						.date, .bottom
+							@apply flex items-center gap-3
+							date, .view
+								font-size: calc(14 / 1920 * 100rem)
+								@apply pr-3 border-r border-r-[#D9D9D9]
+								@screen -md
+									@apply text-[15px]
+							.author
+								font-size: calc(14 / 1920 * 100rem)
+								@screen -md
+									@apply text-[15px]
+		.news-list
+			.col-left
+				.item
+					.content
+						.bottom
+							@apply gap-3
+							date, .view
+								@apply pr-3 border-r border-r-[#D9D9D9]
+		.item
+			@apply flex flex-col flex-1
+			.content
+				@apply flex-1
+		.wrap
+			@apply w-full
+		ul.tabslet-tab
+			@apply overflow-x-auto
+			&::-webkit-scrollbar
+				@apply w-[calc(3/1920*100rem)] rem:h-[3px]
+			&::-webkit-scrollbar-track
+				background-color: rgba(#e5e5e5,.5 )
+			&::-webkit-scrollbar-thumb
+				@apply bg-Primary-1
+		.heading
+			@apply mb-5
+		.btn-view-more
+			a
+				@apply flex items-center gap-1
+				@screen -md
+					@apply p-0
+				span
+					@apply text-Primary-1 transition-all ease-in-out
+				.icon
+					i
+						@apply text-Primary-1
+				&:hover
+					@apply bg-transparent
+					span
+						@apply text-[#009116]
+					.icon
+						i
+							@apply text-[#009116]
+	.col-right
+		.news-wrapper
+			@apply pb-3 border-b border-b-[#D9D9D9] last:border-none
+			&:hover
+				.content
+					h2
+						@apply text-Primary-1
+		.heading
+			@apply gap-5 mb-7
+			.icon
+				@apply w-10
+		.box-list
+			a.btn-primary 
+				@apply py-0 rem:h-[26px] inline-flex
+			.news-item
+				@apply pb-3 border-b border-b-[#D9D9D9] items-start last:pb-0 last:border-none
+				h2
+					&:hover
+						@apply text-Primary-1
+					
+@screen -xl
+	.home-7
+		.col-left
+			@apply max-w-[44.229167rem]
+			.home-7-list 
+				.col-left
+					@apply col-span-full pr-0
+				.col-right
+					@apply col-span-full
+					.news-list
+						.img
+							@apply w-[12.25rem]
+						.content
+							h2
+								@apply text-[18px]
+							.date
+								date
+									@apply text-[16px]		
+@screen -lg
+	.home-7
+		.col-left
+			@apply max-w-[30.229167rem]
+			.heading-wrapper 
+				@apply flex-col gap-5
+@screen -md						
+	.home-7
+		.wrapper
+			@apply flex-col
+			.col-left
+				@apply max-w-full
+			.col-right
+				@apply col-span-full
+				.news-list
+					.content
+						h2
+							@apply text-[1.04167rem] #{!important}
+						.date
+							date
+								@apply text-[15px]	#{!important}	
+							.category
+								@apply text-[15px] #{!important}

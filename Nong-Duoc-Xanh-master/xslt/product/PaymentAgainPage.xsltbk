@@ -1,0 +1,356 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
+  <xsl:output method="html" indent="yes" />
+
+  <xsl:template match="/OrderDetail">
+    <section class="section checkout-section repay-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="order-info">
+              <div class="order-name">
+                <xsl:text>Mã đơn hàng:</xsl:text>
+                <strong>
+                  <xsl:text>#</xsl:text>
+                  <xsl:value-of select="OrderCode"/>
+                </strong>
+              </div>
+              <div class="des order-date">
+                <xsl:text>Ngày mua:</xsl:text>
+                <xsl:value-of select="OrderDate"/>
+              </div>
+              <div class="des order-name">
+                <xsl:text>Tình trạng:</xsl:text>
+                <strong>
+                  <xsl:value-of select="OrderStatus"/>
+                </strong>
+              </div>
+              <div class="des order-name">
+                <xsl:text>Tình trạng thanh toán:</xsl:text>
+                <strong>
+                  <xsl:value-of select="PaymentStatus"/>
+                </strong>
+              </div>
+              <div class="des order-name">
+                <xsl:text>Phương thức vận chuyển:</xsl:text>
+                <strong>
+                  <xsl:value-of select="ShippingMethod"/>
+                </strong>
+              </div>
+            </div>
+            <div class="order-list">
+              <div class="item">
+                <div class="order-item">
+                  <div class="row order-information-wrapper">
+                    <div class="col-12 col-md-6 mt-2 mb-2">
+                      <div class="order-information">
+                        <div class="title">Thông tin đặt mua</div>
+                        <ul>
+                          <li class="name">
+                            <strong>
+                              <xsl:value-of select="BillingFirstName"/>
+                            </strong>
+                          </li>
+                          <li>
+                            <xsl:text>Địa chỉ:</xsl:text>
+                            <xsl:value-of select="BillingAddress"/>
+                          </li>
+                          <li>
+                            <xsl:text>Email:</xsl:text>
+                            <xsl:value-of select="BillingEmail"/>
+                          </li>
+                          <li>
+                            <xsl:text>Điện thoại:</xsl:text>
+                            <xsl:value-of select="BillingPhone"/>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6 mt-2 mb-2">
+                      <div class="order-information">
+                        <div class="title">Thông tin giao hàng</div>
+                        <ul>
+                          <li class="name">
+                            <strong>
+                              <xsl:choose>
+                                <xsl:when test="ShippingFirstName != ''">
+                                  <xsl:value-of select="ShippingFirstName"></xsl:value-of>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:value-of select="BillingFirstName"></xsl:value-of>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </strong>
+                          </li>
+                          <li>
+                            Địa chỉ:
+                            <xsl:choose>
+                              <xsl:when test="ShippingAddress != ''">
+                                <xsl:value-of select="ShippingAddress"></xsl:value-of>
+                                <xsl:if test="ShippingDistrict!=''">
+                                  <xsl:text>, </xsl:text>
+                                  <xsl:value-of select="ShippingDistrict"></xsl:value-of>
+                                </xsl:if>
+                                <xsl:if test="ShippingProvince!=''">
+                                  <xsl:text>, </xsl:text>
+                                  <xsl:value-of select="ShippingProvince"></xsl:value-of>
+                                </xsl:if>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="BillingAddress"></xsl:value-of>
+                                <xsl:if test="BillingDistrict!=''">
+                                  <xsl:text>, </xsl:text>
+                                  <xsl:value-of select="BillingDistrict"></xsl:value-of>
+                                </xsl:if>
+                                <xsl:if test="BillingProvince!=''">
+                                  <xsl:text>, </xsl:text>
+                                  <xsl:value-of select="BillingProvince"></xsl:value-of>
+                                </xsl:if>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </li>
+                          <li>
+                            Email:
+                            <xsl:choose>
+                              <xsl:when test="ShippingEmail != ''">
+                                <xsl:value-of select="ShippingEmail"></xsl:value-of>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="BillingEmail"></xsl:value-of>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </li>
+                          <li>
+                            Điện thoại:
+                            <xsl:choose>
+                              <xsl:when test="ShippingPhone != ''">
+                                <xsl:value-of select="ShippingPhone"></xsl:value-of>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="BillingPhone"></xsl:value-of>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <xsl:if test="InvoiceCompanyTaxCode !=''">
+                      <div class="col-12">
+                        <h3>Billing information</h3>
+                        <div class="address-col">
+                          <p>
+                            <span>Tax code: </span>
+                            <xsl:value-of select="InvoiceCompanyTaxCode"></xsl:value-of>
+                          </p>
+                          <p>
+                            <span>Company name: </span>
+                            <xsl:value-of select="InvoiceCompanyName"></xsl:value-of>
+                          </p>
+                          <p>
+                            <span>Address: </span>
+                            <xsl:value-of select="InvoiceCompanyAddress"></xsl:value-of>
+                          </p>
+                        </div>
+                      </div>
+                    </xsl:if>
+                  </div>
+                  <div class="order-product">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th class="text-left">Sản phẩm</th>
+                          <th>Giá</th>
+                          <th>Số lượng</th>
+                          <th>Tổng cộng</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <xsl:apply-templates select="Product"></xsl:apply-templates>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-item checkout-payment-wrap mt-3">
+              <div class="card-heading">
+                <div class="card-title">Phương thức thanh toán</div>
+              </div>
+              <div class="card-body">
+                <ul class="checkout-check-list">
+                  <xsl:apply-templates select="Payment"></xsl:apply-templates>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="repay-aside">
+              <div class="order-total">
+                <table>
+                  <tr class="group">
+                    <td class="label">
+                      <xsl:text>Tổng tiền hàng chưa giảm:</xsl:text>
+                    </td>
+                    <td class="value">
+                      <xsl:value-of select="OrderSubTotal"></xsl:value-of>
+                    </td>
+                  </tr>
+                  <tr class="group">
+                    <td class="label">
+                      <xsl:text>Giảm giá:</xsl:text>
+                    </td>
+                    <td class="value discount-total">
+                      <xsl:value-of select="OrderDiscount"></xsl:value-of>
+                    </td>
+                  </tr>
+                  <xsl:if test="OrderCouponAmountValue > 0">
+                    <tr class="group">
+                      <td class="label">
+                        Giảm giá Coupon:
+                      </td>
+                      <td class="value shipping-total">
+                        <xsl:value-of select="OrderCouponAmount"></xsl:value-of>
+                      </td>
+                    </tr>
+                  </xsl:if>
+                  <tr class="group">
+                    <td class="label">
+                      Phí vận chuyển:
+                    </td>
+                    <td class="value shipping-total">
+                      <xsl:value-of select="ShippingFee"></xsl:value-of>
+                    </td>
+                  </tr>
+                  <xsl:if test="RedeemedRewardPointsAmountValue > 0">
+                    <tr class="group">
+                      <td class="label">
+                        Quy đổi điểm:
+                      </td>
+                      <td class="value total">
+                        <xsl:value-of select="RedeemedRewardPointsAmount"></xsl:value-of>
+                      </td>
+                    </tr>
+                  </xsl:if>
+                  <tr class="group">
+                    <td class="label">
+                      Tổng cộng:
+                    </td>
+                    <td class="value total">
+                      <xsl:value-of select="OrderTotal"></xsl:value-of>
+                    </td>
+                  </tr>
+                  <xsl:if test="Link != ''">
+                    <tr class="group ">
+                      <td class="label">
+                        VAT invoice for this order :
+                      </td>
+                      <td class="value">
+                        <a>
+                          <xsl:attribute name="href">
+                            <xsl:value-of select="Link"></xsl:value-of>
+                          </xsl:attribute>
+                          Link
+                        </a>
+                      </td>
+                    </tr>
+                  </xsl:if>
+                </table>
+              </div>
+              <div class="button-group cart-group-button mt-3">
+                <a class="btn btn-white text-light-grey btn-back" href="#">   
+                	<xsl:attribute name="data-code">
+                    <xsl:value-of select="OrderCode"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="onclick">
+                    <xsl:text>AjaxCheckout.cancelOrder(this);return false;</xsl:text>
+                  </xsl:attribute> 
+                  <em class="ri-arrow-left-line"></em>
+                  <span class="ml-1">Hủy đơn hàng</span> 
+                </a>
+
+                <a class="btn btn-next btn-gradient" href="#">
+                  <xsl:attribute name="data-code">
+                    <xsl:value-of select="OrderCode"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="onclick">
+                    <xsl:text>AjaxCheckout.paymentAgain(this);return false;</xsl:text>
+                  </xsl:attribute>
+                  <span>Thanh toán lại</span>
+                  <em class="lnr lnr-arrow-right"></em>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </xsl:template>
+
+
+
+  <xsl:template match="Product">
+    <tr>
+      <td>
+        <a class="product" href="#">
+          <xsl:attribute name="href">
+            <xsl:value-of select="Url" />
+          </xsl:attribute>
+          <div class="img">
+            <img class="lazyload" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">
+              <xsl:attribute name="data-src">
+                <xsl:value-of select="ImageUrl"></xsl:value-of>
+              </xsl:attribute>
+              <xsl:attribute name="alt">
+                <xsl:value-of select="Title"></xsl:value-of>
+              </xsl:attribute>
+            </img>
+          </div>
+          <div class="caption">
+            <xsl:value-of select="Title"></xsl:value-of>
+          </div>
+        </a>
+      </td>
+      <td style="white-space: nowrap;">
+        <xsl:value-of select="Price"></xsl:value-of>
+      </td>
+      <td>
+        <xsl:value-of select="Quantity"></xsl:value-of>
+      </td>
+      <td>
+        <xsl:value-of select="ItemTotal"></xsl:value-of>
+      </td>
+    </tr>
+  </xsl:template>
+  <xsl:template match="Payment">
+    <li class="checkout-check-item">
+      <label>
+        <input type="radio" name="PaymentMethod" onchange="AjaxCheckout.ordercalculator()">
+          <xsl:attribute name="id">
+            <xsl:value-of select="Id"></xsl:value-of>
+          </xsl:attribute>
+          <xsl:attribute name="value">
+            <xsl:value-of select="Id"></xsl:value-of>
+          </xsl:attribute>
+          <xsl:if test="IsActive = 'true'"> 
+            <xsl:attribute name="checked">
+              <xsl:text>checked</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+        </input>
+        <span class="fake-radio"></span>
+        <div class="content">
+          <xsl:value-of disable-output-escaping="yes" select="Description"></xsl:value-of>
+          <!-- <div class="img">
+            
+          </div>
+          <div class="text-wrap">
+            <div class="text">
+              <xsl:value-of select="Title"></xsl:value-of>
+            </div>
+          </div> -->
+        </div>
+      </label>
+    </li>
+  </xsl:template>
+</xsl:stylesheet>

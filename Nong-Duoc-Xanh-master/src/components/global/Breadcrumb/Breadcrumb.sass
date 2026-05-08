@@ -1,0 +1,24 @@
+.global-breadcrumb
+	@apply bg-Secondary-Light-Grey border-b border-b-Neutral-100
+	p
+		@apply h-[calc(48/1920*100rem)] flex items-center overflow-auto
+		&::-webkit-scrollbar
+			@apply w-[calc(3/1920*100rem)] rem:h-[3px]
+		&::-webkit-scrollbar-track
+			background-color: rgba(#e5e5e5,.5 )
+		&::-webkit-scrollbar-thumb
+			@apply bg-Primary-1
+		a
+			&:first-child
+				@apply text-0
+				&::before
+					content: '\f015'
+					@apply font-awesome text-sm
+		a,span
+			@apply text-sm text-Neutral-500* whitespace-nowrap
+		span.separator
+			@apply text-0 inline-flex
+			&::before
+				content: "/"
+				@apply font-awesome font-normal text-sm mx-2
+

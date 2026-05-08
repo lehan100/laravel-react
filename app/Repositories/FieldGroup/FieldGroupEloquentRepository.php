@@ -16,6 +16,14 @@ class FieldGroupEloquentRepository extends EloquentRepository implements FieldGr
         return FieldGroup::class;
     }
 
+    public function isInUse(int $id): bool
+    {
+        return $this->_model->newQuery()
+            ->whereKey($id)
+            ->whereHas('pages')
+            ->exists();
+    }
+
     public function lists($params = null, $options = null): LengthAwarePaginator|Collection|null
     {
         if (($options['task'] ?? null) === 'admin-list-items') {

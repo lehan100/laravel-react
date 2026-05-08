@@ -1,0 +1,16 @@
+.brand-2
+	.wrapper
+		.partner-item
+			.content
+				a.btn-primary 
+					@apply px-5
+
+@screen -md
+	.brand-2
+		.wrapper
+			@apply gap-3
+			.partner-item
+				@apply flex-col p-3
+				.content
+					.desc
+						@apply line-clamp-3

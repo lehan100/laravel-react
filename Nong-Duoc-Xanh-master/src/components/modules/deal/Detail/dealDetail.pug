@@ -1,0 +1,295 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.deal-detail-1(class="rem:pt-[31px] bg-Secondary-Light-Grey")
+	.container 
+		.wrapper(class="flex gap-base bg-Neutral-White rounded-xl p-5")
+			.col-left(class="rem:max-w-[700px] w-full")
+				.img 
+					a(href="#" class="img-ratio ratio:pt-[530_700] rem:rounded-[32px]") 
+						+PugImg()
+			.col-right(class="flex-1")
+				h1(class="rem:text-[24px] text-Neutral-Black font-bold mb-5") Bộ phân bón RUSI NPK Complex 4 công thức
+				.product-info 
+					.item.rating 
+						.icon 
+							<i class="fa-solid fa-star"></i>
+						span 4.8
+					.item.review 
+						.number 100 
+						span Đánh giá
+				.deal-good-price(class="rounded-xl overflow-hidden")
+					.top(class="flex items-center justify-between bg-Primary-7 px-5 rem:h-[36px]")
+						.heading(class="flex items-center gap-3")
+							.icon(class="rem:w-[15px]") 
+								a(href="#" class="") 
+									img(src="./img/sale1.svg", alt="")
+							h2(class="rem:text-[16px] font-bold text-Neutral-White uppercase") MUA CHUNG GIÁ TỐT
+						.time-sale(class="flex items-center gap-5 text-Neutral-White")
+							span(class="text-sm font-normal") Kết thúc trong:
+							.countdown(data-start="2025-08-10T12:00:00" data-end="2025-08-11T12:00:00")
+								span.hours 
+								span.minutes 
+								span.seconds 
+					.bottom(class="bg-[#FFF2F2] p-5")
+						.price(class="flex items-center justify-between")
+							.price-sale
+								bdi 200.000 ₫
+								span /chai 1L
+							.price-old
+								bdi 220.000₫
+								span (Tiết kiệm:15%)
+						.sell-line(data-sold="120" data-total="150") 
+							span Đã bán 120
+				.deal-detail-info 
+					.item 
+						.title Đơn hàng tối thiểu:
+						.content 1.000kg/ Khách hàng
+					.item 
+						.title Đơn hàng tối thiểu:
+						.content
+							p.open(class="text-Primary-2") Đang mở bán
+							.icon 
+								<i class="fa-solid fa-minus"></i>
+							p Kết thúc: 
+								.date(class="text-Primary-7") 10/10/2025
+					.item 
+						.title Đơn hàng tối thiểu:
+						.content 1.000kg/ Khách hàng
+					.item 
+						.title Đơn hàng tối thiểu:
+						.content 1.000kg/ Khách hàng
+				.deal-detail-contact(class="flex rem:gap-[43px] rem:mt-[17px]")
+					.box(class="bg-[#0D59F6] p-3 rounded-xl rem:max-w-[295px] w-full text-Neutral-White")
+						.top(class="flex items-center rem:gap-[15px] mb-2") 
+							.icon(class="w-10 flex-shrink-0") 
+								a(href="#" class="img-ratio") 
+									+PugImg("./img/zalo.png")
+							.title(class="font-bold") Chia sẻ mua chung gía tốt với bạn bè qua Zalo!
+						.bottom 
+							.text(class="text-sm font-normal") Để giúp bạn bè tiết kiệm chi phí canh tác hơn
+					.social(class="flex-1")
+						.title(class="font-bold") Chia sẻ ngay
+						.social-links 
+							a(href="#") 
+								<i class="fa-brands fa-facebook-f"></i>
+							a.tiktok(href="#") 
+								<i class="fa-brands fa-facebook-f"></i>
+section.deal-detail-2(class="py-5 bg-Secondary-Light-Grey")
+	.container 
+		.box(class="bg-Neutral-White rounded-xl p-10")
+			.deal-table(class="table-responsive") 
+				table(class="w-full border-collapse max-md:overflow-x-hidden max-md:w-[520px]") 
+					thead 
+						tr 
+							th(class=" rem:w-[640px] text-left text-Primary-1") Thông tin đơn hàng
+							th(class="text-center") Số lượng
+							th(class="text-center") Đơn giá
+							th(class="text-center") Thành tiền
+					tbody 
+						-for(var i = 0; i < 5; i++)
+							tr 														
+								td(class="")
+									.info-order(class="flex items-center gap-base")
+										.img(class="rem:w-[130px] flex-shrink-0") 
+											a(href="#" class="img-ratio") 
+												+PugImg()
+										.content(class="flex flex-col gap-3") 
+											.title(class="font-bold") GROGREEN GEL NPK 26-26-26+TE phân bón lá nuôi trái, to lá, bung chồi, mập...
+											.info 
+												.item(class="text-sm flex items-center rem:gap-[10px]" ) 
+													p Xuất xứ: 
+														strong Tây Ban Nha
+													p Nhà sản xuất: 
+														strong Uralchem 5A
+											.view-detail(class="text-sm text-Primary-1 underline") 
+												a(href="#") Xem thông tin chi tiết sản phẩm
+								td(class="text-center")
+									.product-quantity
+										.quantity(class="inline-flex justify-centerw items-center rem:h-[44px]") 
+											button.minus(class="inline-flex  items-center justify-center ") 
+												i.fa-solid.fa-minus
+											.quantity-input(class="rem:w-[44px] h-full") 
+												input(type="text" value="1" class="w-full text-center bg-Neutral-White h-full  font-bold")
+											button.plus(class="inline-flex  items-center justify-center ") 
+												i.fa-solid.fa-plus
+								td(class="text-center") 
+									.price(class="flex flex-col rem:gap-[6px]") 	
+										.price-sale 
+											bdi(class="text-xl font-bold") 200.000 ₫
+										.price-old 
+											bdi(class="text-Neutral-500* text-sm line-through") 300.000 ₫
+										.save(class="text-Primary-1") Tiết kiệm 20%
+								td(class="text-center") 
+									.total(class="text-xl font-bold")
+										bdi 2.000.000 ₫
+			.box-total(class="flex flex-col items-end mt-5")
+				.box-total-wrapper(class="flex flex-col items-end gap-3")
+					.item 
+						.title Đơn giá:
+						.price-unit 
+							bdi 12.000.000 ₫
+					.item 
+						.title Tiết kiệm được:
+						.price-save 
+							bdi 12.000.000 ₫
+					.item 
+						.title Đơn giá:
+						.price-total
+							bdi 12.000.000 ₫
+				.box-total-bottom(class="flex items-center gap-5 mt-5")
+					.hotline(class="italic text-Neutral-Black")
+						p Gọi ngay 
+							a(href="#" class="text-Primary-7 underline") 18006022
+							|  để được hỗ trợ (6:00-18:00)
+					.wrap-btn(class="flex items-center gap-5")
+						button.btn-add-to-cart
+							.icon 
+								<i class="fa-regular fa-cart-shopping"></i>
+							span Thêm vào giỏ hàng
+						button.btn-add-to-cart.btn-buy-now
+							.icon 
+								<i class="fa-regular fa-cart-shopping"></i>
+							span Mua ngay
+section.section-support-global(class="bg-Secondary-Light-Grey")
+	.container 
+		.wrapper(class="p-10 rounded-5 grid lg:grid-cols-4 grid-cols-2 xl:gap-20 gap-6 bg-Neutral-White")
+			-for(var i = 0; i < 4; i++)
+				.item(class="flex gap-3")
+					.icon(class="w-10") 
+						a(href="#" class="img-ratio") 
+							+PugImg("./img/5.svg")
+					.content 
+						.title(class="text-xl font-bold text-Primary-4 mb-2") Thuốc chính hãng
+						.sub-title(class="font-normal") Đa dạng và chuyên sâu
+section.product-detail-3.deal-detail-3(class="bg-Secondary-Light-Grey py-5")
+	.container 
+		.wrapper
+			.col-left
+				.box(class="bg-Neutral-White rounded-5 px-5 py-10")
+					.item 
+						h2(class="text-xl text-Primary-1 font-bold") Mô tả sản phẩm
+						.format-content 
+							p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ  giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+							p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+					.item 
+						h2(class="text-xl text-Primary-1 font-bold") Mô tả sản phẩm
+						.format-content 
+							p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ  giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+							p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+					.item 
+						h2(class="text-xl text-Primary-1 font-bold") Mô tả sản phẩm
+						.format-content 
+							p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ  giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+							p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+					.item 
+						h2(class="text-xl text-Primary-1 font-bold") Hướng dẫn sử dụng
+						.wrap(data-toggle="tabslet")
+							ul.tabslet-tab
+								li.active
+									a(href="#tab1") Cây ăn trái
+								li
+									a(href="#tab2") Sầu riêng
+							.tabslet-content.active#tab1
+								.format-content 
+									p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+									p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+									p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+								.view-more(class="flex items-center gap-3 transition-all ease-in-out cursor-pointer mt-5") 
+									span(class="text-sm text-Primary-1 font-medium") Xem thêm
+									.icon(class="text-xs text-Primary-1") 
+										<i class="fa-regular fa-chevron-down"></i>
+							.tabslet-content#tab2
+								.format-content 
+									p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái. 222
+									p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+									p Phân bón CYTOBASE NPK 15-5-40+TE công thức Kali cao là phân tưới nhỏ giọt sản xuất tại Việt Nam theo công nghệ tiên tiến của Châu Âu. Công dụng nổi bật của sản phẩm này là giúp TO TRÁI, ĐẶC RUỘT, NGỌT TRÁI, NĂNG SUẤT TỐI ĐA thích hợp sử dụng trong giai đoạn nuôi trái.
+								.view-more(class="flex items-center gap-3 transition-all ease-in-out cursor-pointer mt-5") 
+									span(class="text-sm text-Primary-1 font-medium") Xem thêm
+									.icon(class="text-xs text-Primary-1") 
+										<i class="fa-regular fa-chevron-down"></i>
+
+section.product-detail-4(class="pb-5 bg-Secondary-Light-Grey")
+	.container 
+		.box(class="bg-Neutral-White p-5 rounded-5")
+			h2 Đánh giá sản phẩm 
+section.product-detail-5(class="bg-Secondary-Light-Grey")
+	.container 
+		.box(class="bg-Neutral-White rounded-5 p-5")
+			h2(class="mb-3 text-xl text-Primary-1") Câu hỏi thường gặp
+			.wrap-item-toggle(class='')
+				-for(var i = 0; i < 4; i++)
+					.item-toggle(class="group bg-Neutral-White py-6 border-b border-b-Neutral-200")
+						.title(class="text-lg font-medium rem:min-h-[32px] flex items-center gap-3 justify-between cursor-pointer transition-300 ")
+							.number(class="title-24 !font-normal text-Neutral-800") 01
+							span(class="title-24 text-Neutral-800") What is Lorem Ipsum?
+							i.fa-regular.fa-plus.text-xl.ml-auto(class="transition-300 text-Neutral-950")
+						.content(style="display: none;")
+							.format-content(class="text-justify font-normal")
+								p Some people notice immediate tightness, but full results appear in 2-3 months as collagen regenerates.
+section.buy-deal-going(class="section-40 bg-Secondary-Light-Grey")
+	.container 
+		.heading(class="flex items-center gap-6 mb-5")
+			.icon(class="rem:w-[50px]") 
+				a(href="#" class="img-ratio") 
+					img(src="./img/4.svg", alt="")
+			h2(class="title-40") Deal mua chung đang diễn ra
+		.slide(class="relative")
+			.swiper
+				.swiper-wrapper 
+					-for(var i = 0; i < 6; i++)
+						.swiper-slide 
+							.product-item-sale 
+								.img 
+									a(href="#" class="img-ratio ratio:pt-[213_320] zoom-img") 
+										+PugImg("./img/product-sale.png")
+								.content(class="mt-5 px-5 pb-5")
+									.heading
+										.h3(class="text-xl text-Neutral-Black font-bold mb-2")
+											a(href="#") Bộ phân bón RUSI NPK Complex 4 công thức 
+										.wrapper(class="flex items-center gap-5")
+											.rating(class="flex items-center gap-1")
+												.icon 
+													<i class="fa-solid fa-star"></i>
+												span 4.8
+											a.tag(href="#") Mua sỉ giá tốt
+									.price 
+										.price-sale 
+											bdi 200.000 ₫
+										.price-old 
+											bdi 300.000 ₫
+									.info 
+										.quantity 
+											span Số lượng:
+											|  30 tấn
+										.minimun-order 
+											span Đơn hàng tối thiểu:
+											|  1.000kg/khách hàng
+										.status
+											span Tình trạng:
+											| đang mở bán
+										.delivery-datey
+											span Ngày giao hàng:
+											|  5/01/2023
+										.delivery
+											span Giao hàng:
+											|  toàn quốc
+										.time-sale 
+											span Kết thúc trong:
+											.countdown(data-start="2025-08-10T12:00:00" data-end="2025-08-11T12:00:00")
+												span.hours 
+												span.minutes 
+												span.seconds 
+									.sell-line(data-sold="120" data-total="150") 
+										span Đã bán 120
+									a.see-now(href="#") 
+										span XEM NGAY
+										.icon 
+											<i class="fa-regular fa-eye"></i>
+			.wrap-button-slide.drop
+				.btn.btn-prev.btn-sw-1.primary
+				.btn.btn-next.btn-sw-1.primary

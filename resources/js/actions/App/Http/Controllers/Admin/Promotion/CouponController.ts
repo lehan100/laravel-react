@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:135
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:152
 * @route '/admin123/coupon/products-picker'
 */
 export const productsPicker = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ productsPicker.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:135
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:152
 * @route '/admin123/coupon/products-picker'
 */
 productsPicker.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ productsPicker.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:135
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:152
 * @route '/admin123/coupon/products-picker'
 */
 productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:135
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:152
 * @route '/admin123/coupon/products-picker'
 */
 productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:182
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:199
 * @route '/admin123/coupon/destroy-many'
 */
 export const destroyMany = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -60,7 +60,7 @@ destroyMany.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:182
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:199
 * @route '/admin123/coupon/destroy-many'
 */
 destroyMany.url = (options?: RouteQueryOptions) => {
@@ -69,7 +69,7 @@ destroyMany.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:182
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:199
 * @route '/admin123/coupon/destroy-many'
 */
 destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -131,7 +131,7 @@ toggleStatus.put = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::index
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:39
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:44
 * @route '/admin123/coupon'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +146,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::index
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:39
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:44
 * @route '/admin123/coupon'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -155,7 +155,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::index
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:39
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:44
 * @route '/admin123/coupon'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -165,7 +165,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::index
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:39
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:44
 * @route '/admin123/coupon'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -175,7 +175,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::create
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:49
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:54
 * @route '/admin123/coupon/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::create
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:49
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:54
 * @route '/admin123/coupon/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -199,7 +199,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::create
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:49
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:54
 * @route '/admin123/coupon/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -209,7 +209,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::create
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:49
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:54
 * @route '/admin123/coupon/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -219,7 +219,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::store
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:63
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:70
 * @route '/admin123/coupon'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -234,7 +234,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::store
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:63
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:70
 * @route '/admin123/coupon'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -243,7 +243,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::store
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:63
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:70
 * @route '/admin123/coupon'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -253,7 +253,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::show
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:82
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:89
 * @route '/admin123/coupon/{coupon}'
 */
 export const show = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -268,7 +268,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::show
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:82
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:89
 * @route '/admin123/coupon/{coupon}'
 */
 show.url = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -295,7 +295,7 @@ show.url = (args: { coupon: string | number } | [coupon: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::show
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:82
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:89
 * @route '/admin123/coupon/{coupon}'
 */
 show.get = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -305,7 +305,7 @@ show.get = (args: { coupon: string | number } | [coupon: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::show
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:82
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:89
 * @route '/admin123/coupon/{coupon}'
 */
 show.head = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -315,7 +315,7 @@ show.head = (args: { coupon: string | number } | [coupon: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::edit
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:118
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:125
 * @route '/admin123/coupon/{coupon}/edit'
 */
 export const edit = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -330,7 +330,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::edit
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:118
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:125
 * @route '/admin123/coupon/{coupon}/edit'
 */
 edit.url = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -357,7 +357,7 @@ edit.url = (args: { coupon: string | number } | [coupon: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::edit
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:118
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:125
 * @route '/admin123/coupon/{coupon}/edit'
 */
 edit.get = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -367,7 +367,7 @@ edit.get = (args: { coupon: string | number } | [coupon: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::edit
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:118
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:125
 * @route '/admin123/coupon/{coupon}/edit'
 */
 edit.head = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -377,7 +377,7 @@ edit.head = (args: { coupon: string | number } | [coupon: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::update
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:150
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:167
 * @route '/admin123/coupon/{coupon}'
 */
 export const update = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -392,7 +392,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::update
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:150
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:167
 * @route '/admin123/coupon/{coupon}'
 */
 update.url = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -419,7 +419,7 @@ update.url = (args: { coupon: string | number } | [coupon: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::update
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:150
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:167
 * @route '/admin123/coupon/{coupon}'
 */
 update.put = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -429,7 +429,7 @@ update.put = (args: { coupon: string | number } | [coupon: string | number ] | s
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::update
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:150
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:167
 * @route '/admin123/coupon/{coupon}'
 */
 update.patch = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -439,7 +439,7 @@ update.patch = (args: { coupon: string | number } | [coupon: string | number ] |
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::destroy
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:170
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:187
 * @route '/admin123/coupon/{coupon}'
 */
 export const destroy = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -454,7 +454,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::destroy
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:170
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:187
 * @route '/admin123/coupon/{coupon}'
 */
 destroy.url = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -481,7 +481,7 @@ destroy.url = (args: { coupon: string | number } | [coupon: string | number ] | 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\CouponController::destroy
-* @see app/Http/Controllers/Admin/Promotion/CouponController.php:170
+* @see app/Http/Controllers/Admin/Promotion/CouponController.php:187
 * @route '/admin123/coupon/{coupon}'
 */
 destroy.delete = (args: { coupon: string | number } | [coupon: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

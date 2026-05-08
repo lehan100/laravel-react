@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\PageManager\FieldGroupController;
 use App\Http\Controllers\Admin\PageManager\PageController;
 use App\Http\Controllers\Admin\Promotion\BuyToGiftController;
 use App\Http\Controllers\Admin\Promotion\CouponController;
+use App\Http\Controllers\Admin\Promotion\PromotionCampaignController;
 use App\Http\Controllers\Admin\Promotion\SaleOfferController;
 use App\Http\Controllers\Admin\Report\ReportInventoryController;
 use App\Http\Controllers\Admin\Report\ReportProductController;
@@ -31,6 +32,8 @@ use App\Http\Controllers\Admin\Settings\LocationController;
 use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Ai\CategoryAiController;
+use App\Http\Controllers\Ai\LocaleTranslateController;
+use App\Http\Controllers\Ai\PostAiController;
 use App\Http\Controllers\Ai\ProductAiController;
 use App\Http\Controllers\ImageUploadController;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +56,12 @@ Route::get('/check-ai', function () {
     return agent()->prompt('Chào bạn, tôi là Gemini và tôi đã sẵn sàng!');
 });
 // End Test AI
+
+Route::get('/', function () {
+    return Inertia::render('Home/Index');
+})->name('home');
+
+Route::get('flash-sale/{slug}', [PromotionCampaignController::class, 'publicShow'])->name('promotion-campaign.public');
 
 Route::post('photo-upload', [ImageUploadController::class, 'storePhoto'])->name('photo.upload');
 Route::post('category-upload', [ImageUploadController::class, 'storeCategory'])->name('category.upload');
@@ -99,6 +108,10 @@ Route::prefix($prefixAdmin)->group(function () {
         Route::post('product/ai-suggest-content', [ProductAiController::class, 'suggestContent'])->name('product.ai.suggest-content');
         Route::post('product/ai-suggest-seo', [ProductAiController::class, 'suggestSeo'])->name('product.ai.suggest-seo');
         Route::post('category/ai-suggest-seo', [CategoryAiController::class, 'suggestSeo'])->name('category.ai.suggest-seo');
+        Route::post('post/ai-suggest-content', [PostAiController::class, 'suggestContent'])->name('post.ai.suggest-content');
+        Route::post('post/ai-suggest-seo', [PostAiController::class, 'suggestSeo'])->name('post.ai.suggest-seo');
+        Route::post('ai/translate', [LocaleTranslateController::class, 'translate'])->name('ai.translate');
+        Route::post('post/ai-translate', [PostAiController::class, 'translate'])->name('post.ai.translate');
         /* ----------- Dashboard ----------- */
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         /* ----------- Locations ----------- */
@@ -109,8 +122,8 @@ Route::prefix($prefixAdmin)->group(function () {
         /* ----------- Roles ----------- */
         Route::get('roles/permissions/{id}', [RoleController::class, 'permissions'])
             ->where('id', '[0-9]+')->name('roles.permissions');
-        /* ----------- Layout  ----------- */
-        Route::prefix('layout')->name('layout.')->group(function () {
+        /* ----------- Settings  ----------- */
+        Route::prefix('settings')->name('layout.')->group(function () {
             Route::get('/', [LayoutController::class, 'index'])->name('index');
             Route::post('store', [LayoutController::class, 'store'])->name('store');
         });
@@ -135,6 +148,7 @@ Route::prefix($prefixAdmin)->group(function () {
             'saleoffer' => SaleOfferController::class,
             'coupon' => CouponController::class,
             'buytogift' => BuyToGiftController::class,
+            'promotion-campaign' => PromotionCampaignController::class,
             'warehouse' => WarehouseController::class,
             'orders' => OrderController::class,
             'payment-methods' => PaymentMethodController::class,

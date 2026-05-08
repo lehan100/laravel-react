@@ -1,0 +1,80 @@
+.section-checkout .wrap-grid-checkout
+	.col-right
+		.item-review-order
+			.wrap-img
+				@apply flex justify-between gap-3
+				.img
+					@apply w-[29%]
+				.wrap
+					@apply flex-col
+	.col-left
+		.woocommerce-shipping-fields__field-wrapper
+			@apply flex flex-col gap-5
+			p.form-row 
+				label
+					@apply mb-1
+.woocommerce-form__label-for-checkbox span
+	@screen -md
+		display: unset !important
+.woocommerce-checkout-review-order-table
+	.wrap-footer
+		table
+			@apply w-full
+.woocommerce-checkout .col-right .wrap-img .wrap .wrap-price-right .product-quantity
+	@apply font-normal
+.woocommerce-checkout-review-order-table
+	@apply flex flex-col gap-5
+#ship-to-different-address
+	@apply mb-5
+.woocommerce-form__label-for-checkbox
+	@apply gap-2
+.woocommerce-form__label-for-checkbox input[type="checkbox"] 
+	@apply block #{!important}
+.woocommerce-form__label-for-checkbox span::before 
+	@apply hidden #{!important}
+.section-wrap-box-white
+	.coupon-form-container
+		.wrap-form-coupon
+			@apply flex flex-col gap-3
+			&.ajax-coupon-form
+				@apply gap-0
+			.input-text
+				@apply w-full border border-Neutral-200 rem:h-[48px] px-5
+				@apply inline-flex items-center justify-center rounded-full
+			button.ajax-apply-coupon
+				@apply bg-Primary-2 text-white rem:h-[48px] px-5
+				@apply inline-flex items-center justify-center rounded-full
+				&:hover
+					@apply bg-Primary-1
+.woocommerce-checkout .col-right .wrap-img .wrap .wrap-price-right
+	@apply items-center
+.section-checkout .total
+	table
+		tbody
+			tr
+				@apply flex items-center gap-2 justify-between
+.section-checkout .woocommerce-billing-fields__field-wrapper .form-row label
+	@screen -md
+		@apply text-[15px]
+.section-checkout-success
+	.section-wrap-box-white 
+		@screen -xl
+			@apply mt-[4rem]
+	.wrap-thank-you
+		.col-right
+			table
+				tbody
+					tr
+						@screen -md
+							@apply flex flex-col
+						td
+							@screen -md
+								@apply w-full #{!important}
+.wrap-progress-steps .label
+	@screen -md
+		@apply w-[180px] whitespace-normal #{!important}
+#order_review
+	.product-total
+		span
+			bdi
+				@apply font-bold

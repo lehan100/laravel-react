@@ -1,0 +1,209 @@
+.deal-detail-1
+	.col-right
+		.time-sale
+			@apply xl:rem:max-w-max w-full justify-end #{!important}
+			@screen -md
+				@apply justify-center max-w-full #{!important}
+			span
+				@screen -md
+					@apply text-[15px]
+		.product-info
+			@apply flex items-center gap-2 mb-5
+			
+			.item
+				@apply flex items-center gap-1
+				span
+					@apply text-sm
+					@screen -md
+						@apply text-[15px]
+				.number
+					@apply text-sm text-Primary-1
+					@screen -md
+						@apply text-[15px]
+				.title
+					@apply text-sm
+					@screen -md
+						@apply text-[15px]
+				.name-brand
+					@apply text-Primary-1 underline
+				&.rating
+					.icon
+						i
+							@apply text-Secondary-3
+					span
+						text-decoration-line: underline
+						text-decoration-style: solid
+						text-decoration-skip-ink: none
+						text-decoration-thickness: auto
+						text-underline-offset: auto
+						@apply text-Primary-1 underline text-sm
+						@screen -md
+							@apply text-[15px]
+		.deal-good-price
+			.top
+				@screen -semi-2xl
+					@apply h-[2.875rem]
+				@screen -xl
+					@apply h-full flex-col py-3
+				@screen -md
+					@apply p-2 gap-1
+				.heading
+					h2
+						@screen -md
+							@apply text-[15px]
+			.time-sale
+				@screen -3xl
+					@apply max-w-[14.5rem]
+				@screen -semi-2xl
+					@apply max-w-[15.5rem]
+				.countdown
+					@apply flex items-center gap-2
+					@screen -md
+						@apply gap-[4px]
+					span
+						@apply rounded-1  bg-Neutral-White rem:h-[24px]
+						@apply text-sm font-bold text-Primary-7 inline-flex items-center justify-center w-auto
+						@screen -md
+							@apply text-[15px]
+
+		.deal-detail-contact
+			@screen -md
+				@apply flex-col gap-5
+			.box
+				@screen -md
+					@apply max-w-full
+		.price
+			.price-sale
+				@apply flex gap-1 mb-0 items-center
+				bdi
+					@apply text-32 text-Primary-7 font-bold flex items-center
+					@screen -md
+						@apply text-[16px]
+					.woocommerce-Price-currencySymbol
+						@apply text-Primary-7
+				span
+					
+					@apply text-xl flex items-end text-Neutral-700
+			.price-old
+				@apply flex flex-col items-center gap-1
+				bdi
+					@apply  line-through font-normal
+				span
+					@apply text-Primary-1
+		.deal-detail-info 
+			@apply mt-6 flex flex-col gap-3
+			.item
+				@apply flex items-center gap-2
+				.title
+					@apply font-bold
+				.content
+					@apply flex items-center gap-2
+					@screen -md
+						@apply gap-[2px]
+		.deal-detail-contact			
+			.social
+				.social-links 					
+					@apply flex items-center gap-2 mt-3
+					a
+						@apply sq-10 inline-flex items-center justify-center
+						@apply bg-[#0039B3] text-Neutral-White rounded-full
+						&.tiktok
+							@apply bg-Neutral-Black
+.deal-detail-2
+	.box
+		@screen -md
+			@apply p-[8px]
+		&.gbw-program-display
+			@apply max-w-full
+	table
+		@screen -md
+			@apply w-full #{!important}
+		@apply table-fixed 
+		thead 
+			@screen -md
+				@apply hidden
+			tr
+				th
+					@apply text-xl text-Neutral-700 font-bold pb-5
+		tbody
+			@screen -md
+				@apply flex flex-col gap-3
+			tr
+				@screen -md
+					@apply grid grid-cols-1 gap-3 border-b border-b-Neutral-200 pb-3
+				td
+					@apply py-5 border-b border-b-[#D9D9D9]
+					@screen -md
+						@apply border-none py-0 text-left
+					.product-quantity
+						@apply justify-center
+						@screen -md
+							@apply justify-normal mb-0
+						.quantity-input
+							@screen -md
+								@apply flex items-center justify-center
+							input
+								-webkit-text-size-adjust: 100%
+								transform: none !important
+								@screen -md
+									@apply text-[16px] #{!important}
+					.info-order
+						@screen -md
+							@apply items-start
+						.info
+							.item
+								@screen -md
+									@apply text-[15px]
+					.view-detail
+						@screen -md
+							@apply text-[15px]
+					.price
+						@screen -md
+							@apply flex-row
+						.price-old
+							bdi
+								@screen -md
+									@apply text-[15px]
+					.total
+						.gbw-product-total-desktop
+							@apply xl:block hidden
+						.gbw-product-total-mobile
+							@apply xl:hidden flex items-center gap-1
+				&:first-child
+					td
+						@apply border-t border-t-[#D9D9D9]
+	.box-total
+		.gbw-need-more-item
+			@screen -md
+				@apply text-[15px]			
+		@screen -md
+			@apply items-start
+		.box-total-wrapper 
+			@screen -md
+				@apply items-start
+		.item
+			@apply flex items-center gap-base text-xl
+			@screen -md
+				@apply gap-1
+			.title
+				@apply  text-Neutral-700 font-normal
+			.price-unit
+				@apply text-Primary-1
+			.price-save
+				@apply text-Primary-7 font-bold
+			.price-total
+				@apply text-Primary-2
+		.box-total-bottom
+			@screen -md
+				@apply flex-col items-start
+
+@screen -xl
+	.deal-detail-1
+		.wrapper
+			@apply flex flex-col
+			.col-left
+				@apply w-full max-w-full
+	.deal-detail-3
+		.wrapper
+			.col-left
+				@apply w-full #{!important}

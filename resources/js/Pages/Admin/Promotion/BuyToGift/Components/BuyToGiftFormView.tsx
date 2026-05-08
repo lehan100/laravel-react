@@ -1,12 +1,13 @@
 import AdminFormHeader from '@/Components/Common/AdminFormHeader';
+import ProductPickerModal from '@/Components/Common/ProductPickerModal';
 import { InputGroup } from '@/Components/Form/HancmsInput';
 import MessageError from '@/Components/Form/MessageError';
 import StatusBadge from '@/Components/Status/StatusBadge';
 import StatusSwitch from '@/Components/Status/StatusSwitch';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Gift, PackageCheck, Plus, Save, Search, Trash2, X } from 'lucide-react';
-import axios from 'axios';
+import { ArrowRight, CheckCircle2, Gift, PackageCheck, Plus, Save, Trash2 } from 'lucide-react';
+import { useProductPickerModal } from '@/Components/Common/useProductPickerModal';
 import {
   formatProductPrice,
   getLanguageByLocale,
@@ -38,6 +39,7 @@ type BuyToGiftFormViewProps = {
   errors: Record<string, string>;
   processing: boolean;
   itemsCategoryActive: any[];
+  itemsCampaignActive: any[];
   itemsSelectedBuyProducts: any[];
   itemsSelectedGiftProducts: any[];
   undo: number;
@@ -68,6 +70,7 @@ export default function BuyToGiftFormView({
   errors,
   processing,
   itemsCategoryActive = [],
+  itemsCampaignActive = [],
   itemsSelectedBuyProducts = [],
   itemsSelectedGiftProducts = [],
   undo,
@@ -77,6 +80,7 @@ export default function BuyToGiftFormView({
 }: BuyToGiftFormViewProps) {
   const { props }: any = usePage();
   const locale = getLocaleCode(props.locale || 'vi');
+  const uiLocale = locale === 'vi' ? 'vi-VN' : locale === 'ja' ? 'ja-JP' : locale === 'en' ? 'en-US' : locale;
   const langList = props?.langs?.data || (Array.isArray(props?.langs) ? props.langs : Object.values(props?.langs || {}));
   const currentLanguage = getLanguageByLocale(langList, locale);
   const [resolvedCurrency, setResolvedCurrency] = useState<ProductCurrency>(() => getProductCurrencyFromLocale(locale, currentLanguage));
@@ -84,22 +88,22 @@ export default function BuyToGiftFormView({
   const [activeRuleIndex, setActiveRuleIndex] = useState(0);
 
   const [knownProducts, setKnownProducts] = useState<Map<number, any>>(new Map());
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const productPicker = useProductPickerModal({ routeName: 'buytogift.products-picker' });
   const [modalTarget, setModalTarget] = useState<'buy' | 'gift'>('buy');
   const [modalRuleIndex, setModalRuleIndex] = useState(0);
-  const [productSearch, setProductSearch] = useState('');
-  const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
-  const [productModalPage, setProductModalPage] = useState(1);
-  const [tempSelectedProductIds, setTempSelectedProductIds] = useState<number[]>([]);
-  const [modalProducts, setModalProducts] = useState<any[]>([]);
-  const [modalLoading, setModalLoading] = useState(false);
-  const [modalTotalPages, setModalTotalPages] = useState(1);
-  const [modalCurrentPage, setModalCurrentPage] = useState(1);
-  const modalPageSize = 10;
 
   const rules: BuyToGiftRule[] = useMemo(() => {
     return Array.isArray(data.rules) && data.rules.length > 0 ? data.rules : [newRule()];
   }, [data.rules]);
+
+  const campaignOptions = useMemo(
+    () => (Array.isArray(itemsCampaignActive) ? itemsCampaignActive : []).map((campaign: any) => ({
+      id: Number(campaign.id),
+      name: campaign.name || `#${campaign.id}`,
+      ends_at: campaign.ends_at || '',
+    })),
+    [itemsCampaignActive]
+  );
 
   useEffect(() => {
     if (!Array.isArray(data.rules) || data.rules.length === 0) {
@@ -112,6 +116,13 @@ export default function BuyToGiftFormView({
       setActiveRuleIndex(Math.max(0, rules.length - 1));
     }
   }, [activeRuleIndex, rules.length]);
+
+  useEffect(() => {
+    const selectedCampaign = campaignOptions.find((campaign: any) => String(campaign.id) === String(data.campaign_id));
+    if (selectedCampaign?.ends_at && data.ends_at !== selectedCampaign.ends_at) {
+      setData('ends_at', selectedCampaign.ends_at);
+    }
+  }, [campaignOptions, data.campaign_id, data.ends_at, setData]);
 
   const categoryOptions = useMemo(
     () => (Array.isArray(itemsCategoryActive) ? itemsCategoryActive : []).map((category: any) => ({
@@ -139,6 +150,20 @@ export default function BuyToGiftFormView({
   }, [itemsSelectedBuyProducts, itemsSelectedGiftProducts]);
 
   useEffect(() => {
+    if (productPicker.rows.length === 0) {
+      return;
+    }
+
+    setKnownProducts((prev) => {
+      const map = new Map(prev);
+      productPicker.rows.forEach((row: any) => {
+        map.set(Number(row.id), row);
+      });
+      return map;
+    });
+  }, [productPicker.rows]);
+
+  useEffect(() => {
     let mounted = true;
     loadProductCurrency(currentLanguage, locale).then((nextCurrency) => {
       if (!mounted) return;
@@ -149,46 +174,29 @@ export default function BuyToGiftFormView({
     };
   }, [locale, currentLanguage?.code, currentLanguage?.currency]);
 
-  useEffect(() => {
-    setProductModalPage(1);
-  }, [productSearch, productCategoryFilter]);
-
-  useEffect(() => {
-    if (!isProductModalOpen) return;
-    const timeout = setTimeout(async () => {
-      setModalLoading(true);
-      try {
-        const response = await axios.get(route('buytogift.products-picker'), {
-          params: {
-            search: productSearch,
-            category_id: productCategoryFilter,
-            page: productModalPage,
-            per_page: modalPageSize,
-          },
-        });
-        const rows = Array.isArray(response?.data?.data) ? response.data.data : [];
-        const meta = response?.data?.meta || {};
-        setModalProducts(rows);
-        setModalCurrentPage(Number(meta.current_page || 1));
-        setModalTotalPages(Number(meta.last_page || 1));
-        setKnownProducts((prev) => {
-          const map = new Map(prev);
-          rows.forEach((row: any) => map.set(Number(row.id), row));
-          return map;
-        });
-      } catch (_error) {
-        setModalProducts([]);
-      } finally {
-        setModalLoading(false);
-      }
-    }, 250);
-    return () => clearTimeout(timeout);
-  }, [isProductModalOpen, productSearch, productCategoryFilter, productModalPage]);
-
   const inputClass = (fieldName: string) =>
     `w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-cyan-500/20 ${
       errors[fieldName] ? 'border-red-500 bg-red-50' : 'border-slate-300 focus:border-cyan-600'
     }`;
+
+  const formatCampaignEndsAt = (value?: string | null) => {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleString(uiLocale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   const renderField = (
     label: string,
@@ -233,31 +241,27 @@ export default function BuyToGiftFormView({
   const openProductModal = (ruleIndex: number, target: 'buy' | 'gift') => {
     setModalRuleIndex(ruleIndex);
     setModalTarget(target);
-    setTempSelectedProductIds(target === 'buy' ? (rules[ruleIndex]?.buy_product_ids || []) : (rules[ruleIndex]?.gift_product_ids || []));
-    setProductSearch('');
-    setProductCategoryFilter('all');
-    setProductModalPage(1);
-    setIsProductModalOpen(true);
+    productPicker.open(target === 'buy' ? (rules[ruleIndex]?.buy_product_ids || []) : (rules[ruleIndex]?.gift_product_ids || []));
   };
 
   const toggleTempProduct = (productId: number) => {
-    const product = modalProducts.find((row: any) => Number(row.id) === Number(productId));
+    const product = productPicker.rows.find((row: any) => Number(row.id) === Number(productId));
     if (product && Number(product.quantity ?? 0) <= 0) {
       return;
     }
 
-    setTempSelectedProductIds((prev) => (prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]));
+    productPicker.toggleSelected(productId);
   };
 
   const confirmProductSelection = () => {
     const rule = rules[modalRuleIndex];
     if (!rule) return;
     if (modalTarget === 'buy') {
-      updateRule(modalRuleIndex, { buy_product_ids: tempSelectedProductIds });
+      updateRule(modalRuleIndex, { buy_product_ids: productPicker.selectedIds });
     } else {
-      updateRule(modalRuleIndex, { gift_product_ids: tempSelectedProductIds });
+      updateRule(modalRuleIndex, { gift_product_ids: productPicker.selectedIds });
     }
-    setIsProductModalOpen(false);
+    productPicker.close();
   };
 
   const removeSelectedProduct = (ruleIndex: number, target: 'buy' | 'gift', productId: number) => {
@@ -419,13 +423,28 @@ export default function BuyToGiftFormView({
                       <input type="text" className={inputClass('name')} value={data.name} onChange={(e) => setData('name', e.target.value)} />
                       {errors.name && <MessageError>{errors.name}</MessageError>}
                     </InputGroup>
+                    <InputGroup label={trans('hancms.promotion.campaign.name')}>
+                      <select
+                        className={inputClass('campaign_id')}
+                        value={data.campaign_id || ''}
+                        onChange={(e) => setData('campaign_id', e.target.value)}
+                      >
+                        <option value="">{trans('hancms.placeholder.select')}</option>
+                        {campaignOptions.map((campaign: any) => (
+                          <option key={campaign.id} value={campaign.id}>
+                            {campaign.name}{campaign.ends_at ? ` - ${formatCampaignEndsAt(campaign.ends_at)}` : ''}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.campaign_id && <MessageError>{errors.campaign_id}</MessageError>}
+                    </InputGroup>
                     <div className="space-y-5">
                       <InputGroup label={trans('hancms.promotion.buytogift.fields.starts_at')}>
                         <input type="datetime-local" className={inputClass('starts_at')} value={data.starts_at || ''} onChange={(e) => setData('starts_at', e.target.value)} />
                         {errors.starts_at && <MessageError>{errors.starts_at}</MessageError>}
                       </InputGroup>
                       <InputGroup label={trans('hancms.promotion.buytogift.fields.ends_at')}>
-                        <input type="datetime-local" className={inputClass('ends_at')} value={data.ends_at || ''} onChange={(e) => setData('ends_at', e.target.value)} />
+                        <input type="datetime-local" readOnly={!!data.campaign_id} className={inputClass('ends_at')} value={data.ends_at || ''} onChange={(e) => setData('ends_at', e.target.value)} />
                         {errors.ends_at && <MessageError>{errors.ends_at}</MessageError>}
                       </InputGroup>
                     </div>
@@ -584,95 +603,31 @@ export default function BuyToGiftFormView({
         </div>
       </form>
 
-      {isProductModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 py-6">
-          <div className="absolute inset-0 bg-slate-950/45" onClick={() => setIsProductModalOpen(false)} />
-          <div className="relative z-10 flex max-h-[calc(100vh-3rem)] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-              <div className="min-w-0">
-                <h3 className="truncate text-base font-semibold text-slate-900">
-                  {modalTarget === 'buy' ? trans('hancms.promotion.buytogift.fields.buy_products') : trans('hancms.promotion.buytogift.fields.gift_products')}
-                </h3>
-                <div className="mt-1 text-xs text-slate-500">{tempSelectedProductIds.length} selected</div>
-              </div>
-              <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700" onClick={() => setIsProductModalOpen(false)}>
-                <X size={18} />
-              </button>
-            </div>
-            <div className="min-h-0 flex-1 space-y-3 overflow-auto p-5">
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="relative">
-                  <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input type="text" className="w-full rounded-lg border border-slate-300 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20" placeholder={trans('hancms.filter.search')} value={productSearch} onChange={(e) => setProductSearch(e.target.value)} />
-                </div>
-                <select className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20" value={productCategoryFilter} onChange={(e) => setProductCategoryFilter(e.target.value)}>
-                  <option value="all">Tất cả danh mục</option>
-                  {categoryOptions.map((category: any) => <option key={category.id} value={category.id}>{category.name}</option>)}
-                </select>
-              </div>
-              <div className="overflow-x-auto rounded-xl border border-slate-200">
-                <table className="min-w-full divide-y divide-slate-200 text-sm">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="w-14 px-3 py-2 text-left font-semibold text-slate-600">#</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-600">ID</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.sku')}</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.name')}</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.price')}</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.quantity')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
-                    {modalLoading ? (
-                      <tr><td colSpan={6} className="px-3 py-6 text-center text-slate-400">Đang tải...</td></tr>
-                    ) : modalProducts.length === 0 ? (
-                      <tr><td colSpan={6} className="px-3 py-6 text-center text-slate-400">Không có dữ liệu</td></tr>
-                    ) : (
-                      modalProducts.map((row: any) => {
-                        const quantity = Number(row.quantity ?? 0);
-                        const isOutOfStock = quantity <= 0;
-
-                        return (
-                          <tr key={row.id} className={isOutOfStock ? 'bg-slate-50 text-slate-400' : ''}>
-                            <td className="px-3 py-2">
-                              <input
-                                type="checkbox"
-                                checked={tempSelectedProductIds.includes(row.id)}
-                                disabled={isOutOfStock}
-                                onChange={() => toggleTempProduct(row.id)}
-                              />
-                            </td>
-                            <td className="px-3 py-2">{row.id}</td>
-                            <td className="px-3 py-2">{row.sku}</td>
-                            <td className="px-3 py-2">{row.name}</td>
-                            <td className="px-3 py-2">{formatProductPrice(row.price, resolvedCurrency)}</td>
-                            <td className="px-3 py-2">
-                              <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${isOutOfStock ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200' : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'}`}>
-                                {quantity}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs text-slate-500">Trang {modalCurrentPage}/{modalTotalPages}</span>
-                <div className="flex items-center gap-2">
-                  <button type="button" className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-700 disabled:cursor-not-allowed disabled:opacity-50" disabled={modalCurrentPage <= 1} onClick={() => setProductModalPage((prev) => Math.max(1, prev - 1))}><ChevronLeft size={16} /></button>
-                  <button type="button" className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-700 disabled:cursor-not-allowed disabled:opacity-50" disabled={modalCurrentPage >= modalTotalPages} onClick={() => setProductModalPage((prev) => Math.min(modalTotalPages, prev + 1))}><ChevronRight size={16} /></button>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-5 py-3">
-              <button type="button" onClick={() => setIsProductModalOpen(false)} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{trans('hancms.button.cancel')}</button>
-              <button type="button" onClick={confirmProductSelection} className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">{trans('hancms.button.confirm')}</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ProductPickerModal
+        title={modalTarget === 'buy' ? trans('hancms.promotion.buytogift.fields.buy_products') : trans('hancms.promotion.buytogift.fields.gift_products')}
+        isOpen={productPicker.isOpen}
+        search={productPicker.search}
+        categoryFilter={productPicker.categoryFilter}
+        categoryOptions={categoryOptions}
+        rows={productPicker.rows}
+        loading={productPicker.loading}
+        currentPage={productPicker.currentPage}
+        totalPages={productPicker.totalPages}
+        selectedIds={productPicker.selectedIds}
+        onClose={productPicker.close}
+        onConfirm={confirmProductSelection}
+        onSearchChange={productPicker.setSearch}
+        onCategoryFilterChange={productPicker.setCategoryFilter}
+        onToggleProduct={toggleTempProduct}
+        onPreviousPage={() => productPicker.setPage((prev) => Math.max(1, prev - 1))}
+        onNextPage={() => productPicker.setPage((prev) => Math.min(productPicker.totalPages, prev + 1))}
+        formatPrice={(price) => formatProductPrice(price, resolvedCurrency)}
+        trans={trans}
+        allCategoriesLabel="Tất cả danh mục"
+        loadingLabel="Đang tải..."
+        emptyLabel="Không có dữ liệu"
+        requireStock
+      />
     </div>
   );
 }

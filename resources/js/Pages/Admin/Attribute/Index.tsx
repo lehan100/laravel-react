@@ -10,6 +10,7 @@ import { useTrans } from '@/Hooks/useTrans'
 import Pagination from '@/Components/Pagination/Pagination'
 import StatusBadge from '@/Components/Status/StatusBadge'
 import TableView from '@/Components/Table/TableViewAll'
+import { resolveMediaUrl } from '@/Components/Common/mediaUrl'
 import { Head, router, useForm, usePage } from '@inertiajs/react'
 import { useMemo } from 'react'
 
@@ -97,7 +98,7 @@ export default function AttributeIndex() {
                                         <img
                                             alt={value.value ?? 'value'}
                                             className="h-4 w-4 rounded-full object-cover"
-                                            src={value.image_url}
+                                            src={resolveMediaUrl(value.image_url, '/media/attribute') ?? ''}
                                         />
                                     ) : value.color ? (
                                         <span

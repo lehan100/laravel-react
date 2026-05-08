@@ -1,0 +1,84 @@
+.footer
+	.footer-top
+		@apply rem:pb-[52px] border-b-2 border-b-Primary-2
+		.item
+			@apply flex items-center gap-3 cursor-pointer relative
+			&:nth-child(2)
+				.icon
+					@apply border-none
+			&:last-child
+				.icon
+					@apply border-none
+				
+			.icon
+				@apply sq-12 rounded-full inline-flex items-center justify-center border-2 border-Primary-1
+				i
+					@apply text-xl font-black text-Primary-1
+				img
+					@apply w-full h-full object-contain
+			.content
+				@apply text-Primary-1
+				.title
+					@apply  font-medium
+				a
+					font-size: calc(24 / 1920 * 100rem)
+					@apply  font-bold
+					@screen -md
+						@apply text-[15px]
+	.footer-mid
+		.footer-contact
+			@apply flex flex-col gap-2
+			p
+				@apply xl:text-lg text-[16px]
+				a
+					@apply block
+					span
+						text-decoration-line: underline
+						text-decoration-style: solid
+						text-decoration-skip-ink: none
+						text-decoration-thickness: auto
+						text-underline-offset: auto
+						text-underline-position: from-font
+						@apply  inline-flex  mr-1
+		.social
+			ul
+				@apply flex items-center rem:gap-[10px]
+				li
+					@apply w-10 h-10
+					a
+						@apply sq-10 rounded-full inline-flex items-center justify-center bg-[#0039B3] text-Neutral-White border-none
+						img
+							@apply w-full h-full object-contain
+						&.youtube
+							@apply bg-[#EF0004]
+		.footer-column
+			h3
+				@screen -md
+				@apply text-[18px]
+			ul.footer-menu
+				@apply flex flex-col gap-3
+				li
+					a
+						@apply xl:rem:text-[18px] text-[#222] text-[16px]
+					&:hover
+						a
+							@apply text-Primary-1
+					&[class*='current']
+						&>a
+							@apply text-Primary-1
+	.footer-bottom
+		.footer-policy-link
+			ul
+				@apply flex items-center gap-3
+				li
+					a
+						@apply text-sm font-normal text-Neutral-400
+@screen -md
+	.footer
+		.footer-mid
+			@apply grid-cols-1 gap-6
+		.footer-bottom
+			.wrapper
+				@apply flex-col
+				.footer-copyright
+					@apply text-center

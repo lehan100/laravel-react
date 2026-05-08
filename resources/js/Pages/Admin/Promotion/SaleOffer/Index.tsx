@@ -11,6 +11,7 @@ import CreatedButton from '@/Components/Button/CreatedButton';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import Card from '@/Components/Main/Card';
 import StatusBadge from '@/Components/Status/StatusBadge';
+import PromotionStatusBadge from '@/Components/Status/PromotionStatusBadge';
 import { Link } from '@inertiajs/react';
 import { Eye } from 'lucide-react';
 import { formatProductPrice, getLanguageByLocale, getLocaleCode, getProductCurrencyFromLocale, loadProductCurrency, type ProductCurrency } from '../../Product/productUtils';
@@ -19,6 +20,7 @@ export default function IndexPage() {
   const { trans } = useTrans();
   const { locale, items, langs }: any = usePage().props;
   const currentLocale = getLocaleCode(locale || 'vi');
+  const uiLocale = currentLocale === 'vi' ? 'vi-VN' : currentLocale === 'ja' ? 'ja-JP' : currentLocale === 'en' ? 'en-US' : currentLocale;
   const langList = langs?.data || (Array.isArray(langs) ? langs : Object.values(langs || {}));
   const currentLanguage = getLanguageByLocale(langList, currentLocale);
   const [resolvedCurrency, setResolvedCurrency] = useState<ProductCurrency>(() => getProductCurrencyFromLocale(currentLocale, currentLanguage));
@@ -28,6 +30,27 @@ export default function IndexPage() {
 
   const rows = items?.data || [];
   const links = items?.meta?.links || [];
+
+  const formatDateTimeByLocale = (value?: string | null) => {
+    if (!value) {
+      return '---';
+    }
+
+    const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+    const date = new Date(normalized);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat(uiLocale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -48,6 +71,11 @@ export default function IndexPage() {
       { label: trans('hancms.column.code'), name: 'code' },
       { label: trans('hancms.column.name'), name: 'name' },
       {
+        label: trans('hancms.promotion.saleoffer.fields.ends_at'),
+        name: 'ends_at',
+        renderCell: (row: any) => formatDateTimeByLocale(row.ends_at),
+      },
+      {
         label: trans('hancms.promotion.saleoffer.fields.discount_value'),
         name: 'discount_display',
         renderCell: (row: any) =>
@@ -63,6 +91,21 @@ export default function IndexPage() {
             value={row.is_active ? 1 : 0}
             activeLabel={trans('hancms.status.active')}
             inactiveLabel={trans('hancms.status.inactive')}
+          />
+        ),
+      },
+      {
+        label: trans('hancms.promotion.status'),
+        name: 'promotion_status',
+        renderCell: (row: any) => (
+          <PromotionStatusBadge
+            value={row.promotion_status}
+            labels={{
+              active: trans('hancms.promotion.statuses.active'),
+              upcoming: trans('hancms.promotion.statuses.upcoming'),
+              expired: trans('hancms.promotion.statuses.expired'),
+              inactive: trans('hancms.promotion.statuses.inactive'),
+            }}
           />
         ),
       },
@@ -86,7 +129,7 @@ export default function IndexPage() {
         ),
       },
     ],
-    [resolvedCurrency, trans]
+    [resolvedCurrency, trans, uiLocale]
   );
 
   function destroy(id: number) {

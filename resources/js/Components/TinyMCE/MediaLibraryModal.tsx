@@ -1,27 +1,110 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
-import { X, Loader2, ImageIcon, Folder, ChevronRight, Home, FolderPlus, Upload, Move, Trash2, Edit2Icon } from 'lucide-react';
+import {
+    X,
+    Loader2,
+    ImageIcon,
+    Folder,
+    ArrowLeft,
+    ChevronRight,
+    Home,
+    FolderPlus,
+    Upload,
+    Move,
+    Trash2,
+    Edit2Icon,
+    Copy,
+    Check,
+    Search,
+} from 'lucide-react';
 import { useTrans } from '@/Hooks/useTrans';
-const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
+
+type MediaInfo = {
+    width?: number;
+    height?: number;
+    size?: string;
+    count?: number;
+};
+
+type Breadcrumb = {
+    name: string;
+    path: string;
+};
+
+type MediaItem = {
+    type: 'file' | 'folder';
+    name: string;
+    path: string;
+    url?: string;
+    info?: MediaInfo;
+};
+
+type Props = {
+    isOpen: boolean;
+    onClose: () => void;
+    onSelect: (url: string) => void;
+    onSelectItem?: (item: MediaItem) => void;
+};
+
+type AlertType = 'success' | 'error';
+
+type UiAlert = {
+    id: string;
+    type: AlertType;
+    message: string;
+};
+
+const MediaLibraryModal = ({ isOpen, onClose, onSelect, onSelectItem }: Props) => {
     const { trans } = useTrans();
-    const [items, setItems] = useState<any[]>([]);
+    const [items, setItems] = useState<MediaItem[]>([]);
+    const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([]);
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [currentPath, setCurrentPath] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [newFolderName, setNewFolderName] = useState('');
-    const [draggingItem, setDraggingItem] = useState<any>(null);
+    const [draggingItem, setDraggingItem] = useState<MediaItem | null>(null);
+    const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+    const [query, setQuery] = useState('');
+    const [copied, setCopied] = useState(false);
+    const [alerts, setAlerts] = useState<UiAlert[]>([]);
+
+    const pushAlert = useCallback((type: AlertType, message: string) => {
+        const id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        setAlerts((prev) => [{ id, type, message }, ...prev].slice(0, 3));
+        window.setTimeout(() => {
+            setAlerts((prev) => prev.filter((item) => item.id !== id));
+        }, 3500);
+    }, []);
 
     const fetchMedia = useCallback((path = '') => {
         setLoading(true);
         // @ts-ignore
         axios.get(route('media.get.images', { path })).then(res => {
-            setItems(res.data);
+            const payload = res.data || {};
+            setItems(Array.isArray(payload.items) ? payload.items : []);
+            setBreadcrumbs(Array.isArray(payload.breadcrumbs) ? payload.breadcrumbs : []);
             setCurrentPath(path);
             setLoading(false);
         }).catch(() => setLoading(false));
     }, []);
+
+    const filteredItems = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return items;
+        return items.filter((item) => (item.name || '').toLowerCase().includes(q));
+    }, [items, query]);
+
+    const handleGoBack = useCallback(() => {
+        if (!currentPath) {
+            fetchMedia('');
+            return;
+        }
+
+        const parentPath = currentPath.split('/').filter(Boolean).slice(0, -1).join('/');
+        fetchMedia(parentPath);
+    }, [currentPath, fetchMedia]);
 
     const uploadFiles = async (files: FileList) => {
         const formData = new FormData();
@@ -31,9 +114,10 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
         try {
             // @ts-ignore
             await axios.post(route('media.upload.tinymce'), formData);
+            pushAlert('success', trans('hancms.tinymce.message.success.upload'));
             fetchMedia(currentPath);
         } catch (error) {
-            alert("Lỗi upload!");
+            pushAlert('error', trans('hancms.tinymce.message.error.upload'));
         } finally {
             setUploading(false);
         }
@@ -50,7 +134,7 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
             });
             fetchMedia(currentPath);
         } catch (error) {
-            alert(trans('hancms.tinymce.message.error.move'));
+            pushAlert('error', trans('hancms.tinymce.message.error.move'));
         } finally {
             setDraggingItem(null);
             setLoading(false);
@@ -67,7 +151,7 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
             setIsCreating(false);
             fetchMedia(currentPath);
         } catch (error) {
-            alert(trans('hancms.tinymce.message.error.create_folder'));
+            pushAlert('error', trans('hancms.tinymce.message.error.create_folder'));
         }
     };
     const handleDelete = async (e: any, item: any) => {
@@ -81,9 +165,35 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
         try {
             // @ts-ignore
             await axios.post(route('media.delete'), { path: item.path, type: item.type });
+            if (selectedItem?.path === item.path) {
+                setSelectedItem(null);
+            }
+            pushAlert('success', trans('hancms.tinymce.message.success.delete'));
             fetchMedia(currentPath);
         } catch (error) {
-            alert(trans('hancms.tinymce.message.error.delete'));
+            pushAlert('error', trans('hancms.tinymce.message.error.delete'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteDirect = async (item: MediaItem) => {
+        const typeLabel = item.type === 'folder'
+            ? trans('hancms.tinymce.label.folder')
+            : trans('hancms.tinymce.label.file');
+        if (!confirm(trans('hancms.tinymce.message.delete', { name: typeLabel }))) return;
+
+        setLoading(true);
+        try {
+            // @ts-ignore
+            await axios.post(route('media.delete'), { path: item.path, type: item.type });
+            if (selectedItem?.path === item.path) {
+                setSelectedItem(null);
+            }
+            pushAlert('success', trans('hancms.tinymce.message.success.delete'));
+            fetchMedia(currentPath);
+        } catch (_error) {
+            pushAlert('error', trans('hancms.tinymce.message.error.delete'));
         } finally {
             setLoading(false);
         }
@@ -98,23 +208,73 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
         setLoading(true);
         try {
             // @ts-ignore
-            await axios.post(route('media.rename'), {
+            const response = await axios.post(route('media.rename'), {
                 old_path: item.path.replace(/^\/+/, ''),
                 new_name: newName,
                 type: item.type
             });
+            if (selectedItem?.path === item.path) {
+                setSelectedItem((current) => (
+                    current
+                        ? {
+                            ...current,
+                            name: response.data?.name || newName,
+                            path: response.data?.path || current.path,
+                        }
+                        : current
+                ));
+            }
             fetchMedia(currentPath);
         } catch (error) {
-            alert(trans('hancms.tinymce.message.error.rename'));
+            pushAlert('error', trans('hancms.tinymce.message.error.rename'));
         } finally {
             setLoading(false);
         }
     };
+
+    const getRelativeUrl = (item: MediaItem): string => {
+        const itemUrl = item.url || '';
+        if (!itemUrl) return '';
+        return itemUrl.replace(window.location.origin, '');
+    };
+
+    const insertSelected = (item: MediaItem) => {
+        const relativeUrl = getRelativeUrl(item);
+        if (!relativeUrl) return;
+        onSelect(relativeUrl);
+        onSelectItem?.(item);
+        onClose();
+    };
+
+    const copySelectedUrl = async (item: MediaItem) => {
+        const url = getRelativeUrl(item);
+        if (!url) return;
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 1200);
+        } catch (_e) {
+            prompt('Copy URL', url);
+        }
+    };
+
     useEffect(() => {
-        if (isOpen) fetchMedia('');
+        if (isOpen) {
+            setQuery('');
+            setCopied(false);
+            setSelectedItem(null);
+            setAlerts([]);
+            setBreadcrumbs([]);
+            fetchMedia('');
+        }
         if (!isOpen) {
             setDraggingItem(null);
             setIsCreating(false);
+            setQuery('');
+            setCopied(false);
+            setSelectedItem(null);
+            setAlerts([]);
+            setBreadcrumbs([]);
         }
         const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
         window.addEventListener('keydown', handleEsc);
@@ -125,12 +285,9 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
         if (item.type === 'folder') {
             fetchMedia(item.path);
         } else {
-            const relativeUrl = item.url.replace(window.location.origin, '');
-            onSelect(relativeUrl);
+            setSelectedItem(item);
         }
     };
-
-    const breadcrumbs = currentPath.split('/').filter(Boolean);
 
     if (!isOpen) return null;
 
@@ -172,16 +329,28 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                 </div>
 
                 <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap border-b bg-white px-4 py-2 text-[10px] font-bold text-gray-400 shadow-sm sm:px-6 sm:py-2.5 sm:text-[11px] z-20">
-                    <button type="button" onClick={() => fetchMedia('')} className="hover:text-indigo-600 flex items-center gap-1 transition-colors uppercase"><Home size={14} /> Root</button>
+                    <button
+                        type="button"
+                        onClick={handleGoBack}
+                        disabled={!currentPath}
+                        className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-600 transition-colors hover:border-indigo-200 hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <ArrowLeft size={12} />
+                        Back
+                    </button>
+                    <button type="button" onClick={() => fetchMedia('')} className="hover:text-indigo-600 flex items-center gap-1 transition-colors"><Home size={14} /> Root</button>
                     {breadcrumbs.map((folder, i) => (
                         <React.Fragment key={i}>
                             <ChevronRight size={12} className="text-gray-300" />
-                            <button type="button" onClick={() => fetchMedia(breadcrumbs.slice(0, i + 1).join('/'))} className="hover:text-indigo-600 uppercase transition-colors">{folder}</button>
+                            <button type="button" onClick={() => fetchMedia(folder.path)} className="hover:text-indigo-600 transition-colors">{folder.name}</button>
                         </React.Fragment>
                     ))}
                 </div>
 
-                <div className="relative flex-1 overflow-y-auto bg-white p-4 custom-scrollbar sm:min-h-[400px] sm:p-6" onClick={() => setDraggingItem(null)}>
+                <div
+                    className="relative flex-1 overflow-y-auto bg-white p-4 custom-scrollbar sm:min-h-[400px] sm:p-6"
+                    onClick={() => setDraggingItem(null)}
+                >
                     {(uploading || loading) && (
                         <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center backdrop-blur-[1px]">
                             <div className="flex flex-col items-center gap-3 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
@@ -191,7 +360,72 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-6">
+                    {alerts.length ? (
+                        <div className="mb-4 space-y-2 sm:mb-6">
+                            {alerts.map((alertItem) => (
+                                <div
+                                    key={alertItem.id}
+                                    className={`rounded-2xl border px-4 py-3 shadow-sm ${
+                                        alertItem.type === 'success'
+                                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                                            : 'border-rose-200 bg-rose-50 text-rose-800'
+                                    }`}
+                                    role="alert"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="text-[12px] font-bold leading-relaxed">
+                                            {alertItem.message}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setAlerts((prev) => prev.filter((item) => item.id !== alertItem.id))}
+                                            className="rounded-xl p-1 text-current/60 hover:bg-white/60 hover:text-current"
+                                            aria-label="Dismiss"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : null}
+
+                    <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="relative w-full sm:max-w-md">
+                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder={trans('hancms.tinymce.label.search') || 'Search...'}
+                                className="w-full rounded-2xl border border-gray-200 bg-white pl-10 pr-3 py-2.5 text-[12px] font-bold text-gray-700 outline-none focus:border-indigo-300 focus:ring-4 focus:ring-indigo-100"
+                            />
+                        </div>
+                        {selectedItem?.type === 'file' ? (
+                            <div className="flex flex-wrap items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => copySelectedUrl(selectedItem)}
+                                    className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-600 shadow-sm transition-all active:scale-95 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                                >
+                                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                                    {copied
+                                        ? (trans('hancms.tinymce.button.copied') || 'Copied')
+                                        : (trans('hancms.tinymce.button.copy_url') || 'Copy URL')}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => insertSelected(selectedItem)}
+                                    className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-md shadow-indigo-100 transition-all active:scale-95 hover:bg-indigo-700"
+                                >
+                                    <ImageIcon size={14} />
+                                    {trans('hancms.tinymce.button.insert') || 'Insert'}
+                                </button>
+                            </div>
+                        ) : null}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_300px]">
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-4">
                         {isCreating && (
                             <div className="border-2 border-indigo-400 rounded-2xl p-3 bg-indigo-50 flex flex-col items-center justify-center gap-3 aspect-square shadow-inner animate-in zoom-in-95 sm:p-4">
                                 <Folder size={40} className="text-indigo-400 fill-indigo-100" />
@@ -203,8 +437,8 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                             </div>
                         )}
 
-                        {items.length > 0 ? (
-                            items.map((item: any, idx) => (
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map((item: MediaItem, idx) => (
                                 <div
                                     key={idx}
                                     draggable={item.type === 'file'}
@@ -227,11 +461,19 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                                             handleMoveItem(item.path);
                                         }
                                     }}
-                                    className={`group relative border border-gray-100 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all bg-gray-50 aspect-square flex flex-col items-center justify-center 
-                                        ${item.type === 'file' ? 'active:scale-95 hover:border-indigo-500' : 'hover:bg-indigo-50/50 hover:border-amber-400'}`}
+                                    className={`group relative border rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all bg-gray-50 aspect-square flex flex-col items-center justify-center
+                                        ${item.type === 'file'
+                                            ? (selectedItem?.path === item.path ? 'border-indigo-500 ring-4 ring-indigo-100' : 'border-gray-100 hover:border-indigo-500 active:scale-95')
+                                            : 'border-gray-100 hover:bg-indigo-50/50 hover:border-amber-400'}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleItemClick(item);
+                                    }}
+                                    onDoubleClick={(e) => {
+                                        e.stopPropagation();
+                                        if (item.type === 'file') {
+                                            insertSelected(item);
+                                        }
                                     }}
                                 >
                                     <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 flex gap-1 z-10 transition-opacity">
@@ -251,16 +493,18 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                                         </button>
                                     </div>
                                     {item.type === 'folder' ? (
-                                        <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                            <Folder size={56} className="text-amber-400 fill-amber-400 group-hover:scale-110 transition-transform duration-500 shadow-sm" />
-                                            <span className="text-[10px] font-black text-gray-600 mt-3 truncate w-full text-center uppercase tracking-tight px-1">{item.name}</span>
-                                            <span className="text-[9px] font-bold text-gray-400 tracking-widest mt-0.5">
+                                        <div className="flex h-full w-full flex-col items-center justify-start px-3 pt-5 pb-4">
+                                            <Folder size={58} className="shrink-0 text-amber-400 fill-amber-400 group-hover:scale-110 transition-transform duration-500 shadow-sm" />
+                                            <span className="mt-3 flex min-h-[40px] w-full items-center justify-center px-1 text-center text-[13px] font-black leading-5 tracking-tight text-gray-700 capitalize break-words [overflow-wrap:anywhere]">
+                                                {item.name}
+                                            </span>
+                                            <span className="mt-2 text-[10px] font-bold text-gray-400 tracking-widest">
                                                 {item.info?.count || 0} items
                                             </span>
                                         </div>
                                     ) : (
                                         <>
-                                            <img src={item.url} alt="" className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 shadow-inner" />
+                                            <img src={item.url} alt="" className="h-full w-full object-contain bg-gray-100 p-2 group-hover:scale-105 transition-transform duration-700 shadow-inner" />
                                             {draggingItem?.path === item.path && (
                                                 <div className="absolute inset-0 bg-indigo-600/40 backdrop-blur-sm flex items-center justify-center">
                                                     <Move size={32} className="text-white animate-pulse" />
@@ -284,6 +528,96 @@ const MediaLibraryModal = ({ isOpen, onClose, onSelect }: any) => {
                                 <p className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em]">{trans('hancms.tinymce.message.folder_empty')}</p>
                             </div>
                         )}
+                    </div>
+
+                        <div className="hidden lg:block">
+                            <div className="sticky top-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                                <div className="flex items-center justify-between gap-3 border-b border-gray-100 bg-gray-50 px-4 py-3">
+                                    <div className="min-w-0 text-[12px] font-black uppercase tracking-widest text-gray-800">
+                                        {trans('hancms.tinymce.label.inspector') || 'Inspector'}
+                                    </div>
+                                    <div className="inline-flex max-w-[130px] shrink-0 items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-gray-600 shadow-sm">
+                                        <span className="truncate whitespace-nowrap">
+                                            {selectedItem?.type === 'file'
+                                                ? (trans('hancms.tinymce.label.selected_file') || 'Selected file')
+                                                : (trans('hancms.tinymce.label.no_selection') || 'No selection')}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="p-4">
+                                    {selectedItem?.type === 'file' ? (
+                                        <div className="space-y-4">
+                                            <div className="overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                                                <img src={selectedItem.url} alt="" className="h-48 w-full object-contain p-2" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div className="break-words text-[14px] font-black leading-snug text-gray-900">
+                                                    {selectedItem.name}
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-wider text-gray-600">
+                                                    {selectedItem.info?.width && selectedItem.info?.height ? (
+                                                        <span className="rounded-lg bg-indigo-50 px-2 py-1 text-indigo-700">
+                                                            {selectedItem.info.width}x{selectedItem.info.height}
+                                                        </span>
+                                                    ) : null}
+                                                    {selectedItem.info?.size ? (
+                                                        <span className="rounded-lg bg-gray-100 px-2 py-1 text-gray-700">
+                                                            {selectedItem.info.size}
+                                                        </span>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+
+                                            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-600">
+                                                    {trans('hancms.tinymce.label.url') || 'URL'}
+                                                </div>
+                                                <div className="mt-2 max-h-20 overflow-y-auto break-all rounded-lg bg-white p-2 font-mono text-[11px] leading-relaxed text-gray-800">
+                                                    {getRelativeUrl(selectedItem)}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => copySelectedUrl(selectedItem)}
+                                                    className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-700 shadow-sm transition-all active:scale-95 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                                                >
+                                                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                                                    {copied
+                                                        ? (trans('hancms.tinymce.button.copied') || 'Copied')
+                                                        : (trans('hancms.tinymce.button.copy_url') || 'Copy URL')}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => insertSelected(selectedItem)}
+                                                    className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white shadow-md shadow-indigo-100 transition-all active:scale-95 hover:bg-indigo-700"
+                                                >
+                                                    <ImageIcon size={14} />
+                                                    {trans('hancms.tinymce.button.insert') || 'Insert'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteDirect(selectedItem)}
+                                                    className="inline-flex min-h-10 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-rose-700 shadow-sm transition-all active:scale-95 hover:border-rose-300 hover:bg-rose-100"
+                                                    title={trans('hancms.button.delete') || 'Delete'}
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-5 text-center">
+                                            <ImageIcon className="mx-auto text-gray-300" size={34} />
+                                            <div className="mt-3 text-[11px] font-bold leading-relaxed tracking-wider text-gray-500">
+                                                {trans('hancms.tinymce.message.pick_image_hint') || 'Select an image to preview and insert.'}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

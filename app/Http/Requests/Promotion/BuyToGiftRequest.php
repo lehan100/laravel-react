@@ -27,7 +27,7 @@ class BuyToGiftRequest extends FormRequest
         if (is_array($rules)) {
             $normalizedRules = [];
             foreach ($rules as $index => $rule) {
-                if (!is_array($rule)) {
+                if (! is_array($rule)) {
                     continue;
                 }
 
@@ -66,6 +66,7 @@ class BuyToGiftRequest extends FormRequest
             'max_sets_per_order' => ['nullable', 'integer', 'min:1'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'campaign_id' => ['nullable', 'integer', 'exists:promotion_campaigns,id'],
             'priority' => ['nullable', 'integer', 'min:0'],
             'buy_product_ids' => ['nullable', 'array'],
             'buy_product_ids.*' => ['integer', 'exists:products,id'],
@@ -114,6 +115,7 @@ class BuyToGiftRequest extends FormRequest
 
         if ($decimalIndex === -1) {
             $numeric = preg_replace('/[^\d-]/u', '', $cleaned);
+
             return $numeric === null || $numeric === '' ? null : (float) $numeric;
         }
 

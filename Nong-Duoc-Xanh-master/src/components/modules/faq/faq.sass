@@ -1,0 +1,52 @@
+.faq
+	.wrap-item-toggle
+		.item-toggle
+			@apply border border-transparent
+			@screen -md
+				@apply p-3
+			.title
+				span
+					@screen -md
+						@apply text-[16px]
+			&.active
+				@apply border border-Primary-1
+				.title
+					@apply pb-6 mb-6 border-b-2 border-b-Primary-1 
+					.number
+						@apply text-Primary-1
+					span
+						@apply text-Primary-1
+					i
+						&::before
+							content: "\f068"
+							@apply  font-awesome text-Primary-1
+	.col-left
+		@apply xl:sticky xl:rem:top-[80px] h-fit
+		.col-left-menu
+			ul
+				li
+					@apply transition-all ease-in-out
+					span
+						@apply transition-all ease-in-out
+					.icon						
+						i
+							@apply transition-all ease-in-out
+					&.active
+						a
+							span
+								@apply text-Primary-1
+							.icon
+								i
+									&::before
+										content: "\f068"
+										@apply  font-awesome text-Primary-1
+@screen -md
+	.faq
+		.wrap-item-toggle
+			.item-toggle	
+				.wrapper
+					@apply flex-col
+					.img
+						@apply w-full max-w-full
+					.content-wrap
+						@apply w-full

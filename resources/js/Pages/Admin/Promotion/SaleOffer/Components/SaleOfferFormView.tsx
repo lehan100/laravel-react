@@ -2,6 +2,7 @@ import AdminFormHeader from '@/Components/Common/AdminFormHeader';
 import AdminSideTabsLayout from '@/Components/Common/AdminSideTabsLayout';
 import ProductPickerModal from '@/Components/Common/ProductPickerModal';
 import SelectedProductsTable from '@/Components/Common/SelectedProductsTable';
+import { useProductPickerModal } from '@/Components/Common/useProductPickerModal';
 import { InputGroup } from '@/Components/Form/HancmsInput';
 import MessageError from '@/Components/Form/MessageError';
 import Card from '@/Components/Main/Card';
@@ -9,7 +10,6 @@ import StatusSwitch from '@/Components/Status/StatusSwitch';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import { Save } from 'lucide-react';
-import axios from 'axios';
 import { formatPriceInput, formatProductPrice, getLanguageByLocale, getLocaleCode, getProductCurrencyFromLocale, loadProductCurrency, parsePriceInput, type ProductCurrency } from '../../../Product/productUtils';
 
 type SaleOfferFormViewProps = {
@@ -21,6 +21,7 @@ type SaleOfferFormViewProps = {
   errors: Record<string, string>;
   processing: boolean;
   itemsCategoryActive: any[];
+  itemsCampaignActive: any[];
   itemsSelectedProducts: any[];
   undo: number;
   handleUndo: (status: number) => void;
@@ -37,6 +38,7 @@ export default function SaleOfferFormView({
   errors,
   processing,
   itemsCategoryActive = [],
+  itemsCampaignActive = [],
   itemsSelectedProducts = [],
   undo,
   handleUndo,
@@ -64,21 +66,12 @@ export default function SaleOfferFormView({
   );
   const [discountValueFocused, setDiscountValueFocused] = useState(false);
   const [maxDiscountAmountFocused, setMaxDiscountAmountFocused] = useState(false);
+  const productPicker = useProductPickerModal({ routeName: 'saleoffer.products-picker' });
   const selectedProductIds = useMemo(
     () => (Array.isArray(data.product_ids) ? data.product_ids.map((id: any) => Number(id)).filter((id: number) => !Number.isNaN(id)) : []),
     [data.product_ids]
   );
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [productSearch, setProductSearch] = useState('');
-  const [productCategoryFilter, setProductCategoryFilter] = useState<string>('all');
-  const [productModalPage, setProductModalPage] = useState(1);
-  const [tempSelectedProductIds, setTempSelectedProductIds] = useState<number[]>([]);
-  const [modalProducts, setModalProducts] = useState<any[]>([]);
-  const [modalLoading, setModalLoading] = useState(false);
-  const [modalTotalPages, setModalTotalPages] = useState(1);
-  const [modalCurrentPage, setModalCurrentPage] = useState(1);
   const [knownProducts, setKnownProducts] = useState<Map<number, any>>(new Map());
-  const modalPageSize = 10;
 
   const productRows = useMemo(
     () => (Array.isArray(itemsSelectedProducts) ? itemsSelectedProducts : []).map((item: any) => ({
@@ -110,9 +103,32 @@ export default function SaleOfferFormView({
     setKnownProducts(map);
   }, [itemsSelectedProducts]);
 
+  useEffect(() => {
+    if (productPicker.rows.length === 0) {
+      return;
+    }
+
+    setKnownProducts((prev) => {
+      const map = new Map(prev);
+      productPicker.rows.forEach((row: any) => {
+        map.set(Number(row.id), row);
+      });
+      return map;
+    });
+  }, [productPicker.rows]);
+
   const selectedProductRows = useMemo(
     () => selectedProductIds.map((id: number) => knownProducts.get(id)).filter(Boolean),
     [selectedProductIds, knownProducts]
+  );
+
+  const campaignOptions = useMemo(
+    () => (Array.isArray(itemsCampaignActive) ? itemsCampaignActive : []).map((campaign: any) => ({
+      id: Number(campaign.id),
+      name: campaign.name || `#${campaign.id}`,
+      ends_at: campaign.ends_at || '',
+    })),
+    [itemsCampaignActive]
   );
 
   useEffect(() => {
@@ -127,8 +143,6 @@ export default function SaleOfferFormView({
       mounted = false;
     };
   }, [locale, currentLanguage?.code, currentLanguage?.currency]);
-
-  const modalPageProducts = modalProducts;
 
   useEffect(() => {
     setDiscountType(data.discount_type || 'percent');
@@ -161,7 +175,14 @@ export default function SaleOfferFormView({
   ]);
 
   useEffect(() => {
-    const infoErrorFields = ['code', 'name', 'description', 'discount_type', 'discount_value', 'max_discount_amount'];
+    const selectedCampaign = campaignOptions.find((campaign: any) => String(campaign.id) === String(data.campaign_id));
+    if (selectedCampaign?.ends_at && data.ends_at !== selectedCampaign.ends_at) {
+      setData('ends_at', selectedCampaign.ends_at);
+    }
+  }, [campaignOptions, data.campaign_id, data.ends_at, setData]);
+
+  useEffect(() => {
+    const infoErrorFields = ['code', 'name', 'description', 'campaign_id', 'discount_type', 'discount_value', 'max_discount_amount'];
     const scopeErrorFields = ['product_ids'];
     const conditionErrorFields = ['starts_at', 'ends_at', 'priority'];
 
@@ -178,57 +199,29 @@ export default function SaleOfferFormView({
     }
   }, [errors]);
 
-  useEffect(() => {
-    setProductModalPage(1);
-  }, [productSearch, productCategoryFilter]);
-
-  useEffect(() => {
-    if (!isProductModalOpen) {
-      return;
-    }
-
-    const timeout = setTimeout(async () => {
-      setModalLoading(true);
-      try {
-        const response = await axios.get(route('saleoffer.products-picker'), {
-          params: {
-            search: productSearch,
-            category_id: productCategoryFilter,
-            page: productModalPage,
-            per_page: modalPageSize,
-          },
-        });
-
-        const responseData:any = response?.data?.data || [];
-        const meta:any = response?.data?.meta || {};
-
-        const rows = Array.isArray(responseData) ? responseData : [];
-        setModalProducts(rows);
-        setModalCurrentPage(Number(meta.current_page || 1));
-        setModalTotalPages(Number(meta.last_page || 1));
-        setKnownProducts((prev) => {
-          const map = new Map(prev);
-          rows.forEach((row: any) => {
-            map.set(Number(row.id), row);
-          });
-          return map;
-        });
-      } catch (_error) {
-        setModalProducts([]);
-        setModalCurrentPage(1);
-        setModalTotalPages(1);
-      } finally {
-        setModalLoading(false);
-      }
-    }, 250);
-
-    return () => clearTimeout(timeout);
-  }, [isProductModalOpen, productSearch, productCategoryFilter, productModalPage]);
-
   const inputClass = (fieldName: string): any =>
     `w-full border rounded-md p-2 text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500 ${
       errors[fieldName] ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-indigo-500'
     }`;
+
+  const formatCampaignEndsAt = (value?: string | null) => {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleString(uiLocale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   const handleDiscountTypeChange = (value: string):any => {
     setDiscountType(value);
@@ -264,7 +257,7 @@ export default function SaleOfferFormView({
 
   const hasTabError = (tab: 'info' | 'scope' | 'conditions') => {
     if (tab === 'info') {
-      return ['code', 'name', 'description', 'discount_type', 'discount_value', 'max_discount_amount'].some((field) => !!errors[field]);
+      return ['code', 'name', 'description', 'campaign_id', 'discount_type', 'discount_value', 'max_discount_amount'].some((field) => !!errors[field]);
     }
     if (tab === 'scope') {
       return ['product_ids'].some((field) => !!errors[field]);
@@ -273,19 +266,11 @@ export default function SaleOfferFormView({
   };
 
   const openProductModal = () => {
-    setTempSelectedProductIds(selectedProductIds);
-    setProductSearch('');
-    setProductCategoryFilter('all');
-    setProductModalPage(1);
-    setIsProductModalOpen(true);
+    productPicker.open(selectedProductIds);
   };
 
   const toggleTempProduct = (productId: number) => {
-    setTempSelectedProductIds((prev) => (
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    ));
+    productPicker.toggleSelected(productId);
   };
 
   const removeSelectedProduct = (productId: number) => {
@@ -293,8 +278,8 @@ export default function SaleOfferFormView({
   };
 
   const confirmProductSelection = () => {
-    setData('product_ids', tempSelectedProductIds);
-    setIsProductModalOpen(false);
+    setData('product_ids', productPicker.selectedIds);
+    productPicker.close();
   };
 
   const promotionTabs = [
@@ -328,6 +313,22 @@ export default function SaleOfferFormView({
             <InputGroup label={trans('hancms.column.description')}>
               <textarea rows={4} className={inputClass('description')} value={data.description} onChange={(e) => setData('description', e.target.value)} />
               {errors.description && <MessageError>{errors.description}</MessageError>}
+            </InputGroup>
+
+            <InputGroup label={trans('hancms.promotion.campaign.name')}>
+              <select
+                className={inputClass('campaign_id')}
+                value={data.campaign_id || ''}
+                onChange={(e) => setData('campaign_id', e.target.value)}
+              >
+                <option value="">{trans('hancms.placeholder.select')}</option>
+                {campaignOptions.map((campaign: any) => (
+                  <option key={campaign.id} value={campaign.id}>
+                    {campaign.name}{campaign.ends_at ? ` - ${formatCampaignEndsAt(campaign.ends_at)}` : ''}
+                  </option>
+                ))}
+              </select>
+              {errors.campaign_id && <MessageError>{errors.campaign_id}</MessageError>}
             </InputGroup>
 
             <InputGroup label={trans('hancms.promotion.saleoffer.fields.discount_type')}>
@@ -437,6 +438,7 @@ export default function SaleOfferFormView({
             <input
               type="datetime-local"
               lang={uiLocale}
+              readOnly={!!data.campaign_id}
               className={inputClass('ends_at')}
               value={data.ends_at}
               onChange={(e) => setData('ends_at', e.target.value)}
@@ -491,22 +493,22 @@ export default function SaleOfferFormView({
 
       <ProductPickerModal
         title={trans('hancms.promotion.saleoffer.fields.apply_products')}
-        isOpen={isProductModalOpen}
-        search={productSearch}
-        categoryFilter={productCategoryFilter}
+        isOpen={productPicker.isOpen}
+        search={productPicker.search}
+        categoryFilter={productPicker.categoryFilter}
         categoryOptions={categoryOptions}
-        rows={modalPageProducts}
-        loading={modalLoading}
-        currentPage={modalCurrentPage}
-        totalPages={modalTotalPages}
-        selectedIds={tempSelectedProductIds}
-        onClose={() => setIsProductModalOpen(false)}
+        rows={productPicker.rows}
+        loading={productPicker.loading}
+        currentPage={productPicker.currentPage}
+        totalPages={productPicker.totalPages}
+        selectedIds={productPicker.selectedIds}
+        onClose={productPicker.close}
         onConfirm={confirmProductSelection}
-        onSearchChange={setProductSearch}
-        onCategoryFilterChange={setProductCategoryFilter}
+        onSearchChange={productPicker.setSearch}
+        onCategoryFilterChange={productPicker.setCategoryFilter}
         onToggleProduct={toggleTempProduct}
-        onPreviousPage={() => setProductModalPage((prev) => Math.max(1, prev - 1))}
-        onNextPage={() => setProductModalPage((prev) => Math.min(modalTotalPages, prev + 1))}
+        onPreviousPage={() => productPicker.setPage((prev) => Math.max(1, prev - 1))}
+        onNextPage={() => productPicker.setPage((prev) => Math.min(productPicker.totalPages, prev + 1))}
         formatPrice={(price) => formatProductPrice(price, resolvedCurrency)}
         trans={trans}
         allCategoriesLabel="Tất cả danh mục"

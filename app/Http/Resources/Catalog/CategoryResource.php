@@ -2,12 +2,15 @@
 
 namespace App\Http\Resources\Catalog;
 
+use App\Http\Resources\Concerns\LoadsRelationCollections;
 use App\Models\Catalog\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CategoryResource extends JsonResource
 {
+    use LoadsRelationCollections;
+
     /**
      * Transform the resource into an array.
      *
@@ -19,6 +22,8 @@ class CategoryResource extends JsonResource
         $configPath = config('image.path.category');
         $baseUrl = url('/');
         $path = $configPath['path'] ?? 'uploads';
+        $translations = $this->loadedCollection('translations');
+        $slugs = $this->loadedCollection('slugs');
 
         return [
             'id' => $this->id,
@@ -42,9 +47,9 @@ class CategoryResource extends JsonResource
             'posts_count' => $this->whenCounted('posts'),
             'posts' => $this->whenLoaded('posts', function () {
                 return $this->posts->map(function (Post $post): array {
-                    $translation = $post->translations
-                        ->firstWhere('locale', app()->getLocale())
-                        ?? $post->translations->first();
+                    $translation = $post->relationLoaded('translations')
+                        ? ($post->translations->firstWhere('locale', app()->getLocale()) ?? $post->translations->first())
+                        : null;
 
                     return [
                         'id' => $post->id,
@@ -55,9 +60,9 @@ class CategoryResource extends JsonResource
                 })->values()->all();
             }),
             'photo' => $this->photo ?? '',
-            'photo_url' => $this->photo ? rtrim($baseUrl, '/').'/'.trim($path, '/').'/'.$this->photo : null,
-            'translations' => $this->translations->mapWithKeys(function ($item) {
-                $slugLocale = $this->slugs->where('locale', $item->locale)->whereNull('redirect_to')->where('is_default', true)->first();
+            'photo_url' => $this->photo ? $this->buildImageUrl($baseUrl, $path, $this->photo) : null,
+            'translations' => $translations->mapWithKeys(function ($item) use ($slugs) {
+                $slugLocale = $slugs->where('locale', $item->locale)->whereNull('redirect_to')->where('is_default', true)->first();
 
                 return [$item->locale => [
                     'name' => $item->name ?? '',
@@ -70,5 +75,21 @@ class CategoryResource extends JsonResource
                 ]];
             }),
         ];
+    }
+
+    private function buildImageUrl(string $baseUrl, string $path, string $image): string
+    {
+        if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://') || str_starts_with($image, '/')) {
+            return $image;
+        }
+
+        $parsedPath = parse_url($image, PHP_URL_PATH);
+        $parsedPath = is_string($parsedPath) && $parsedPath !== '' ? $parsedPath : $image;
+
+        if (str_contains($parsedPath, '/')) {
+            return '/'.ltrim($parsedPath, '/');
+        }
+
+        return rtrim($baseUrl, '/').'/'.trim($path, '/').'/'.$image;
     }
 }

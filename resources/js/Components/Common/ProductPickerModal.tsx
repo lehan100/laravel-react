@@ -12,6 +12,13 @@ type ProductPickerRow = {
     price: number;
     quantity?: number | string;
     is_stock?: number | string | boolean;
+    campaigns?: Array<{
+        id: number;
+        name: string;
+        slug?: string;
+        ends_at?: string | null;
+        is_active?: boolean;
+    }>;
 };
 
 type ProductPickerModalProps = {
@@ -38,6 +45,7 @@ type ProductPickerModalProps = {
     loadingLabel?: string;
     emptyLabel?: string;
     requireStock?: boolean;
+    showCampaigns?: boolean;
 };
 
 export default function ProductPickerModal({
@@ -64,6 +72,7 @@ export default function ProductPickerModal({
     loadingLabel,
     emptyLabel,
     requireStock = false,
+    showCampaigns = false,
 }: ProductPickerModalProps) {
     if (!isOpen) {
         return null;
@@ -109,6 +118,9 @@ export default function ProductPickerModal({
                                     <th className="px-3 py-2 text-left font-semibold text-slate-600">ID</th>
                                     <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.sku')}</th>
                                     <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.name')}</th>
+                                    {showCampaigns && (
+                                        <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.promotion.campaign.name')}</th>
+                                    )}
                                     <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.price')}</th>
                                     <th className="px-3 py-2 text-left font-semibold text-slate-600">{trans('hancms.column.quantity')}</th>
                                 </tr>
@@ -116,13 +128,13 @@ export default function ProductPickerModal({
                             <tbody className="divide-y divide-slate-200 bg-white">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={6} className="px-3 py-6 text-center text-slate-400">
+                                        <td colSpan={showCampaigns ? 7 : 6} className="px-3 py-6 text-center text-slate-400">
                                             {loadingLabel ?? trans('hancms.loading')}
                                         </td>
                                     </tr>
                                 ) : rows.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-3 py-6 text-center text-slate-400">
+                                        <td colSpan={showCampaigns ? 7 : 6} className="px-3 py-6 text-center text-slate-400">
                                             {emptyLabel ?? trans('hancms.no_data')}
                                         </td>
                                     </tr>
@@ -144,6 +156,29 @@ export default function ProductPickerModal({
                                                 <td className="px-3 py-2">{row.id}</td>
                                                 <td className="px-3 py-2">{row.sku}</td>
                                                 <td className="px-3 py-2">{row.name}</td>
+                                                {showCampaigns && (
+                                                    <td className="px-3 py-2">
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {(row.campaigns || []).length > 0 ? (
+                                                                row.campaigns!.map((campaign) => (
+                                                                    <span
+                                                                        key={campaign.id}
+                                                                        className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                                                                            campaign.is_active
+                                                                                ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+                                                                                : 'bg-slate-50 text-slate-500 ring-1 ring-slate-200'
+                                                                        }`}
+                                                                        title={campaign.ends_at ?? ''}
+                                                                    >
+                                                                        {campaign.name}
+                                                                    </span>
+                                                                ))
+                                                            ) : (
+                                                                <span className="text-xs text-slate-400">{trans('hancms.no_data')}</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                )}
                                                 <td className="px-3 py-2">{formatPrice(row.price)}</td>
                                                 <td className="px-3 py-2">
                                                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${isOutOfStock ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200' : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'}`}>

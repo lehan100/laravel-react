@@ -1,0 +1,585 @@
+@layer components
+	.date
+		@apply flex-wrap
+	#address-form .form-row 
+		&:last-child			
+			@apply flex justify-center
+	body .devvn_review_mid .star-rating
+		@apply text-base #{!important}
+		.rating
+			&::after
+				content: "/"
+				@apply inline-block ml-1
+
+	body .star-average .woocommerce-product-rating
+		@apply gap-3 mb-base
+		.star_average
+			@apply mr-0
+		.star_icon
+			@apply  text-[#f5a623]
+			i
+				@apply font-bold
+	.shipped_via
+		@apply hidden
+	.woocommerce-order-details .woocommerce-table tfoot tr:last-child td
+		@apply whitespace-nowrap
+		@screen -md
+			@apply whitespace-normal
+	.woocommerce-account .woocommerce-MyAccount-navigation ul li.is-active a
+		@apply bg-Primary-1 text-Neutral-White #{!important}
+	.woocommerce-account .woocommerce-MyAccount-navigation ul li a
+		&:hover
+			@apply bg-Primary-1 text-Neutral-White #{!important}
+	.woocommerce-order-details .woocommerce-table .woocommerce-button.pay
+		@apply hidden
+	.woocommerce-order-details .woocommerce-table .woocommerce-button
+		@apply hidden #{!important}
+
+	.mini-cart-wrapper .woocommerce-mini-cart.cart_list li
+		@apply py-[2.041667rem] #{!important}
+	.mini-cart-wrapper .mini_cart_item .img-product a
+		@apply rem:w-[75px] rem:h-[75px] #{!important}
+	.mini-cart-wrapper .woocommerce-mini-cart .wrap-quantity-price .price-sale bdi
+		font-size: calc(16/1920*100rem)
+	.mini-cart-wrapper .woocommerce-mini-cart-item.mini_cart_item .product-quantity
+		@apply mb-3
+	.mini-cart-wrapper .woocommerce-mini-cart .wrap-quantity-price .price-old bdi
+		font-size: calc(16/1920*100rem)
+	.mini-cart-wrapper .woocommerce-mini-cart .wrap-price .product-price .label
+		font-size: calc(16/1920*100rem)
+	.search-page 
+		.search-query 
+			@screen -md
+				@apply text-[16px]
+		.wrap-product-grid 
+			.product-item
+				.image
+					.button-add-cart
+						.quick-add-to-cart
+							@apply hidden
+				.content
+					.button-add-cart 
+						a.added_to_cart
+							@apply hidden
+	.heading
+		.icon
+			a
+				img
+					@apply object-contain
+	.sell-line 
+		@apply relative w-full rounded-3xl bg-[#C7D4E9] flex items-center justify-center overflow-visible left-0 mt-3 text-center xl:rem:h-[22px] mb-3
+		span
+			font-size: calc(14 / 1920 * 100rem)
+			@apply relative z-10 text-Neutral-White uppercase font-bold
+			@screen -md
+				@apply text-[15px]
+		&::after
+			content: ""
+			position: absolute
+			top: 50%
+			transform: translateY(-50%)
+			background-size: contain
+			background-repeat: no-repeat
+			z-index: 0
+			@apply left-0
+
+		&::before
+			content: ""
+			position: absolute
+			left: 0
+			top: 0
+			bottom: 0
+			transition: width 0.3s ease-in-out
+			width: calc(var(--product, 0) * 1%)
+			
+			border-top-left-radius: 32px
+			border-bottom-left-radius: 32px
+			z-index: 0
+			@apply bg-Primary-1
+	.item-comp
+		@apply flex
+	.section-support-global
+		.wrapper
+			@screen -md
+				@apply p-5 gap-2
+			.item
+				@screen -md
+					@apply flex-col
+				.icon
+					a
+						img
+							@apply object-contain
+	.section-banner-product
+		.banner-product
+			@apply hidden
+		.wrapper
+			@screen -md
+				@apply gap-2
+			.item
+				@screen -md
+					@apply flex-col
+				.icon
+					a
+						img
+							@apply object-contain
+		.banner-product 
+			.img
+				@apply relative
+				.content 
+					@apply absolute top-2/4 -translate-y-2/4 rem:left-[56px] h-full
+					@apply flex flex-col justify-center
+					.img-product
+						@screen -md
+							@apply w-[14rem]
+	input[type="number"] 
+		-moz-appearance: textfield
+	input[type="number"]::-webkit-outer-spin-button,
+	input[type="number"]::-webkit-inner-spin-button 
+		-webkit-appearance: none
+		margin: 0
+	.section-about-global
+		.col-right
+			.swiper
+				@apply rounded-5
+			.pagination
+				@apply static transform-none rem:mt-[22px]
+				.swiper-pagination 
+					@apply static flex items-center justify-center
+					.swiper-pagination-bullet					
+						background-image: url('../img/bullet.svg')
+						background-size: contain
+						background-repeat: no-repeat
+						transition: all 0.3s ease
+						border-radius: 0
+						@apply bg-transparent opacity-100 rem:w-[18px] rem:h-[18px] mx-1
+						&-active
+							background-image: url('../img/bullet-active.svg')
+							@apply mx-1
+				
+	ul.tabslet-tab
+		@apply flex items-center gap-3 overflow-auto whitespace-nowrap
+		cursor: grab
+		user-select: none
+		
+		&.active
+			cursor: grabbing
+		
+		&:active
+			cursor: grabbing
+
+		@screen -lg
+			@apply pb-3
+		&::-webkit-scrollbar
+			@apply w-[calc(3/1920*100rem)] rem:h-[3px]
+		&::-webkit-scrollbar-track
+			background-color: rgba(#cac8c8,.5 )
+		&::-webkit-scrollbar-thumb
+			@apply bg-Primary-1
+		li
+			a
+				@apply py-2 px-4 rounded-[32px] bg-Neutral-White border border-Primary-1
+				@apply text-lg font-medium text-Primary-1 inline-flex items-center justify-center
+			&.active
+				a
+					@apply bg-Primary-2 border-transparent text-Neutral-White
+			&:hover
+				a
+					@apply bg-Primary-2 border-transparent text-Neutral-White
+	ul.news-menu
+		@apply flex items-center gap-3 overflow-auto whitespace-nowrap pb-3
+		&::-webkit-scrollbar
+			@apply w-[calc(3/1920*100rem)] rem:h-[3px]
+		&::-webkit-scrollbar-track
+			background-color: rgba(#cac8c8,.5 )
+		&::-webkit-scrollbar-thumb
+			@apply bg-Primary-1
+		li
+			a
+				@apply py-2 px-4 rounded-[32px] bg-Neutral-White border border-Primary-1
+				@apply text-lg font-medium text-Primary-1 inline-flex items-center justify-center
+			&.active
+				a
+					@apply bg-Primary-2 border-transparent text-Neutral-White
+			&:hover
+				a
+					@apply bg-Primary-2 border-transparent text-Neutral-White
+	.product-item
+		@apply transition-300 flex flex-1 flex-col relative
+		.image
+			.btn-add-cart
+				@apply rem:py-[10px] px-5 border border-Neutral-200 bg-Secondary-Light-Grey
+				@apply flex items-center rem:gap-[10px] rem:h-[46px] rounded-full
+				@screen -md
+					@apply p-[9px]
+				span
+					@apply text-Primary-1 text-sm font-bold
+				.icon
+					i
+						@apply text-Primary-1 rem:text-[16px]
+				&:hover
+					@apply bg-Primary-2 border-transparent
+					span
+						@apply text-Neutral-White
+					.icon
+						i
+							@apply text-Neutral-White
+				&.added
+					@apply hidden
+		.content
+			@apply flex flex-col flex-1 p-4
+			@screen -3xl
+				@apply p-[8px]
+			@screen -semi-2xl
+				@apply p-2
+			.specifications
+				@apply flex flex-col gap-2
+			.variable-item-contents
+				@apply flex-wrap
+				.variable-item-span
+					@apply py-1 px-2 rounded-1 border border-Neutral-300 text-sm font-normal text-Neutral-700
+					@apply inline-flex items-center justify-center whitespace-nowrap
+					@apply transition-300 ease-in-out cursor-pointer
+					@screen -md
+						@apply text-[12px]
+					&:hover
+						@apply bg-Primary-1 border-transparent text-Neutral-White
+					&.selected
+						@apply bg-Primary-1 border-transparent text-Neutral-White
+			.top
+				@apply flex flex-col flex-1
+				.specification
+					.label
+						@apply hidden
+				.title
+					font-size: calc(16 / 1920 * 100rem) 
+					@screen -md
+						@apply text-[14px] line-clamp-2
+			.price
+				.price-sale
+					@apply w-full
+					bdi
+						font-size: calc(24 / 1920 * 100rem)
+						@apply text-Primary-7 font-bold flex items-center 
+						@screen -md
+							@apply gap-0 #{!important}
+						// @screen -semi-2xl
+						// 	@apply text-[10px] #{!important}
+						// @screen -md
+						// 	@apply text-[15px] #{!important}
+						// .woocommerce-Price-amount
+						// 	.woocommerce-Price-currencySymbol
+						// 		@apply text-lg
+						// 	&:last-child
+						// 		bdi
+						// 			@apply text-sm text-neutral-950 font-normal line-through
+				.product-price
+					@apply flex gap-1 flex-wrap
+					.label
+						@apply text-sm
+						@screen -semi-2xl
+							@apply text-[10px] #{!important}
+						@screen -md
+							@apply text-[15px] #{!important}
+					.price-wrap
+						.price-sale
+							@apply flex items-center
+							span
+								@apply text-sm
+								@screen -semi-2xl
+									@apply text-[10px] #{!important}
+								@screen -md
+									@apply text-[15px] #{!important}
+							bdi
+								text-decoration-line: none !important
+								font-size: calc(16 / 1920 * 100rem)
+								@apply text-Primary-7 #{!important}
+								// @screen -semi-2xl
+								// 	@apply text-[10px] #{!important}
+								// @screen -md
+								// 	@apply text-[15px] #{!important}
+						.price-old
+							span
+								@apply text-sm text-Primary-1
+								@screen -md
+									@apply text-[15px]
+
+				.price-old
+					bdi
+						@apply text-sm line-through font-normal
+						@screen -md
+							@apply text-[15px]
+			.info
+				font-size: calc(14 / 1920 * 100rem)
+				@apply my-3 flex flex-col gap-1
+				@screen -xl
+					@apply text-[15px]
+
+			.review
+				@apply flex items-center gap-2 mb-3 mt-auto
+				.rating
+					font-size: calc(14 / 1920 * 100rem)
+					@apply flex items-center gap-1 border-r border-r-Neutral-100 pr-2 
+					@screen -md
+						@apply text-[15px]
+					i
+						@apply text-Secondary-3
+				.sell
+					font-size: calc(14 / 1920 * 100rem)
+					@screen -md
+						@apply text-[15px]
+			.button-add-cart 
+				@apply mt-auto
+		&:hover
+			box-shadow: 0 0 0 1px #30ca34
+			.content
+				.title
+					@apply text-Primary-1
+		&.active
+			&::before
+				content: ""
+				@apply bg-Neutral-White/45 pointer-events-none absolute w-full h-full top-0 left-0  z-10
+			&::after
+				content: "\f3f4"
+				@apply font-awesome top-2/4 -translate-y-2/4 left-2/4 -translate-x-2/4 text-Primary-1 text-32 absolute animate-spin
+
+
+	.product-item-sale 
+		transition: box-shadow 0.3s ease
+		@apply border border-Neutral-300 rounded-5 overflow-hidden
+		@apply flex flex-col flex-1
+		.img
+			a
+				@apply rounded-5
+				img
+					@apply object-contain
+		.content
+			@apply flex flex-col flex-1 px-4 bg-Neutral-White
+			@screen -md
+				@apply px-3
+			.heading
+				@apply xl:rem:h-[94px] flex flex-col flex-shrink-0
+				.h3					
+					@apply flex-1
+					a
+						@apply  line-clamp-2
+						@screen -md
+							@apply text-[14px]
+				.wrapper
+					@apply mt-auto
+					@screen -md
+						@apply gap-[8px] flex-wrap
+			.rating
+				.icon
+					i
+						@apply text-Secondary-3 text-sm
+				span
+					@apply text-sm text-Neutral-950 font-semibold
+					@screen -md
+						@apply text-[15px]
+			a.tag
+				font-size: calc(14 / 1920 * 100rem)
+				@apply bg-Primary-7 rounded-full rem:py-[6px] px-3
+				@apply font-bold text-Neutral-White  inline-flex items-center justify-center
+				@screen -md
+					@apply text-[12px]
+			.price
+				@apply my-3 flex items-center justify-between
+				.price-sale
+					bdi
+						font-size: calc(24 / 1920 * 100rem)
+						@apply font-bold text-Primary-7
+						@screen -md
+							@apply text-[16px]
+				.price-old
+					bdi
+						font-size: calc(14 / 1920 * 100rem)
+						@apply font-normal line-through text-Neutral-950
+						@screen -md
+							@apply text-[15px]
+			.info
+				@apply flex flex-col gap-2 text-Neutral-Black font-normal flex-1 mt-auto mb-3
+				font-size: calc(16 / 1920 * 100rem)
+				@screen -md
+					@apply mb-4 text-[12px]
+				span
+					@apply font-bold
+				.status
+					@apply flex items-center gap-1
+				.time-sale
+					@apply flex items-center gap-3 mt-auto flex-wrap
+					span
+						font-size: calc(14 / 1920 * 100rem)
+						@apply text-Primary-7 font-normal
+						@screen -md	
+							@apply text-[15px]
+					.countdown
+						@apply flex items-center gap-1
+						span
+							font-size: calc(14 / 1920 * 100rem)
+							@apply w-auto rem:h-[24px] bg-Primary-7 rounded-1  font-bold
+							@apply inline-flex items-center justify-center text-Neutral-White
+							@screen -md
+								@apply text-[15px] w-max
+							&.days
+								@apply hidden
+			.sell-line 
+				@apply relative w-full rounded-3xl bg-[#C7D4E9] text-xs flex items-center justify-center overflow-visible left-0 mt-3 text-center xl:rem:h-[22px]
+				@screen -md
+					@apply h-[28px]
+				span
+					font-size: calc(14 / 1920 * 100rem)
+					@apply relative z-10 text-Neutral-White uppercase font-bold
+					@screen -md
+						@apply text-[12px]
+				&::after
+					content: ""
+					position: absolute
+					top: 50%
+					transform: translateY(-50%)
+					background-size: contain
+					background-repeat: no-repeat
+					z-index: 0
+					@apply left-0
+
+				&::before
+					content: ""
+					position: absolute
+					left: 0
+					top: 0
+					bottom: 0
+					transition: width 0.3s ease-in-out
+					width: calc(var(--product, 0) * 1%)
+					
+					border-top-left-radius: 32px
+					border-bottom-left-radius: 32px
+					z-index: 0
+					@apply bg-Primary-1
+
+			.see-now
+				@apply rem:h-[46px] rounded-full border border-Neutral-200 bg-Secondary-Light-Grey mt-auto
+				@apply inline-flex items-center justify-center px-5 w-full rem:gap-[10px]
+				&.gbw-register-notification
+					-webkit-appearance: unset !important
+					background-image: unset !important
+					@apply bg-Secondary-Light-Grey #{!important}
+				span
+					font-size: calc(14 / 1920 * 100rem)
+					@apply font-bold text-Primary-1
+					@screen -md
+						@apply text-[1wpx]
+				.icon
+					i
+						@apply text-Primary-1
+				&:hover
+					@apply bg-Primary-2 border-transparent
+					span
+						@apply text-Neutral-White
+					.icon
+						i
+							@apply text-Neutral-White
+		&:hover
+			box-shadow: 0 0 0 1.5px #30ca34
+			.content
+				.h3
+					@apply text-Primary-1
+	.pagination
+		.facetwp-pager
+			@apply flex items-center gap-3
+			.facetwp-page
+				@apply sq-10 border border-Primary-1 rounded-full inline-flex items-center justify-center
+				@apply  text-Primary-1
+				@apply transition-all ease-in-out cursor-pointer font-bold
+				&.active
+					@apply bg-Primary-1 border-transparent text-Neutral-White
+				&:hover
+					@apply bg-Primary-1 border-transparent text-Neutral-White
+		.page-numbers
+			@apply flex items-center gap-3
+			li
+				span, a
+					@apply sq-10 border border-Primary-1 rounded-full inline-flex items-center justify-center
+					@apply  text-Primary-1
+					@apply transition-all ease-in-out cursor-pointer font-bold
+					&.current
+						@apply bg-Primary-1 border-transparent text-Neutral-White
+				&:hover
+					a
+						@apply bg-Primary-1 text-Neutral-White
+	
+
+	.policy-links 
+		ul
+			@apply flex items-center gap-3 overflow-auto whitespace-nowrap pb-2
+			&::-webkit-scrollbar
+				@apply w-[calc(4/1920*100rem)] h-[2px]
+			&::-webkit-scrollbar-track
+				@apply bg-Neutral-200
+			&::-webkit-scrollbar-thumb
+				@apply bg-Primary-1
+			li
+				a
+					@apply rem:h-[42px] inline-flex items-center justify-center
+					@apply bg-white border border-Primary-1 text-Primary-1 text-lg rounded-full px-4
+				&[class*='current']
+					&>a
+						@apply bg-Primary-2 text-Neutral-White border-transparent
+				&:hover
+					a
+						@apply bg-Primary-2 text-Neutral-White border-transparent
+	@screen -xl
+		.section-about-global
+			.bg
+				@apply w-[7rem]
+			.wrapper
+				@apply gap-base
+				.col-left
+					.btn-view-shop
+						@apply justify-start flex
+	@screen -lg
+		.section-banner-product
+			.banner-product
+				.img
+					a
+						@apply pt-[40%]
+	@screen -md
+		.section-about-global
+			.bg
+				@apply w-[4rem] bottom-[2px]
+		.home-7
+			.home-7-list
+				.col-right
+					.news-wrapper
+						@apply flex-col
+						.img
+							@apply w-full #{!important}
+		.section-banner-product
+			.banner-product
+				.img
+					a
+						@apply pt-[100%]
+				.content
+					@apply max-w-full px-8 left-0 #{!important}
+	// .button-to-top
+	// 	@apply opacity-0 pointer-events-none
+		// &.active
+		// 	@apply opacity-100 pointer-events-auto
+
+	// .indicator-swipe
+	// 	&:not(.custom)
+	// 		@apply absolute top-1/2 -translate-y-1/2  right-15
+	// 	@apply z-30 bg-blue-75 w-[calc(144/19.2*1rem)] h-14 rounded-full flex justify-between items-center px-3 pointer-events-none
+	// 	@apply transition-all
+	// 	// &:not(.active)
+	// 	// 	@apply opacity-0
+	// 	svg
+	// 		@apply stroke-white
+	// 	.hand
+	// 		animation: moveSwipeGesture 2.25s infinite ease-in-out
+	// 		@apply md:w-12 md:h-12 w-10 h-10
+	// @keyframes moveSwipeGesture
+	// 	0%
+	// 		transform: translateX(-8px)
+	// 	50%
+	// 		transform: translateX(8px)
+	// 	100%
+	// 		transform: translateX(-8px)

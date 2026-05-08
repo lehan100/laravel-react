@@ -1,0 +1,28 @@
+section.brand-1 
+	.container 
+		.global-breadcrumb
+			nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+				p
+					a(href="#") Trang chủ
+					span(class="separator")  | 
+					span(class="last") Về chúng tôi
+		.banner-product 
+			.img
+				a(href="#" class="img-ratio ratio:pt-[480_1400] rounded-xl") 
+					+PugImg()
+section.section-commit-about(class="section-py")
+	.container 
+		h2(class="title-40 mb-base") Cam kết sản phẩm – Chính hãng & Hiệu quả vượt trội
+		.wrapper(class="grid lg:grid-cols-2 gap-base xl:gap-0 items-center")
+			.col-left(class="xl:pr-5")
+				.img 
+					a(href="#" class="img-ratio ratio:pt-[453_680] zoom-img-1 rounded-5") 
+						+PugImg()
+			.col-right(class="xl:pl-25")
+				.about-6-main(class="flex flex-col rem:gap-[47px]") 
+					-for(var i = 0; i < 2; i++)
+						.item 
+							.title(class="text-32 text-Primary-2 font-extrabold rem:mb-[27px]") Hàng chính hãng 100%
+							.desc(class="text-lg font-normal")
+								p Tất cả sản phẩm đều được nhập khẩu hoặc phân phối trực tiếp từ các thương hiệu nông nghiệp uy tín hàng đầu như Syngenta, Bayer CropScience, Vĩnh Thạnh, MAP Pacific, Fertiberia, NAM Agro, ADOB, SICIT GROUP…
+

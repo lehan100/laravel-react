@@ -1,0 +1,14 @@
+section.about-7(class="xl:pt-20 xl:pb-25 py-10")
+	.container 
+		h2(class="mb-base title-40") Chứng nhận sản phẩm
+		.slide(class="relative")
+			.swiper 
+				.swiper-wrapper
+					-for(var i = 0; i < 10; i++)
+						.swiper-slide 
+							.img 
+								a(href="#" class="img-ratio ratio:pt-[133_200]") 
+									+PugImg("./img/6.png")
+			.wrap-button-slide.drop
+				.btn.btn-prev.btn-sw-1
+				.btn.btn-next.btn-sw-1

@@ -1,0 +1,128 @@
+.btn
+	@apply cursor-pointer select-none transition-all duration-300
+	&.btn-sw-1
+		@apply w-12 h-12 py-2 px-5  flex-center hover:bg-Primary-1 rounded-full bg-black/30 
+		&::before
+			@apply font-awesome text-Neutral-White text-2xl font-thin
+		&.btn-prev
+			&::before
+				content: '\f053'
+		&.btn-next
+			&::before
+				content: '\f054'
+				@apply font-awesome
+		&.primary
+			@apply bg-black/70 rounded-lg sq-10
+			&:hover
+				@apply bg-Primary-1 
+	&.btn-primary
+		backdrop-filter: blur(6px)
+		@apply bg-Primary-2 py-3 px-10 rounded-full text-Neutral-White w-max border-transparent #{!important}
+		@apply text-lg font-medium inline-flex items-center justify-center rem:h-[48px]
+		&:hover
+			@apply bg-Primary-1 #{!important}
+		&.blue
+			@apply bg-Primary-1
+			&:hover
+				@apply bg-Primary-2
+		&.gbw-load-more-deals
+			@apply gap-2 px-5
+		&.view-more
+			@apply bg-transparent gap-3 #{!important}
+			span
+				@apply text-Primary-1 transition-all ease-in-out
+			.icon
+				i
+					@apply text-Primary-1 text-lg
+			&:hover
+				span
+					@apply text-[#009116]
+				.icon
+					i
+						@apply text-[#009116]
+			
+.button-add-cart
+	.btn-add-cart
+		@apply rem:py-[10px] px-5 border border-Neutral-200 bg-Secondary-Light-Grey
+		@apply flex items-center rem:gap-[10px] rem:h-[46px] rounded-full
+		@screen -md
+			@apply py-3 px-[8px]
+		span
+			font-size: calc(14 / 1920 * 100rem)
+			@apply text-Primary-1 font-bold			
+			@screen -3xl
+				@apply text-[12px]
+			@screen -semi-2xl
+				@apply text-[11px]
+		.icon
+			i
+				@apply text-Primary-1 rem:text-[16px]
+		&:hover
+			@apply bg-Primary-2 border-transparent
+			span
+				@apply text-Neutral-White
+			.icon
+				i
+					@apply text-Neutral-White
+	a.added_to_cart
+		@apply bg-Primary-1 rem:h-[46px] rounded-full px-5 inline-flex items-center justify-center text-white
+		&:hover
+			@apply bg-Primary-2
+
+.btn-add-to-cart
+	@apply bg-Primary-2 rem:h-[48px] inline-flex items-center justify-center #{!important}
+	@apply px-5 rounded-full gap-3 text-Neutral-White text-lg relative #{!important}
+	@apply transition-all ease-in-out 
+	span
+		@apply font-medium
+	&:hover
+		@apply bg-Primary-1 #{!important}
+	&.loading
+		.icon
+			@apply animate-spin
+			i
+				&::before
+					content: "\f3f4"
+					@apply  font-awesome w-full h-full text-Neutral-White 
+
+		
+	&.btn-buy-now
+		@apply bg-Primary-7 opacity-100 text-Neutral-White #{!important}
+		&:hover
+			@apply bg-Primary-1 #{!important}
+#add-new-address
+	@apply bg-Primary-2 text-Neutral-White
+	&:hover
+		@apply bg-Primary-1
+.product-quantity
+	@apply rem:mb-[30px]
+	label
+		@apply font-bold text-Neutral-Black
+	.quantity
+		@apply border border-[#ddd] rounded-xl p-1
+		input
+			@apply border-none text-[#090909] text-[16px] #{!important}
+		.minus
+			touch-action: manipulation
+			@apply w-9 h-9 bg-[#F1F1F1] rounded-xl
+			i
+				@apply text-[#818285]
+		.plus
+			touch-action: manipulation
+			@apply w-9 h-9 bg-[#F1F1F1] rounded-xl
+			i
+				@apply text-[#818285]
+	.price
+		bdi
+			@apply text-Primary-1 font-medium
+#gbw-apply-filters
+	@apply bg-Primary-1
+.mini-cart-wrapper
+	.wrap-button-cart
+		.woocommerce-mini-cart__buttons 
+			a.checkout
+				@apply bg-Primary-2 text-Neutral-White border-none
+.mini-cart-wrapper .top-mini-cart .close
+	@apply sq-10 inline-flex items-center justify-center bg-Primary-2 rounded-1
+	i
+		@apply text-Neutral-White

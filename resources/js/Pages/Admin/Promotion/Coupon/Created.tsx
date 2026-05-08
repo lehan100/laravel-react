@@ -6,11 +6,12 @@ import CouponFormView from './Components/CouponFormView';
 
 export default function CreatedPage() {
   const { trans } = useTrans();
-  const { itemsCategoryActive, itemsSelectedProducts }: any = usePage().props;
+  const { itemsCategoryActive, itemsCampaignActive, itemsSelectedProducts }: any = usePage().props;
   const { data, setData, errors, post, processing } = useForm({
     code: '',
     name: '',
     description: '',
+    campaign_id: '',
     discount_type: 'percent',
     discount_value: 0,
     max_discount_amount: '',
@@ -50,6 +51,7 @@ export default function CreatedPage() {
       errors={errors as any}
       processing={processing}
       itemsCategoryActive={itemsCategoryActive || []}
+      itemsCampaignActive={itemsCampaignActive || []}
       itemsSelectedProducts={itemsSelectedProducts || []}
       undo={undo}
       handleUndo={handleUndo}

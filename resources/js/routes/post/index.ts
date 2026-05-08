@@ -1,7 +1,8 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
+import ai from './ai'
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::destroyMany
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:140
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:143
 * @route '/admin123/post/destroy-many'
 */
 export const destroyMany = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -16,7 +17,7 @@ destroyMany.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::destroyMany
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:140
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:143
 * @route '/admin123/post/destroy-many'
 */
 destroyMany.url = (options?: RouteQueryOptions) => {
@@ -25,7 +26,7 @@ destroyMany.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::destroyMany
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:140
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:143
 * @route '/admin123/post/destroy-many'
 */
 destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -87,7 +88,7 @@ toggleStatus.put = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::index
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:47
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:48
 * @route '/admin123/post'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -102,7 +103,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::index
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:47
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:48
 * @route '/admin123/post'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -111,7 +112,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::index
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:47
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:48
 * @route '/admin123/post'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -121,7 +122,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::index
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:47
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:48
 * @route '/admin123/post'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -131,7 +132,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::create
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:58
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:59
 * @route '/admin123/post/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +147,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::create
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:58
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:59
 * @route '/admin123/post/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -155,7 +156,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::create
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:58
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:59
 * @route '/admin123/post/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -165,7 +166,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::create
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:58
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:59
 * @route '/admin123/post/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -175,7 +176,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::store
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:71
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:74
 * @route '/admin123/post'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -190,7 +191,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::store
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:71
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:74
 * @route '/admin123/post'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -199,7 +200,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::store
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:71
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:74
 * @route '/admin123/post'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -209,7 +210,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::show
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:89
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:92
 * @route '/admin123/post/{post}'
 */
 export const show = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -224,7 +225,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::show
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:89
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:92
 * @route '/admin123/post/{post}'
 */
 show.url = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -251,7 +252,7 @@ show.url = (args: { post: string | number } | [post: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::show
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:89
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:92
 * @route '/admin123/post/{post}'
 */
 show.get = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -261,7 +262,7 @@ show.get = (args: { post: string | number } | [post: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::show
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:89
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:92
 * @route '/admin123/post/{post}'
 */
 show.head = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -271,7 +272,7 @@ show.head = (args: { post: string | number } | [post: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::edit
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:94
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:97
 * @route '/admin123/post/{post}/edit'
 */
 export const edit = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -286,7 +287,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::edit
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:94
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:97
 * @route '/admin123/post/{post}/edit'
 */
 edit.url = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -313,7 +314,7 @@ edit.url = (args: { post: string | number } | [post: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::edit
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:94
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:97
 * @route '/admin123/post/{post}/edit'
 */
 edit.get = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -323,7 +324,7 @@ edit.get = (args: { post: string | number } | [post: string | number ] | string 
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::edit
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:94
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:97
 * @route '/admin123/post/{post}/edit'
 */
 edit.head = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -333,7 +334,7 @@ edit.head = (args: { post: string | number } | [post: string | number ] | string
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::update
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:108
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:111
 * @route '/admin123/post/{post}'
 */
 export const update = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -348,7 +349,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::update
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:108
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:111
 * @route '/admin123/post/{post}'
 */
 update.url = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -375,7 +376,7 @@ update.url = (args: { post: string | number } | [post: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::update
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:108
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:111
 * @route '/admin123/post/{post}'
 */
 update.put = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -385,7 +386,7 @@ update.put = (args: { post: string | number } | [post: string | number ] | strin
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::update
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:108
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:111
 * @route '/admin123/post/{post}'
 */
 update.patch = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -395,7 +396,7 @@ update.patch = (args: { post: string | number } | [post: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::destroy
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:127
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:130
 * @route '/admin123/post/{post}'
 */
 export const destroy = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -410,7 +411,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::destroy
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:127
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:130
 * @route '/admin123/post/{post}'
 */
 destroy.url = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -437,7 +438,7 @@ destroy.url = (args: { post: string | number } | [post: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\PostController::destroy
-* @see app/Http/Controllers/Admin/Catalog/PostController.php:127
+* @see app/Http/Controllers/Admin/Catalog/PostController.php:130
 * @route '/admin123/post/{post}'
 */
 destroy.delete = (args: { post: string | number } | [post: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -446,6 +447,7 @@ destroy.delete = (args: { post: string | number } | [post: string | number ] | s
 })
 
 const post = {
+    ai: Object.assign(ai, ai),
     destroyMany: Object.assign(destroyMany, destroyMany),
     toggleStatus: Object.assign(toggleStatus, toggleStatus),
     index: Object.assign(index, index),

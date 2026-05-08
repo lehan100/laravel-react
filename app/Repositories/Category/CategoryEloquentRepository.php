@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Category;
 
+use App\Http\Resources\Catalog\ProductPickerResource;
 use App\Models\Catalog\Category;
 use App\Models\Catalog\Product;
 use App\Pipelines\HandleSlugHistory;
@@ -42,6 +43,9 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
                     // Phải có category_id để Eloquent map được quan hệ
                     $q->select(['id', 'category_id', 'locale', 'name'])
                         ->where('locale', $currentLocale);
+                },
+                'slugs' => function ($q) {
+                    $q->select(['id', 'sluggable_id', 'sluggable_type', 'locale', 'slug', 'redirect_to', 'is_default']);
                 },
             ])->withCount(['products', 'posts']);
 
@@ -138,7 +142,7 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
             $item->status = $params['status'] ?? 0;
             $item->order = $itemOrder;
             $item->type = $params['type'] ?? 'product';
-            $item->photo = $params['photo'] ?? null;
+            $item->photo = $this->normalizeCategoryPhotoName($params['photo'] ?? null);
             $item->page_id = array_key_exists('page_id', $params) && ! in_array($params['page_id'], [null, '', 0, '0'], true)
                 ? (int) $params['page_id']
                 : null;
@@ -247,6 +251,32 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
         return (int) $parentId;
     }
 
+    protected function normalizeCategoryPhotoName(mixed $photo): ?string
+    {
+        if (! is_string($photo)) {
+            return null;
+        }
+
+        $photo = trim($photo);
+
+        if ($photo === '') {
+            return null;
+        }
+
+        if (str_starts_with($photo, '/') || str_starts_with($photo, 'http://') || str_starts_with($photo, 'https://')) {
+            return $photo;
+        }
+
+        $path = parse_url($photo, PHP_URL_PATH);
+        $path = is_string($path) && $path !== '' ? $path : $photo;
+
+        if (str_contains($path, '/')) {
+            return ltrim($path, '/');
+        }
+
+        return basename($path) ?: null;
+    }
+
     /**
      * @param  array<int, int>  $categoryIds
      * @return array{data: array<int, array<string, mixed>>, meta: array<string, mixed>}
@@ -322,8 +352,19 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
                         ->where('locale', $currentLocale);
                 },
                 'categories:id',
+                'promotionCampaigns' => function ($query) use ($currentLocale) {
+                    $query->select(['promotion_campaigns.id', 'promotion_campaigns.starts_at', 'promotion_campaigns.ends_at', 'promotion_campaigns.priority', 'promotion_campaigns.is_active'])
+                        ->with(['translations' => function ($translationQuery) use ($currentLocale): void {
+                            $translationQuery->select(['id', 'promotion_campaign_id', 'locale', 'name', 'slug'])
+                                ->where('locale', $currentLocale);
+                        }, 'slugs' => function ($slugQuery): void {
+                            $slugQuery->select(['id', 'sluggable_id', 'sluggable_type', 'locale', 'slug', 'redirect_to', 'is_default']);
+                        }])
+                        ->orderBy('promotion_campaigns.priority')
+                        ->orderByDesc('promotion_campaigns.id');
+                },
             ])
-            ->orderBy('id');
+            ->orderBy('products.id');
     }
 
     /**
@@ -365,21 +406,7 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
 
     private function mapProductsForPicker($products): array
     {
-        return $products->map(function ($item) {
-            $translations = $item->translations ?? collect();
-            $name = optional($translations->first())->name ?: ($item->sku ?: ('#'.$item->id));
-
-            return [
-                'id' => (int) $item->id,
-                'sku' => $item->sku,
-                'price' => (float) ($item->price ?? 0),
-                'quantity' => (int) ($item->is_stock ?? 0) === 1 ? (int) ($item->quantity ?? 0) : 0,
-                'is_stock' => (int) ($item->is_stock ?? 0),
-                'status' => (int) ($item->status ?? 0),
-                'name' => $name,
-                'category_ids' => ($item->categories ?? collect())->pluck('id')->map(fn ($id) => (int) $id)->values()->all(),
-            ];
-        })->values()->all();
+        return ProductPickerResource::collection($products)->resolve(request());
     }
 
     /**

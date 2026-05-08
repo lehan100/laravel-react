@@ -1,0 +1,189 @@
+//- button animation icon di chuyển sang phải
+mixin button() 
+	.button(class="mt-10")
+		a(href="#" class="btn-lined")
+			span xem them 
+			span(class="icon") 
+				i.fa-solid.fa-arrow-right
+				i.fa-solid.fa-arrow-right
+mixin subscribeForm()
+	.subscribe
+		.subscribefrm
+			input.subscribeemail(type="text", placeholder="Nhập email của bạn...")
+			button.subscribebutton Gửi
+mixin PugImg(url="./img/1.jpg")
+	img(data-src=url, alt="", class="lozad " + attributes.class)
+mixin btnViewAll(text="Xem thêm")
+	a(href="" x-link class='btn-primary-2 btn ' + attributes.class)
+		span=text
+		img(src=imgButton, alt="", class="w-5 h-5 svg")
+mixin HeaderLanguageVertical()
+	ul 
+		li.wpml-ls-item
+			a(href="") 
+				span.wpml-ls-native VN
+		ul 
+			li 
+				a(href="") 
+					span EN
+mixin HeaderLanguageHorizontal()
+	ul 
+		li.wpml-ls-item
+			a(href="") 
+				span.wpml-ls-native VN
+		li.wpml-ls-item
+			a(href="") 
+				span.wpml-ls-native VN
+mixin BtnPrimary()
+	a(href="" class='btn-primary btn ')
+		span Xem tất cả
+mixin HeadingGlobal()
+	.heading(class="flex items-center gap-6")
+		.icon(class="rem:w-[50px]") 
+			a(href="#" class="img-ratio") 
+				img(src="./img/4.svg", alt="")
+		h2(class="title-40") Giải pháp cây trồng
+mixin ProductItem()
+	.product-item(class="group bg-Neutral-White rounded-5 border border-Neutral-100")
+		.image(class="rounded-2xl group relative overflow-hidden")
+			a(href="#" class="img-ratio rounded-5 zoom-img")
+				img.product-img(src="./img/product.png" alt="Sản phẩm màu đỏ")
+			.button-add-cart(class="absolute flex justify-center bottom-0 left-0 w-full translate-y-full opacity-0 group-hover:-translate-y-10 group-hover:opacity-100 transition-all duration-500 z-10")
+				a(href="#" class="btn-add-cart")  
+					span THÊM VÀO GIỎ HÀNG
+					.icon 
+						i.fa-regular.fa-cart-flatbed-boxes
+			//- button(class="lg:hidden absolute right-1 z-10 h-9 w-9 translate-y-3 cursor-pointer rounded-full !bg-black/20  backdrop-blur-[17px] transition-all duration-300 bottom-12 text-lg inline-flex items-center justify-center")
+			//- 	img(src="./img/icon-add-cart.svg", alt="" class="w-[1rem] h-[1rem]")
+		.content(class="p-5")
+			.top
+				.title(class="line-clamp-3 font-bold text-Neutral-Black mb-2")
+					a(href="#") GROGREEN GEL NPK 26-26-26+TE phân bón lá nuôi trái, to lá, bung chồi, mập...
+				.variable-item-contents(class="flex items-center gap-1")
+					span.variable-item-span Chai 1L
+					span.variable-item-span Can 20L
+					span.variable-item-span Phuy 200L
+			.price(class="flex items-center justify-between mt-3")
+				.price-sale 
+					bdi 200.000 ₫
+				.price-old 
+					bdi 300.000 ₫
+			.info 
+				.origin 
+					p Xuất xứ:
+						strong  Tây Ban Nha
+				.offer 
+					p Ưu đãi:
+						strong  mua 5 tặng 1, mua 10 tặng 3
+			.review 
+				.rating 
+					.star 
+						<i class="fa-solid fa-star"></i>
+					span 4.8
+				.sell Đã bán 1,2k
+			.button-add-cart(class="flex justify-center w-full transition-all duration-500 z-10 mt-3")
+				a(href="#" class="btn-add-cart")  
+					span THÊM VÀO GIỎ HÀNG
+					.icon 
+						i.fa-regular.fa-cart-flatbed-boxes
+
+
+
+mixin ProductItemSale()
+	.product-item-sale 
+		.img 
+			a(href="#" class="img-ratio ratio:pt-[213_320] zoom-img") 
+				+PugImg("./img/product-sale.png")
+		.content(class="mt-5 px-5 pb-5")
+			.heading
+				.h3(class="text-xl text-Neutral-Black font-bold mb-2")
+					a(href="#") Bộ phân bón RUSI NPK Complex 4 công thức 
+				.wrapper(class="flex items-center gap-5")
+					.rating(class="flex items-center gap-1")
+						.icon 
+							<i class="fa-solid fa-star"></i>
+						span 4.8
+					a.tag(href="#") Mua sỉ giá tốt
+			.price 
+				.price-sale 
+					bdi 200.000 ₫
+				.price-old 
+					bdi 300.000 ₫
+			.info 
+				.quantity 
+					span Số lượng:
+					|  30 tấn
+				.minimun-order 
+					span Đơn hàng tối thiểu:
+					|  1.000kg/khách hàng
+				.status
+					span Tình trạng:
+					| đang mở bán
+				.delivery-datey
+					span Ngày giao hàng:
+					|  5/01/2023
+				.delivery
+					span Giao hàng:
+					|  toàn quốc
+			.sell-line(data-sold="120" data-total="150") 
+				span Đã bán 120
+			a.see-now(href="#") 
+				span XEM NGAY
+				.icon 
+					<i class="fa-regular fa-eye"></i>
+mixin AboutSection()
+	section.section-about-global(class="pt-15 rem:pb-[97px] relative")
+		.bg(class="rem:w-[179px] absolute rem:bottom-[14px] rem:left-[37px]")
+			a(href="#" class="img-ratio ratio:pt-[261_179]") 
+				+PugImg("./img/icon-about.png")
+		.container 
+			.wrapper(class="grid lg:grid-cols-2 grid-cols-1")
+				.col-left(class="xl:pr-25")
+					h2(class="title-40 text-Primary-1 !font-semibold mb-base")
+						|  Giới thiệu về NÔNG DƯỢC 
+						span(class="text-Primary-2") XANH
+					.format-content(class="text-lg font-normal mb-base")
+						p Chuỗi cửa hàng vật tư nông nghiệp Chính hãng – Chất lượng vượt trội – Đồng hành cùng nhà nông
+						p CÔNG TY TNHH THƯƠNG MẠI NÔNG DƯỢC XANH là chuỗi cửa hàng cung cấp vật tư nông nghiệp chính hãng với chất lượng vượt trội, chuyên phục vụ người nông dân trên hành trình canh tác bền vững và hiệu quả. Với triết lý “Farmer-centric – Lấy lợi ích của người nông dân làm trung tâm của mọi hành động”, chúng tôi cam kết mang đến giá trị thực sự và lâu dài cho nhà nông.
+					.btn-view-shop
+						a(href="" class='btn-primary btn ')
+							span Xem hệ thống cửa hàng
+				.col-right(class="xl:pl-10") 
+					.slide(class="relative")
+						.swiper 
+							.swiper-wrapper
+								-for(var i = 0; i < 3; i++) 
+									.swiper-slide 
+										.img 
+											a(href="#" class="img-ratio ratio:pt-[453_679] zoom-img rounded-5") 
+												+PugImg()
+						.pagination(class="flex-center left-2/4 -translate-x-2/4 bottom-10 absolute z-10")
+							.swiper-pagination
+mixin ProductBannerSection()
+	.section-banner-product(class="bg-Secondary-Light-Grey")
+		.container 
+			.global-breadcrumb
+				nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+					p
+						a(href="#") Trang chủ
+						span(class="separator")  | 
+						span(class="last") Về chúng tôi
+			.banner-product 
+				.img
+					a(href="#" class="img-ratio ratio:pt-[480_1400] rounded-xl") 
+						+PugImg("./img/banner-product.png")
+					.content(class="rem:max-w-[500px] w-full") 
+						h2(class="text-32 text-Neutral-White mb-6") Chính hãng – Chất lượng vượt trội Đồng hành cùng nhà nông
+						.img-product(class="rem:w-[318px]")
+							a(href="#" class="ratio-contain ratio:pt-[206_308]") 
+								+PugImg("./img/9.png")
+			.wrapper(class="py-10 grid lg:grid-cols-4 grid-cols-2 xl:gap-20 gap-6")
+				-for(var i = 0; i < 4; i++)
+					.item(class="flex gap-3")
+						.icon(class="w-10") 
+							a(href="#" class="img-ratio") 
+								+PugImg("./img/5.svg")
+						.content 
+							.title(class="text-xl font-bold text-Primary-4 mb-2") Thuốc chính hãng
+							.sub-title(class="font-normal") Đa dạng và chuyên sâu
+

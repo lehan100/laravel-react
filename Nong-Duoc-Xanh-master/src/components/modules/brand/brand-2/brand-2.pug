@@ -1,0 +1,27 @@
+section.brand-2(class="pb-20")
+	.container 
+		.heading(class="flex items-center gap-6")
+			.icon(class="rem:w-[50px]") 
+				a(href="#" class="img-ratio") 
+					img(src="./img/4.svg", alt="")
+			h2(class="title-40") Đối tác của NÔNG DƯỢC XANH
+		.format-content(class="text-lg font-normal my-5")
+			p CÔNG TY TNHH THƯƠNG MẠI NÔNG DƯỢC XANH là chuỗi cửa hàng cung cấp vật tư nông nghiệp chính hãng với chất lượng vượt trội, chuyên phục vụ người nông dân trên hành trình canh tác bền vững và hiệu quả. Với triết lý “Farmer-centric – Lấy lợi ích của người nông dân làm trung tâm của mọi hành động”, chúng tôi cam kết mang đến giá trị thực sự và lâu dài cho nhà nông.
+		.wrapper(class="grid lg:grid-cols-3 grid-cols-2 gap-base")
+			-for(var i = 0; i < 9; i++) 
+				.partner-item(class="flex gap-4 py-10 px-5 rounded-5 border border-Neutral-300")
+					.logo(class="rem:max-w-[100px] w-full") 
+						a(href="#" class="img-ratio rounded-full") 
+							+PugImg()
+					.content(class="flex flex-col gap-3")
+						.title(class="text-lg font-bold text-Neutral-Black") SQM EUROPE B.V.
+						.desc(class="text-Neutral-Black")
+							p Add a paragraph text here. Click to the textbox to customize content, font style, color of your paragraph.
+						a(href="" class='btn-primary btn')
+							span Xem ngay
+		.pagination(class="mt-base flex-center")
+			.facetwp-facet 
+				.facetwp-pager
+					a(href="#" class="facetwp-page") 1
+					a(href="#" class="facetwp-page") 2
+					a(href="#" class="facetwp-page") 3

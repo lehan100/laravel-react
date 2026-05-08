@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DestroyManyPagesRequest;
 use App\Http\Requests\StorePageRequest;
 use App\Http\Requests\UpdatePageRequest;
+use App\Http\Resources\ApiMessageResource;
+use App\Http\Resources\PageQuickStoreResource;
+use App\Http\Resources\PageResource;
 use App\Models\Page;
 use App\Repositories\Page\PageRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +24,9 @@ class PageController extends Controller
     public function index(Request $request): Response
     {
         return Inertia::render('Admin/PageManager/Index', [
-            'pages' => $this->repository->lists($request->only(['search']), ['task' => 'admin-list-items']),
+            'pages' => PageResource::collection(
+                $this->repository->lists($request->only(['search']), ['task' => 'admin-list-items'])
+            ),
             'filters' => $request->only(['search']),
             'translations' => $this->repository->translations(),
         ]);
@@ -44,44 +49,36 @@ class PageController extends Controller
         $page = $this->repository->save($request->validated(), ['task' => 'add-item']);
 
         if (! $page instanceof Page) {
-            return response()->json([
+            return (new ApiMessageResource([
                 'message' => __('hancms.page.messages.create_failed'),
-            ], 422);
+            ]))->response()->setStatusCode(422);
         }
 
-        $page->load(['fieldGroup', 'translations', 'slugs']);
-        $currentLocale = app()->getLocale();
-        $pageTranslation = $page->translations?->firstWhere('locale', $currentLocale)
-            ?? $page->translations?->first();
+        $page = $this->repository->get(['id' => $page->id], ['task' => 'get-item']) ?? $page->load(['fieldGroup', 'translations']);
 
         return response()->json([
-            'page' => [
-                'id' => $page->id,
-                'title' => $page->title,
-                'label' => $pageTranslation?->title ?: $page->title ?: "#{$page->id}",
-                'name' => $pageTranslation?->title ?: $page->title ?: "#{$page->id}",
-                'schema_title' => $page->fieldGroup?->title ?? '',
-                'has_content' => $page->hasContent(),
-                'edit_url' => route('pages.edit', $page),
-            ],
+            'page' => PageQuickStoreResource::make($page),
         ]);
     }
 
     public function show(Page $page): Response
     {
-        $page->load(['fieldGroup', 'translations', 'slugs']);
+        $page = $this->repository->get(['id' => $page->id], ['task' => 'get-item']) ?? $page->load(['fieldGroup', 'translations', 'slugs']);
 
         return Inertia::render('Admin/PageManager/Show', array_merge(
             $this->repository->getFormProps(['page' => $page]),
-            ['page' => $page]
+            ['page' => PageResource::make($page)]
         ));
     }
 
     public function edit(Page $page): Response
     {
-        $page->load(['fieldGroup', 'translations', 'slugs']);
+        $page = $this->repository->get(['id' => $page->id], ['task' => 'get-item']) ?? $page->load(['fieldGroup', 'translations', 'slugs']);
 
-        return Inertia::render('Admin/PageManager/Edit', $this->repository->getFormProps(['page' => $page]));
+        return Inertia::render('Admin/PageManager/Edit', array_merge(
+            $this->repository->getFormProps(['page' => $page]),
+            ['page' => PageResource::make($page)]
+        ));
     }
 
     public function update(UpdatePageRequest $request, Page $page): RedirectResponse

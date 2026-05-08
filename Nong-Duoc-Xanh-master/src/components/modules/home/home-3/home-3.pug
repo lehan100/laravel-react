@@ -1,0 +1,21 @@
+section.home-3(class="rem:pb-[46px] pt-10 bg-Secondary-Light-Grey")
+	.container 
+		.box(class="border-2 bg-Neutral-White border-Primary-7 rounded-[32px] overflow-hidden")
+			.heading(class="flex items-center justify-between gap-6 bg-Primary-7 py-3 px-5")
+				.left(class="flex items-center gap-5")
+					.icon(class="rem:w-[40px]") 
+						a(href="#" class="img-ratio") 
+							img(src="./img/sale.svg", alt="")
+					h2(class="rem:text-[32px] font-extrabold text-Neutral-White") Mua chung giá tốt hôm nay 
+				.right 
+					.label Kết thúc trong
+					.countdown 
+						span 48
+						span 48
+						span 48
+			.bottom(class="py-10 px-5 grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 rem:gap-[26px]")
+				-for(var i = 0; i < 4; i++)
+					+ProductItemSale()
+			.btn-view-all(class="flex-center mb-base")
+				+BtnPrimary()
+				

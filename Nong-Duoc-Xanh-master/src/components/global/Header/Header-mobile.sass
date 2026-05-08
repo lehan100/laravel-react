@@ -1,0 +1,154 @@
+.header-menu-mobile
+	@apply xl:hidden
+	&[data-step-index="0"]
+		.close
+			i
+				&::before
+					content: '\f00d'
+	.header-menu-mobile-auth
+		@apply flex items-center gap-5 mt-5 px-4
+		.header-auth-item 
+			a
+				@apply bg-Primary-1 rounded-lg px-3 inline-flex items-center justify-center gap-3 w-full h-[40px]
+				.icon
+					@apply rem:w-[32px] rem:h-[32px]
+					.img-svg
+						@apply w-full h-full object-cover
+				span
+					@apply text-Neutral-White
+		.header-language
+			@apply flex items-center md:gap-3 gap-1 relative  h-[40px]
+			>ul
+				@apply py-[2px] border border-white
+				>li
+					@apply relative
+					>a
+						@apply relative flex items-center
+						&::after
+							content: '\f078'
+							@apply font-awesome text-sm transition-300 text-black ml-2 font-black
+						span
+							@apply text-blue-700 text-lg font-normal
+				&:hover
+					>ul			
+						@apply opacity-100 visible block
+				>ul
+					@apply absolute left-0 top-full bg-red-700 opacity-0 invisible hidden z-10 w-full px-2 py-[2px]
+					li
+						a
+							span
+								@apply text-black
+			&:hover
+				.wpml-ls
+					&>ul>li>a
+						@apply bg-yellow-400 text-white
+						&::after
+							@apply rotate-180 text-white
+					&>ul>li>ul
+						@apply opacity-100 translate-y-0 pointer-events-auto
+			.wpml-ls
+				@apply max-w-full w-full h-full
+				&>ul
+					@apply static h-full
+					&>li
+						@apply h-full
+						&>a
+							@apply rounded-1 border border-Neutral-200 h-full
+							@apply px-3 py-1 text-black rem:text-[15px] flex items-center gap-1
+							@apply transition-300
+							&::after
+								content: '\f107'
+								@apply font-awesome text-base transition-300 text-black
+								@apply border-none static #{!important}
+							span
+								@apply text-[15px]
+						&>ul
+							@apply absolute top-full left-0 w-full
+							@apply border border-Neutral-200 rounded-1 overflow-hidden
+							@apply opacity-0 pointer-events-none -translate-y-2 transition-300 bg-white
+							li
+								a
+									@apply px-3 py-1 flex items-center w-full bg-white
+									@apply hover:bg-gray-700 hover:text-white transition-300 border-none
+
+	@media (max-width: 1199.98px)
+		@apply fixed top-0 left-0 w-full h-[100dvh] z-[999] bg-white block
+		@apply pointer-events-none translate-x-full overflow-hidden
+		+transition-base()
+	.header-title-close
+		@apply bg-Primary-1
+	.header-top
+		@apply flex items-start px-[15px] gap-[15px] mt-5
+	.header-menu
+		&>ul
+			&>li
+				&.dropdown-product 
+					.icon-bar
+						@apply hidden
+					i
+						@apply hidden
+				
+				&[class*="has-children"]
+					>a
+						span
+							@apply flex items-center justify-between w-full
+						.icon
+							@apply hidden
+							span
+								i
+									@apply hidden
+					
+					ul.sub-menu
+						@apply bg-[#F3F6FB]
+						li
+							a
+								@apply text-Primary-1 px-6  py-2
+								span
+									@apply text-[16px]
+					&.dropdown-product 
+						&>a							
+							&::after
+								content: '\f054'
+								@apply inline-block font-awesome text-xl
+				a
+					@apply justify-start gap-3 #{!important}
+					.icon-bar
+						@apply w-10 h-10
+						img
+							@apply w-full h-full object-contain
+		ul
+			li
+				&>a
+					@apply flex items-center px-[15px] py-5 text-[18px] font-light border-b border-neutral-100 justify-between
+					.icon
+						@apply hidden
+		.menu-list
+			a
+				&::after
+					content: '\f054'
+					@apply inline-block font-awesome text-xl
+				.icon
+					@apply hidden
+	.menu-mega-main
+		@apply fixed top-[0] translate-x-full w-screen h-[calc(100svh-50px)] bg-white z-10 left-0 transition-all duration-300
+		&.active
+			@apply translate-x-0
+	.menu-sub-list
+		@apply w-full
+		ul
+			@apply w-full
+	.tab-content-menu
+		@apply fixed top-[0px] translate-x-full w-screen h-[calc(100svh-0px)] bg-white z-10 left-0 transition-all duration-300 p-5
+		@apply block #{!important}
+		.menu-sub-content
+			@apply hidden
+		.tab-content
+			@apply flex flex-col gap-6
+		&.active
+			@apply translate-x-0
+
+
+// body
+// 	&.isOpenMenu
+// 		.header-menu-mobile
+// 			@apply pointer-events-auto translate-x-0

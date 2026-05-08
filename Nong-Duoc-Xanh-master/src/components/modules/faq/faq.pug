@@ -1,0 +1,41 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.faq(class="section-py")
+	.container 
+		h2(class="title-40 rem:mb-[35px] uppercase") hỗ trợ
+		.policy-links 
+			ul 
+				li 
+					a(href="./faq.html") FAQs
+				li 
+					a(href="#") Chính sách
+				li 
+					a(href="./gallery.html") Thư viện ảnh
+				li 
+					a(href="./gallery-video.html") Thư viện Video
+		.wrap-item-toggle(class='mt-base flex flex-col gap-4')
+			-for(var i = 0; i < 4; i++)
+				.item-toggle(class="group bg-Neutral-50 p-6 rounded-xl")
+					.title(class="text-lg font-medium rem:min-h-[32px] flex items-center gap-3 justify-between cursor-pointer transition-300 ")
+						.number(class="rem:text-[24px] !font-normal text-Neutral-800") 01
+						span(class="rem:text-[24px] text-Neutral-800") What is Lorem Ipsum?
+						i.fa-regular.fa-plus.text-xl.ml-auto(class="transition-300 text-Neutral-950")
+					.content(style="display: none;")
+						.wrapper(class="flex gap-12")
+							.img(class="rem:max-w-[357px] w-full")
+								a(href="#" class="img-ratio ratio:pt-[200_357]") 
+									+PugImg()
+							.content-wrap(class="flex-1")
+								.format-content(class="text-lg font-normal text-justify") 
+									p Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda provident non, nam quis molestias amet. Maiores mollitia laboriosam pariatur similique ab qui laudantium illo porro, quae temporibus dolorum quo explicabo!
+		.pagination(class="mt-base flex-center")
+			.facetwp-facet 
+				.facetwp-pager
+					a(href="#" class="facetwp-page") 1
+					a(href="#" class="facetwp-page") 2
+					a(href="#" class="facetwp-page") 3

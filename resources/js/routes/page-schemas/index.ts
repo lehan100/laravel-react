@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::destroyMany
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:72
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:82
 * @route '/admin123/page-schemas/destroy-many'
 */
 export const destroyMany = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -16,7 +16,7 @@ destroyMany.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::destroyMany
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:72
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:82
 * @route '/admin123/page-schemas/destroy-many'
 */
 destroyMany.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ destroyMany.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::destroyMany
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:72
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:82
 * @route '/admin123/page-schemas/destroy-many'
 */
 destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -35,7 +35,7 @@ destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> =>
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::toggleStatus
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:79
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:89
 * @route '/admin123/page-schemas/{id}/toggle-status'
 */
 export const toggleStatus = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -50,7 +50,7 @@ toggleStatus.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::toggleStatus
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:79
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:89
 * @route '/admin123/page-schemas/{id}/toggle-status'
 */
 toggleStatus.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -77,7 +77,7 @@ toggleStatus.url = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::toggleStatus
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:79
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:89
 * @route '/admin123/page-schemas/{id}/toggle-status'
 */
 toggleStatus.put = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -87,7 +87,7 @@ toggleStatus.put = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::index
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:20
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:21
 * @route '/admin123/page-schemas'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -102,7 +102,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::index
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:20
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:21
 * @route '/admin123/page-schemas'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -111,7 +111,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::index
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:20
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:21
 * @route '/admin123/page-schemas'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -121,7 +121,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::index
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:20
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:21
 * @route '/admin123/page-schemas'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -131,7 +131,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::create
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:29
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:32
 * @route '/admin123/page-schemas/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +146,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::create
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:29
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:32
 * @route '/admin123/page-schemas/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -155,7 +155,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::create
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:29
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:32
 * @route '/admin123/page-schemas/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -165,7 +165,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::create
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:29
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:32
 * @route '/admin123/page-schemas/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -175,7 +175,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::store
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:34
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:37
 * @route '/admin123/page-schemas'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -190,7 +190,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::store
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:34
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:37
 * @route '/admin123/page-schemas'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -199,7 +199,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::store
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:34
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:37
 * @route '/admin123/page-schemas'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -209,7 +209,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::show
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:41
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:44
 * @route '/admin123/page-schemas/{field_group}'
 */
 export const show = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -224,7 +224,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::show
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:41
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:44
 * @route '/admin123/page-schemas/{field_group}'
 */
 show.url = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -257,7 +257,7 @@ show.url = (args: { field_group: number | { id: number } } | [field_group: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::show
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:41
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:44
 * @route '/admin123/page-schemas/{field_group}'
 */
 show.get = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -267,7 +267,7 @@ show.get = (args: { field_group: number | { id: number } } | [field_group: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::show
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:41
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:44
 * @route '/admin123/page-schemas/{field_group}'
 */
 show.head = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -277,7 +277,7 @@ show.head = (args: { field_group: number | { id: number } } | [field_group: numb
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::edit
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:49
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
 * @route '/admin123/page-schemas/{field_group}/edit'
 */
 export const edit = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -292,7 +292,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::edit
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:49
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
 * @route '/admin123/page-schemas/{field_group}/edit'
 */
 edit.url = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -325,7 +325,7 @@ edit.url = (args: { field_group: number | { id: number } } | [field_group: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::edit
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:49
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
 * @route '/admin123/page-schemas/{field_group}/edit'
 */
 edit.get = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -335,7 +335,7 @@ edit.get = (args: { field_group: number | { id: number } } | [field_group: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::edit
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:49
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
 * @route '/admin123/page-schemas/{field_group}/edit'
 */
 edit.head = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -345,7 +345,7 @@ edit.head = (args: { field_group: number | { id: number } } | [field_group: numb
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::update
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:64
 * @route '/admin123/page-schemas/{field_group}'
 */
 export const update = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -360,7 +360,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::update
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:64
 * @route '/admin123/page-schemas/{field_group}'
 */
 update.url = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -393,7 +393,7 @@ update.url = (args: { field_group: number | { id: number } } | [field_group: num
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::update
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:64
 * @route '/admin123/page-schemas/{field_group}'
 */
 update.put = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -403,7 +403,7 @@ update.put = (args: { field_group: number | { id: number } } | [field_group: num
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::update
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:54
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:64
 * @route '/admin123/page-schemas/{field_group}'
 */
 update.patch = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -413,7 +413,7 @@ update.patch = (args: { field_group: number | { id: number } } | [field_group: n
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::destroy
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:61
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:71
 * @route '/admin123/page-schemas/{field_group}'
 */
 export const destroy = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -428,7 +428,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::destroy
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:61
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:71
 * @route '/admin123/page-schemas/{field_group}'
 */
 destroy.url = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -461,7 +461,7 @@ destroy.url = (args: { field_group: number | { id: number } } | [field_group: nu
 
 /**
 * @see \App\Http\Controllers\Admin\PageManager\FieldGroupController::destroy
-* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:61
+* @see app/Http/Controllers/Admin/PageManager/FieldGroupController.php:71
 * @route '/admin123/page-schemas/{field_group}'
 */
 destroy.delete = (args: { field_group: number | { id: number } } | [field_group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

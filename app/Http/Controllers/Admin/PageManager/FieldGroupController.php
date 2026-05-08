@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DestroyManyFieldGroupsRequest;
 use App\Http\Requests\StoreFieldGroupRequest;
 use App\Http\Requests\UpdateFieldGroupRequest;
+use App\Http\Resources\FieldGroupResource;
 use App\Models\FieldGroup;
 use App\Repositories\FieldGroup\FieldGroupRepositoryInterface as RepositoryInterface;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,9 @@ class FieldGroupController extends Controller
     public function index(Request $request): Response
     {
         return Inertia::render('Admin/PageManager/FieldGroups/Index', [
-            'fieldGroups' => $this->repository->lists($request->only(['search']), ['task' => 'admin-list-items']),
+            'fieldGroups' => FieldGroupResource::collection(
+                $this->repository->lists($request->only(['search']), ['task' => 'admin-list-items'])
+            ),
             'filters' => $request->only(['search']),
             'translations' => $this->repository->translations(),
         ]);
@@ -40,17 +43,23 @@ class FieldGroupController extends Controller
 
     public function show(FieldGroup $fieldGroup): Response
     {
+        $fieldGroup = $this->repository->get(['id' => $fieldGroup->id], ['task' => 'get-item']) ?? $fieldGroup;
+
         return Inertia::render('Admin/PageManager/FieldGroups/Show', array_merge(
             $this->repository->getFormProps(['fieldGroup' => $fieldGroup]),
-            ['fieldGroup' => $fieldGroup]
+            ['fieldGroup' => FieldGroupResource::make($fieldGroup)]
         ));
     }
+
     public function edit(FieldGroup $fieldGroup): Response
     {
-        return Inertia::render('Admin/PageManager/FieldGroups/Edit', $this->repository->getFormProps(['fieldGroup' => $fieldGroup]));
-    }
+        $fieldGroup = $this->repository->get(['id' => $fieldGroup->id], ['task' => 'get-item']) ?? $fieldGroup;
 
-public  
+        return Inertia::render('Admin/PageManager/FieldGroups/Edit', array_merge(
+            $this->repository->getFormProps(['fieldGroup' => $fieldGroup]),
+            ['fieldGroup' => FieldGroupResource::make($fieldGroup)]
+        ));
+    }
 
     public function update(UpdateFieldGroupRequest $request, FieldGroup $fieldGroup): RedirectResponse
     {
@@ -61,7 +70,7 @@ public
 
     public function destroy(FieldGroup $fieldGroup): RedirectResponse
     {
-        if ($fieldGroup->pages()->exists()) {
+        if ($this->repository->isInUse($fieldGroup->id)) {
             return back()->with('error', __('hancms.field_group.messages.in_use'));
         }
 

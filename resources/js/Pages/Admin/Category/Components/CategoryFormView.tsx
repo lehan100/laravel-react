@@ -6,7 +6,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import Card from '@/Components/Main/Card';
 import { Link, usePage } from '@inertiajs/react';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
-import SingleUpload from '@/Components/ImageUpload/SingleUpload';
+import { resolveMediaUrl } from '@/Components/Common/mediaUrl';
 import StatusSwitch from '@/Components/Status/StatusSwitch';
 import axios from 'axios';
 import CategorySelector from './CategorySelector';
@@ -15,6 +15,7 @@ import CategoryProductsTab from './CategoryProductsTab';
 import CategoryNewsTab from './CategoryNewsTab';
 import { getLanguageByLocale } from '@/Pages/Admin/Product/productUtils';
 import { quickStore as quickCreatePage } from '@/actions/App/Http/Controllers/Admin/PageManager/PageController';
+import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
 
 const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive, itemsSelectedProducts = [], itemsSelectedNews = [], pages = [], pageSchemas = [] }: any) => {
     const [currentTab, setCurrentTab] = useState(langCode || 'vi');
@@ -37,6 +38,9 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             return carry;
         }, {})
     );
+    const [isPhotoPickerOpen, setIsPhotoPickerOpen] = useState(false);
+    const [aiTranslating, setAiTranslating] = useState(false);
+    const [aiTranslateError, setAiTranslateError] = useState('');
     const isLocked = (locale: string) => lockedTabs[locale] !== false;
     const toggleLock = (locale: string) => {
         setLockedTabs(prev => ({
@@ -134,31 +138,106 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
         }
     };
 
-    //Upload Image
-    const [previewUrl, setPreviewUrl] = useState<string | null>(
-        data.photo ? `/${config_path['path']}/${data.photo}` : null
-    );
-    const [loading, setLoading] = useState(false);
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const applyAiTranslations = (translations: Record<string, any>) => {
+        setData((prev: any) => {
+            const nextTranslations = { ...(prev.translations || {}) };
 
-        const formData = new FormData();
-        formData.append('photo', file);
+            Object.entries(translations).forEach(([locale, fields]) => {
+                const translatedFields = fields as Record<string, any>;
+                const translatedName = String(translatedFields.name || '').trim();
+                const currentData = nextTranslations[locale] || {};
+                const nextLocaleData = {
+                    ...currentData,
+                    ...Object.fromEntries(
+                        ['name', 'description', 'content', 'seo_title', 'seo_keyword', 'seo_description']
+                            .map((field) => {
+                                const value = String(translatedFields[field] || '').trim();
+                                return value !== '' ? [field, value] : null;
+                            })
+                            .filter((entry): entry is [string, string] => entry !== null)
+                    ),
+                };
 
-        setLoading(true);
+                if (translatedName !== '' && (isLocked(locale) || String(nextLocaleData.slug || '').trim() === '')) {
+                    nextLocaleData.slug = createSlug(translatedName);
+                }
+
+                nextTranslations[locale] = nextLocaleData;
+            });
+
+            return {
+                ...prev,
+                translations: nextTranslations,
+            };
+        });
+    };
+
+    const handleAiTranslate = async () => {
+        const sourceTranslation = data.translations?.[currentTab] || {};
+        const targetLocales = langList
+            .map((item: any) => item.code)
+            .filter((code: string) => code !== currentTab);
+
+        setAiTranslateError('');
+
+        if (!targetLocales.length) {
+            setAiTranslateError(trans('hancms.catalog.category.ai.no_target_languages') || 'No target languages available.');
+            return;
+        }
+
+        const hasSourceContent = ['name', 'description', 'content', 'seo_title', 'seo_keyword', 'seo_description']
+            .some((field) => String(sourceTranslation?.[field] || '').trim() !== '');
+
+        if (!hasSourceContent) {
+            setAiTranslateError(trans('hancms.catalog.category.ai.missing_input') || 'Please enter content in the current language first.');
+            return;
+        }
+
+        setAiTranslating(true);
+
         try {
-            const response = await axios.post(route('category.upload'), formData);
-            setPreviewUrl(response.data.url);
-            setData('photo', response.data.file_name);
-        } catch (error) {
-            console.error("Upload lỗi:", error);
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'category',
+                    source_locale: currentTab,
+                    target_locales: targetLocales,
+                    fields: {
+                        name: sourceTranslation.name || '',
+                        description: sourceTranslation.description || '',
+                        content: sourceTranslation.content || '',
+                        seo_title: sourceTranslation.seo_title || '',
+                        seo_keyword: sourceTranslation.seo_keyword || '',
+                        seo_description: sourceTranslation.seo_description || '',
+                    },
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+
+            if (!Object.keys(translations).length) {
+                setAiTranslateError(trans('hancms.catalog.category.ai.empty_response') || 'AI did not return translations.');
+                return;
+            }
+
+            applyAiTranslations(translations);
+        } catch (error: any) {
+            setAiTranslateError(
+                error?.response?.data?.message
+                || trans('hancms.catalog.category.ai.failed')
+                || 'Unable to translate category content right now.'
+            );
         } finally {
-            setLoading(false);
+            setAiTranslating(false);
         }
     };
 
-    //Upload Image
+    const previewUrl = resolveMediaUrl(data.photo, config_path);
+    const handlePhotoSelected = (url: string) => {
+        setData('photo', resolveMediaUrl(url, config_path) ?? url);
+        setIsPhotoPickerOpen(false);
+    };
+
     // Tiny MCE
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tinyCallback, setTinyCallback] = useState<any>(null);
@@ -305,7 +384,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
             return carry;
         }, {});
 
-        const hasAnyTitle = Object.values(translations).some((translation) => Boolean(translation.title));
+        const hasAnyTitle = Object.values(translations as Record<string, { title: string; slug: string }>).some((translation) => Boolean(translation.title));
 
         if (!hasAnyTitle) {
             setQuickPageError(trans('hancms.catalog.category.quick_page_title_required'));
@@ -425,11 +504,24 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                         ) : null}
                     </InputGroup>
                     <InputGroup label={trans('hancms.column.image')} className='items-center'>
-                        <SingleUpload
-                            previewUrl={previewUrl}
-                            loading={loading}
-                            handleFileChange={handleFileChange}
-                        />
+                        <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-3">
+                            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
+                                {previewUrl ? (
+                                    <img src={previewUrl} alt={trans('hancms.column.image')} className="h-full w-full object-cover" />
+                                ) : (
+                                    <div className="text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                        {trans('hancms.column.image')}
+                                    </div>
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsPhotoPickerOpen(true)}
+                                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
+                            >
+                                {trans('hancms.page.pick_image')}
+                            </button>
+                        </div>
                     </InputGroup>
                 </div>
             </Card>
@@ -460,7 +552,8 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
 
                     {contentTab === 'content' || !contentRelationTab ? (
                         <>
-                            <div className="flex gap-3 mb-6 border-b pb-6 pl-1 overflow-x-auto">
+                            <div className="mb-6 flex flex-col gap-3 border-b pb-6 pl-1 lg:flex-row lg:items-start lg:justify-between">
+                                <div className="flex min-w-0 flex-1 flex-wrap gap-2">
                                 {langList.map((lang: any) => {
                                     const errorInTab = hasLangError(lang.code);
                                     return (
@@ -468,7 +561,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                             key={lang.code}
                                             type="button"
                                             onClick={() => setCurrentTab(lang.code)}
-                                            className={`p-4 rounded-md text-[12px] font-black uppercase transition-all flex items-center gap-2 border-2
+                                            className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border-2 p-4 text-[12px] font-black uppercase transition-all
                                                     ${currentTab === lang.code
                                                     ? 'bg-indigo-800 text-white shadow-lg scale-105 border-indigo-800'
                                                     : errorInTab
@@ -476,7 +569,13 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border-transparent'
                                                 }`}
                                         >
-                                            <img src={`/${languageConfigPath.path}/${lang.photo}`} className="w-4 h-4 rounded-full object-cover" alt={lang.name} />
+                                            {resolveMediaUrl(lang.photo, languageConfigPath) ? (
+                                                <img src={resolveMediaUrl(lang.photo, languageConfigPath) ?? ''} className="w-4 h-4 rounded-full object-cover" alt={lang.name} />
+                                            ) : (
+                                                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-[9px] font-black uppercase text-current">
+                                                    {lang.code?.slice(0, 2) || 'NA'}
+                                                </span>
+                                            )}
                                             {lang.name}
                                             {errorInTab && (
                                                 <span className="relative flex h-2 w-2 ml-1">
@@ -487,6 +586,28 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                         </button>
                                     )
                                 })}
+                                </div>
+                                <div className="flex shrink-0 flex-col items-start gap-2 lg:items-end">
+                                    <button
+                                        type="button"
+                                        onClick={handleAiTranslate}
+                                        disabled={aiTranslating || langList.length < 2}
+                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiTranslating || langList.length < 2
+                                            ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                            : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                            }`}
+                                        >
+                                        <Sparkles size={14} />
+                                        {aiTranslating
+                                            ? (trans('hancms.catalog.category.ai.generating') || 'Generating...')
+                                            : (trans('hancms.catalog.category.ai.translate_button') || 'AI dịch tự động')}
+                                    </button>
+                                    {aiTranslateError && (
+                                        <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                            {aiTranslateError}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <InputGroup label={trans('hancms.column.name')}>
                                 <input
@@ -695,13 +816,19 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                             key={lang.code}
                                             type="button"
                                             onClick={() => setQuickPageTab(lang.code)}
-                                            className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
+                                            className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition ${
                                                 active
                                                     ? 'bg-slate-900 text-white'
                                                     : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                                             }`}
                                         >
-                                            <img src={`/${languageConfigPath.path}/${lang.photo}`} className="h-4 w-4 rounded-full object-cover" alt={lang.name} />
+                                            {resolveMediaUrl(lang.photo, languageConfigPath) ? (
+                                                <img src={resolveMediaUrl(lang.photo, languageConfigPath) ?? ''} className="h-4 w-4 rounded-full object-cover" alt={lang.name} />
+                                            ) : (
+                                                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-200 text-[9px] font-black uppercase text-slate-600">
+                                                    {lang.code?.slice(0, 2) || 'NA'}
+                                                </span>
+                                            )}
                                             <span>{lang.name}</span>
                                             <span className="uppercase opacity-70">{lang.code}</span>
                                         </button>
@@ -738,7 +865,9 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                                 : 'border border-indigo-100 bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
                                         }`}
                                     >
-                                        {quickPageSlugLocked[quickPageTab] !== false ? 'LOCK' : 'EDIT'}
+                                        {quickPageSlugLocked[quickPageTab] !== false
+                                            ? (trans('hancms.catalog.category.quick_page_slug_lock') || 'LOCK')
+                                            : (trans('hancms.catalog.category.quick_page_slug_edit') || 'EDIT')}
                                     </button>
                                 </div>
                             </InputGroup>
@@ -771,7 +900,9 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                 disabled={isQuickPageSaving}
                                 className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                {isQuickPageSaving ? '...' : trans('hancms.catalog.category.quick_create_page')}
+                                {isQuickPageSaving
+                                    ? (trans('hancms.catalog.category.quick_page_saving') || '...')
+                                    : trans('hancms.catalog.category.quick_create_page')}
                             </button>
                         </div>
                     </div>
@@ -781,6 +912,11 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSelect={handleSelectImage}
+            />
+            <MediaLibraryModal
+                isOpen={isPhotoPickerOpen}
+                onClose={() => setIsPhotoPickerOpen(false)}
+                onSelect={handlePhotoSelected}
             />
         </div>
 

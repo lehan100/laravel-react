@@ -1,0 +1,8 @@
+.about-2
+	@apply rem:min-h-[456px] relative
+	&::before
+		content: ""
+		mix-blend-mode: color-burn
+		@apply w-full h-full justify-normal top-0 left-0 pointer-events-none absolute bg-[#1DB721] 
+	@screen -md
+		@apply py-10

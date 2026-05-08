@@ -4,7 +4,9 @@ namespace App\Repositories\BuyToGift;
 
 use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionBuyToGiftOfferRule;
+use App\Models\Promotion\PromotionCampaign;
 use App\Repositories\EloquentRepository;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGiftRepositoryInterface
@@ -14,6 +16,7 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
         'code',
         'name',
         'description',
+        'campaign_id',
         'starts_at',
         'ends_at',
         'priority',
@@ -83,7 +86,34 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
             },
             'rules.buyProducts:id',
             'rules.giftProducts:id',
+            'campaign' => function ($query): void {
+                $query->select(['id', 'ends_at'])
+                    ->with([
+                        'translations' => function ($translationQuery): void {
+                            $translationQuery->select(['id', 'promotion_campaign_id', 'locale', 'name'])
+                                ->where('locale', app()->getLocale());
+                        },
+                    ]);
+            },
         ])->find($params['id'] ?? null);
+    }
+
+    /**
+     * @return Collection<int, array{id: int, name: string, ends_at: string|null}>
+     */
+    public function activeOptions(): Collection
+    {
+        return $this->_model->query()
+            ->select(['id', 'code', 'name', 'ends_at', 'is_active'])
+            ->where('is_active', true)
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (PromotionBuyToGiftOffer $offer): array => [
+                'id' => (int) $offer->id,
+                'name' => $offer->name ?: $offer->code ?: ('#'.$offer->id),
+                'ends_at' => optional($offer->ends_at)->format('Y-m-d\\TH:i'),
+            ])
+            ->values();
     }
 
     public function save($params = null, $options = null)
@@ -119,8 +149,17 @@ class BuyToGiftEloquentRepository extends EloquentRepository implements BuyToGif
             $item->code = $params['code'] ?? $item->code;
             $item->name = $params['name'] ?? $item->name;
             $item->description = $params['description'] ?? $item->description;
+            $campaignId = $params['campaign_id'] ?? $item->campaign_id;
+            $item->campaign_id = $campaignId !== '' ? $campaignId : null;
             $item->starts_at = $params['starts_at'] ?? $item->starts_at;
-            $item->ends_at = $params['ends_at'] ?? $item->ends_at;
+            if (! empty($item->campaign_id)) {
+                $campaign = PromotionCampaign::query()->select(['id', 'starts_at', 'ends_at'])->find($item->campaign_id);
+                $item->starts_at = $campaign?->starts_at ?? $item->starts_at;
+                $item->ends_at = $campaign?->ends_at ?? ($params['ends_at'] ?? $item->ends_at);
+            } else {
+                $endsAt = $params['ends_at'] ?? $item->ends_at;
+                $item->ends_at = $endsAt !== '' ? $endsAt : null;
+            }
             $item->priority = $params['priority'] ?? $item->priority ?? 100;
             $item->is_active = $params['is_active'] ?? $item->is_active ?? true;
             $item->stackable = $params['stackable'] ?? $item->stackable ?? false;

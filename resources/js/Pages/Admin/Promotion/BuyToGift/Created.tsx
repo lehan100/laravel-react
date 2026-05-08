@@ -6,11 +6,12 @@ import BuyToGiftFormView from './Components/BuyToGiftFormView';
 
 export default function CreatedPage() {
   const { trans } = useTrans();
-  const { itemsCategoryActive, itemsSelectedBuyProducts, itemsSelectedGiftProducts }: any = usePage().props;
+  const { itemsCategoryActive, itemsCampaignActive, itemsSelectedBuyProducts, itemsSelectedGiftProducts }: any = usePage().props;
   const { data, setData, errors, post, processing } = useForm({
     code: '',
     name: '',
     description: '',
+    campaign_id: '',
     condition_type: 'order_amount',
     min_order_amount: '',
     max_sets_per_order: '',
@@ -60,6 +61,7 @@ export default function CreatedPage() {
       errors={errors as any}
       processing={processing}
       itemsCategoryActive={itemsCategoryActive || []}
+      itemsCampaignActive={itemsCampaignActive || []}
       itemsSelectedBuyProducts={itemsSelectedBuyProducts || []}
       itemsSelectedGiftProducts={itemsSelectedGiftProducts || []}
       undo={undo}

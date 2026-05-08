@@ -6,12 +6,13 @@ import SaleOfferFormView from './Components/SaleOfferFormView';
 
 export default function EditPage() {
   const { trans } = useTrans();
-  const { item, itemsCategoryActive, itemsSelectedProducts }: any = usePage().props;
+  const { item, itemsCategoryActive, itemsCampaignActive, itemsSelectedProducts }: any = usePage().props;
 
   const { data, setData, errors, put, processing } = useForm({
     code: item?.code || '',
     name: item?.name || '',
     description: item?.description || '',
+    campaign_id: item?.campaign_id || '',
     discount_type: item?.discount_type || 'percent',
     discount_value: item?.discount_value ?? 0,
     max_discount_amount: item?.max_discount_amount ?? '',
@@ -45,6 +46,7 @@ export default function EditPage() {
       errors={errors as any}
       processing={processing}
       itemsCategoryActive={itemsCategoryActive || []}
+      itemsCampaignActive={itemsCampaignActive || []}
       itemsSelectedProducts={itemsSelectedProducts || []}
       undo={undo}
       handleUndo={handleUndo}

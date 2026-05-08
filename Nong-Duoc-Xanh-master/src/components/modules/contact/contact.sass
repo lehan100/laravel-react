@@ -1,0 +1,50 @@
+.contact
+	@apply relative z-10  xl:rem:pb-[136px] pb-10
+	.contact-main
+		@screen -md
+			@apply gap-10
+	.contact-item
+		@apply flex gap-4
+	.map
+		iframe
+			@apply w-full rem:h-[336px] rounded-5
+	.col-left
+		h2
+			@apply title-48 text-left text-Primary-1 #{!important}
+		.contact-item
+			.bottom
+				a
+					@apply hover:text-Primary-1
+				p
+					word-break: break-word
+					overflow-wrap: anywhere
+
+	.col-right
+		@apply rounded-5
+		.title
+			@apply mb-6
+			@screen -lg
+				@apply mb-5
+		.contact-form
+			@apply grid grid-cols-1 gap-5
+			.form-group
+				input 
+					@apply w-full px-5 bg-Neutral-White border border-Neutral-100 rounded-full rem:h-[50px] inline-flex items-center justify-center
+			.form-submit
+				button.button-primary
+					@apply text-lg font-medium border border-Primary-1 transition-500  py-2 px-4 rounded-full text-Primary-1 flex items-center gap-2
+					&:hover
+						@apply bg-Primary-1 text-Neutral-White
+			.form-group.form-textarea 
+				textarea
+					@apply  w-full py-3 px-6 bg-Neutral-White border border-Neutral-100 rounded-full
+			.bottom
+				.form-submit
+					button.btn-primary
+						@apply flex items-center gap-3
+		.form-textarea
+			@apply rem:h-[156px]
+			textarea
+				@apply h-full
+	
+			

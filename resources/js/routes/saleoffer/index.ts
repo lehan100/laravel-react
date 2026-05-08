@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:113
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:130
 * @route '/admin123/saleoffer/products-picker'
 */
 export const productsPicker = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ productsPicker.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:113
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:130
 * @route '/admin123/saleoffer/products-picker'
 */
 productsPicker.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ productsPicker.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:113
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:130
 * @route '/admin123/saleoffer/products-picker'
 */
 productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:113
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:130
 * @route '/admin123/saleoffer/products-picker'
 */
 productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:160
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:177
 * @route '/admin123/saleoffer/destroy-many'
 */
 export const destroyMany = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -60,7 +60,7 @@ destroyMany.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:160
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:177
 * @route '/admin123/saleoffer/destroy-many'
 */
 destroyMany.url = (options?: RouteQueryOptions) => {
@@ -69,7 +69,7 @@ destroyMany.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:160
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:177
 * @route '/admin123/saleoffer/destroy-many'
 */
 destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -131,7 +131,7 @@ toggleStatus.put = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::index
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:39
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:44
 * @route '/admin123/saleoffer'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +146,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::index
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:39
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:44
 * @route '/admin123/saleoffer'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -155,7 +155,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::index
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:39
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:44
 * @route '/admin123/saleoffer'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -165,7 +165,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::index
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:39
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:44
 * @route '/admin123/saleoffer'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -175,7 +175,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::create
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:49
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:54
 * @route '/admin123/saleoffer/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::create
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:49
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:54
 * @route '/admin123/saleoffer/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -199,7 +199,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::create
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:49
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:54
 * @route '/admin123/saleoffer/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -209,7 +209,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::create
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:49
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:54
 * @route '/admin123/saleoffer/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -219,7 +219,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::store
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:63
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:70
 * @route '/admin123/saleoffer'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -234,7 +234,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::store
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:63
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:70
 * @route '/admin123/saleoffer'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -243,7 +243,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::store
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:63
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:70
 * @route '/admin123/saleoffer'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -253,7 +253,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::show
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:82
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:89
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 export const show = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -268,7 +268,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::show
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:82
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:89
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 show.url = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -295,7 +295,7 @@ show.url = (args: { saleoffer: string | number } | [saleoffer: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::show
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:82
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:89
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 show.get = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -305,7 +305,7 @@ show.get = (args: { saleoffer: string | number } | [saleoffer: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::show
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:82
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:89
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 show.head = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -315,7 +315,7 @@ show.head = (args: { saleoffer: string | number } | [saleoffer: string | number 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::edit
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:96
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:103
 * @route '/admin123/saleoffer/{saleoffer}/edit'
 */
 export const edit = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -330,7 +330,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::edit
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:96
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:103
 * @route '/admin123/saleoffer/{saleoffer}/edit'
 */
 edit.url = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -357,7 +357,7 @@ edit.url = (args: { saleoffer: string | number } | [saleoffer: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::edit
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:96
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:103
 * @route '/admin123/saleoffer/{saleoffer}/edit'
 */
 edit.get = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -367,7 +367,7 @@ edit.get = (args: { saleoffer: string | number } | [saleoffer: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::edit
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:96
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:103
 * @route '/admin123/saleoffer/{saleoffer}/edit'
 */
 edit.head = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -377,7 +377,7 @@ edit.head = (args: { saleoffer: string | number } | [saleoffer: string | number 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::update
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:128
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:145
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 export const update = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -392,7 +392,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::update
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:128
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:145
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 update.url = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -419,7 +419,7 @@ update.url = (args: { saleoffer: string | number } | [saleoffer: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::update
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:128
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:145
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 update.put = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -429,7 +429,7 @@ update.put = (args: { saleoffer: string | number } | [saleoffer: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::update
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:128
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:145
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 update.patch = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -439,7 +439,7 @@ update.patch = (args: { saleoffer: string | number } | [saleoffer: string | numb
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::destroy
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:148
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:165
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 export const destroy = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -454,7 +454,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::destroy
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:148
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:165
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 destroy.url = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -481,7 +481,7 @@ destroy.url = (args: { saleoffer: string | number } | [saleoffer: string | numbe
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\SaleOfferController::destroy
-* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:148
+* @see app/Http/Controllers/Admin/Promotion/SaleOfferController.php:165
 * @route '/admin123/saleoffer/{saleoffer}'
 */
 destroy.delete = (args: { saleoffer: string | number } | [saleoffer: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

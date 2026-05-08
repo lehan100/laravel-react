@@ -1,0 +1,27 @@
+section.home-5(class="section-40 bg-Secondary-Light-Grey")
+	.container 
+		+HeadingGlobal()
+		.wrap(data-toggle="tabslet")
+			ul.tabslet-tab(class="mb-base")
+				li.active
+					a(href="#tab1") Nổi bật
+				li
+					a(href="#tab2") Phân NPK
+				li
+					a(href="#tab3") Phân hòa tan
+				li
+					a(href="#tab4") Phân hữu cơ
+				li
+					a(href="#tab5") Trung vi lượng
+				li
+					a(href="#tab6") Phân bón lá hữu cơ
+				li
+					a(href="#tab7") Phân bón lá NPK
+			.tabslet-content.active#tab1
+				.home-5-list(class="grid relative xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 gap-5")
+					-for(var i = 0; i < 10; i++)
+						+ProductItem()
+			.tabslet-content#tab2
+				p ok
+		.btn-view-all(class="flex-center")
+			+BtnPrimary()

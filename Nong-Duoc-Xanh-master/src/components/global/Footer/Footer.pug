@@ -1,0 +1,83 @@
+footer.footer(class="pt-15 bg-Secondary-Light-Grey") 
+	.container 
+		.footer-top(class="grid lg:grid-cols-4 grid-cols-2 gap-base")
+			-for(var i = 0; i < 4; i++)
+				.item 
+					.icon 
+						<i class="fa-regular fa-phone"></i>
+					.content 
+						.title Gọi mua hàng
+						a(href="#") 09.6661.6664
+		.footer-mid(class="grid grid-cols-[6fr_3fr_3fr] pt-10 rem:pb-[52px]") 
+			.footer-column
+				.footer-logo(class="rem:w-[438px] mb-6") 
+					a(href="#" class="img-ratio ratio:pt-[50_438]") 
+						+PugImg("./img/logo-footer.png")
+				.footer-contact 
+					p 
+						a(href="#") 
+							span  Mã số doanh nghiệp: 
+							| 3401239954
+					p GPKD số 5801502755 do Sở KH & ĐT Lâm Đồng cấp ngày 18/05/2023.
+					p 
+						a(href="#") 
+							span  Địa chỉ: 
+							| số 6, Bùi Thị Xuân, Thị Trấn Di Linh, Huyện Di Linh, Lâm Đồng
+					p 
+						a(href="#") 
+							span  Email:   
+							| marketing@nongduocxanh.com.vn.
+				.social(class="mt-6")
+					ul 
+						li 
+							a(href="#") 
+								<i class="fa-brands fa-facebook-f"></i>
+						li 
+							a.youtube(href="#") 
+								<i class="fa-brands fa-facebook-f"></i>
+						li 
+							a.tiktok(href="#") 
+								img(src="./img/tiktok.svg", alt="")
+						li 
+							a.shoppe(href="#") 
+								img(src="./img/shoppe.png", alt="")
+			.footer-column
+				h3(class="text-xl font-bold text-Primary-1 mb-6") Liên kết nhanh 
+				ul.footer-menu
+					-for(var i = 0; i < 9; i++) 
+						li 
+							a(href="#") Giới thiệu
+			.footer-column
+				h3(class="text-xl font-bold text-Primary-1 mb-6") Liên kết nhanh 
+				ul.footer-menu
+					-for(var i = 0; i < 9; i++) 
+						li 
+							a(href="#") Giới thiệu
+	.footer-bottom(class="py-6 border-t border-t-[#E4E5E6]")
+		.container
+			.wrapper(class="flex items-center justify-between")
+				.footer-copyright(class="text-sm font-normal text-Neutral-400")
+					p © 2025 Nông Dược Xanh. All Rights Reserved. Thiết kế web bởi Cánh Cam.
+				.footer-policy(class="flex items-center gap-3")
+					.footer-policy-link 
+						ul 
+							li 
+								a(href="#") Điều kiện & Điều khoản
+							li 
+								a(href="#") Sitemap
+					.footer-img(class="rem:w-[108px]") 
+						a(href="#" class="img-ratio ratio:pt-[40_108]") 
+							img(src="./img/bocongthuong.png", alt="")
+	.tool-fixed-cta
+		.wrapper
+			.btn.button-to-top
+				.btn-icon
+					.icon 
+						<i class="fa-regular fa-up-to-line"></i>
+			.btn
+				a.btn-icon(href="#") 
+					.icon 
+						<i class="fa-regular fa-phone"></i>
+		.logo(class="w-10 mt-5")
+			a(href="#" class="img-ratio ratio:pt-[58_40]") 
+				img(src="./img/frame-footer.png", alt="")

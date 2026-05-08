@@ -10,14 +10,15 @@ class Slug extends Model
     protected $table = 'slugs';
 
     protected $fillable = [
-        'key', 
-        'locale', 
-        'sluggable_id', 
-        'sluggable_type', 
-        'is_default'
+        'slug',
+        'locale',
+        'sluggable_id',
+        'sluggable_type',
+        'redirect_to',
+        'status',
+        'is_default',
     ];
 
-    
     public function sluggable(): MorphTo
     {
         return $this->morphTo();

@@ -1,0 +1,25 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.member(class="section-py")
+	.container 
+		h2(class="title-40 mb-base") Nhân sự
+		.wrapper(class="grid grid-cols-4 gap-base")
+			-for(var i = 0; i < 12; i++)
+				.member-item 
+					.img 
+						a(href="#" class="img-ratio ratio:pt-[426_320] rounded-5") 
+							+PugImg()
+					.content(class="mt-6")
+						.name(class="text-Primary-1 text-xl font-semibold") TRAN Tuan Anh 
+						.job(class="text-lg font-normal") Bachelor of Health Sciences – La Trobe University
+		.pagination(class="mt-base flex-center")
+			.facetwp-facet 
+				.facetwp-pager
+					a(href="#" class="facetwp-page") 1
+					a(href="#" class="facetwp-page") 2
+					a(href="#" class="facetwp-page") 3

@@ -66,6 +66,7 @@ class CouponRequest extends FormRequest
             'usage_limit_per_user' => ['nullable', 'integer', 'min:1'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'campaign_id' => ['nullable', 'integer', 'exists:promotion_campaigns,id'],
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['integer', 'exists:categories,id'],
             'product_ids' => ['nullable', 'array'],
@@ -100,6 +101,7 @@ class CouponRequest extends FormRequest
 
         if ($decimalIndex === -1) {
             $numeric = preg_replace('/[^\d-]/u', '', $cleaned);
+
             return $numeric === null || $numeric === '' ? null : (float) $numeric;
         }
 

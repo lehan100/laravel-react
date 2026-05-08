@@ -1,0 +1,60 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.system(class="section-py")
+	.container 
+		.heading(class="flex items-center gap-6 mb-base")
+			.icon(class="rem:w-[50px]") 
+				a(href="#" class="img-ratio") 
+					img(src="./img/4.svg", alt="")
+			h2(class="title-40") Hệ thống cửa hàng
+		.system-select(class="flex flex-col md:flex-row items-center mb-base")
+			.select-view 
+				.select-view-item(class="relative")
+					select#view(name="view") 
+						option(value="- Chọn tỉnh / thành -") - Chọn tỉnh / thành -
+						option(value="12") 24
+						option(value="12") 36 
+						option(value="12") 48 
+					.icon(class="absolute right-5 top-2/4 -translate-y-2/4 cursor-pointer pointer-events-none text-Primary-1") 
+						<i class="fa-light fa-chevron-down"></i>
+			.select-view 
+				.select-view-item(class="relative")
+					select#view(name="view") 
+						option(value="- Chọn tỉnh / thành -") - Chọn tỉnh / thành -
+						option(value="12") 24
+						option(value="12") 36 
+						option(value="12") 48 
+					.icon(class="absolute right-5 top-2/4 -translate-y-2/4 cursor-pointer pointer-events-none text-Primary-1") 
+						<i class="fa-light fa-chevron-down"></i>
+			a(href="#" class="btn btn-primary !rounded-xl flex-1 rem:gap-[10px]")
+				span TÌM
+				.icon
+					<i class="fa-solid fa-arrow-right"></i>
+		.wrapper(class="flex flex-col md:flex-row")
+			.col-left(class="rem:max-w-[936px] w-full")
+				.map 
+					<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125404.48100296881!2d106.70732525720226!3d10.819726974748333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d85e042bf04b%3A0xbb26baec1664394d!2zVGjhu6cgxJDhu6ljLCBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1753931129436!5m2!1svi!2s" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+				
+			.col-right(class="flex-1 overflow-y-auto")
+				-for(var i = 0; i < 10; i++)
+					.item(class="p-5 border-t border-t-Neutral-100 bg-Neutral-White")
+						.title(class="text-xl font-semibold  mb-3") Cửa hàng 2: Nông dược XANH  - Km 15 Hàm Cường, Bình Thuận
+						.system-main 
+							.item(class="flex items-center gap-3")
+								.icon 
+									<i class="fa-solid fa-location-dot"></i>
+								.location(class="flex flex-col")
+									a(href="#") Thôn Thuận Minh, Xã Tân Thành, Tỉnh Lâm Đồng
+									a.view-map(href="#" class="text-Primary-1 underline") (Xem bản đồ)
+							.item(class="flex items-center gap-3")
+								.icon 
+									<i class="fa-solid fa-phone"></i>
+								.location(class="flex")
+									a(href="#") 0966 616 664
+									a.view-map(href="#" class="text-Primary-1 underline") (Chat Zalo)
+								

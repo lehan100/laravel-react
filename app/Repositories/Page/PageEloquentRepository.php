@@ -211,14 +211,23 @@ class PageEloquentRepository extends EloquentRepository implements PageRepositor
                 ->orderBy('id')
                 ->get(['id', 'name', 'code', 'photo']),
             'products' => Product::query()
+                ->with([
+                    'translations' => function ($query): void {
+                        $query->select(['id', 'product_id', 'locale', 'name']);
+                    },
+                ])
                 ->orderByDesc('id')
                 ->limit(200)
                 ->get()
                 ->map(fn (Product $product): array => [
                     'id' => $product->id,
                     'sku' => $product->sku,
-                    'label' => $product->name ?? $product->sku ?? "#{$product->id}",
-                    'name' => $product->name ?? $product->sku ?? "#{$product->id}",
+                    'label' => $product->relationLoaded('translations')
+                        ? ($product->translations->first()?->name ?? $product->sku ?? "#{$product->id}")
+                        : ($product->sku ?? "#{$product->id}"),
+                    'name' => $product->relationLoaded('translations')
+                        ? ($product->translations->first()?->name ?? $product->sku ?? "#{$product->id}")
+                        : ($product->sku ?? "#{$product->id}"),
                     'price' => (float) $product->price,
                     'quantity' => $product->quantity,
                     'status' => $product->status,
@@ -232,13 +241,19 @@ class PageEloquentRepository extends EloquentRepository implements PageRepositor
                 ->orderByDesc('id')
                 ->limit(200)
                 ->get()
-                ->map(fn (Post $post): array => [
-                    'id' => $post->id,
-                    'label' => $post->name ?? "#{$post->id}",
-                    'name' => $post->name ?? "#{$post->id}",
-                    'type' => $post->type,
-                    'status' => $post->status,
-                ]),
+                ->map(function (Post $post): array {
+                    $name = $post->relationLoaded('translations')
+                        ? ($post->translations->first()?->name ?? "#{$post->id}")
+                        : "#{$post->id}";
+
+                    return [
+                        'id' => $post->id,
+                        'label' => $name,
+                        'name' => $name,
+                        'type' => $post->type,
+                        'status' => $post->status,
+                    ];
+                }),
             'bannerPositions' => MediaPosition::query()
                 ->select(['id', 'name', 'code'])
                 ->orderBy('id')

@@ -1,13 +1,16 @@
 import { store, update } from '@/actions/App/Http/Controllers/Admin/Catalog/AttributeController'
-import { storeAttribute } from '@/actions/App/Http/Controllers/ImageUploadController'
 import { InputGroup } from '@/Components/Form/HancmsInput'
 import MessageError from '@/Components/Form/MessageError'
 import StatusSwitch from '@/Components/Status/StatusSwitch'
+import { resolveMediaUrl } from '@/Components/Common/mediaUrl'
 import { useTrans } from '@/Hooks/useTrans'
 import { Head, router, usePage } from '@inertiajs/react'
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { GripVertical, Image as ImageIcon } from 'lucide-react'
+import { GripVertical, Image as ImageIcon, Sparkles } from 'lucide-react'
+import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal'
+import axios from 'axios'
+import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController'
 
 type LocaleItem = {
     locale?: string
@@ -118,17 +121,24 @@ function normalizeTranslationList<T extends { locale: string }>(translations: Tr
     return Object.values(translations)
 }
 
+function normalizeLocaleKey(locale: string): string {
+    return String(locale || '')
+        .trim()
+        .toLowerCase()
+        .replace('_', '-')
+        .split('-')[0]
+}
+
 function findTranslationByLocale<T extends { locale: string }>(
     translations: T[],
     locale: string,
     index: number
 ): T | undefined {
-    const normalizedLocale = String(locale)
-    const fallbackLocale = String(index)
+    const normalizedLocale = normalizeLocaleKey(locale)
 
     return (
-        translations.find((item) => String(item.locale) === normalizedLocale) ??
-        translations.find((item) => String(item.locale) === fallbackLocale) ??
+        translations.find((item) => normalizeLocaleKey(String(item.locale)) === normalizedLocale) ??
+        translations.find((item) => String(item.locale) === String(index)) ??
         translations[index]
     )
 }
@@ -220,55 +230,6 @@ function buildInitialState(attribute: AttributeResource | null | undefined, lang
     }
 }
 
-function buildImageUrl(
-    configPath: string | { path?: string } | undefined,
-    image: string | null | undefined
-): string | null {
-    if (!image) {
-        return null
-    }
-
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-        return image
-    }
-
-    const basePath = typeof configPath === 'string' ? configPath : configPath?.path ?? '/media/attribute'
-    const normalizedBasePath = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath
-    const prefixedBasePath = normalizedBasePath.startsWith('/') ? normalizedBasePath : `/${normalizedBasePath}`
-
-    return `${prefixedBasePath}/${image}`
-}
-
-function resolveValueImageSrc(
-    configPath: string | { path?: string } | undefined,
-    image: string | null | undefined,
-    imageUrl: string | null | undefined
-): string | null {
-    return imageUrl ?? buildImageUrl(configPath, image)
-}
-
-async function uploadAttributeImage(file: File): Promise<{ file_name: string; url: string }> {
-    const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? ''
-    const formData = new FormData()
-    formData.append('photo', file)
-
-    const response = await fetch(storeAttribute().url, {
-        method: storeAttribute().method.toUpperCase(),
-        headers: {
-            Accept: 'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: formData,
-    })
-
-    if (!response.ok) {
-        throw new Error('Unable to upload attribute image')
-    }
-
-    return response.json()
-}
-
 export default function AttributeFormView({ attribute, undo = 0, onProcessingChange }: AttributeFormViewProps) {
     const { langs, config_path: configPath = '/media/attribute', languageConfigPath, errors = {}, item } = usePage<PageProps>().props
     const { trans } = useTrans()
@@ -276,9 +237,14 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
     const resolvedAttribute = unwrapAttributeResource(attribute ?? item ?? null)
     const initialState = useMemo(() => buildInitialState(resolvedAttribute, langList), [resolvedAttribute, langList])
     const [data, setData] = useState<AttributeFormState>(initialState)
-    const [uploading, setUploading] = useState(false)
     const [draggedValueIndex, setDraggedValueIndex] = useState<number | null>(null)
+    const [isImagePickerOpen, setIsImagePickerOpen] = useState(false)
+    const [imageTarget, setImageTarget] = useState<number | null>(null)
     const initialAttributeId = useRef<number | null>(resolvedAttribute?.id ?? null)
+    const [aiNameTranslating, setAiNameTranslating] = useState(false)
+    const [aiNameTranslateError, setAiNameTranslateError] = useState('')
+    const [aiValueTranslating, setAiValueTranslating] = useState(false)
+    const [aiValueTranslateError, setAiValueTranslateError] = useState('')
 
     const submitAction = resolvedAttribute ? update(resolvedAttribute.id) : store()
     const isEditMode = Boolean(resolvedAttribute)
@@ -326,6 +292,197 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                 values,
             }
         })
+    }
+
+    const applyNameTranslations = (translations: Record<string, any>) => {
+        setData((current) => {
+            const nextTranslations = current.translations.slice()
+
+            Object.entries(translations).forEach(([locale, fields]) => {
+                const translatedValue = String((fields as Record<string, any>).name || '').trim()
+
+                if (translatedValue === '') {
+                    return
+                }
+
+                const localeIndex = nextTranslations.findIndex((item) => String(item.locale) === String(locale))
+
+                if (localeIndex >= 0) {
+                    nextTranslations[localeIndex] = {
+                        ...nextTranslations[localeIndex],
+                        name: translatedValue,
+                    }
+                }
+            })
+
+            return {
+                ...current,
+                translations: nextTranslations,
+            }
+        })
+    }
+
+    const applyValueTranslations = (valueIndex: number, translations: Record<string, any>) => {
+        setData((current) => {
+            const values = current.values.slice()
+            const nextTranslations = values[valueIndex]?.translations.slice() || []
+
+            Object.entries(translations).forEach(([locale, fields]) => {
+                const translatedValue = String((fields as Record<string, any>).value || '').trim()
+
+                if (translatedValue === '') {
+                    return
+                }
+
+                const localeIndex = nextTranslations.findIndex((item) => String(item.locale) === String(locale))
+
+                if (localeIndex >= 0) {
+                    nextTranslations[localeIndex] = {
+                        ...nextTranslations[localeIndex],
+                        value: translatedValue,
+                    }
+                }
+            })
+
+            values[valueIndex] = {
+                ...values[valueIndex],
+                translations: nextTranslations,
+            }
+
+            return {
+                ...current,
+                values,
+            }
+        })
+    }
+
+    const getLocalizedSource = (translations: Array<Record<string, any>>, field: 'name' | 'value') => {
+        for (let index = 0; index < langList.length; index += 1) {
+            const locale = getLocaleKey(langList[index])
+            const matched = translations.find((item) => String(item.locale) === String(locale) || String(item.locale) === String(index))
+            const value = String(matched?.[field] || '').trim()
+
+            if (value !== '') {
+                return {
+                    locale,
+                    value,
+                }
+            }
+        }
+
+        for (const translation of translations) {
+            const value = String(translation?.[field] || '').trim()
+
+            if (value !== '') {
+                return {
+                    locale: String(translation.locale),
+                    value,
+                }
+            }
+        }
+
+        return null
+    }
+
+    const handleAiTranslateNames = async () => {
+        setAiNameTranslateError('')
+
+        const source = getLocalizedSource(data.translations || [], 'name')
+
+        if (!source) {
+            setAiNameTranslateError(trans('hancms.catalog.attribute.ai.missing_input') || 'Please enter a name in one language first.')
+            return
+        }
+
+        const targetLocales = langList
+            .map((lang) => getLocaleKey(lang))
+            .filter((locale) => locale !== source.locale)
+
+        if (!targetLocales.length) {
+            setAiNameTranslateError(trans('hancms.catalog.attribute.ai.no_target_languages') || 'No target languages available.')
+            return
+        }
+
+        setAiNameTranslating(true)
+
+        try {
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'attribute',
+                    source_locale: source.locale,
+                    target_locales: targetLocales,
+                    fields: {
+                        name: source.value,
+                    },
+                },
+            })
+
+            const translations = response?.data?.translations || {}
+
+            if (!Object.keys(translations).length) {
+                setAiNameTranslateError(trans('hancms.catalog.attribute.ai.empty_response') || 'AI did not return translations.')
+                return
+            }
+
+            applyNameTranslations(translations)
+        } catch (error: any) {
+            setAiNameTranslateError(error?.response?.data?.message || trans('hancms.catalog.attribute.ai.failed') || 'Unable to translate attribute names right now.')
+        } finally {
+            setAiNameTranslating(false)
+        }
+    }
+
+    const handleAiTranslateValues = async () => {
+        setAiValueTranslateError('')
+
+        if (!data.values.length) {
+            setAiValueTranslateError(trans('hancms.catalog.attribute.ai.missing_input') || 'Please add at least one value first.')
+            return
+        }
+
+        setAiValueTranslating(true)
+
+        try {
+            for (let valueIndex = 0; valueIndex < data.values.length; valueIndex += 1) {
+                const currentValue = data.values[valueIndex]
+                const source = getLocalizedSource(currentValue.translations || [], 'value')
+
+                if (!source) {
+                    continue
+                }
+
+                const targetLocales = langList
+                    .map((lang) => getLocaleKey(lang))
+                    .filter((locale) => locale !== source.locale)
+
+                if (!targetLocales.length) {
+                    continue
+                }
+
+                const response = await axios.request({
+                    ...translateLocaleFields(),
+                    data: {
+                        module: 'attribute',
+                        source_locale: source.locale,
+                        target_locales: targetLocales,
+                        fields: {
+                            value: source.value,
+                        },
+                    },
+                })
+
+                const translations = response?.data?.translations || {}
+
+                if (Object.keys(translations).length) {
+                    applyValueTranslations(valueIndex, translations)
+                }
+            }
+        } catch (error: any) {
+            setAiValueTranslateError(error?.response?.data?.message || trans('hancms.catalog.attribute.ai.failed') || 'Unable to translate attribute values right now.')
+        } finally {
+            setAiValueTranslating(false)
+        }
     }
 
     const updateValue = (valueIndex: number, key: keyof AttributeValueForm, value: string | number | null) => {
@@ -379,31 +536,34 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
         })
     }
 
-    const handleUpload = async (valueIndex: number, file: File | null) => {
-        if (!file) {
+    const openImagePicker = (valueIndex: number): void => {
+        setImageTarget(valueIndex)
+        setIsImagePickerOpen(true)
+    }
+
+    const handleImageSelected = (url: string): void => {
+        if (imageTarget === null) {
             return
         }
 
-        setUploading(true)
+        const resolvedUrl = resolveMediaUrl(url, configPath) ?? url
 
-        try {
-            const response = await uploadAttributeImage(file)
-            setData((current) => {
-                const values = current.values.slice()
-                values[valueIndex] = {
-                    ...values[valueIndex],
-                    image: response.file_name,
-                    image_url: response.url,
-                }
+        setData((current) => {
+            const values = current.values.slice()
+            values[imageTarget] = {
+                ...values[imageTarget],
+                image: resolvedUrl,
+                image_url: resolvedUrl,
+            }
 
-                return {
-                    ...current,
-                    values,
-                }
-            })
-        } finally {
-            setUploading(false)
-        }
+            return {
+                ...current,
+                values,
+            }
+        })
+
+        setImageTarget(null)
+        setIsImagePickerOpen(false)
     }
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -452,9 +612,7 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                             </p>
                         </div>
 
-                        <div className="text-sm text-slate-500">
-                            {uploading ? trans('hancms.catalog.attribute.uploading') : null}
-                        </div>
+                        <div className="text-sm text-slate-500" />
                     </div>
 
                     <div className="mt-6 space-y-5">
@@ -522,6 +680,25 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                             <h3 className="text-base font-semibold text-slate-900">{trans('hancms.catalog.attribute.sections.translations')}</h3>
                             <p className="text-sm text-slate-500">{trans('hancms.catalog.attribute.fields.localized_name_hint')}</p>
                         </div>
+                        <div className="flex flex-col items-end gap-2">
+                            <button
+                                type="button"
+                                onClick={handleAiTranslateNames}
+                                disabled={aiNameTranslating || langList.length < 2}
+                                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiNameTranslating || langList.length < 2
+                                    ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                    : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                    }`}
+                            >
+                                <Sparkles size={14} />
+                                {aiNameTranslating ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...') : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
+                            </button>
+                            {aiNameTranslateError && (
+                                <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                    {aiNameTranslateError}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="mt-6 grid gap-4 lg:grid-cols-3">
@@ -566,25 +743,46 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                     ? trans('hancms.catalog.attribute.fields.image_hint')
                                     : data.type === 'color'
                                         ? trans('hancms.catalog.attribute.fields.color_hint')
-                                        : trans('hancms.catalog.attribute.fields.localized_value_hint')}
+                                : trans('hancms.catalog.attribute.fields.localized_value_hint')}
                             </p>
                         </div>
-
-                        <button
-                            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-                            type="button"
-                            onClick={appendValue}
-                        >
-                            {trans('hancms.catalog.attribute.fields.add_value')}
-                        </button>
+                        <div className="flex flex-col items-end gap-2">
+                            <button
+                                type="button"
+                                onClick={handleAiTranslateValues}
+                                disabled={aiValueTranslating || langList.length < 2}
+                                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiValueTranslating || langList.length < 2
+                                    ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                    : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                    }`}
+                            >
+                                <Sparkles size={14} />
+                                {aiValueTranslating ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...') : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
+                            </button>
+                            {aiValueTranslateError && (
+                                <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                    {aiValueTranslateError}
+                                </div>
+                            )}
+                            <button
+                                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                                type="button"
+                                onClick={appendValue}
+                            >
+                                {trans('hancms.catalog.attribute.fields.add_value')}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="mt-6 space-y-3">
-                        {data.values.map((value, valueIndex) => (
-                            <div
-                                key={value.id ?? valueIndex}
-                                className="rounded-2xl border border-slate-200 bg-slate-50/40 px-5 py-5 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.25)]"
-                            >
+                        {data.values.map((value, valueIndex) => {
+                            const imageSrc = resolveMediaUrl(value.image_url || value.image, configPath)
+
+                            return (
+                                <div
+                                    key={value.id ?? valueIndex}
+                                    className="rounded-2xl border border-slate-200 bg-slate-50/40 px-5 py-5 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.25)]"
+                                >
                                 <div
                                     className={`grid gap-4 xl:grid-cols-[40px_minmax(0,1fr)_minmax(220px,260px)_auto] xl:items-end ${draggedValueIndex === valueIndex ? 'opacity-70' : ''}`}
                                     draggable
@@ -657,28 +855,30 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                                 label={trans('hancms.catalog.attribute.fields.image')}
                                                 className="xl:self-center"
                                             >
-                                                <label className="group flex h-20 w-20 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-white transition hover:border-sky-400 hover:bg-sky-50/40 xl:ml-auto">
-                                                    <input
-                                                        className="sr-only"
-                                                        type="file"
-                                                        accept="image/*"
-                                                        onChange={(event) => handleUpload(valueIndex, event.target.files?.[0] ?? null)}
-                                                    />
-
-                                                    <div className="flex h-full w-full items-center justify-center overflow-hidden bg-white p-1">
-                                                        {resolveValueImageSrc(configPath, value.image, value.image_url) ? (
+                                                <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-3 xl:ml-auto xl:w-fit">
+                                                    <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
+                                                        {imageSrc ? (
                                                             <img
                                                                 alt={trans('hancms.catalog.attribute.fields.image')}
-                                                                className="h-full w-full object-contain"
-                                                                src={resolveValueImageSrc(configPath, value.image, value.image_url) ?? ''}
+                                                                className="h-full w-full object-cover"
+                                                                src={imageSrc}
                                                             />
                                                         ) : (
-                                                            <div className="flex h-full w-full items-center justify-center text-slate-400 transition group-hover:text-slate-700">
+                                                            <div className="flex h-full w-full items-center justify-center text-slate-400">
                                                                 <ImageIcon size={22} strokeWidth={1.8} />
                                                             </div>
                                                         )}
                                                     </div>
-                                                </label>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openImagePicker(valueIndex)}
+                                                        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
+                                                    >
+                                                        <ImageIcon size={14} />
+                                                        {trans('hancms.page.pick_image')}
+                                                    </button>
+                                                </div>
                                                 {errors[`values.${valueIndex}.image`] ? (
                                                     <MessageError>{errors[`values.${valueIndex}.image`]}</MessageError>
                                                 ) : null}
@@ -719,10 +919,20 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                                </div>
+                        );
+                        })}
                     </div>
                 </div>
+
+                <MediaLibraryModal
+                    isOpen={isImagePickerOpen}
+                    onClose={() => {
+                        setImageTarget(null)
+                        setIsImagePickerOpen(false)
+                    }}
+                    onSelect={handleImageSelected}
+                />
 
             </form>
         </div>

@@ -1,0 +1,85 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="#") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.blog(class="section-py bg-Secondary-Light-Grey")
+	.container 
+		.heading(class="flex md:flex-row flex-col items-center justify-between mb-base gap-base xl:gap-0")
+			+HeadingGlobal()
+			.wrap
+				ul.tabslet-tab(class="")
+					li.active
+						a(href="#tab1") Nổi bật
+					li
+						a(href="#tab2") Phân NPK
+					li
+						a(href="#tab3") Phân hòa tan
+					li
+						a(href="#tab4") Phân hữu cơ
+		.wrapper(class="flex gap-3")
+			.col-left(class="rem:max-w-[984px] w-full flex ")
+				.col-left-inner(class="rem:max-w-[360px] w-full bg-Neutral-White p-5 rounded-tl-5 rounded-bl-5 flex flex-col justify-center")
+					.title(class="text-xl text-Neutral-950 font-bold mb-2 hover:text-Primary-1 line-clamp-2")
+						a(href="#") Hướng dẫn sử dụng thuốc bảo vệ thực vật an toàn và hiệu quả
+					.desc(class="line-clamp-4 text-Neutral-600 font-normal mb-8")
+						p Nấm đối kháng là chủng nấm vi sinh tiêu diệt, ngăn chặn sự phát triển các loại nấm gây bệnh, không cho xâm nhập vào vùng rễ, thân, và lá sầu riêng khu vực Đồng Nai và...
+					.date(class="flex items-center gap-2")
+						date(class="text-neutral-500 text-sm") 03.06.2024
+						.category(class="text-Primary-1 font-medium") Kỹ thuật cây trồng
+					.bottom(class="flex items-center justify-between text-Neutral-600 mt-3")
+						.view(class="flex items-center gap-2")
+							.icon 
+								<i class="fa-regular fa-eye"></i>
+							span 15.000
+						.author(class="flex items-center gap-2") 
+							.label Tác giả:
+							.name Ks. Minh Trí
+				.image(class="flex-1")
+					a(href="#" class="img-ratio ratio:pt-[483_624] rounded-tr-5 rounded-br-5 zoom-img") 
+						+PugImg()
+			.col-right(class="col-span-5 rounded-5 bg-Neutral-White p-5")
+				.news-list(class="flex flex-col gap-5")
+					-for(var i = 0; i < 4; i++) 
+						.news-wrapper(class="flex md:flex-row flex-col items-center gap-3 group")
+							.img(class="rem:w-[120px]")
+								a(href="#" class="img-ratio ratio:pt-[80_120] zoom-img-1 rounded-xl") 
+									+PugImg()
+							.content(class="flex-1 w-full")
+								.title(class="font-normal line-clamp-2 mb-1 group-hover:text-Primary-1")
+									a(href="#") Hướng dẫn sử dụng thuốc bảo vệ thực vật an toàn và...
+								.date(class="flex items-center gap-2")
+									date(class="text-neutral-500 text-sm") 03.06.2024
+									.category(class="text-Primary-1 font-medium text-sm") Kỹ thuật cây trồng
+section.blog-2(class="section-py !pt-10")
+	.container 
+		.blog-2-list(class="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-2 lg:gap-base gap-3")
+			-for(var i = 0; i < 8; i++)
+				.blog-item(class="group")
+					.blog-img 
+						a(href="#" class="img-ratio ratio:pt-[212_320] zoom-img rounded-t-5") 
+							+PugImg()
+					.content(class="bg-Neutral-White rounded-b-5 border border-Neutral-300 p-5")
+						.title(class="text-xl font-bold text-Neutral-950 tracking-[-0.4px] mb-2 line-clamp-2 group-hover:text-Primary-1")
+							a(href="#") Hướng dẫn sử dụng thuốc bảo vệ thực vật an toàn và hiệu quả
+						.desc(class="line-clamp-4 text-Neutral-600 font-normal mb-8")
+							p Nấm đối kháng là chủng nấm vi sinh tiêu diệt, ngăn chặn sự phát triển các loại nấm gây bệnh, không cho xâm nhập vào vùng rễ, thân, và lá sầu riêng khu vực Đồng Nai và...
+						.date(class="flex items-center gap-2")
+							date(class="text-neutral-500 text-sm") 03.06.2024
+							.category(class="text-Primary-1 font-medium") Kỹ thuật cây trồng
+						.bottom(class="flex items-center justify-between text-Neutral-600 mt-3")
+							.view(class="flex items-center gap-2")
+								.icon 
+									<i class="fa-regular fa-eye"></i>
+								span 15.000
+							.author(class="flex items-center gap-2") 
+								.label Tác giả:
+								.name Ks. Minh Trí
+		.pagination(class="mt-base flex-center")
+			.facetwp-facet 
+				.facetwp-pager
+					a(href="#" class="facetwp-page") 1
+					a(href="#" class="facetwp-page") 2
+					a(href="#" class="facetwp-page") 3

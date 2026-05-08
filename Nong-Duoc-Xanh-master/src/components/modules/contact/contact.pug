@@ -1,0 +1,64 @@
+section.global-breadcrumb
+	.container
+		nav(aria-label="breadcrumbs", class="rank-math-breadcrumb")
+			p
+				a(href="https://oracle.webcanhcam.vn") Trang chủ
+				span(class="separator")  | 
+				span(class="last") Về chúng tôi
+section.contact(class="py-20 font-font-title max-md:py-10")
+	.contact-bg(class="absolute h-full right-0 top-0 -z-1") 
+		img(src="./img/bg-contact.png", alt="" class="w-full h-full")
+	.container 
+		.contact-main(class="flex flex-col items-start lg:flex-row gap-20")
+			.col-left(class="lg:rem:max-w-[560px] w-full")
+				h2(class="text-Primary-Primary_01 text-32 mb-6 uppercase") CÔNG TY CỔ PHẦN ĐẦU TƯ TT CAPITAL
+				.contact-box(class="") 
+					.contact-list(class="flex flex-col gap-5") 
+						.contact-item
+							span(class="text-lg") 
+								i.fa-regular.fa-location-dot
+							.contact-wrap(class="flex flex-col gap-2")
+								.top(class="font-bold rem:mb-[6px]") 
+									p ĐỊA CHỈ VĂN PHÒNG
+								.bottom(class="font-normal text-Neutral-500")
+									p 123 Nguyễn Đình Chính, P.11, Q. Phú Nhuận, TP.HCM
+						.contact-item
+							span(class="text-lg")  
+								i.fa-regular.fa-phone
+							.contact-wrap(class="flex flex-col gap-2")
+								.top(class="font-bold rem:mb-[6px]") 
+									p ĐỊA CHỈ VĂN PHÒNG
+								.bottom(class="font-normal text-Neutral-500")
+									p 123 Nguyễn Đình Chính, P.11, Q. Phú Nhuận, TP.HCM
+						.contact-item
+							span(class="text-lg")  
+								i.fa-regular.fa-envelope
+							.contact-wrap(class="flex flex-col gap-2")
+								.top(class="font-bold rem:mb-[6px]") 
+									p ĐỊA CHỈ VĂN PHÒNG
+								.bottom(class="font-normal text-Neutral-500")
+									p 123 Nguyễn Đình Chính, P.11, Q. Phú Nhuận, TP.HCM
+						.map 
+							iframe(src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.1860899485405!2d106.66242087596952!3d10.797055089353039!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175292e045f31ed%3A0xcc1f3cde54c86d27!2zMzE2IEzDqiBWxINuIFPhu7ksIFBoxrDhu51uZyAxLCBUw6JuIELDrG5oLCBI4buTIENow60gTWluaCA3MDA5MDAsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1743336128299!5m2!1svi!2s", width="800", height="600", style="border:0;", allowfullscreen, loading="lazy", referrerpolicy="no-referrer-when-downgrade")
+						
+			.col-right(class="lg:p-12 p-5 bg-Neutral-White shadow-Dropshadow-Light flex-1 w-full")
+				.title(class="text-xl text-center text-[#090909] font-medium") Mọi sự hợp tác tốt đẹp đều bắt đầu từ một cuộc trò chuyện. Hãy liên hệ với chúng tôi, mọi mong muốn của bạn 
+					|
+					span(class="text-Primary-Primary_01") sẽ được lắng nghe.
+				form.contact-form(action="" class="my-8")
+					.form-group
+						input(type="text" placeholder="Họ và tên") 
+					.form-group
+						input(type="email" placeholder="Email") 
+					.form-group
+						input(type="tel" placeholder="Số điện thoại") 
+					.form-group
+						input(type="text" placeholder="Tiêu đề") 
+					.form-group.form-textarea(class="w-full") 
+						textarea(name="Noi dung" class="w-full border border-Neutral-100  px-6 py-3 bg-Neutral/White rem:text-[16px] leading-6 font-normal text-neutral-500") Nội dung
+					.bottom(class="flex items-center justify-between") 
+						.capcha 
+							img(src="./img/capcha.png", alt="")
+						.form-submit(class="flex items-center justify-center") 
+							button(class="py-2 px-3 border border-Primary-1 text-Primary-Primary_01 rem:text-[18px] font-medium flex items-center gap-2 hover:bg-Primary-1 hover:text-Neutral-White") Gửi
+								i.fa-solid.fa-arrow-right

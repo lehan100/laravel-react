@@ -3,33 +3,37 @@
 namespace App\Http\Controllers\Admin\Media;
 
 use App\Http\Controllers\Controller;
+use App\Services\Media\FolderNamingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class TinyMCEController extends Controller
 {
+    public function __construct(private FolderNamingService $folderNamingService) {}
+
     public function uploadTinyMCE(Request $request)
     {
         $request->validate([
             'file' => 'required|image|max:2048',
-            'path' => 'nullable|string'
+            'path' => 'nullable|string',
         ]);
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = $request->path ?: '';
 
-            $fileName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'-'.time().'.'.$file->getClientOriginalExtension();
 
             // Lưu vào disk media_root (đã trỏ sẵn vào public/media/editor)
             $savePath = Storage::disk('media_root')->putFileAs($path, $file, $fileName);
 
             return response()->json([
                 // SỬA: Chỉ cần asset('media/editor/...') vì savePath bắt đầu từ sau thư mục editor
-                'location' => '/media/editor/' . $savePath
+                'location' => '/media/editor/'.$savePath,
             ]);
         }
+
         return response()->json(['error' => 'Upload failed'], 500);
     }
 
@@ -38,22 +42,23 @@ class TinyMCEController extends Controller
         $path = $request->query('path', '');
         $disk = Storage::disk('media_root');
 
-        if (!$disk->exists($path)) {
+        if (! $disk->exists($path)) {
             $disk->makeDirectory($path);
         }
 
         $items = [];
+        $breadcrumbs = $this->folderNamingService->breadcrumbs($disk, $path);
 
         $directories = $disk->directories($path);
         foreach ($directories as $dir) {
-            $fileCount = count($disk->files($dir));
+            $fileCount = $this->folderNamingService->folderCount($disk, $dir);
             $items[] = [
-                'name' => basename($dir),
+                'name' => $this->folderNamingService->displayName($disk, $dir),
                 'type' => 'folder',
                 'path' => $dir,
                 'info' => [
-                    'count' => $fileCount
-                ]
+                    'count' => $fileCount,
+                ],
             ];
         }
 
@@ -69,49 +74,62 @@ class TinyMCEController extends Controller
                     'name' => basename($file),
                     'type' => 'file',
                     // SỬA: URL chuẩn phải nối từ thư mục media/editor
-                    'url'  => '/media/editor/' . $file,
+                    'url' => '/media/editor/'.$file,
                     'path' => $file,
                     'info' => [
-                        'width'  => $dimensions[0] ?? 0,
+                        'width' => $dimensions[0] ?? 0,
                         'height' => $dimensions[1] ?? 0,
-                        'size'   => $size > 1048576
-                            ? round($size / 1048576, 2) . ' MB'
-                            : round($size / 1024, 2) . ' KB'
-                    ]
+                        'size' => $size > 1048576
+                            ? round($size / 1048576, 2).' MB'
+                            : round($size / 1024, 2).' KB',
+                    ],
                 ];
             }
         }
 
-        return response()->json($items);
+        return response()->json([
+            'items' => $items,
+            'breadcrumbs' => $breadcrumbs,
+            'path' => $path,
+        ]);
     }
 
     public function createFolder(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'path' => 'nullable|string'
+            'path' => 'nullable|string',
         ]);
 
-        $folderName = Str::slug($request->name);
+        $displayName = trim((string) $request->name);
+        $folderName = $this->folderNamingService->slugFolderName($displayName);
         $basePath = $request->path ?: '';
-        $fullPath = trim($basePath . '/' . $folderName, '/');
+        $fullPath = trim($basePath.'/'.$folderName, '/');
+
+        if ($folderName === '') {
+            return response()->json(['success' => false, 'message' => 'Tên thư mục không hợp lệ!'], 422);
+        }
 
         try {
             if (Storage::disk('media_root')->exists($fullPath)) {
                 return response()->json(['success' => false, 'message' => 'Thư mục đã tồn tại!'], 422);
             }
 
-            Storage::disk('media_root')->makeDirectory($fullPath);
+            $disk = Storage::disk('media_root');
+            $disk->makeDirectory($fullPath);
+            $this->folderNamingService->storeMetadata($disk, $fullPath, $displayName);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Tạo thư mục thành công!',
-                'path' => $fullPath
+                'path' => $fullPath,
+                'name' => $displayName,
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
     public function moveFile(Request $request)
     {
         $request->validate([
@@ -121,7 +139,7 @@ class TinyMCEController extends Controller
 
         $disk = Storage::disk('media_root');
         $fileName = basename($request->file_path);
-        $newPath = $request->target_path . '/' . $fileName;
+        $newPath = $request->target_path.'/'.$fileName;
 
         try {
             if ($disk->exists($newPath)) {
@@ -140,50 +158,71 @@ class TinyMCEController extends Controller
     {
         // 1. Làm sạch đường dẫn từ React gửi lên (loại bỏ dấu / ở đầu)
         $oldPath = ltrim($request->old_path, '/');
-        $newName = $request->new_name;
+        $newName = trim((string) $request->new_name);
         $type = $request->type;
+        $disk = Storage::disk('media_root');
 
         // 2. Sử dụng đúng Disk 'media_root' để kiểm tra tồn tại
-        if (!Storage::disk('media_root')->exists($oldPath)) {
+        if (! $disk->exists($oldPath)) {
             return response()->json([
-                'message' => "Không tìm thấy file gốc trên hệ thống",
-                'debug_path' => $oldPath
+                'message' => 'Không tìm thấy file gốc trên hệ thống',
+                'debug_path' => $oldPath,
             ], 404);
         }
 
         // 3. Xử lý đường dẫn thư mục cha và phần mở rộng
         $info = pathinfo($oldPath);
         // Nếu file ở thư mục gốc, dirname sẽ là ".", ta cần chuẩn hóa thành chuỗi rỗng
-        $directory = ($info['dirname'] === '.') ? '' : $info['dirname'] . '/';
-        $extension = isset($info['extension']) ? '.' . $info['extension'] : '';
+        $directory = ($info['dirname'] === '.') ? '' : $info['dirname'].'/';
+        $extension = isset($info['extension']) ? '.'.$info['extension'] : '';
 
         // 4. Đảm bảo File giữ nguyên đuôi (extension) cũ nếu người dùng lỡ xóa
-        if ($type === 'file' && !empty($extension)) {
+        if ($type === 'file' && ! empty($extension)) {
             // Kiểm tra xem tên mới đã có đuôi file chưa, nếu chưa thì cộng thêm vào
-            if (!str_ends_with($newName, $extension)) {
+            if (! str_ends_with($newName, $extension)) {
                 $newName .= $extension;
             }
         }
 
         // 5. Tạo đường dẫn mới
-        $newPath = $directory . $newName;
+        $newPath = $directory.$newName;
+
+        if ($type === 'folder') {
+            $newPath = $directory.$this->folderNamingService->slugFolderName($newName);
+
+            if ($newPath === $oldPath) {
+                $this->folderNamingService->storeMetadata($disk, $oldPath, $newName);
+
+                return response()->json([
+                    'success' => true,
+                    'path' => $oldPath,
+                    'name' => $newName,
+                ]);
+            }
+        }
 
         // 6. Kiểm tra xem tên mới đã tồn tại trên Disk 'media_root' chưa
-        if (Storage::disk('media_root')->exists($newPath)) {
+        if ($disk->exists($newPath)) {
             return response()->json(['message' => 'Tên này đã tồn tại trong thư mục!'], 422);
         }
 
         try {
             // 7. Thực hiện di chuyển trên Disk 'media_root'
-            Storage::disk('media_root')->move($oldPath, $newPath);
+            $disk->move($oldPath, $newPath);
 
-            return response()->json(['success' => true]);
+            if ($type === 'folder') {
+                $this->folderNamingService->storeMetadata($disk, $newPath, $newName);
+            }
+
+            return response()->json([
+                'success' => true,
+                'path' => $newPath,
+                'name' => $newName,
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Lỗi hệ thống: '.$e->getMessage()], 500);
         }
     }
-
-
 
     public function delete(Request $request)
     {
@@ -193,10 +232,10 @@ class TinyMCEController extends Controller
         $type = $request->type;
 
         // 2. Kiểm tra tồn tại trên disk 'media_root' trước khi xóa
-        if (!Storage::disk('media_root')->exists($path)) {
+        if (! Storage::disk('media_root')->exists($path)) {
             return response()->json([
                 'message' => 'Không tìm thấy tập tin hoặc thư mục để xóa.',
-                'debug_path' => $path
+                'debug_path' => $path,
             ], 404);
         }
 
@@ -211,7 +250,7 @@ class TinyMCEController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Lỗi hệ thống khi xóa: ' . $e->getMessage()
+                'message' => 'Lỗi hệ thống khi xóa: '.$e->getMessage(),
             ], 500);
         }
     }

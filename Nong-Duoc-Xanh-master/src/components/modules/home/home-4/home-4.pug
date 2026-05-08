@@ -1,0 +1,27 @@
+section.home-4(class="section-40 !pt-0 bg-Secondary-Light-Grey")
+	.container 
+		+HeadingGlobal()
+		.box(class="bg-Neutral-White rounded-[32px] p-5 flex gap-base mt-base")
+			.col-left(class="rem:max-w-[440px] w-full")
+				.slide(class="relative")
+					.swiper 
+						.swiper-wrapper
+							-for(var i = 0; i < 3; i++) 
+								.swiper-slide 
+									.img 
+										a(href="#" class="img-ratio rounded-5") 
+											+PugImg()
+					.wrap-button-slide.drop
+						.btn.btn-prev.btn-sw-1.primary
+						.btn.btn-next.btn-sw-1.primary
+			.col-right(class="flex-1 w-full overflow-hidden")
+				.slide-partner(class="relative")
+					.swiper 
+						.swiper-wrapper
+							-for(var i = 0; i < 12; i++)  
+								.swiper-slide 
+									.img 
+										a(href="#" class="img-ratio rounded-5 zoom-img") 
+											+PugImg("./img/partner.png")
+		.btn-view-all(class="flex-center rem:mt-[34px]")
+			+BtnPrimary()

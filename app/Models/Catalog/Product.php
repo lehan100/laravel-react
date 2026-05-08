@@ -2,6 +2,7 @@
 
 namespace App\Models\Catalog;
 
+use App\Models\Promotion\PromotionCampaign;
 use App\Models\Sales\InventoryAdjustmentHistory;
 use App\Models\Slug;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -61,6 +62,12 @@ class Product extends Model implements TranslatableContract
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_product');
+    }
+
+    public function promotionCampaigns(): BelongsToMany
+    {
+        return $this->belongsToMany(PromotionCampaign::class, 'promotion_campaign_products', 'product_id', 'promotion_campaign_id')
+            ->withTimestamps();
     }
 
     public function adjustmentHistories(): HasMany

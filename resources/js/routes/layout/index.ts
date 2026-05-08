@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::index
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:30
-* @route '/admin123/layout'
+* @route '/admin123/settings'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: index.url(options),
@@ -11,13 +11,13 @@ export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 index.definition = {
     methods: ["get","head"],
-    url: '/admin123/layout',
+    url: '/admin123/settings',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::index
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:30
-* @route '/admin123/layout'
+* @route '/admin123/settings'
 */
 index.url = (options?: RouteQueryOptions) => {
     return index.definition.url + queryParams(options)
@@ -26,7 +26,7 @@ index.url = (options?: RouteQueryOptions) => {
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::index
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:30
-* @route '/admin123/layout'
+* @route '/admin123/settings'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: index.url(options),
@@ -36,7 +36,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::index
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:30
-* @route '/admin123/layout'
+* @route '/admin123/settings'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: index.url(options),
@@ -46,7 +46,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::store
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:48
-* @route '/admin123/layout/store'
+* @route '/admin123/settings/store'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: store.url(options),
@@ -55,13 +55,13 @@ export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
 
 store.definition = {
     methods: ["post"],
-    url: '/admin123/layout/store',
+    url: '/admin123/settings/store',
 } satisfies RouteDefinition<["post"]>
 
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::store
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:48
-* @route '/admin123/layout/store'
+* @route '/admin123/settings/store'
 */
 store.url = (options?: RouteQueryOptions) => {
     return store.definition.url + queryParams(options)
@@ -70,7 +70,7 @@ store.url = (options?: RouteQueryOptions) => {
 /**
 * @see \App\Http\Controllers\Admin\Settings\LayoutController::store
 * @see app/Http/Controllers/Admin/Settings/LayoutController.php:48
-* @route '/admin123/layout/store'
+* @route '/admin123/settings/store'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: store.url(options),

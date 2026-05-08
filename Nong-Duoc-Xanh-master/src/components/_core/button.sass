@@ -1,0 +1,44 @@
+.btn-lined
+	.icon, .icon-2
+		@apply text-Neutral-White flex items-center overflow-hidden w-6 h-6
+		> *
+			@apply rem:min-w-[25px] flex-center transition-all duration-500 ease-in-out h-full w-full
+
+		// Các hướng di chuyển ban đầu
+		&.to-left > *
+			@apply translate-x-0
+		&.to-right > *
+			@apply -translate-x-full
+		&.to-top > *
+			@apply translate-y-0
+		&.to-bottom > *
+			@apply -translate-y-full
+
+		// Hướng down đặc biệt
+		&.down
+			@apply flex-col
+			> *
+				@apply translate-x-0 rem:min-h-[25px]
+
+	.icon-2
+		@apply text-Neutral-Black
+
+	// Hiệu ứng khi hover
+	&:hover
+		.icon, .icon-2
+			&.to-left > *
+				@apply -translate-x-full
+			&.to-right > *
+				@apply translate-x-0
+			&.to-top > *
+				@apply -translate-y-full
+			&.to-bottom > *
+				@apply translate-y-0
+			&.down > *
+				@apply translate-y-0
+// cấu trúc dùng 
+ 
+// a(href="#" class="btn-lined w-12 h-12 inline-flex items-center justify-center")
+// 	span(class="icon to-left") 
+// 		i(class="text-Primary-1 group-hover:text-Neutral-White").fa-solid.fa-angle-left
+// 		i(class="text-Primary-1 group-hover:text-Neutral-White").fa-solid.fa-angle-left

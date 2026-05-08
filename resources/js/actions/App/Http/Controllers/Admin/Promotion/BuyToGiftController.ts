@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:121
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:138
 * @route '/admin123/buytogift/products-picker'
 */
 export const productsPicker = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ productsPicker.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:121
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:138
 * @route '/admin123/buytogift/products-picker'
 */
 productsPicker.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ productsPicker.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:121
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:138
 * @route '/admin123/buytogift/products-picker'
 */
 productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::productsPicker
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:121
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:138
 * @route '/admin123/buytogift/products-picker'
 */
 productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:168
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:185
 * @route '/admin123/buytogift/destroy-many'
 */
 export const destroyMany = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -60,7 +60,7 @@ destroyMany.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:168
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:185
 * @route '/admin123/buytogift/destroy-many'
 */
 destroyMany.url = (options?: RouteQueryOptions) => {
@@ -69,7 +69,7 @@ destroyMany.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::destroyMany
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:168
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:185
 * @route '/admin123/buytogift/destroy-many'
 */
 destroyMany.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -131,7 +131,7 @@ toggleStatus.put = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::index
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:39
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:44
 * @route '/admin123/buytogift'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +146,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::index
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:39
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:44
 * @route '/admin123/buytogift'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -155,7 +155,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::index
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:39
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:44
 * @route '/admin123/buytogift'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -165,7 +165,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::index
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:39
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:44
 * @route '/admin123/buytogift'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -175,7 +175,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::create
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:49
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:54
 * @route '/admin123/buytogift/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::create
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:49
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:54
 * @route '/admin123/buytogift/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -199,7 +199,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::create
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:49
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:54
 * @route '/admin123/buytogift/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -209,7 +209,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::create
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:49
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:54
 * @route '/admin123/buytogift/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -219,7 +219,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::store
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:66
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:73
 * @route '/admin123/buytogift'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -234,7 +234,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::store
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:66
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:73
 * @route '/admin123/buytogift'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -243,7 +243,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::store
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:66
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:73
 * @route '/admin123/buytogift'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -253,7 +253,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::show
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:85
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:92
 * @route '/admin123/buytogift/{buytogift}'
 */
 export const show = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -268,7 +268,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::show
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:85
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:92
 * @route '/admin123/buytogift/{buytogift}'
 */
 show.url = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -295,7 +295,7 @@ show.url = (args: { buytogift: string | number } | [buytogift: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::show
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:85
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:92
 * @route '/admin123/buytogift/{buytogift}'
 */
 show.get = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -305,7 +305,7 @@ show.get = (args: { buytogift: string | number } | [buytogift: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::show
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:85
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:92
 * @route '/admin123/buytogift/{buytogift}'
 */
 show.head = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -315,7 +315,7 @@ show.head = (args: { buytogift: string | number } | [buytogift: string | number 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::edit
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:102
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:109
 * @route '/admin123/buytogift/{buytogift}/edit'
 */
 export const edit = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -330,7 +330,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::edit
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:102
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:109
 * @route '/admin123/buytogift/{buytogift}/edit'
 */
 edit.url = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -357,7 +357,7 @@ edit.url = (args: { buytogift: string | number } | [buytogift: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::edit
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:102
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:109
 * @route '/admin123/buytogift/{buytogift}/edit'
 */
 edit.get = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -367,7 +367,7 @@ edit.get = (args: { buytogift: string | number } | [buytogift: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::edit
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:102
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:109
 * @route '/admin123/buytogift/{buytogift}/edit'
 */
 edit.head = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -377,7 +377,7 @@ edit.head = (args: { buytogift: string | number } | [buytogift: string | number 
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::update
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:136
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:153
 * @route '/admin123/buytogift/{buytogift}'
 */
 export const update = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -392,7 +392,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::update
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:136
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:153
 * @route '/admin123/buytogift/{buytogift}'
 */
 update.url = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -419,7 +419,7 @@ update.url = (args: { buytogift: string | number } | [buytogift: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::update
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:136
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:153
 * @route '/admin123/buytogift/{buytogift}'
 */
 update.put = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -429,7 +429,7 @@ update.put = (args: { buytogift: string | number } | [buytogift: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::update
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:136
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:153
 * @route '/admin123/buytogift/{buytogift}'
 */
 update.patch = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -439,7 +439,7 @@ update.patch = (args: { buytogift: string | number } | [buytogift: string | numb
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::destroy
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:156
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:173
 * @route '/admin123/buytogift/{buytogift}'
 */
 export const destroy = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -454,7 +454,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::destroy
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:156
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:173
 * @route '/admin123/buytogift/{buytogift}'
 */
 destroy.url = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -481,7 +481,7 @@ destroy.url = (args: { buytogift: string | number } | [buytogift: string | numbe
 
 /**
 * @see \App\Http\Controllers\Admin\Promotion\BuyToGiftController::destroy
-* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:156
+* @see app/Http/Controllers/Admin/Promotion/BuyToGiftController.php:173
 * @route '/admin123/buytogift/{buytogift}'
 */
 destroy.delete = (args: { buytogift: string | number } | [buytogift: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

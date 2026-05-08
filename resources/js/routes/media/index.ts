@@ -5,7 +5,7 @@ import create from './create'
 import move from './move'
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::rename
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:139
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:157
 * @route '/admin123/media-rename'
 */
 export const rename = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -20,7 +20,7 @@ rename.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::rename
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:139
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:157
 * @route '/admin123/media-rename'
 */
 rename.url = (options?: RouteQueryOptions) => {
@@ -29,7 +29,7 @@ rename.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::rename
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:139
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:157
 * @route '/admin123/media-rename'
 */
 rename.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -39,7 +39,7 @@ rename.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::deleteMethod
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:188
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:227
 * @route '/admin123/media-delete'
 */
 export const deleteMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -54,7 +54,7 @@ deleteMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::deleteMethod
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:188
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:227
 * @route '/admin123/media-delete'
 */
 deleteMethod.url = (options?: RouteQueryOptions) => {
@@ -63,7 +63,7 @@ deleteMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::deleteMethod
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:188
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:227
 * @route '/admin123/media-delete'
 */
 deleteMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

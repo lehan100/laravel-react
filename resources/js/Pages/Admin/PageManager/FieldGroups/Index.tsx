@@ -46,7 +46,7 @@ export default function Index() {
     const { trans } = useTrans();
     const { fieldGroups, filters } = usePage().props as unknown as Props;
     const rows = fieldGroups?.data || [];
-    const paginationLinks = fieldGroups?.links || fieldGroups?.meta?.links || [];
+    const paginationLinks = fieldGroups?.meta?.links || [];
     const [selectedIds, setSelectedIds] = useState('');
 
     const columns = useMemo(() => [

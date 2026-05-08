@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::uploadTinyMCE
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:12
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:15
 * @route '/admin123/upload-tinymce'
 */
 export const uploadTinyMCE = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ uploadTinyMCE.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::uploadTinyMCE
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:12
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:15
 * @route '/admin123/upload-tinymce'
 */
 uploadTinyMCE.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ uploadTinyMCE.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::uploadTinyMCE
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:12
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:15
 * @route '/admin123/upload-tinymce'
 */
 uploadTinyMCE.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ uploadTinyMCE.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => (
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::getImages
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 export const getImages = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -50,7 +50,7 @@ getImages.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::getImages
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 getImages.url = (options?: RouteQueryOptions) => {
@@ -59,7 +59,7 @@ getImages.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::getImages
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 getImages.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -69,7 +69,7 @@ getImages.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::getImages
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:36
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:40
 * @route '/admin123/media-get-images'
 */
 getImages.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -79,7 +79,7 @@ getImages.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::createFolder
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:88
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:97
 * @route '/admin123/media-create-folder'
 */
 export const createFolder = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -94,7 +94,7 @@ createFolder.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::createFolder
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:88
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:97
 * @route '/admin123/media-create-folder'
 */
 createFolder.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ createFolder.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::createFolder
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:88
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:97
 * @route '/admin123/media-create-folder'
 */
 createFolder.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -113,7 +113,7 @@ createFolder.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::moveFile
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:115
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:133
 * @route '/admin123/media-move-file'
 */
 export const moveFile = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -128,7 +128,7 @@ moveFile.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::moveFile
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:115
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:133
 * @route '/admin123/media-move-file'
 */
 moveFile.url = (options?: RouteQueryOptions) => {
@@ -137,7 +137,7 @@ moveFile.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::moveFile
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:115
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:133
 * @route '/admin123/media-move-file'
 */
 moveFile.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -147,7 +147,7 @@ moveFile.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::rename
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:139
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:157
 * @route '/admin123/media-rename'
 */
 export const rename = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -162,7 +162,7 @@ rename.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::rename
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:139
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:157
 * @route '/admin123/media-rename'
 */
 rename.url = (options?: RouteQueryOptions) => {
@@ -171,7 +171,7 @@ rename.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::rename
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:139
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:157
 * @route '/admin123/media-rename'
 */
 rename.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -181,7 +181,7 @@ rename.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::deleteMethod
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:188
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:227
 * @route '/admin123/media-delete'
 */
 export const deleteMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -196,7 +196,7 @@ deleteMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::deleteMethod
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:188
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:227
 * @route '/admin123/media-delete'
 */
 deleteMethod.url = (options?: RouteQueryOptions) => {
@@ -205,7 +205,7 @@ deleteMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Media\TinyMCEController::deleteMethod
-* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:188
+* @see app/Http/Controllers/Admin/Media/TinyMCEController.php:227
 * @route '/admin123/media-delete'
 */
 deleteMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::reorder
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:179
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:185
 * @route '/admin123/category/reorder'
 */
 export const reorder = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ reorder.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::reorder
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:179
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:185
 * @route '/admin123/category/reorder'
 */
 reorder.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ reorder.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::reorder
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:179
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:185
 * @route '/admin123/category/reorder'
 */
 reorder.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ reorder.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::productsPicker
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:128
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:134
 * @route '/admin123/category/products-picker'
 */
 export const productsPicker = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -50,7 +50,7 @@ productsPicker.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::productsPicker
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:128
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:134
 * @route '/admin123/category/products-picker'
 */
 productsPicker.url = (options?: RouteQueryOptions) => {
@@ -59,7 +59,7 @@ productsPicker.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::productsPicker
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:128
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:134
 * @route '/admin123/category/products-picker'
 */
 productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -69,7 +69,7 @@ productsPicker.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::productsPicker
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:128
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:134
 * @route '/admin123/category/products-picker'
 */
 productsPicker.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -417,7 +417,7 @@ edit.head = (args: { category: number | { id: number } } | [category: number | {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::update
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:144
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:150
 * @route '/admin123/category/{category}'
 */
 export const update = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -432,7 +432,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::update
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:144
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:150
 * @route '/admin123/category/{category}'
 */
 update.url = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -459,7 +459,7 @@ update.url = (args: { category: string | number } | [category: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::update
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:144
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:150
 * @route '/admin123/category/{category}'
 */
 update.put = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -469,7 +469,7 @@ update.put = (args: { category: string | number } | [category: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::update
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:144
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:150
 * @route '/admin123/category/{category}'
 */
 update.patch = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -479,7 +479,7 @@ update.patch = (args: { category: string | number } | [category: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::destroy
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:166
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:172
 * @route '/admin123/category/{category}'
 */
 export const destroy = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -494,7 +494,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::destroy
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:166
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:172
 * @route '/admin123/category/{category}'
 */
 destroy.url = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -521,7 +521,7 @@ destroy.url = (args: { category: string | number } | [category: string | number 
 
 /**
 * @see \App\Http\Controllers\Admin\Catalog\CategoryController::destroy
-* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:166
+* @see app/Http/Controllers/Admin/Catalog/CategoryController.php:172
 * @route '/admin123/category/{category}'
 */
 destroy.delete = (args: { category: string | number } | [category: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

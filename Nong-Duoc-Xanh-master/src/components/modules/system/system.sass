@@ -1,0 +1,66 @@
+.page-template-page-agent-system
+	.global-breadcrumb
+		@apply bg-Secondary-Light-Grey
+		.rank-math-breadcrumb
+			p
+				a, span
+					@apply text-Neutral-500*
+.system
+	background: rgba(0, 80, 147, 0.04)
+	@apply border-b border-b-Neutral-200
+	@apply pt-10
+	.system-select 
+		@apply flex lg:items-center items-start md:gap-2 gap-3 w-full
+		.select-view
+			@apply  relative text-Neutral-White text-xs font-normal  rem:w-[592px]
+			&:first-child
+				@apply xl:rem:w-[560px] lg:w-[25rem]
+			
+			.icon
+				@apply text-Neutral-500*
+			@screen -md
+				@apply w-full
+			select
+				appearance: none
+				-webkit-appearance: none
+				-moz-appearance: none
+				@apply px-5 cursor-pointer w-full relative rem:h-[48px] rounded-xl text-base 
+				@apply bg-Neutral-White border border-[#ddd] text-[#77787B] font-normal
+	.wrapper
+		.col-left
+			.map
+				@apply w-full h-full rounded-l-5
+				iframe
+					@apply w-full h-full rounded-l-5
+					@screen -xl
+						@apply rounded-5
+		.col-right
+			@apply rem:h-[560px] rounded-tr-5 rounded-br-5
+			&::-webkit-scrollbar
+				@apply w-[calc(4/1920*100rem)]
+			&::-webkit-scrollbar-track
+				@apply bg-Neutral-200
+			&::-webkit-scrollbar-thumb
+				@apply bg-Primary-1
+			.item
+				@apply transition-300 ease-in-out cursor-pointer
+				.title
+					@apply transition-all ease-in-out border-b border-b-transparent inline-flex
+				.icon
+					i
+						@apply text-Neutral-500*
+				.system-main
+					@apply flex flex-col gap-2
+					.item
+						.location
+							@apply gap-1
+				&.active
+					.title
+						@apply text-Primary-1 border-b-Primary-1 font-bold
+				&:hover					
+					.title
+						@apply text-Primary-1 border-b-Primary-1 font-bold
+					.desc
+						@apply text-Neutral-White
+
+			
