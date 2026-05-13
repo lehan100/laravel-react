@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('product_id');
             $table->unsignedInteger('user_id')->nullable();
-            $table->string('action', 20)->default('set');
+            $table->string('action', 100)->default('set');
             $table->integer('old_quantity')->default(0);
             $table->integer('new_quantity')->default(0);
             $table->integer('delta')->default(0);

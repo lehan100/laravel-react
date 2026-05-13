@@ -18,6 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->string('locale', 10)->index();
             $table->string('name')->nullable();
+            $table->text('description')->nullable();
             $table->string('slug')->nullable();
             $table->unique(['promotion_campaign_id', 'locale'], 'promotion_campaign_locale_unique');
             $table->unique(['slug', 'locale'], 'promotion_campaign_slug_locale_unique');

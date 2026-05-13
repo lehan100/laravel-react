@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string("sku")->nullable()->index();
-            $table->integer("quantity")->nullable()->default(0);
-            $table->integer("weight")->nullable()->default(0);
+            $table->string('sku')->nullable()->index();
+            $table->integer('quantity')->nullable()->default(0);
+            $table->unsignedInteger('sold_quantity')->default(0);
+            $table->integer('weight')->nullable()->default(0);
             $table->decimal('price', 15, 2)->default(0);
-            $table->boolean("is_coupon")->default(false);
-            $table->boolean("is_stock")->default(false);
+            $table->boolean('is_coupon')->default(false);
+            $table->boolean('is_stock')->default(false);
             $table->unsignedTinyInteger('status')->default(0);
             $table->unsignedInteger('order')->default(0);
             $table->integer('hit_viewer')->unsigned()->nullable()->default(0);

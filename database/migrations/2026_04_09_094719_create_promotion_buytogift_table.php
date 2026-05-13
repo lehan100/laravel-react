@@ -44,6 +44,7 @@ return new class extends Migration
             $table->enum('condition_type', ['order_amount', 'buy_product'])->default('buy_product');
             $table->decimal('min_order_amount', 12, 2)->nullable();
             $table->unsignedInteger('max_sets_per_order')->nullable(); // null = không giới hạn
+            $table->unsignedInteger('max_gift_qty')->nullable();
             $table->unsignedInteger('priority')->default(100);
             $table->boolean('is_active')->default(true);
             $table->boolean('stackable')->default(false);
@@ -100,6 +101,26 @@ return new class extends Migration
             );
             $table->index('product_id');
         });
+
+        Schema::create('promotion_buytogift_rule_stock_allocations', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('promotion_buytogift_offer_rule_id');
+            $table->foreign('promotion_buytogift_offer_rule_id', 'buytogift_rule_stock_allocations_rule_fk')
+                ->references('id')
+                ->on('promotion_buytogift_offer_rules')
+                ->cascadeOnDelete();
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->cascadeOnDelete();
+            $table->unsignedInteger('allocated_quantity')->default(0);
+            $table->timestamps();
+
+            $table->unique(
+                ['promotion_buytogift_offer_rule_id', 'product_id'],
+                'buytogift_rule_stock_allocations_unique'
+            );
+            $table->index('product_id');
+        });
     }
 
     /**
@@ -107,6 +128,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('promotion_buytogift_rule_stock_allocations');
         Schema::dropIfExists('promotion_buytogift_rule_gift_items');
         Schema::dropIfExists('promotion_buytogift_rule_buy_items');
         Schema::dropIfExists('promotion_buytogift_offer_rules');

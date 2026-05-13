@@ -17,11 +17,48 @@ return new class extends Migration
         $this->createOrUpdateProductVariantsTable();
         $this->createOrUpdateVariantTranslationsTable();
         $this->createOrUpdateVariantAttributeValuesTable();
+        $this->addBuyToGiftVariantColumns();
+        $this->createOrUpdateBuyToGiftGiftVariantOptionsTable();
         $this->migrateLegacyVariantNameTranslations();
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('promotion_buytogift_rule_gift_variant_options');
+
+        if (Schema::hasTable('promotion_buytogift_rule_buy_items') && Schema::hasColumn('promotion_buytogift_rule_buy_items', 'variant_id')) {
+            Schema::table('promotion_buytogift_rule_buy_items', function (Blueprint $table): void {
+                $table->unique(
+                    ['promotion_buytogift_rule_id', 'product_id'],
+                    'promotion_buytogift_rule_buy_items_unique'
+                );
+                $table->dropUnique('promotion_buytogift_rule_buy_items_variant_unique');
+                $table->dropConstrainedForeignId('variant_id');
+            });
+        }
+
+        if (Schema::hasTable('promotion_buytogift_rule_gift_items') && Schema::hasColumn('promotion_buytogift_rule_gift_items', 'variant_id')) {
+            Schema::table('promotion_buytogift_rule_gift_items', function (Blueprint $table): void {
+                $table->unique(
+                    ['promotion_buytogift_rule_id', 'product_id'],
+                    'promotion_buytogift_rule_gift_items_unique'
+                );
+                $table->dropUnique('promotion_buytogift_rule_gift_items_variant_unique');
+                $table->dropConstrainedForeignId('variant_id');
+            });
+        }
+
+        if (Schema::hasTable('promotion_buytogift_rule_stock_allocations') && Schema::hasColumn('promotion_buytogift_rule_stock_allocations', 'variant_id')) {
+            Schema::table('promotion_buytogift_rule_stock_allocations', function (Blueprint $table): void {
+                $table->unique(
+                    ['promotion_buytogift_offer_rule_id', 'product_id'],
+                    'buytogift_rule_stock_allocations_unique'
+                );
+                $table->dropUnique('buytogift_rule_stock_allocations_variant_unique');
+                $table->dropConstrainedForeignId('variant_id');
+            });
+        }
+
         Schema::dropIfExists('variant_attribute_values');
         Schema::dropIfExists('variant_translations');
         Schema::dropIfExists('product_variants');
@@ -240,6 +277,78 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['product_variant_id', 'attribute_value_id'], 'variant_attribute_value_unique');
+        });
+    }
+
+    private function addBuyToGiftVariantColumns(): void
+    {
+        foreach ([
+            'promotion_buytogift_rule_buy_items' => 'buy_items',
+            'promotion_buytogift_rule_gift_items' => 'gift_items',
+            'promotion_buytogift_rule_stock_allocations' => 'stock_allocations',
+        ] as $tableName => $uniqueSuffix) {
+            if (! Schema::hasTable($tableName) || Schema::hasColumn($tableName, 'variant_id')) {
+                continue;
+            }
+
+            Schema::table($tableName, function (Blueprint $table) use ($tableName, $uniqueSuffix): void {
+                $table->foreignId('variant_id')
+                    ->nullable()
+                    ->after('product_id')
+                    ->constrained('product_variants')
+                    ->cascadeOnDelete();
+
+                if ($tableName === 'promotion_buytogift_rule_stock_allocations') {
+                    $table->unique(
+                        ['promotion_buytogift_offer_rule_id', 'product_id', 'variant_id'],
+                        'buytogift_rule_stock_allocations_variant_unique'
+                    );
+                    $table->dropUnique('buytogift_rule_stock_allocations_unique');
+
+                    return;
+                }
+
+                $table->unique(
+                    ['promotion_buytogift_rule_id', 'product_id', 'variant_id'],
+                    "promotion_buytogift_rule_{$uniqueSuffix}_variant_unique"
+                );
+                $table->dropUnique("promotion_buytogift_rule_{$uniqueSuffix}_unique");
+            });
+        }
+    }
+
+    private function createOrUpdateBuyToGiftGiftVariantOptionsTable(): void
+    {
+        if (Schema::hasTable('promotion_buytogift_rule_gift_variant_options')) {
+            return;
+        }
+
+        Schema::create('promotion_buytogift_rule_gift_variant_options', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('promotion_buytogift_offer_rule_id');
+            $table->foreignId('product_id');
+            $table->foreignId('variant_id');
+            $table->unsignedInteger('reserve_qty')->default(0);
+            $table->timestamps();
+
+            $table->foreign('promotion_buytogift_offer_rule_id', 'pbg_gift_var_opt_rule_fk')
+                ->references('id')
+                ->on('promotion_buytogift_offer_rules')
+                ->cascadeOnDelete();
+            $table->foreign('product_id', 'pbg_gift_var_opt_product_fk')
+                ->references('id')
+                ->on('products')
+                ->cascadeOnDelete();
+            $table->foreign('variant_id', 'pbg_gift_var_opt_variant_fk')
+                ->references('id')
+                ->on('product_variants')
+                ->cascadeOnDelete();
+
+            $table->unique(
+                ['promotion_buytogift_offer_rule_id', 'product_id', 'variant_id'],
+                'promotion_buytogift_rule_gift_variant_options_unique'
+            );
+            $table->index(['product_id', 'variant_id']);
         });
     }
 

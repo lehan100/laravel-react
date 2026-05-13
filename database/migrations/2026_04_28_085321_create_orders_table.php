@@ -37,6 +37,11 @@ return new class extends Migration
                 if (! Schema::hasColumn('orders', 'note')) {
                     $table->text('note')->nullable();
                 }
+
+                if (! Schema::hasColumn('orders', 'coupon_code')) {
+                    $table->string('coupon_code')->nullable()->after('note');
+                }
+
                 if (! Schema::hasColumn('orders', 'order_status')) {
                     $table->string('order_status', 30)->default('pending')->index();
                 }
@@ -55,6 +60,11 @@ return new class extends Migration
                 if (! Schema::hasColumn('orders', 'discount_total')) {
                     $table->decimal('discount_total', 15, 2)->default(0);
                 }
+
+                if (! Schema::hasColumn('orders', 'applied_promotions')) {
+                    $table->json('applied_promotions')->nullable()->after('discount_total');
+                }
+
                 if (! Schema::hasColumn('orders', 'shipping_total')) {
                     $table->decimal('shipping_total', 15, 2)->default(0);
                 }
@@ -83,12 +93,14 @@ return new class extends Migration
             $table->string('customer_phone', 50)->nullable();
             $table->string('customer_address', 1000)->nullable();
             $table->text('note')->nullable();
+            $table->string('coupon_code')->nullable();
             $table->string('order_status', 30)->default('pending')->index();
             $table->string('payment_status', 30)->default('unpaid')->index();
             $table->string('shipping_status', 30)->default('pending')->index();
             $table->unsignedInteger('total_quantity')->default(0);
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('discount_total', 15, 2)->default(0);
+            $table->json('applied_promotions')->nullable();
             $table->decimal('shipping_total', 15, 2)->default(0);
             $table->decimal('grand_total', 15, 2)->default(0);
             $table->timestamp('placed_at')->nullable()->index();

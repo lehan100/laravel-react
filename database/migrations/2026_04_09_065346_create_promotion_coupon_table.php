@@ -31,6 +31,7 @@ return new class extends Migration
 
             $table->timestamp('starts_at')->nullable();
             $table->timestamp('ends_at')->nullable();
+            $table->unsignedInteger('priority')->default(100);
 
             $table->boolean('is_active')->default(true);
             $table->boolean('is_public')->default(true);
@@ -41,6 +42,7 @@ return new class extends Migration
 
             $table->index('code');
             $table->index(['is_active', 'starts_at', 'ends_at']);
+            $table->index(['priority', 'is_active']);
         });
 
         Schema::create('coupon_products', function (Blueprint $table) {
