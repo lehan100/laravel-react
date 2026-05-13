@@ -52,4 +52,44 @@ class PaymentMethodRequestTest extends TestCase
         $this->assertArrayHasKey('code', $validator->errors()->messages());
         $this->assertArrayHasKey('provider', $validator->errors()->messages());
     }
+
+    #[Test]
+    public function it_uses_human_readable_labels_for_required_payment_method_errors(): void
+    {
+        app()->setLocale('vi');
+
+        $request = new PaymentMethodRequest;
+        $request->replace([
+            'code' => 'momo',
+            'provider' => 'momo',
+            'name' => '',
+            'settings' => [
+                'access_key' => 'ACCESS123',
+                'secret_key' => 'SECRET123',
+                'endpoint' => 'https://example.com/momo',
+                'return_url' => 'https://example.com/return',
+            ],
+        ]);
+
+        $validator = Validator::make(
+            $request->all(),
+            $request->rules(),
+            $request->messages(),
+            $request->attributes()
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(
+            __('validation.required', ['attribute' => mb_strtolower(__('hancms.column.name'))]),
+            $validator->errors()->first('name')
+        );
+        $this->assertSame(
+            __('validation.required_if', [
+                'attribute' => mb_strtolower(__('hancms.sales.payment_methods.fields.partner_code')),
+                'other' => mb_strtolower(__('hancms.sales.payment_methods.name')),
+                'value' => 'momo',
+            ]),
+            $validator->errors()->first('settings.partner_code')
+        );
+    }
 }

@@ -156,6 +156,9 @@ return [
         ],
         'banner' => [
             'name' => 'Banners',
+            'ai' => [
+                'translate_button' => 'AI auto-translate',
+            ],
         ],
     ],
     'report' => [
@@ -223,6 +226,14 @@ return [
         'inventory' => [
             'name' => 'Inventory Report',
             'description' => 'Track low stock, out-of-stock products, and inventory adjustments.',
+            'actions' => [
+                'set' => 'Set stock',
+                'adjust' => 'Adjust stock',
+                'order_deduct' => 'Order stock deduction',
+                'order_rollback' => 'Order stock rollback',
+                'promotion_buytogift_reserve' => 'Reserve stock for buy-to-gift campaign',
+                'promotion_buytogift_release' => 'Release buy-to-gift campaign stock',
+            ],
             'metrics' => [
                 'total_stock' => 'Total stock',
                 'low_stock' => 'Low stock',
@@ -289,6 +300,7 @@ return [
                 'max_discount_amount' => 'Max Discount Amount',
                 'min_order_amount' => 'Min Order Amount',
                 'max_order_amount' => 'Max Order Amount',
+                'priority' => 'Priority',
                 'usage_limit_total' => 'Total Usage Limit',
                 'usage_limit_per_user' => 'Usage Limit Per User',
                 'first_order_only' => 'First order only',
@@ -310,6 +322,9 @@ return [
                 'buy_product' => 'Buy product get gift',
                 'stock_scope_all' => 'Unlimited stock scope',
                 'stock_scope_limited' => 'Limited stock scope',
+                'stock_limited' => 'Limited stock scope',
+                'stock_all' => 'Unlimited stock scope',
+                'stock_empty' => 'Out of gifts',
             ],
             'summary' => [
                 'rule' => 'Rule',
@@ -318,6 +333,29 @@ return [
                 'min_order_amount' => 'Minimum order',
                 'product_short' => 'product',
                 'more_rules' => 'more rules',
+                'max_gift_qty' => 'Max gift',
+                'max_sets_per_order' => 'Max sets',
+                'stock_limit' => 'Stock limit',
+                'stock_all' => 'All stock',
+                'stock_limited' => 'Limited stock',
+                'no_gift_cap' => 'No gift cap',
+                'unlimited_sets' => 'Unlimited sets',
+                'remaining_slots' => 'Slots left',
+                'slots' => 'slots',
+                'sold_quantity' => 'Sold',
+                'reserved_quantity' => 'Reserved',
+                'reserved_total' => 'Total reserved',
+                'wasted' => 'Excess',
+                'wasted_slots' => 'excess slots',
+                'buy_slots' => 'Buy slots',
+                'gift_slots' => 'Gift slots',
+                'available_slots' => 'Available slots',
+                'buy_products_count' => 'Buy products',
+                'gift_products_count' => 'Gift products',
+                'warning_title' => 'Warning',
+                'warning_wasted' => 'There are :count gifts left, but not enough for another slot.',
+                'warning_sold_out' => 'The gifts are sold out.',
+                'warning_max_gift_cap' => 'The maximum gift quantity only covers :slots slots, leaving :shortage slots uncovered by current stock.',
             ],
             'fields' => [
                 'condition_type' => 'Condition Type',
@@ -325,13 +363,14 @@ return [
                 'buy_qty' => 'Buy Quantity',
                 'gift_products' => 'Gift Products',
                 'gift_qty' => 'Gift Quantity',
+                'max_gift_qty' => 'Maximum gift quantity',
                 'min_order_amount' => 'Minimum order amount for gift',
                 'max_sets_per_order' => 'Max gift sets per order',
+                'priority' => 'Priority',
                 'stock_scope' => 'Stock scope',
                 'stock_limit' => 'Applicable stock quantity',
                 'starts_at' => 'Starts At',
                 'ends_at' => 'Ends At',
-                'priority' => 'Priority',
                 'stackable' => 'Allow stackable',
             ],
         ],
@@ -384,6 +423,7 @@ return [
                 'delete_not_supported' => 'Warehouse delete is not supported.',
                 'bulk_delete_not_supported' => 'Bulk warehouse delete is not supported.',
                 'toggle_reason' => 'Warehouse status updated from the warehouse management page.',
+                'parent_stock_managed_by_variants' => 'This product has variants. Update stock on each variant instead.',
             ],
             'actions' => [
                 'update_stock' => 'Update stock',
@@ -423,6 +463,7 @@ return [
                 'customer' => 'Customer Information',
                 'status' => 'Order Status',
                 'items' => 'Order Items',
+                'discount_details' => 'Discount Details',
                 'history' => 'Processing History',
             ],
             'actions' => [
@@ -477,6 +518,16 @@ return [
                 'line_total' => 'Line Total',
                 'placed_at' => 'Placed At',
                 'total_quantity' => 'Total Quantity',
+                'coupon_code' => 'Coupon Code',
+                'applied_promotions' => 'Applied Promotions',
+                'gift_quantity' => 'Gift Quantity',
+            ],
+            'promotions' => [
+                'types' => [
+                    'coupon' => 'Coupon',
+                    'sale_offer' => 'Sale Offer',
+                    'buy_to_gift' => 'Buy to Gift',
+                ],
             ],
             'payment_methods' => [
                 'cod_label' => 'Cash on Delivery',
@@ -651,6 +702,9 @@ return [
                     'contact' => 'Contact',
                 ],
             ],
+            'fields' => [
+                'name' => 'Category name',
+            ],
             'news_add' => 'Add news',
             'news_hint' => 'Posts that belong to this category.',
             'news_empty' => 'No news in this category yet.',
@@ -682,11 +736,18 @@ return [
             'no_photo' => 'No photos yet.',
             'no_new_photo' => 'No new photos yet.',
             'fields' => [
+                'name' => 'Product name',
                 'base_price' => 'Base price',
                 'stock_available' => 'In stock',
                 'stock_out' => 'Out of stock',
                 'coupon_allowed' => 'Coupon allowed',
                 'coupon_disallowed' => 'Coupon not allowed',
+            ],
+            'warnings' => [
+                'quantity_zero' => 'Quantity is zero.',
+                'price_zero' => 'Price is zero.',
+                'stock_zero' => 'Stock is zero.',
+                'no_images' => 'The product has no images yet.',
             ],
             'variants' => [
                 'name' => 'Product variants',
@@ -715,6 +776,11 @@ return [
                 'variants' => 'Variants',
             ],
         ],
+        'media_banner' => [
+            'ai' => [
+                'generating' => 'Translating...',
+            ],
+        ],
         'attribute' => [
             'admin' => [
                 'name' => 'Attribute List',
@@ -737,6 +803,7 @@ return [
                 'values' => 'Values',
             ],
             'fields' => [
+                'name' => 'Attribute name',
                 'code' => 'Code',
                 'code_placeholder' => 'brand, color, size',
                 'type' => 'Type',
@@ -779,6 +846,10 @@ return [
             'name' => 'Posts',
             'created' => 'Create Post',
             'edit' => 'Edit Post',
+            'fields' => [
+                'name' => 'Post name',
+                'type' => 'Post type',
+            ],
             'ai' => [
                 'translate_button' => 'AI auto-translate',
                 'suggest_content' => 'AI Suggest Content',
@@ -902,6 +973,8 @@ return [
         'search' => 'Search',
         'sku' => 'SKU',
         'quantity' => 'Quantity',
+        'sold_quantity' => 'Sold',
+        'reserved_quantity' => 'Reserved',
         'weight' => 'Weight',
         'brand' => 'Brand',
         'price' => 'Price',

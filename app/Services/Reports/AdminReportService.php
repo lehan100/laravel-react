@@ -6,11 +6,15 @@ use App\Models\Catalog\Product;
 use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
-use App\Models\Sales\InventoryAdjustmentHistory;
 use App\Models\Sales\Order;
 use App\Models\Sales\OrderItem;
+use App\Repositories\BuyToGift\BuyToGiftRepositoryInterface;
+use App\Repositories\Coupon\CouponRepositoryInterface;
+use App\Repositories\Order\OrderRepositoryInterface;
+use App\Repositories\Product\ProductRepositoryInterface;
+use App\Repositories\SaleOffer\SaleOfferRepositoryInterface;
+use App\Services\ExchangeRateService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Laravel\Ai\Exceptions\RateLimitedException;
@@ -19,6 +23,15 @@ use function Laravel\Ai\agent;
 
 class AdminReportService
 {
+    public function __construct(
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly CouponRepositoryInterface $couponRepository,
+        private readonly SaleOfferRepositoryInterface $saleOfferRepository,
+        private readonly BuyToGiftRepositoryInterface $buyToGiftRepository,
+        private readonly ?ExchangeRateService $exchangeRateService = null
+    ) {}
+
     /**
      * @return array<string, mixed>
      */
@@ -41,11 +54,12 @@ class AdminReportService
     public function analyze(string $type, Request $request): array
     {
         $report = $this->build($type, $request);
+        $locale = $this->normalizeLocale(app()->currentLocale());
 
         try {
             $response = agent(
-                instructions: $this->analysisInstructions()
-            )->prompt($this->analysisPrompt($report));
+                instructions: $this->analysisInstructions($locale)
+            )->prompt($this->analysisPrompt($report, $locale));
 
             return [
                 'analysis' => trim((string) $response),
@@ -82,9 +96,7 @@ class AdminReportService
      */
     private function revenue(Carbon $startDate, Carbon $endDate): array
     {
-        $orders = Order::query()
-            ->whereBetween('placed_at', [$startDate, $endDate])
-            ->get();
+        $orders = $this->orderRepository->getOrdersByDateRange($startDate, $endDate);
         $effectiveOrders = $orders->where('order_status', '!=', 'cancelled');
         $paidOrders = $effectiveOrders->where('payment_status', 'paid');
         $dailyOrders = $this->dailyOrders($effectiveOrders);
@@ -119,15 +131,7 @@ class AdminReportService
      */
     private function product(Carbon $startDate, Carbon $endDate): array
     {
-        $items = OrderItem::query()
-            ->selectRaw('product_id, product_sku, product_name, SUM(quantity) as sold_quantity, SUM(line_total) as revenue')
-            ->whereHas('order', fn (Builder $query) => $query
-                ->whereBetween('placed_at', [$startDate, $endDate])
-                ->where('order_status', '!=', 'cancelled'))
-            ->groupBy('product_id', 'product_sku', 'product_name')
-            ->orderByDesc('revenue')
-            ->limit(15)
-            ->get();
+        $items = $this->orderRepository->getTopSellingProducts($startDate, $endDate, 15);
 
         $totalRevenue = (float) $items->sum('revenue');
         $totalQuantity = (int) $items->sum('sold_quantity');
@@ -141,7 +145,7 @@ class AdminReportService
                 ['label' => __('hancms.report.product.metrics.sold_products'), 'value' => $items->count(), 'tone' => 'cyan'],
                 ['label' => __('hancms.report.product.metrics.sold_quantity'), 'value' => $totalQuantity, 'tone' => 'emerald'],
                 ['label' => __('hancms.report.product.metrics.top_revenue'), 'value' => $this->money($totalRevenue), 'tone' => 'slate'],
-                ['label' => __('hancms.report.product.metrics.active_catalog'), 'value' => Product::query()->where('status', 1)->count(), 'tone' => 'amber'],
+                ['label' => __('hancms.report.product.metrics.active_catalog'), 'value' => count($this->productRepository->getProductsForInventoryReport()->where('status', 1)), 'tone' => 'amber'],
             ],
             'charts' => [
                 'top' => $items->map(fn (OrderItem $item) => [
@@ -171,14 +175,11 @@ class AdminReportService
      */
     private function inventory(Carbon $startDate, Carbon $endDate): array
     {
-        $products = Product::query()
-            ->with(['translations' => fn ($query) => $query->whereIn('locale', ['vi', app()->getLocale()])])
-            ->orderBy('quantity')
-            ->limit(20)
-            ->get();
-        $adjustments = InventoryAdjustmentHistory::query()
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get();
+        $products = $this->productRepository->getProductsForInventoryReport();
+        $adjustments = $this->productRepository->getInventoryAdjustmentsByDateRange($startDate, $endDate);
+        $sortedProducts = $products
+            ->sortBy(fn (Product $product) => $this->effectiveStock($product))
+            ->values();
 
         return [
             'type' => 'inventory',
@@ -186,16 +187,16 @@ class AdminReportService
             'description' => __('hancms.report.inventory.description'),
             'filters' => $this->filters($startDate, $endDate),
             'metrics' => [
-                ['label' => __('hancms.report.inventory.metrics.total_stock'), 'value' => Product::query()->sum('quantity'), 'tone' => 'cyan'],
-                ['label' => __('hancms.report.inventory.metrics.low_stock'), 'value' => Product::query()->where('quantity', '>', 0)->where('quantity', '<=', 5)->count(), 'tone' => 'amber'],
-                ['label' => __('hancms.report.inventory.metrics.out_of_stock'), 'value' => Product::query()->where('quantity', '<=', 0)->count(), 'tone' => 'rose'],
+                ['label' => __('hancms.report.inventory.metrics.total_stock'), 'value' => $products->sum(fn (Product $product) => $this->effectiveStock($product)), 'tone' => 'cyan'],
+                ['label' => __('hancms.report.inventory.metrics.low_stock'), 'value' => $products->filter(fn (Product $product) => $this->effectiveStock($product) > 0 && $this->effectiveStock($product) <= 5)->count(), 'tone' => 'amber'],
+                ['label' => __('hancms.report.inventory.metrics.out_of_stock'), 'value' => $products->filter(fn (Product $product) => $this->effectiveStock($product) <= 0)->count(), 'tone' => 'rose'],
                 ['label' => __('hancms.report.inventory.metrics.adjustments'), 'value' => $adjustments->count(), 'tone' => 'slate'],
             ],
             'charts' => [
                 'adjustments' => $adjustments
                     ->groupBy('action')
                     ->map(fn (Collection $items, string $action) => [
-                        'label' => $action,
+                        'label' => $this->inventoryActionLabel($action),
                         'value' => $items->sum('delta'),
                         'count' => $items->count(),
                     ])
@@ -208,12 +209,13 @@ class AdminReportService
                 ['key' => 'quantity', 'label' => __('hancms.report.columns.stock')],
                 ['key' => 'status_label', 'label' => __('hancms.report.columns.status')],
             ],
-            'rows' => $products->map(fn (Product $product) => [
+            'rows' => $sortedProducts->map(fn (Product $product) => [
                 'name' => $this->productName($product),
                 'sku' => $product->sku ?: 'N/A',
-                'quantity' => (int) $product->quantity,
-                'status_label' => $this->stockStatusLabel((int) $product->quantity),
-            ])->values()->all(),
+                'quantity' => $this->effectiveStock($product),
+                'status_key' => $this->stockStatusKey($this->effectiveStock($product)),
+                'status_label' => $this->stockStatusLabel($this->effectiveStock($product)),
+            ])->take(20)->values()->all(),
         ];
     }
 
@@ -223,16 +225,13 @@ class AdminReportService
     private function promotion(Carbon $startDate, Carbon $endDate): array
     {
         $now = now();
-        $coupons = PromotionCoupon::query()->get();
-        $saleOffers = PromotionSaleOffer::query()->get();
-        $giftOffers = PromotionBuyToGiftOffer::query()->withCount('rules')->get();
-        $activeCount = $coupons->filter(fn ($item) => $this->isActiveCampaign($item, $now))->count()
-            + $saleOffers->filter(fn ($item) => $this->isActiveCampaign($item, $now))->count()
-            + $giftOffers->filter(fn ($item) => $this->isActiveCampaign($item, $now))->count();
-        $discountTotal = Order::query()
-            ->whereBetween('placed_at', [$startDate, $endDate])
-            ->where('order_status', '!=', 'cancelled')
-            ->sum('discount_total');
+        $coupons = $this->couponRepository->getAllCoupons();
+        $saleOffers = $this->saleOfferRepository->getAllOffers();
+        $giftOffers = $this->buyToGiftRepository->getAllOffersWithRuleCount();
+        $activeCount = $coupons->filter(fn ($item) => $this->campaignStatusKey($item, $now) === 'active')->count()
+            + $saleOffers->filter(fn ($item) => $this->campaignStatusKey($item, $now) === 'active')->count()
+            + $giftOffers->filter(fn ($item) => $this->campaignStatusKey($item, $now) === 'active')->count();
+        $discountTotal = $this->orderRepository->getDiscountTotalByDateRange($startDate, $endDate);
 
         return [
             'type' => 'promotion',
@@ -314,80 +313,271 @@ class AdminReportService
         return $translation?->name ?: ($product->sku ?: '#'.$product->id);
     }
 
-    private function isActiveCampaign(object $campaign, Carbon $now): bool
-    {
-        if (! (bool) ($campaign->is_active ?? false)) {
-            return false;
-        }
-
-        if ($campaign->starts_at && $campaign->starts_at->greaterThan($now)) {
-            return false;
-        }
-
-        if ($campaign->ends_at && $campaign->ends_at->lessThan($now)) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * @return array<string, string>
      */
     private function campaignRow(string $type, object $campaign, Carbon $now): array
     {
+        $statusKey = $this->campaignStatusKey($campaign, $now);
+
         return [
             'type' => $type,
             'code' => (string) ($campaign->code ?? 'N/A'),
             'name' => (string) ($campaign->name ?? 'N/A'),
-            'status_label' => $this->isActiveCampaign($campaign, $now)
-                ? __('hancms.report.status_labels.active')
-                : __('hancms.report.status_labels.inactive'),
+            'status_key' => $statusKey,
+            'status_label' => __('hancms.report.status_labels.'.$statusKey),
         ];
+    }
+
+    private function campaignStatusKey(object $campaign, Carbon $now): string
+    {
+        if (! (bool) ($campaign->is_active ?? false)) {
+            return 'inactive';
+        }
+
+        $startsAt = $this->normalizePromotionDate($campaign->starts_at ?? null);
+        $endsAt = $this->normalizePromotionDate($campaign->ends_at ?? null);
+
+        if ($startsAt && $startsAt->greaterThan($now)) {
+            return 'upcoming';
+        }
+
+        if ($endsAt && $endsAt->lessThan($now)) {
+            return 'expired';
+        }
+
+        return 'active';
+    }
+
+    private function normalizePromotionDate(Carbon|string|null $value): ?Carbon
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $timezone = config('app.admin_timezone', 'Asia/Ho_Chi_Minh');
+        $dateString = $value instanceof Carbon ? $value->format('Y-m-d H:i:s') : (string) $value;
+
+        return Carbon::parse($dateString, $timezone);
     }
 
     private function stockStatusLabel(int $quantity): string
     {
+        return __('hancms.report.status_labels.'.$this->stockStatusKey($quantity));
+    }
+
+    private function stockStatusKey(int $quantity): string
+    {
         if ($quantity <= 0) {
-            return __('hancms.report.status_labels.out_of_stock');
+            return 'out_of_stock';
         }
 
         if ($quantity <= 5) {
-            return __('hancms.report.status_labels.low_stock');
+            return 'low_stock';
         }
 
-        return __('hancms.report.status_labels.healthy');
+        return 'healthy';
+    }
+
+    private function effectiveStock(Product $product): int
+    {
+        $variantCount = (int) ($product->variants_count ?? 0);
+        $variantStock = (int) ($product->variants_sum_stock ?? 0);
+
+        return $variantCount > 0 ? $variantStock : (int) ($product->quantity ?? 0);
+    }
+
+    private function inventoryActionLabel(string $action): string
+    {
+        return __('hancms.report.inventory.actions.'.$action);
     }
 
     private function money(mixed $value): string
     {
-        return number_format((float) $value, 0, ',', '.').' đ';
+        $amount = (float) $value;
+        $currencyCode = $this->reportCurrencyCode();
+        $displayAmount = $this->convertToDisplayCurrency($amount, $currencyCode);
+        $fractionDigits = $currencyCode === 'VND' ? 0 : 3;
+        $numeric = number_format($displayAmount, $fractionDigits, '.', ',');
+        $format = $this->currencyFormat($currencyCode);
+        $symbol = $format['symbol'];
+
+        if ($currencyCode === 'VND' || $currencyCode === 'USD') {
+            return $numeric.' '.$symbol;
+        }
+
+        if ($format['prefix']) {
+            return $symbol.$numeric;
+        }
+
+        return $numeric.' '.$symbol;
     }
 
-    private function analysisInstructions(): string
+    private function analysisInstructions(string $locale): string
     {
-        return 'Bạn là chuyên gia phân tích vận hành ecommerce. '
-            .'Hãy đọc dữ liệu báo cáo và trả lời bằng tiếng Việt, ngắn gọn, thực tế. '
-            .'Tập trung vào insight, rủi ro, cơ hội và hành động đề xuất. '
-            .'Không bịa số liệu ngoài JSON được cung cấp.';
+        return match ($locale) {
+            'en' => 'You are an ecommerce operations analyst. '
+                .'Read the report data and answer in English using a clean HTML fragment only. '
+                .'Focus on insights, risks, opportunities, and recommended actions. '
+                .'Do not invent any numbers outside the provided JSON.',
+            'ja' => 'あなたはEコマース運用の専門アナリストです。 '
+                .'レポートデータを読み、日本語のきれいなHTMLフラグメントのみで回答してください。 '
+                .'インサイト、リスク、機会、推奨アクションに集中してください。 '
+                .'提供されたJSON以外の数値は作らないでください。',
+            default => 'Bạn là chuyên gia phân tích vận hành ecommerce. '
+                .'Hãy đọc dữ liệu báo cáo và trả lời bằng một HTML fragment gọn, sạch. '
+                .'Tập trung vào insight, rủi ro, cơ hội và hành động đề xuất. '
+                .'Không bịa số liệu ngoài JSON được cung cấp.',
+        };
     }
 
     /**
      * @param  array<string, mixed>  $report
      */
-    private function analysisPrompt(array $report): string
+    private function analysisPrompt(array $report, string $locale): string
     {
         $payload = json_encode($report, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
+        $intro = match ($locale) {
+            'en' => 'Analyze the report below:',
+            'ja' => '以下のレポートを分析してください:',
+            default => 'Phân tích báo cáo sau:',
+        };
+
+        $formatRequirements = match ($locale) {
+            'en' => <<<'PROMPT'
+Output requirements:
+- Return only valid HTML.
+- Use <p>, <h3>, <ol>, <li>, and <strong>.
+- Start with a short opening paragraph.
+- Add a "Key insights" section with 3-5 concise points.
+- Add a "Next actions" section with 2-4 actionable items.
+- If the data is sparse or zero, clearly state the limitation.
+PROMPT,
+            'ja' => <<<'PROMPT'
+出力要件:
+- HTMLのみを返してください。
+- <p>、<h3>、<ol>、<li>、<strong> を使ってください。
+- 短い導入文から始めてください。
+- 「主要な洞察」セクションに3〜5件の要点を入れてください。
+- 「次のアクション」セクションに2〜4件の実行項目を入れてください。
+- データが少ない、または0の場合は、その制約を明確に述べてください。
+PROMPT,
+            default => <<<'PROMPT'
+Yêu cầu định dạng:
+- Chỉ trả về HTML hợp lệ.
+- Dùng các thẻ <p>, <h3>, <ol>, <li> và <strong>.
+- Bắt đầu bằng một đoạn mở đầu ngắn.
+- Thêm mục "Nhận định chính" với 3-5 ý ngắn gọn.
+- Thêm mục "Hành động tiếp theo" với 2-4 việc nên làm.
+- Nếu dữ liệu ít hoặc bằng 0, hãy nói rõ hạn chế dữ liệu.
+PROMPT,
+        };
+
         return <<<PROMPT
-Phân tích báo cáo sau:
+{$intro}
 
 {$payload}
 
-Yêu cầu định dạng:
-- 3-5 nhận định chính.
-- 2-4 hành động nên làm tiếp theo.
-- Nếu dữ liệu ít hoặc bằng 0, hãy nói rõ hạn chế dữ liệu.
+{$formatRequirements}
 PROMPT;
+    }
+
+    private function normalizeLocale(?string $locale): string
+    {
+        $normalized = strtolower(trim((string) $locale));
+
+        if ($normalized === 'vn') {
+            return 'vi';
+        }
+
+        return explode('-', $normalized)[0] ?: 'vi';
+    }
+
+    private function reportCurrencyCode(): string
+    {
+        return match ($this->normalizeLocale(app()->getLocale())) {
+            'en' => 'USD',
+            'ja' => 'JPY',
+            'ko' => 'KRW',
+            'zh' => 'CNY',
+            'th' => 'THB',
+            'fr', 'de', 'es', 'it', 'nl', 'fi', 'el' => 'EUR',
+            'pt' => 'BRL',
+            'ru' => 'RUB',
+            'ar' => 'SAR',
+            'hi' => 'INR',
+            'id' => 'IDR',
+            'ms' => 'MYR',
+            'tr' => 'TRY',
+            'pl' => 'PLN',
+            'sv' => 'SEK',
+            'da' => 'DKK',
+            'no' => 'NOK',
+            'cs' => 'CZK',
+            'hu' => 'HUF',
+            'ro' => 'RON',
+            'he' => 'ILS',
+            'uk' => 'UAH',
+            'bn' => 'BDT',
+            'ta' => 'INR',
+            'ur' => 'PKR',
+            default => 'VND',
+        };
+    }
+
+    /**
+     * @return array{symbol: string, prefix: bool}
+     */
+    private function currencyFormat(string $currencyCode): array
+    {
+        return match (strtoupper($currencyCode)) {
+            'VND' => ['symbol' => 'đ', 'prefix' => false],
+            'USD' => ['symbol' => '$', 'prefix' => false],
+            'JPY' => ['symbol' => '￥', 'prefix' => true],
+            'KRW' => ['symbol' => '₩', 'prefix' => true],
+            'CNY' => ['symbol' => '¥', 'prefix' => true],
+            'THB' => ['symbol' => '฿', 'prefix' => true],
+            'EUR' => ['symbol' => '€', 'prefix' => false],
+            'BRL' => ['symbol' => 'R$', 'prefix' => true],
+            'RUB' => ['symbol' => '₽', 'prefix' => true],
+            'SAR' => ['symbol' => '﷼', 'prefix' => true],
+            'INR' => ['symbol' => '₹', 'prefix' => true],
+            'IDR' => ['symbol' => 'Rp', 'prefix' => true],
+            'MYR' => ['symbol' => 'RM', 'prefix' => true],
+            'TRY' => ['symbol' => '₺', 'prefix' => true],
+            'PLN' => ['symbol' => 'zł', 'prefix' => true],
+            'SEK' => ['symbol' => 'kr', 'prefix' => true],
+            'DKK' => ['symbol' => 'kr', 'prefix' => true],
+            'NOK' => ['symbol' => 'kr', 'prefix' => true],
+            'CZK' => ['symbol' => 'Kč', 'prefix' => true],
+            'HUF' => ['symbol' => 'Ft', 'prefix' => true],
+            'RON' => ['symbol' => 'lei', 'prefix' => true],
+            'ILS' => ['symbol' => '₪', 'prefix' => true],
+            'UAH' => ['symbol' => '₴', 'prefix' => true],
+            'BDT' => ['symbol' => '৳', 'prefix' => true],
+            'PKR' => ['symbol' => 'Rs', 'prefix' => true],
+            default => ['symbol' => strtoupper($currencyCode), 'prefix' => false],
+        };
+    }
+
+    private function convertToDisplayCurrency(float $amount, string $currencyCode): float
+    {
+        if ($currencyCode === 'VND') {
+            return $amount;
+        }
+
+        $rateToVnd = $this->exchangeRateService()->rateToVnd($currencyCode);
+
+        if ($rateToVnd <= 0) {
+            return $amount;
+        }
+
+        return round($amount / $rateToVnd, 3);
+    }
+
+    private function exchangeRateService(): ExchangeRateService
+    {
+        return $this->exchangeRateService ?? app(ExchangeRateService::class);
     }
 }

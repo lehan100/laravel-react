@@ -5,6 +5,7 @@ namespace App\Repositories\Coupon;
 use App\Models\Promotion\PromotionCampaign;
 use App\Models\Promotion\PromotionCoupon;
 use App\Repositories\EloquentRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -20,6 +21,7 @@ class CouponEloquentRepository extends EloquentRepository implements CouponRepos
         'max_discount_amount',
         'starts_at',
         'ends_at',
+        'priority',
         'is_active',
         'is_public',
         'stackable',
@@ -38,7 +40,9 @@ class CouponEloquentRepository extends EloquentRepository implements CouponRepos
             return null;
         }
 
-        $query = $this->_model->select($this->FIELDSELECT)->orderByDesc('id');
+        $query = $this->_model->select($this->FIELDSELECT)
+            ->orderBy('priority')
+            ->orderByDesc('id');
 
         if (! empty($params['search'])) {
             $search = trim((string) $params['search']);
@@ -84,8 +88,9 @@ class CouponEloquentRepository extends EloquentRepository implements CouponRepos
     public function activeOptions(): Collection
     {
         return $this->_model->query()
-            ->select(['id', 'code', 'name', 'ends_at', 'is_active'])
+            ->select(['id', 'code', 'name', 'ends_at', 'priority', 'is_active'])
             ->where('is_active', true)
+            ->orderBy('priority')
             ->orderByDesc('id')
             ->get()
             ->map(fn (PromotionCoupon $coupon): array => [
@@ -136,6 +141,7 @@ class CouponEloquentRepository extends EloquentRepository implements CouponRepos
             $item->max_discount_amount = $params['max_discount_amount'] ?? $item->max_discount_amount;
             $item->min_order_amount = $params['min_order_amount'] ?? $item->min_order_amount;
             $item->max_order_amount = $params['max_order_amount'] ?? $item->max_order_amount;
+            $item->priority = $params['priority'] ?? $item->priority ?? 100;
             $item->first_order_only = $params['first_order_only'] ?? $item->first_order_only ?? false;
             $item->usage_limit_total = $params['usage_limit_total'] ?? $item->usage_limit_total;
             $item->usage_limit_per_user = $params['usage_limit_per_user'] ?? $item->usage_limit_per_user;
@@ -192,5 +198,21 @@ class CouponEloquentRepository extends EloquentRepository implements CouponRepos
         }
 
         return false;
+    }
+
+    public function getValidCouponByCode(string $code, Carbon $now): ?PromotionCoupon
+    {
+        return $this->_model->query()
+            ->where('is_active', true)
+            ->where('code', $code)
+            ->where(fn ($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now))
+            ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now))
+            ->with(['products', 'categories'])
+            ->first();
+    }
+
+    public function getAllCoupons(): Collection
+    {
+        return $this->_model->query()->get();
     }
 }

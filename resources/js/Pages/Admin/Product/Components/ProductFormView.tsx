@@ -142,6 +142,8 @@ const ProductFormView = ({
     const [isQuickAttributeSubmitting, setIsQuickAttributeSubmitting] = useState(false);
     const [isQuickAttributeImageUploading, setIsQuickAttributeImageUploading] = useState(false);
     const [quickAttributeErrors, setQuickAttributeErrors] = useState<Record<string, string>>({});
+    const [quickAttributeAiTranslating, setQuickAttributeAiTranslating] = useState(false);
+    const [quickAttributeAiTranslateError, setQuickAttributeAiTranslateError] = useState('');
     const [isQuickValueModalOpen, setIsQuickValueModalOpen] = useState(false);
     const [isQuickValueSubmitting, setIsQuickValueSubmitting] = useState(false);
     const [isQuickValueImageUploading, setIsQuickValueImageUploading] = useState(false);
@@ -173,11 +175,14 @@ const ProductFormView = ({
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
     const [aiTranslating, setAiTranslating] = useState(false);
     const [aiTranslateError, setAiTranslateError] = useState('');
+    const [variantAiTranslating, setVariantAiTranslating] = useState(false);
+    const [variantAiTranslateError, setVariantAiTranslateError] = useState('');
     useEffect(() => {
         setAttributeList(attributes || []);
     }, [attributes]);
     const currentVariantLanguage = langList.find((item: any) => item.code === currentTab) || langList[0] || null;
     const currentVariantLocale = currentVariantLanguage?.code || currentTab || langCode || 'vi';
+    const hasVariants = Array.isArray(item?.variants) && item.variants.length > 0;
     const variantLocales = langList.slice(0, 3);
     const quickAttributeLocales = langList.slice(0, 3);
     const quickValueAttribute = quickValueAttributeId !== null
@@ -240,9 +245,81 @@ const ProductFormView = ({
 
         return `/${String(languagePath).replace(/^\/+|\/+$/g, '')}/${String(lang.photo).replace(/^\/+/, '')}`;
     };
+    const getQuickAttributeSourceTranslation = (
+        translations: any,
+        field: 'name' | 'value'
+    ): { locale: string; value: string } | null => {
+        const normalizedTranslations = normalizeTranslationList(translations);
+
+        for (let index = 0; index < quickAttributeLocales.length; index += 1) {
+            const locale = String(quickAttributeLocales[index]?.code || '');
+            const matched = normalizedTranslations.find((translation: any) =>
+                String(translation.locale) === locale || String(translation.locale) === String(index)
+            );
+            const value = String(matched?.[field] || '').trim();
+
+            if (value !== '') {
+                return {
+                    locale,
+                    value,
+                };
+            }
+        }
+
+        for (const translation of normalizedTranslations) {
+            const value = String(translation?.[field] || '').trim();
+
+            if (value !== '') {
+                return {
+                    locale: String(translation.locale || ''),
+                    value,
+                };
+            }
+        }
+
+        return null;
+    };
+    const getVariantSourceTranslation = (): { locale: string; value: string } | null => {
+        if (!variantDraft?.translations) {
+            return null;
+        }
+
+        for (const lang of variantLocales) {
+            const locale = String(lang?.code || '');
+            const value = String(variantDraft.translations?.[locale]?.name || '').trim();
+
+            if (value !== '') {
+                return {
+                    locale,
+                    value,
+                };
+            }
+        }
+
+        for (const [locale, translation] of Object.entries(variantDraft.translations || {})) {
+            const value = String((translation as any)?.name || '').trim();
+            if (value !== '') {
+                return {
+                    locale: String(locale),
+                    value,
+                };
+            }
+        }
+
+        return null;
+    };
     const selectedCategoryIds = Array.isArray(data.category_ids) ? data.category_ids : [];
     const selectedFiles = Array.isArray(data.photos) ? data.photos : [];
     const defaultPhotoId = data.default_photo_id ?? item?.default_photo_id ?? existingPhotos.find((photo: any) => photo.is_default)?.id ?? null;
+    const hasProductImage = existingPhotos.length > 0
+        || selectedFiles.length > 0
+        || (defaultPhotoId !== null && defaultPhotoId !== undefined && String(defaultPhotoId).trim() !== '');
+    const productWarnings = [
+        Number(data.quantity ?? 0) === 0 ? trans('hancms.catalog.product.warnings.quantity_zero') : '',
+        Number(data.price ?? 0) === 0 ? trans('hancms.catalog.product.warnings.price_zero') : '',
+        Number(data.is_stock ?? 0) === 0 ? trans('hancms.catalog.product.warnings.stock_zero') : '',
+        !hasProductImage ? trans('hancms.catalog.product.warnings.no_images') : '',
+    ].filter((message) => message !== '');
 
     useEffect(() => {
         setData('photo_orders', existingPhotos.map((photo: any) => photo.id));
@@ -325,6 +402,8 @@ const ProductFormView = ({
 
     const openQuickAttributeModal = () => {
         setQuickAttributeErrors({});
+        setQuickAttributeAiTranslateError('');
+        setQuickAttributeAiTranslating(false);
         setQuickAttributeDraft({
             code: '',
             type: 'text',
@@ -352,6 +431,8 @@ const ProductFormView = ({
         setIsQuickAttributeSubmitting(false);
         setIsQuickAttributeImageUploading(false);
         setQuickAttributeErrors({});
+        setQuickAttributeAiTranslating(false);
+        setQuickAttributeAiTranslateError('');
     };
 
     const buildQuickValueDraft = (): QuickAttributeValueDraft => ({
@@ -425,6 +506,134 @@ const ProductFormView = ({
                 translations,
             };
         });
+    };
+
+    const handleQuickAttributeAiTranslate = async () => {
+        setQuickAttributeAiTranslateError('');
+
+        const nameSource = getQuickAttributeSourceTranslation(quickAttributeDraft.translations, 'name');
+        const valueSources = quickAttributeDraft.values
+            .map((value, valueIndex) => ({
+                valueIndex,
+                source: getQuickAttributeSourceTranslation(value.translations, 'value'),
+            }))
+            .filter((entry): entry is { valueIndex: number; source: { locale: string; value: string } } => Boolean(entry.source));
+
+        if (!nameSource && valueSources.length === 0) {
+            setQuickAttributeAiTranslateError(
+                trans('hancms.catalog.attribute.ai.missing_input') || 'Please enter a name in one language first.'
+            );
+            return;
+        }
+
+        setQuickAttributeAiTranslating(true);
+
+        try {
+            if (nameSource) {
+                const targetLocales = quickAttributeLocales
+                    .map((lang: any) => lang.code)
+                    .filter((locale: string) => locale !== nameSource.locale);
+
+                if (targetLocales.length) {
+                    const response = await axios.request({
+                        ...translateLocaleFields(),
+                        data: {
+                            module: 'attribute',
+                            source_locale: nameSource.locale,
+                            target_locales: targetLocales,
+                            fields: {
+                                name: nameSource.value,
+                            },
+                        },
+                    });
+
+                    const translations = response?.data?.translations || {};
+
+                    if (Object.keys(translations).length) {
+                        setQuickAttributeDraft((current) => ({
+                            ...current,
+                            translations: current.translations.map((translation) => {
+                                if (translation.locale === nameSource.locale) {
+                                    return translation;
+                                }
+
+                                const translated = translations[translation.locale] || translations[String(translation.locale).toLowerCase()];
+
+                                return {
+                                    ...translation,
+                                    name: translated?.name || translation.name || '',
+                                };
+                            }),
+                        }));
+                    }
+                }
+            }
+
+            for (const entry of valueSources) {
+                const targetLocales = quickAttributeLocales
+                    .map((lang: any) => lang.code)
+                    .filter((locale: string) => locale !== entry.source.locale);
+
+                if (!targetLocales.length) {
+                    continue;
+                }
+
+                const response = await axios.request({
+                    ...translateLocaleFields(),
+                    data: {
+                        module: 'attribute',
+                        source_locale: entry.source.locale,
+                        target_locales: targetLocales,
+                        fields: {
+                            value: entry.source.value,
+                        },
+                    },
+                });
+
+                const translations = response?.data?.translations || {};
+
+                if (!Object.keys(translations).length) {
+                    continue;
+                }
+
+                setQuickAttributeDraft((current) => {
+                    const values = current.values.slice();
+                    const currentValue = values[entry.valueIndex];
+                    if (!currentValue) {
+                        return current;
+                    }
+
+                    values[entry.valueIndex] = {
+                        ...currentValue,
+                        translations: currentValue.translations.map((translation) => {
+                            if (translation.locale === entry.source.locale) {
+                                return translation;
+                            }
+
+                            const translated = translations[translation.locale] || translations[String(translation.locale).toLowerCase()];
+
+                            return {
+                                ...translation,
+                                value: translated?.value || translation.value || '',
+                            };
+                        }),
+                    };
+
+                    return {
+                        ...current,
+                        values,
+                    };
+                });
+            }
+        } catch (error: any) {
+            setQuickAttributeAiTranslateError(
+                error?.response?.data?.message
+                || trans('hancms.catalog.attribute.ai.failed')
+                || 'Unable to translate attribute names and values right now.'
+            );
+        } finally {
+            setQuickAttributeAiTranslating(false);
+        }
     };
 
     const updateQuickAttributeValueTranslation = (index: number, valueIndex: number, value: string) => {
@@ -761,6 +970,84 @@ const ProductFormView = ({
         };
         setData('variants', variants);
         closeVariantModal();
+    };
+
+    const handleVariantAiTranslate = async () => {
+        setVariantAiTranslateError('');
+
+        const source = getVariantSourceTranslation();
+        if (!source) {
+            setVariantAiTranslateError(
+                trans('hancms.catalog.product.ai.missing_input') || 'Please enter a name in one language first.'
+            );
+            return;
+        }
+
+        const targetLocales = variantLocales
+            .map((lang: any) => String(lang.code))
+            .filter((locale: string) => locale !== source.locale);
+
+        if (!targetLocales.length) {
+            setVariantAiTranslateError(
+                trans('hancms.catalog.product.ai.no_target_languages') || 'No target languages available.'
+            );
+            return;
+        }
+
+        setVariantAiTranslating(true);
+
+        try {
+            const response = await axios.request({
+                ...translateLocaleFields(),
+                data: {
+                    module: 'attribute',
+                    source_locale: source.locale,
+                    target_locales: targetLocales,
+                    fields: {
+                        name: source.value,
+                    },
+                },
+            });
+
+            const translations = response?.data?.translations || {};
+            if (!Object.keys(translations).length) {
+                setVariantAiTranslateError(
+                    trans('hancms.catalog.product.ai.empty_response') || 'AI did not return translations.'
+                );
+                return;
+            }
+
+            setVariantDraft((current: any) => {
+                if (!current) {
+                    return current;
+                }
+
+                const nextTranslations = { ...(current.translations || {}) };
+                Object.entries(translations).forEach(([locale, translatedFields]) => {
+                    if (String(locale) === source.locale) {
+                        return;
+                    }
+
+                    nextTranslations[locale] = {
+                        ...(nextTranslations[locale] || {}),
+                        name: String((translatedFields as any)?.name || nextTranslations[locale]?.name || ''),
+                    };
+                });
+
+                return {
+                    ...current,
+                    translations: nextTranslations,
+                };
+            });
+        } catch (error: any) {
+            setVariantAiTranslateError(
+                error?.response?.data?.message
+                || trans('hancms.catalog.product.ai.failed')
+                || 'Unable to translate variant names right now.'
+            );
+        } finally {
+            setVariantAiTranslating(false);
+        }
     };
 
     const getVariantImagePreviewUrl = (variant: any, image?: string, imageIndex = 0) => {
@@ -1135,8 +1422,20 @@ const ProductFormView = ({
     const renderGeneralTab = () => (
         <div className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+                {productWarnings.length > 0 && (
+                    <div className="mb-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                        <div className="font-black uppercase tracking-wide">
+                            {trans('hancms.needs_attention') || 'Cần lưu ý'}
+                        </div>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-amber-800">
+                            {productWarnings.map((warning) => (
+                                <li key={warning}>{warning}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
                 <div className="grid gap-4 md:grid-cols-2">
-                    <InputGroup label={trans('hancms.column.sku')}>
+                    <InputGroup label={trans('hancms.column.sku')} required>
                         <input
                             type="text"
                             className={inputClass('sku')}
@@ -1151,9 +1450,15 @@ const ProductFormView = ({
                             min="0"
                             className={inputClass('quantity')}
                             value={data.quantity ?? 0}
+                            disabled={hasVariants}
                             onChange={(e) => setData('quantity', e.target.value)}
                         />
                         {errors?.quantity && <MessageError>{errors.quantity}</MessageError>}
+                        {hasVariants && (
+                            <p className="mt-2 text-xs text-amber-700">
+                                {trans('hancms.sales.warehouse.messages.parent_stock_managed_by_variants')}
+                            </p>
+                        )}
                     </InputGroup>
                     <InputGroup label={trans('hancms.column.price')}>
                         <div className="relative">
@@ -1309,7 +1614,7 @@ const ProductFormView = ({
 
                 <div className="border-t border-slate-200 pt-6">
                     <div className="grid gap-6">
-                        <InputGroup label={trans('hancms.column.name')}>
+                        <InputGroup label={trans('hancms.catalog.product.fields.name')} required>
                             <input
                                 type="text"
                                 value={langData.name || ''}
@@ -1433,10 +1738,10 @@ const ProductFormView = ({
                             </div>
                             {aiSeoSuggestionError && <MessageError>{aiSeoSuggestionError}</MessageError>}
 
-                            <InputGroup
-                                label={
-                                    <div className="flex justify-between items-end w-full">
-                                        <span>{trans('hancms.seo.field.title') || "Seo Title"}</span>
+                                <InputGroup
+                                    label={
+                                        <div className="flex justify-between items-end w-full">
+                                            <span>{trans('hancms.seo.field.title') || "Seo Title"}</span>
                                         <span className={`text-[10px] font-mono ${langData.seo_title?.length > 60 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
                                             {langData.seo_title?.length || 0}/60 {trans('hancms.seo.character') || "character"}
                                         </span>
@@ -1854,13 +2159,36 @@ const ProductFormView = ({
 
                         <div className="space-y-6 px-5 py-5">
                             <div className="space-y-4">
-                                <div>
-                                    <h4 className="text-xs font-black uppercase text-slate-500">
-                                        {trans('hancms.column.name') || 'Name'}
-                                    </h4>
-                                    <p className="mt-1 text-xs text-slate-400">
-                                        {trans('hancms.catalog.product.variants.localized_name_hint') || 'Enter all language names at the same time.'}
-                                    </p>
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase text-slate-500">
+                                            {trans('hancms.column.name') || 'Name'}
+                                        </h4>
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            {trans('hancms.catalog.product.variants.localized_name_hint') || 'Enter all language names at the same time.'}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleVariantAiTranslate}
+                                            disabled={variantAiTranslating || variantLocales.length < 2}
+                                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${variantAiTranslating || variantLocales.length < 2
+                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                                }`}
+                                        >
+                                            <Sparkles size={14} />
+                                            {variantAiTranslating
+                                                ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
+                                                : (trans('hancms.catalog.product.ai.translate_button') || 'AI dịch tự động')}
+                                        </button>
+                                        {variantAiTranslateError && (
+                                            <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                                {variantAiTranslateError}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="grid gap-4 md:grid-cols-3">
@@ -1884,6 +2212,7 @@ const ProductFormView = ({
                                                     <span>{lang.name || lang.code?.toUpperCase()}</span>
                                                 </span>
                                             )}
+                                            required
                                         >
                                             <input
                                                 type="text"
@@ -1901,7 +2230,7 @@ const ProductFormView = ({
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
-                                <InputGroup label={trans('hancms.column.sku')}>
+                                <InputGroup label={trans('hancms.column.sku')} required>
                                     <input
                                         type="text"
                                         className={inputClass(`variants.${editingVariantIndex}.sku`)}
@@ -1913,7 +2242,7 @@ const ProductFormView = ({
                                     )}
                                 </InputGroup>
 
-                                <InputGroup label={trans('hancms.column.price')}>
+                                <InputGroup label={trans('hancms.column.price')} required>
                                     <input
                                         type="text"
                                         inputMode="decimal"
@@ -1926,7 +2255,7 @@ const ProductFormView = ({
                                     )}
                                 </InputGroup>
 
-                                <InputGroup label={trans('hancms.column.stock') || 'Stock'}>
+                                <InputGroup label={trans('hancms.column.stock') || 'Stock'} required>
                                     <input
                                         type="number"
                                         min="0"
@@ -2282,10 +2611,36 @@ const ProductFormView = ({
                             </div>
 
                             <div className="rounded-xl border border-slate-200 p-4">
-                                <div className="mb-4">
-                                    <h4 className="text-xs font-black uppercase text-slate-500">
-                                        {trans('hancms.catalog.attribute.fields.localized_name_hint')}
-                                    </h4>
+                                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase text-slate-500">
+                                            {trans('hancms.catalog.attribute.fields.localized_name_hint')}
+                                        </h4>
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            Enter one localized name or value first, then let AI fill the others automatically.
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleQuickAttributeAiTranslate}
+                                            disabled={quickAttributeAiTranslating || quickAttributeLocales.length < 2}
+                                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${quickAttributeAiTranslating || quickAttributeLocales.length < 2
+                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                            }`}
+                                        >
+                                            <Sparkles size={14} />
+                                            {quickAttributeAiTranslating
+                                                ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...')
+                                                : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
+                                        </button>
+                                        {quickAttributeAiTranslateError && (
+                                            <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                                {quickAttributeAiTranslateError}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="grid gap-4 md:grid-cols-3">
                                     {quickAttributeLocales.map((lang: any, index: number) => (

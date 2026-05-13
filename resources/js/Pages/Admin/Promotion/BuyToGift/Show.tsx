@@ -31,6 +31,47 @@ export default function ShowPage() {
   const enabledRulesCount = rules.filter((rule: any) => rule?.is_active !== false).length;
   const uniqueBuyProductsCount = new Set(rules.flatMap((rule: any) => rule?.buy_product_ids || [])).size;
   const uniqueGiftProductsCount = new Set(rules.flatMap((rule: any) => rule?.gift_product_ids || [])).size;
+  const primaryRule = rules[0] || null;
+  const primaryRuleGiftVariantOptions = Array.isArray(primaryRule?.gift_variant_options) ? primaryRule.gift_variant_options : [];
+  const primaryRuleGiftVariantReserveTotal = primaryRuleGiftVariantOptions.reduce(
+    (total: number, option: any) => total + Number(option?.reserve_qty ?? 0),
+    0
+  );
+  const primaryRuleReservedQuantity = Number(primaryRule?.reserved_quantity ?? primaryRule?.allocated_stock ?? 0);
+  const primaryRuleSoldQuantity = Number(primaryRule?.sold_quantity ?? 0);
+  const shouldShowInventoryColumns = (rows: any[]) =>
+    rows.some((row: any) => Number(row?.sold_quantity ?? 0) > 0 || Number(row?.reserved_quantity ?? 0) > 0);
+
+  const getRuleDisplaySummary = (rule: any) => {
+    const buyQty = Math.max(1, Number(rule?.buy_qty ?? 1));
+    const giftQty = Math.max(1, Number(rule?.gift_qty ?? 1));
+    const hasLimitedStock = rule?.stock_scope === 'limited' && rule?.stock_limit !== null && rule?.stock_limit !== undefined;
+    const stockLimit = hasLimitedStock ? Math.max(0, Number(rule.stock_limit || 0)) : null;
+    const maxGiftSlots = rule?.max_gift_slots !== null && rule?.max_gift_slots !== undefined
+      ? Math.max(0, Number(rule.max_gift_slots || 0))
+      : null;
+    const availableSlots = Number(rule?.available_slots ?? 0);
+    const wastedStock = rule?.wasted_stock !== null && rule?.wasted_stock !== undefined
+      ? Math.max(0, Number(rule.wasted_stock ?? 0))
+      : (stockLimit !== null ? Math.max(0, stockLimit - availableSlots * (rule?.condition_type === 'buy_product' ? (buyQty + giftQty) : giftQty)) : 0);
+    const maxGiftShortage = rule?.max_gift_shortage !== null && rule?.max_gift_shortage !== undefined
+      ? Math.max(0, Number(rule.max_gift_shortage || 0))
+      : (maxGiftSlots !== null ? Math.max(0, maxGiftSlots - availableSlots) : 0);
+
+    return {
+      availableSlots,
+      wastedStock,
+      maxGiftSlots,
+      maxGiftShortage,
+      isSoldOut: availableSlots <= 0,
+      stockLimit,
+    };
+  };
+
+  const primaryRuleDisplay = getRuleDisplaySummary(primaryRule);
+  const primaryRuleStockLabel = primaryRuleDisplay.stockLimit !== null
+    ? `${primaryRuleDisplay.stockLimit} ${trans('hancms.promotion.buytogift.summary.stock_limit')} · ${primaryRuleDisplay.availableSlots} ${trans('hancms.promotion.buytogift.summary.available_slots')}`
+    : `${primaryRuleDisplay.availableSlots} ${trans('hancms.promotion.buytogift.summary.available_slots')}`;
 
   const formatDateTimeByLocale = (value?: string | null) => {
     if (!value) return '---';
@@ -59,7 +100,12 @@ export default function ShowPage() {
     };
   }, [currentLocale, currentLanguage?.code, currentLanguage?.currency]);
 
-  const renderProductTable = (rows: any[], tone: 'buy' | 'gift') => (
+  const renderProductTable = (rows: any[], tone: 'buy' | 'gift', rule: any = null) => {
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className={`flex items-center justify-between border-b border-slate-200 px-3 py-2 ${tone === 'buy' ? 'bg-cyan-50/70' : 'bg-emerald-50/70'}`}>
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
@@ -77,6 +123,9 @@ export default function ShowPage() {
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">ID</th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.sku')}</th>
               <th className="min-w-[220px] px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.name')}</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.quantity')}</th>
+              {shouldShowInventoryColumns(rows) && <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.sold_quantity')}</th>}
+              {shouldShowInventoryColumns(rows) && <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.reserved_quantity')}</th>}
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.price')}</th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.status')}</th>
             </tr>
@@ -84,7 +133,7 @@ export default function ShowPage() {
           <tbody className="divide-y divide-slate-200 bg-white">
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-3 py-6 text-center text-slate-400">
+                <td colSpan={shouldShowInventoryColumns(rows) ? 8 : 6} className="px-3 py-6 text-center text-slate-400">
                   {trans('hancms.placeholder.select')}
                 </td>
               </tr>
@@ -94,6 +143,31 @@ export default function ShowPage() {
                   <td className="px-3 py-2 text-slate-500">{row.id}</td>
                   <td className="px-3 py-2 font-medium text-slate-800">{row.sku}</td>
                   <td className="px-3 py-2 text-slate-700">{row.name}</td>
+                  <td className="px-3 py-2">
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
+                      Number(row.quantity ?? 0) <= 0
+                        ? 'bg-rose-50 text-rose-700 ring-rose-100'
+                        : Number(row.quantity ?? 0) <= 5
+                          ? 'bg-amber-50 text-amber-700 ring-amber-100'
+                          : 'bg-emerald-50 text-emerald-700 ring-emerald-100'
+                      }`}>
+                      {Number(row.quantity ?? 0)}
+                    </span>
+                  </td>
+                  {shouldShowInventoryColumns(rows) && (
+                    <td className="px-3 py-2">
+                      <span className="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 ring-1 ring-sky-100">
+                        {Number(row.sold_quantity ?? 0)}
+                      </span>
+                    </td>
+                  )}
+                  {shouldShowInventoryColumns(rows) && (
+                    <td className="px-3 py-2">
+                      <span className="inline-flex rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700 ring-1 ring-fuchsia-100">
+                        {Number(rule?.allocations_total_map?.[row.id] ?? rule?.allocations_map?.[row.id] ?? 0)}
+                      </span>
+                    </td>
+                  )}
                   <td className="whitespace-nowrap px-3 py-2 font-medium text-slate-800">{formatProductPrice(row.price, resolvedCurrency)}</td>
                   <td className="whitespace-nowrap px-3 py-2">
                     <StatusBadge
@@ -109,7 +183,66 @@ export default function ShowPage() {
         </table>
       </div>
     </div>
-  );
+    );
+  };
+
+  const renderGiftVariantOptionsTable = (options: any[]) => {
+    if (options.length === 0) {
+      return null;
+    }
+
+    return (
+    <div className="overflow-hidden rounded-lg border border-fuchsia-200 bg-white">
+      <div className="flex items-center justify-between border-b border-fuchsia-200 bg-fuchsia-50/70 px-3 py-2">
+        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-fuchsia-700">
+          <Gift size={15} className="text-fuchsia-700" />
+          Free theo màu
+        </div>
+        <span className="rounded-full bg-fuchsia-100 px-2 py-0.5 text-xs font-semibold text-fuchsia-800">
+          {options.length}
+        </span>
+      </div>
+      <div className="max-h-[280px] overflow-auto">
+        <table className="min-w-full divide-y divide-fuchsia-100 text-sm">
+          <thead className="bg-fuchsia-50">
+            <tr>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Sản phẩm</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Biến thể</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Tồn hiện tại</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Tạm giữ</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-fuchsia-50 bg-white">
+            {options.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-3 py-6 text-center text-slate-400">
+                  {trans('hancms.placeholder.select')}
+                </td>
+              </tr>
+            ) : (
+              options.map((option: any, index: number) => (
+                <tr key={`${option.product_id}:${option.variant_id}:${index}`} className="hover:bg-fuchsia-50/40">
+                  <td className="px-3 py-2 font-medium text-slate-800">
+                    {option.product_name || `#${option.product_id}`}
+                  </td>
+                  <td className="px-3 py-2 text-slate-700">
+                    {option.variant_name || option.variant_sku || `#${option.variant_id}`}
+                  </td>
+                  <td className="px-3 py-2 text-slate-700">
+                    {Number(option.stock ?? 0)}
+                  </td>
+                  <td className="px-3 py-2 font-semibold text-fuchsia-700">
+                    {Number(option.reserve_qty ?? 0)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    );
+  };
 
   const renderRuleProducts = (ids: number[]) => ids.map((id: number) => allRowsMap.get(Number(id))).filter(Boolean);
 
@@ -127,8 +260,8 @@ export default function ShowPage() {
       </HeaderToolbar>
 
       <div className="mt-4 grid gap-3 md:grid-cols-4 mb-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{trans('hancms.column.status')}</div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{trans('hancms.column.status')}</div>
           <div className="mt-2">
             <StatusBadge
               value={item?.is_active ? 1 : 0}
@@ -157,6 +290,40 @@ export default function ShowPage() {
             {trans('hancms.promotion.buytogift.fields.gift_products')}
           </div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{uniqueGiftProductsCount}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hidden">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{trans('hancms.promotion.buytogift.summary.available_slots')}</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{primaryRuleDisplay.availableSlots}</div>
+          <div className="mt-1 text-xs font-medium text-slate-500">{primaryRuleStockLabel}</div>
+          <div className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${primaryRuleDisplay.isSoldOut ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
+            {primaryRuleDisplay.isSoldOut ? trans('hancms.promotion.buytogift.options.stock_empty') : trans('hancms.promotion.buytogift.summary.remaining_slots')}
+          </div>
+          <div className="mt-2 space-y-1 text-xs text-slate-500">
+            <div>{trans('hancms.promotion.buytogift.summary.reserved_total')}: {primaryRuleReservedQuantity}</div>
+            <div>{trans('hancms.promotion.buytogift.summary.sold_quantity')}: {primaryRuleSoldQuantity}</div>
+            {primaryRuleGiftVariantOptions.length > 0 && (
+              <div>Free theo màu: {primaryRuleGiftVariantOptions.length} màu, tạm giữ {primaryRuleGiftVariantReserveTotal}</div>
+            )}
+          </div>
+          {primaryRuleDisplay.isSoldOut && (
+            <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+              <div className="font-semibold uppercase tracking-wide">{trans('hancms.promotion.buytogift.summary.warning_title')}</div>
+              <div className="mt-1">
+                {trans('hancms.promotion.buytogift.summary.warning_sold_out')}
+              </div>
+            </div>
+          )}
+          {Number(primaryRule?.max_gift_qty ?? 0) > 0 && primaryRuleDisplay.maxGiftShortage > 0 && (
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+              <div className="font-semibold uppercase tracking-wide">{trans('hancms.promotion.buytogift.summary.warning_title')}</div>
+              <div className="mt-1">
+                {trans('hancms.promotion.buytogift.summary.warning_max_gift_cap', {
+                  slots: Number(primaryRuleDisplay.maxGiftSlots ?? 0),
+                  shortage: primaryRuleDisplay.maxGiftShortage,
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -201,6 +368,14 @@ export default function ShowPage() {
                           ? trans('hancms.promotion.buytogift.options.order_amount')
                           : trans('hancms.promotion.buytogift.options.buy_product')}
                       </span>
+                      {Array.isArray(rule?.gift_variant_options) && rule.gift_variant_options.length > 0 ? (
+                        <span className="rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700 ring-1 ring-fuchsia-100">
+                          Free theo màu: {rule.gift_variant_options.length} màu, tạm giữ {rule.gift_variant_options.reduce(
+                            (total: number, option: any) => total + Number(option?.reserve_qty ?? 0),
+                            0
+                          )}
+                        </span>
+                      ) : null}
                       <StatusBadge
                         value={rule.is_active ? 1 : 0}
                         activeLabel={trans('hancms.status.active')}
@@ -226,11 +401,62 @@ export default function ShowPage() {
                         <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{trans('hancms.promotion.buytogift.fields.max_sets_per_order')}</div>
                         <div className="mt-1 font-semibold text-slate-800">{rule?.max_sets_per_order || '---'}</div>
                       </div>
+                      <div>
+                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{trans('hancms.promotion.buytogift.fields.stock_scope') || 'Stock scope'}</div>
+                        <div className="mt-1 font-semibold text-slate-800">
+                          {(() => {
+                            const display = getRuleDisplaySummary(rule);
+
+                            return rule?.stock_scope === 'limited'
+                              ? `${trans('hancms.promotion.buytogift.options.stock_limited') || 'Limited'}: ${display.stockLimit ?? 0} (${display.availableSlots} ${trans('hancms.promotion.buytogift.summary.slots')}, ${display.wastedStock} ${trans('hancms.promotion.buytogift.summary.wasted_slots')})`
+                              : `${display.availableSlots} ${trans('hancms.promotion.buytogift.summary.slots')}`;
+                          })()}
+                        </div>
+                        {(() => {
+                          const display = getRuleDisplaySummary(rule);
+
+                          return (
+                            <div className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${display.isSoldOut ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                              {display.isSoldOut ? trans('hancms.promotion.buytogift.options.stock_empty') : `${display.availableSlots} ${trans('hancms.promotion.buytogift.summary.remaining_slots')}`}
+                            </div>
+                          );
+                        })()}
+                        <div className="mt-2 space-y-1 text-xs text-slate-500">
+                          <div>{trans('hancms.promotion.buytogift.summary.reserved_total')}: {Number(rule?.reserved_quantity ?? rule?.allocated_stock ?? 0)}</div>
+                          <div>{trans('hancms.promotion.buytogift.summary.sold_quantity')}: {Number(rule?.sold_quantity ?? 0)}</div>
+                        </div>
+                        {(() => {
+                          const display = getRuleDisplaySummary(rule);
+
+                          return display.isSoldOut ? (
+                            <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+                              <div className="font-semibold uppercase tracking-wide">{trans('hancms.promotion.buytogift.summary.warning_title')}</div>
+                              <div className="mt-1">
+                                {trans('hancms.promotion.buytogift.summary.warning_sold_out')}
+                              </div>
+                            </div>
+                          ) : null;
+                        })()}
+                        {Number(rule?.max_gift_qty ?? 0) > 0 && getRuleDisplaySummary(rule).maxGiftShortage > 0 ? (
+                          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                            <div className="font-semibold uppercase tracking-wide">{trans('hancms.promotion.buytogift.summary.warning_title')}</div>
+                            <div className="mt-1">
+                              {trans('hancms.promotion.buytogift.summary.warning_max_gift_cap', {
+                                slots: Number(getRuleDisplaySummary(rule).maxGiftSlots ?? 0),
+                                shortage: Number(getRuleDisplaySummary(rule).maxGiftShortage ?? 0),
+                              })}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
 
-                    <div className="grid gap-4 xl:grid-cols-2">
-                      {renderProductTable(renderRuleProducts(rule.buy_product_ids || []), 'buy')}
-                      {renderProductTable(renderRuleProducts(rule.gift_product_ids || []), 'gift')}
+                    <div className="space-y-4">
+                      {renderProductTable(renderRuleProducts(rule.buy_product_ids || []), 'buy', rule)}
+                      {renderProductTable(renderRuleProducts(rule.gift_product_ids || []), 'gift', rule)}
+                      {Array.isArray(rule?.gift_variant_options) && rule.gift_variant_options.length > 0
+                        ? renderGiftVariantOptionsTable(rule.gift_variant_options)
+                        : null}
                     </div>
                   </div>
                 </div>

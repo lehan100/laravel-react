@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Catalog\Product;
 use App\Models\Promotion\PromotionBuyToGiftOffer;
+use App\Models\Promotion\PromotionBuyToGiftOfferRule;
 use App\Models\Promotion\PromotionCampaign;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
+use App\Services\Promotion\BuyToGiftStockAllocator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
@@ -225,6 +227,166 @@ class PromotionCampaignModuleTest extends TestCase
                 ->has('itemsSaleOfferActive.0')
                 ->has('itemsBuyToGiftActive.0')
             );
+    }
+
+    #[Test]
+    public function it_cascades_campaign_status_changes_to_attached_promotions_and_buy_to_gift_stock(): void
+    {
+        $this->withoutMiddleware();
+
+        $campaign = $this->createCampaign([
+            'ends_at' => now()->addDay(),
+            'is_active' => true,
+        ], [
+            'vi' => [
+                'name' => 'Campaign Cascade',
+                'slug' => 'campaign-cascade',
+            ],
+        ]);
+
+        $coupon = PromotionCoupon::query()->create([
+            'code' => 'CAMPAIGN-COUPON-001',
+            'name' => 'Campaign Coupon',
+            'discount_type' => 'fixed',
+            'discount_value' => 10000,
+            'campaign_id' => $campaign->id,
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'is_active' => true,
+            'is_public' => true,
+            'stackable' => false,
+        ]);
+
+        $saleOffer = PromotionSaleOffer::query()->create([
+            'code' => 'CAMPAIGN-SALE-001',
+            'name' => 'Campaign Sale',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'campaign_id' => $campaign->id,
+            'priority' => 1,
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'is_active' => true,
+            'stackable' => true,
+        ]);
+
+        $buyProduct = Product::query()->create([
+            'sku' => 'CAMPAIGN-BUY-001',
+            'status' => 1,
+            'is_stock' => true,
+            'quantity' => 2,
+        ]);
+
+        $giftProduct = Product::query()->create([
+            'sku' => 'CAMPAIGN-GIFT-001',
+            'status' => 1,
+            'is_stock' => true,
+            'quantity' => 10,
+        ]);
+
+        $buyToGift = PromotionBuyToGiftOffer::query()->create([
+            'code' => 'CAMPAIGN-GIFT-OFFER-001',
+            'name' => 'Campaign Gift Offer',
+            'campaign_id' => $campaign->id,
+            'priority' => 1,
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'is_active' => true,
+            'stackable' => false,
+        ]);
+
+        $rule = PromotionBuyToGiftOfferRule::query()->create([
+            'promotion_buytogift_offer_id' => $buyToGift->id,
+            'condition_type' => 'buy_product',
+            'priority' => 1,
+            'is_active' => true,
+            'stackable' => false,
+            'stock_scope' => 'limited',
+            'stock_limit' => 4,
+        ]);
+
+        $rule->buyProducts()->attach($buyProduct->id, ['buy_qty' => 1]);
+        $rule->giftProducts()->attach($giftProduct->id, [
+            'gift_qty' => 1,
+            'is_auto_add' => true,
+        ]);
+
+        app(BuyToGiftStockAllocator::class)->syncOffer($buyToGift->fresh([
+            'rules.buyProducts',
+            'rules.giftProducts',
+            'rules.giftVariantOptions',
+            'rules.stockAllocations',
+        ]));
+
+        $this->assertDatabaseHas('promotion_buytogift_rule_stock_allocations', [
+            'promotion_buytogift_offer_rule_id' => $rule->id,
+            'product_id' => $giftProduct->id,
+            'variant_id' => null,
+            'allocated_quantity' => 2,
+        ]);
+
+        $this->put(route('promotion-campaign.toggle-status', $campaign->id))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('promotion_campaigns', [
+            'id' => $campaign->id,
+            'is_active' => 0,
+        ]);
+
+        $this->assertDatabaseHas('promotion_coupons', [
+            'id' => $coupon->id,
+            'is_active' => 0,
+        ]);
+
+        $this->assertFalse((bool) PromotionSaleOffer::query()->findOrFail($saleOffer->id)->is_active);
+
+        $this->assertDatabaseHas('promotion_buytogift_offers', [
+            'id' => $buyToGift->id,
+            'is_active' => 0,
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $giftProduct->id,
+            'quantity' => 10,
+        ]);
+
+        $this->assertDatabaseMissing('promotion_buytogift_rule_stock_allocations', [
+            'promotion_buytogift_offer_rule_id' => $rule->id,
+            'product_id' => $giftProduct->id,
+            'variant_id' => null,
+        ]);
+
+        $this->put(route('promotion-campaign.toggle-status', $campaign->id))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('promotion_campaigns', [
+            'id' => $campaign->id,
+            'is_active' => 1,
+        ]);
+
+        $this->assertDatabaseHas('promotion_coupons', [
+            'id' => $coupon->id,
+            'is_active' => 1,
+        ]);
+
+        $this->assertTrue((bool) PromotionSaleOffer::query()->findOrFail($saleOffer->id)->is_active);
+
+        $this->assertDatabaseHas('promotion_buytogift_offers', [
+            'id' => $buyToGift->id,
+            'is_active' => 1,
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $giftProduct->id,
+            'quantity' => 8,
+        ]);
+
+        $this->assertDatabaseHas('promotion_buytogift_rule_stock_allocations', [
+            'promotion_buytogift_offer_rule_id' => $rule->id,
+            'product_id' => $giftProduct->id,
+            'variant_id' => null,
+            'allocated_quantity' => 2,
+        ]);
     }
 
     private function createCampaign(array $attributes, array $translations): PromotionCampaign

@@ -348,18 +348,21 @@ const PostFormView = ({
     const renderGeneralTab = () => (
         <div className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
-                <StatusSwitch
-                    value={data.status}
-                    onChange={(value) => setData('status', value)}
-                    activeLabel={trans('hancms.status.active')}
-                    inactiveLabel={trans('hancms.status.inactive')}
-                />
+                <InputGroup label={trans('hancms.column.status')} stacked required>
+                    <StatusSwitch
+                        value={data.status}
+                        onChange={(value) => setData('status', value)}
+                        activeLabel={trans('hancms.status.active')}
+                        inactiveLabel={trans('hancms.status.inactive')}
+                    />
+                </InputGroup>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
                 <div className="grid gap-4 md:grid-cols-2">
-                    <InputGroup label={trans('hancms.catalog.category.name')}>
+                    <InputGroup label={trans('hancms.catalog.category.name')} required>
                         <select
+                            required
                             className={inputClass('category_id')}
                             value={data.category_id ?? ''}
                             onChange={(e) => setData('category_id', e.target.value)}
@@ -373,8 +376,9 @@ const PostFormView = ({
                         </select>
                         {errors?.category_id && <MessageError>{errors.category_id}</MessageError>}
                     </InputGroup>
-                    <InputGroup label={trans('hancms.catalog.post.type.label') || 'Chọn vị trí'}>
+                    <InputGroup label={trans('hancms.catalog.post.fields.type') || 'Loại bài viết'} required>
                         <select
+                            required
                             className={inputClass('type')}
                             value={data.type || ''}
                             onChange={(e) => setData('type', e.target.value)}
@@ -480,9 +484,10 @@ const PostFormView = ({
                 </div>
 
                 <div className="grid gap-6">
-                    <InputGroup label={trans('hancms.column.name')}>
+                    <InputGroup label={trans('hancms.catalog.post.fields.name')} required>
                         <input
                             type="text"
+                            required
                             value={langData.name || ''}
                             onChange={(e) => updateTranslation(locale, 'name', e.target.value)}
                             className={`w-full rounded-md border p-2 text-sm outline-none transition-all ${nameError

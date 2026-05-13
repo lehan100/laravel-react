@@ -4,12 +4,16 @@ namespace App\Repositories\Order;
 
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductVariant;
+use App\Models\Promotion\PromotionBuyToGiftOfferRule;
 use App\Models\Sales\Order;
 use App\Models\Sales\OrderItem;
 use App\Models\Sales\PaymentMethod;
 use App\Models\Settings\Province;
 use App\Models\Settings\Ward;
+use App\Repositories\BuyToGift\BuyToGiftRepositoryInterface;
 use App\Repositories\EloquentRepository;
+use App\Services\Promotion\BuyToGiftOrderInventorySynchronizer;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +92,7 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                 'payment_methods' => $this->paymentMethodOptions(),
                 'provinces' => $this->provinceOptions(),
                 'wards' => $this->wardOptions(),
+                'buytogift_gift_variant_reserves' => $this->giftVariantReserveMap(),
             ];
         }
 
@@ -132,22 +137,34 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     'shipping_total' => $shippingTotal,
                     'grand_total' => $totals['subtotal'] - $discountTotal + $shippingTotal,
                     'placed_at' => $params['placed_at'] ?? now(),
+                    'coupon_code' => $this->nullableTrim($params['coupon_code'] ?? null),
+                    'applied_promotions' => $params['applied_promotions'] ?? null,
                 ]);
 
                 $order->items()->createMany($totals['items']);
 
-                if ($this->isFulfilledStatus(
+                if ($this->isInventoryConsumingStatus(
                     (string) ($params['order_status'] ?? 'pending'),
                     (string) ($params['shipping_status'] ?? 'pending')
                 )) {
+                    [$productAdjustments, $variantAdjustments] = $this->buildPhysicalInventoryMaps($totals['items'], -1);
                     $this->applyInventoryAdjustments(
-                        $this->buildItemQuantityMap($totals['items'], -1),
-                        'Order delivered/completed (initial stock deduction)',
+                        $productAdjustments,
+                        $variantAdjustments,
+                        'Order created (initial stock deduction)',
                         [
                             'type' => 'order_delivery',
                             'order_id' => $order->id,
                             'order_number' => $order->order_number,
                         ]
+                    );
+
+                    app(BuyToGiftOrderInventorySynchronizer::class)->syncForTransition(
+                        $order,
+                        'cancelled',
+                        'returned',
+                        [],
+                        $totals['items']
                     );
                 }
 
@@ -169,6 +186,7 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     return null;
                 }
 
+                $original = $this->captureOrderState($order);
                 $totals = $this->buildOrderItemsPayload($params['items'] ?? []);
                 $discountTotal = $this->normalizeMoney($params['discount_total'] ?? 0);
                 $shippingTotal = $this->normalizeMoney($params['shipping_total'] ?? 0);
@@ -180,7 +198,7 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                 );
                 $this->setTimelineContext([
                     'action' => 'updated',
-                    'original' => $this->captureOrderState($order),
+                    'original' => $original,
                     'next_items_signature' => $this->makeItemsSignature($totals['items']),
                 ]);
 
@@ -205,18 +223,41 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     'shipping_total' => $shippingTotal,
                     'grand_total' => $totals['subtotal'] - $discountTotal + $shippingTotal,
                     'placed_at' => $params['placed_at'] ?? $order->placed_at,
+                    'coupon_code' => array_key_exists('coupon_code', $params) ? $this->nullableTrim($params['coupon_code']) : $order->coupon_code,
+                    'applied_promotions' => array_key_exists('applied_promotions', $params) ? $params['applied_promotions'] : $order->applied_promotions,
                 ]);
 
                 $order->items()->delete();
                 $order->items()->createMany($totals['items']);
 
-                $this->syncInventoryForDeliveryTransition(
-                    $order,
-                    $original['order_status'] ?? $order->getOriginal('order_status') ?? 'pending',
-                    $original['shipping_status'] ?? $order->getOriginal('shipping_status') ?? 'pending',
-                    is_array($original['items'] ?? null) ? $original['items'] : [],
-                    $totals['items']
-                );
+                $previousOrderStatus = (string) ($original['order_status'] ?? $order->getOriginal('order_status') ?? 'pending');
+                $previousShippingStatus = (string) ($original['shipping_status'] ?? $order->getOriginal('shipping_status') ?? 'pending');
+                $nextOrderStatus = (string) ($order->order_status ?? $previousOrderStatus);
+                $nextShippingStatus = (string) ($order->shipping_status ?? $previousShippingStatus);
+                $previousItems = is_array($original['items'] ?? null) ? $original['items'] : [];
+                $nextItems = $totals['items'];
+                $previousItemsSignature = (string) ($original['items_signature'] ?? $this->makeItemsSignature($previousItems));
+                $nextItemsSignature = $this->makeItemsSignature($nextItems);
+                $wasConsuming = $this->isInventoryConsumingStatus($previousOrderStatus, $previousShippingStatus);
+                $isConsuming = $this->isInventoryConsumingStatus($nextOrderStatus, $nextShippingStatus);
+
+                if ($previousItemsSignature !== $nextItemsSignature || $wasConsuming !== $isConsuming) {
+                    $this->syncInventoryForDeliveryTransition(
+                        $order,
+                        $previousOrderStatus,
+                        $previousShippingStatus,
+                        $previousItems,
+                        $nextItems
+                    );
+
+                    app(BuyToGiftOrderInventorySynchronizer::class)->syncForTransition(
+                        $order,
+                        $previousOrderStatus,
+                        $previousShippingStatus,
+                        $previousItems,
+                        $nextItems
+                    );
+                }
 
                 $order->load([
                     'paymentMethod:id,name,code',
@@ -238,10 +279,20 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
 
         if ($task === 'delete-item') {
             return DB::transaction(function () use ($params) {
-                $order = Order::query()->find((int) ($params['id'] ?? 0));
+                $order = Order::query()
+                    ->with(['items' => function ($query) {
+                        $query->orderBy('id');
+                    }])
+                    ->find((int) ($params['id'] ?? 0));
                 if (! $order) {
                     return 0;
                 }
+
+                $original = $this->captureOrderState($order);
+                $this->rollbackInventoryForDeletedOrder(
+                    $order,
+                    is_array($original['items'] ?? null) ? $original['items'] : []
+                );
 
                 $this->setTimelineContext([
                     'action' => 'deleted',
@@ -267,9 +318,18 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                 $deletedCount = 0;
 
                 Order::query()
+                    ->with(['items' => function ($query) {
+                        $query->orderBy('id');
+                    }])
                     ->whereIn('id', $ids)
                     ->chunkById(100, function ($orders) use (&$deletedCount) {
                         foreach ($orders as $order) {
+                            $original = $this->captureOrderState($order);
+                            $this->rollbackInventoryForDeletedOrder(
+                                $order,
+                                is_array($original['items'] ?? null) ? $original['items'] : []
+                            );
+
                             $this->setTimelineContext([
                                 'action' => 'deleted',
                             ]);
@@ -335,6 +395,8 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                         ? (int) ($variant->stock ?? 0)
                         : (int) ($product->quantity ?? 0),
                     'price_source' => $rawItem['unit_price'] !== null && $rawItem['unit_price'] !== '' ? 'manual' : 'product',
+                    'is_gift' => (bool) ($rawItem['is_gift'] ?? false),
+                    'rule_id' => $rawItem['rule_id'] ?? null,
                     'variant' => $variant ? [
                         'id' => $variant->id,
                         'sku' => $variant->sku,
@@ -404,6 +466,31 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                 ];
             })
             ->all();
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function giftVariantReserveMap(): array
+    {
+        $offers = app(BuyToGiftRepositoryInterface::class)->getActiveOffersForCalculation(now());
+
+        return $offers
+            ->flatMap(function ($offer): Collection {
+                return $offer->rules->flatMap(function ($rule): Collection {
+                    return $rule->giftVariantOptions->mapWithKeys(function ($option) use ($rule): array {
+                        return [
+                            $this->giftVariantReserveKey((int) $rule->id, (int) $option->product_id, (int) $option->variant_id) => max(0, (int) ($option->reserve_qty ?? 0)),
+                        ];
+                    });
+                });
+            })
+            ->toArray();
+    }
+
+    private function giftVariantReserveKey(int $ruleId, int $productId, int $variantId): string
+    {
+        return $ruleId.':'.$productId.':'.$variantId;
     }
 
     private function variantLabel(ProductVariant $variant): string
@@ -547,12 +634,17 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
             'discount_total' => (float) $order->discount_total,
             'shipping_total' => (float) $order->shipping_total,
             'grand_total' => (float) $order->grand_total,
+            'coupon_code' => $order->coupon_code,
+            'applied_promotions' => is_array($order->applied_promotions) ? $order->applied_promotions : [],
             'placed_at' => optional($order->placed_at)?->format('Y-m-d H:i:s'),
             'items_signature' => $this->makeItemsSignature($order->items),
             'items' => $order->items
                 ->map(fn (OrderItem $item) => [
                     'product_id' => (int) $item->product_id,
                     'quantity' => (int) $item->quantity,
+                    'variant_id' => data_get($item->meta, 'variant.id') ? (int) data_get($item->meta, 'variant.id') : null,
+                    'is_gift' => (bool) data_get($item->meta, 'is_gift', false),
+                    'rule_id' => data_get($item->meta, 'rule_id') ? (int) data_get($item->meta, 'rule_id') : null,
                 ])
                 ->values()
                 ->all(),
@@ -571,6 +663,8 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                         'product_id' => (int) $item->product_id,
                         'quantity' => (int) $item->quantity,
                         'unit_price' => round((float) $item->unit_price, 2),
+                        'variant_id' => (int) data_get($item->meta, 'variant.id', 0) ?: null,
+                        'is_gift' => (bool) data_get($item->meta, 'is_gift', false),
                     ];
                 }
 
@@ -578,10 +672,32 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     'product_id' => (int) ($item['product_id'] ?? 0),
                     'quantity' => (int) ($item['quantity'] ?? 0),
                     'unit_price' => round((float) ($item['unit_price'] ?? 0), 2),
+                    'variant_id' => $this->extractVariantId($item),
+                    'is_gift' => (bool) (($item['meta'] ?? [])['is_gift'] ?? false),
                 ];
             })
-            ->values()
             ->all();
+
+        usort($normalized, function (array $left, array $right): int {
+            $leftKey = [
+                (int) ($left['is_gift'] ?? false),
+                (int) ($left['rule_id'] ?? 0),
+                (int) ($left['product_id'] ?? 0),
+                (int) ($left['variant_id'] ?? 0),
+                (int) ($left['quantity'] ?? 0),
+                (float) ($left['unit_price'] ?? 0),
+            ];
+            $rightKey = [
+                (int) ($right['is_gift'] ?? false),
+                (int) ($right['rule_id'] ?? 0),
+                (int) ($right['product_id'] ?? 0),
+                (int) ($right['variant_id'] ?? 0),
+                (int) ($right['quantity'] ?? 0),
+                (float) ($right['unit_price'] ?? 0),
+            ];
+
+            return $leftKey <=> $rightKey;
+        });
 
         return md5(json_encode($normalized) ?: '[]');
     }
@@ -688,6 +804,43 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
             ->all() ?: null;
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $originalItems
+     */
+    private function rollbackInventoryForDeletedOrder(Order $order, array $originalItems): void
+    {
+        if (! $this->isInventoryConsumingStatus((string) $order->order_status, (string) $order->shipping_status)) {
+            return;
+        }
+
+        [$productAdjustments, $variantAdjustments] = $this->buildPhysicalInventoryMaps($originalItems, 1);
+        $this->applyInventoryAdjustments(
+            $productAdjustments,
+            $variantAdjustments,
+            'Order deleted (stock rollback)',
+            [
+                'type' => 'order_delete_rollback',
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+            ]
+        );
+
+        $transitionOrder = (object) [
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'order_status' => 'cancelled',
+            'shipping_status' => 'returned',
+        ];
+
+        app(BuyToGiftOrderInventorySynchronizer::class)->syncForTransition(
+            $transitionOrder,
+            (string) $order->order_status,
+            (string) $order->shipping_status,
+            $originalItems,
+            []
+        );
+    }
+
     private function currencySymbol(string $currencyCode): string
     {
         return match (strtoupper($currencyCode)) {
@@ -722,31 +875,40 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
         return $trimmed === '' ? null : $trimmed;
     }
 
-    private function isFulfilledStatus(string $orderStatus, string $shippingStatus): bool
+    private function isInventoryConsumingStatus(string $orderStatus, string $shippingStatus): bool
     {
-        return $orderStatus === 'completed' || $shippingStatus === 'delivered';
+        return $orderStatus !== 'cancelled'
+            && $shippingStatus !== 'returned';
     }
 
     /**
      * @param  array<int, array<string, mixed>>  $items
-     * @return array<int, int>
+     * @return array{0: array<int, int>, 1: array<int, int>}
      */
-    private function buildItemQuantityMap(array $items, int $multiplier = 1): array
+    private function buildPhysicalInventoryMaps(array $items, int $multiplier = 1): array
     {
-        $map = [];
+        $productMap = [];
+        $variantMap = [];
 
         foreach ($items as $item) {
             $productId = (int) ($item['product_id'] ?? 0);
             $quantity = (int) ($item['quantity'] ?? 0);
 
-            if ($productId <= 0 || $quantity <= 0) {
+            if ($productId <= 0 || $quantity <= 0 || $this->isGiftItem($item)) {
                 continue;
             }
 
-            $map[$productId] = ($map[$productId] ?? 0) + ($quantity * $multiplier);
+            $variantId = $this->extractVariantId($item);
+            if ($variantId !== null) {
+                $variantMap[$variantId] = ($variantMap[$variantId] ?? 0) + ($quantity * $multiplier);
+
+                continue;
+            }
+
+            $productMap[$productId] = ($productMap[$productId] ?? 0) + ($quantity * $multiplier);
         }
 
-        return $map;
+        return [$productMap, $variantMap];
     }
 
     /**
@@ -760,16 +922,18 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
         array $originalItems,
         array $nextItems
     ): void {
-        $wasFulfilled = $this->isFulfilledStatus($oldOrderStatus, $oldShippingStatus);
-        $isFulfilled = $this->isFulfilledStatus((string) $order->order_status, (string) $order->shipping_status);
+        $wasConsuming = $this->isInventoryConsumingStatus($oldOrderStatus, $oldShippingStatus);
+        $isConsuming = $this->isInventoryConsumingStatus((string) $order->order_status, (string) $order->shipping_status);
 
-        $oldMap = $this->buildItemQuantityMap($originalItems);
-        $newMap = $this->buildItemQuantityMap($nextItems);
+        [$oldProductMap, $oldVariantMap] = $this->buildPhysicalInventoryMaps($originalItems);
+        [$newProductMap, $newVariantMap] = $this->buildPhysicalInventoryMaps($nextItems);
 
-        if (! $wasFulfilled && $isFulfilled) {
+        if (! $wasConsuming && $isConsuming) {
+            [$productAdjustments, $variantAdjustments] = $this->buildPhysicalInventoryMaps($nextItems, -1);
             $this->applyInventoryAdjustments(
-                $this->buildItemQuantityMap($nextItems, -1),
-                'Order delivered/completed (stock deduction)',
+                $productAdjustments,
+                $variantAdjustments,
+                'Order active/created (stock deduction)',
                 [
                     'type' => 'order_delivery',
                     'order_id' => $order->id,
@@ -780,10 +944,11 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
             return;
         }
 
-        if ($wasFulfilled && ! $isFulfilled) {
+        if ($wasConsuming && ! $isConsuming) {
             $this->applyInventoryAdjustments(
-                $oldMap,
-                'Order reverted from delivered/completed (stock rollback)',
+                $oldProductMap,
+                $oldVariantMap,
+                'Order cancelled/returned (stock rollback)',
                 [
                     'type' => 'order_delivery_rollback',
                     'order_id' => $order->id,
@@ -794,25 +959,42 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
             return;
         }
 
-        if ($wasFulfilled && $isFulfilled) {
-            $allProductIds = collect(array_keys($oldMap))
-                ->merge(array_keys($newMap))
+        if ($wasConsuming && $isConsuming) {
+            $allProductIds = collect(array_keys($oldProductMap))
+                ->merge(array_keys($newProductMap))
                 ->unique()
                 ->values();
 
-            $deltaMap = [];
+            $allVariantIds = collect(array_keys($oldVariantMap))
+                ->merge(array_keys($newVariantMap))
+                ->unique()
+                ->values();
+
+            $productDeltaMap = [];
             foreach ($allProductIds as $productId) {
-                $oldQty = (int) ($oldMap[(int) $productId] ?? 0);
-                $newQty = (int) ($newMap[(int) $productId] ?? 0);
+                $oldQty = (int) ($oldProductMap[(int) $productId] ?? 0);
+                $newQty = (int) ($newProductMap[(int) $productId] ?? 0);
                 $delta = $oldQty - $newQty;
 
                 if ($delta !== 0) {
-                    $deltaMap[(int) $productId] = $delta;
+                    $productDeltaMap[(int) $productId] = $delta;
+                }
+            }
+
+            $variantDeltaMap = [];
+            foreach ($allVariantIds as $variantId) {
+                $oldQty = (int) ($oldVariantMap[(int) $variantId] ?? 0);
+                $newQty = (int) ($newVariantMap[(int) $variantId] ?? 0);
+                $delta = $oldQty - $newQty;
+
+                if ($delta !== 0) {
+                    $variantDeltaMap[(int) $variantId] = $delta;
                 }
             }
 
             $this->applyInventoryAdjustments(
-                $deltaMap,
+                $productDeltaMap,
+                $variantDeltaMap,
                 'Order items changed while delivered/completed (stock sync)',
                 [
                     'type' => 'order_delivery_sync',
@@ -824,29 +1006,67 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
     }
 
     /**
-     * @param  array<int, int>  $adjustments
-     *                                        delta > 0: increase stock, delta < 0: decrease stock.
+     * @param  array<int, int>  $productAdjustments
+     * @param  array<int, int>  $variantAdjustments
+     *                                               delta > 0: increase stock, delta < 0: decrease stock.
      * @param  array<string, mixed>  $meta
      */
-    private function applyInventoryAdjustments(array $adjustments, string $reason, array $meta = []): void
+    private function applyInventoryAdjustments(array $productAdjustments, array $variantAdjustments, string $reason, array $meta = []): void
     {
-        if ($adjustments === []) {
+        if ($productAdjustments === [] && $variantAdjustments === []) {
             return;
         }
 
-        $productIds = array_keys($adjustments);
+        if ($productAdjustments !== []) {
+            $productIds = array_keys($productAdjustments);
 
-        Product::query()
-            ->whereIn('id', $productIds)
+            Product::query()
+                ->whereIn('id', $productIds)
+                ->lockForUpdate()
+                ->get()
+                ->each(function (Product $product) use ($productAdjustments, $reason, $meta): void {
+                    $delta = (int) ($productAdjustments[$product->id] ?? 0);
+                    if ($delta === 0) {
+                        return;
+                    }
+
+                    $currentQuantity = (int) ($product->quantity ?? 0);
+                    $nextQuantity = max(0, $currentQuantity + $delta);
+
+                    request()->attributes->set('inventory_log_context', [
+                        'action' => $delta < 0 ? 'order_deduct' : 'order_rollback',
+                        'reason' => $reason,
+                        'meta' => array_merge($meta, [
+                            'channel' => 'order',
+                            'delta' => $delta,
+                            'old_quantity' => $currentQuantity,
+                            'new_quantity' => $nextQuantity,
+                        ]),
+                    ]);
+
+                    $product->quantity = $nextQuantity;
+                    $product->is_stock = $nextQuantity > 0;
+                    $product->save();
+                });
+        }
+
+        if ($variantAdjustments === []) {
+            return;
+        }
+
+        $touchedProductIds = [];
+
+        ProductVariant::query()
+            ->whereIn('id', array_keys($variantAdjustments))
             ->lockForUpdate()
             ->get()
-            ->each(function (Product $product) use ($adjustments, $reason, $meta) {
-                $delta = (int) ($adjustments[$product->id] ?? 0);
+            ->each(function (ProductVariant $variant) use ($variantAdjustments, $reason, $meta, &$touchedProductIds): void {
+                $delta = (int) ($variantAdjustments[$variant->id] ?? 0);
                 if ($delta === 0) {
                     return;
                 }
 
-                $currentQuantity = (int) ($product->quantity ?? 0);
+                $currentQuantity = (int) ($variant->stock ?? 0);
                 $nextQuantity = max(0, $currentQuantity + $delta);
 
                 request()->attributes->set('inventory_log_context', [
@@ -854,15 +1074,125 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     'reason' => $reason,
                     'meta' => array_merge($meta, [
                         'channel' => 'order',
+                        'type' => 'variant_stock',
+                        'variant_id' => (int) $variant->id,
+                        'product_id' => (int) $variant->product_id,
                         'delta' => $delta,
                         'old_quantity' => $currentQuantity,
                         'new_quantity' => $nextQuantity,
                     ]),
                 ]);
 
-                $product->quantity = $nextQuantity;
-                $product->is_stock = $nextQuantity > 0;
-                $product->save();
+                $variant->stock = $nextQuantity;
+                $variant->save();
+                $touchedProductIds[(int) $variant->product_id] = (int) $variant->product_id;
             });
+
+        foreach (array_values($touchedProductIds) as $productId) {
+            $this->syncProductQuantityFromVariantsById($productId);
+        }
+    }
+
+    private function syncProductQuantityFromVariantsById(int $productId): void
+    {
+        $product = Product::query()->lockForUpdate()->find($productId);
+        if (! $product) {
+            return;
+        }
+
+        $this->syncProductQuantityFromVariants($product);
+    }
+
+    private function syncProductQuantityFromVariants(Product $product): void
+    {
+        $product->loadMissing('variants');
+        if ($product->variants->isEmpty()) {
+            return;
+        }
+
+        $totalStock = (int) $product->variants->sum('stock');
+        $product->quantity = $totalStock;
+        $product->is_stock = $totalStock > 0;
+        $product->saveQuietly();
+    }
+
+    /**
+     * @param  array<string, mixed>|array<int, mixed>  $item
+     */
+    private function isGiftItem(array $item): bool
+    {
+        return (bool) data_get($item, 'meta.is_gift', false);
+    }
+
+    /**
+     * @param  array<string, mixed>|array<int, mixed>  $item
+     */
+    private function extractVariantId(array $item): ?int
+    {
+        $variantId = data_get($item, 'variant_id');
+        if ($variantId === null || $variantId === '') {
+            $variantId = data_get($item, 'meta.variant.id');
+        }
+
+        $variantId = (int) $variantId;
+
+        return $variantId > 0 ? $variantId : null;
+    }
+
+    public function calculateSoldQuantityForRule(PromotionBuyToGiftOfferRule $rule, ?int $excludeOrderId = null): int
+    {
+        return (int) OrderItem::query()
+            ->select(['id', 'order_id', 'quantity', 'meta'])
+            ->with(['order:id,order_status,shipping_status,deleted_at'])
+            ->whereHas('order', function ($query): void {
+                $query->whereNull('deleted_at');
+            })
+            ->when($excludeOrderId !== null, function ($query) use ($excludeOrderId): void {
+                $query->where('order_id', '!=', $excludeOrderId);
+            })
+            ->get()
+            ->filter(function (OrderItem $item) use ($rule): bool {
+                if (! (bool) data_get($item->meta, 'is_gift')) {
+                    return false;
+                }
+
+                $orderStatus = (string) ($item->order?->order_status ?? '');
+                $shippingStatus = (string) ($item->order?->shipping_status ?? '');
+
+                if ($orderStatus === 'cancelled' || $shippingStatus === 'returned') {
+                    return false;
+                }
+
+                return (int) data_get($item->meta, 'rule_id') === (int) $rule->id;
+            })
+            ->sum('quantity');
+    }
+
+    public function getOrdersByDateRange(Carbon $startDate, Carbon $endDate): Collection
+    {
+        return $this->_model->query()
+            ->whereBetween('placed_at', [$startDate, $endDate])
+            ->get();
+    }
+
+    public function getTopSellingProducts(Carbon $startDate, Carbon $endDate, int $limit = 15): Collection
+    {
+        return OrderItem::query()
+            ->selectRaw('product_id, product_sku, product_name, SUM(quantity) as sold_quantity, SUM(line_total) as revenue')
+            ->whereHas('order', fn (Builder $query) => $query
+                ->whereBetween('placed_at', [$startDate, $endDate])
+                ->where('order_status', '!=', 'cancelled'))
+            ->groupBy('product_id', 'product_sku', 'product_name')
+            ->orderByDesc('revenue')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function getDiscountTotalByDateRange(Carbon $startDate, Carbon $endDate): float
+    {
+        return (float) $this->_model->query()
+            ->whereBetween('placed_at', [$startDate, $endDate])
+            ->where('order_status', '!=', 'cancelled')
+            ->sum('discount_total');
     }
 }

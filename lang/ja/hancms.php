@@ -156,6 +156,9 @@ return [
         ],
         'banner' => [
             'name' => 'バナー',
+            'ai' => [
+                'translate_button' => 'AI自動翻訳',
+            ],
         ],
     ],
     'report' => [
@@ -223,6 +226,14 @@ return [
         'inventory' => [
             'name' => '在庫レポート',
             'description' => '低在庫、在庫切れ、在庫調整の変動を追跡します。',
+            'actions' => [
+                'set' => '在庫を設定',
+                'adjust' => '在庫を調整',
+                'order_deduct' => '注文による在庫減算',
+                'order_rollback' => '在庫を戻す',
+                'promotion_buytogift_reserve' => '購入特典キャンペーン用に在庫を確保',
+                'promotion_buytogift_release' => '購入特典キャンペーン用在庫を解除',
+            ],
             'metrics' => [
                 'total_stock' => '総在庫',
                 'low_stock' => '低在庫',
@@ -289,6 +300,7 @@ return [
                 'max_discount_amount' => '最大割引額',
                 'min_order_amount' => '最低注文金額',
                 'max_order_amount' => '最高注文金額',
+                'priority' => '優先度',
                 'usage_limit_total' => '総利用回数上限',
                 'usage_limit_per_user' => 'ユーザーごとの利用上限',
                 'first_order_only' => '初回注文のみ',
@@ -310,6 +322,9 @@ return [
                 'buy_product' => '商品購入で特典付与',
                 'stock_scope_all' => '在庫制限なし',
                 'stock_scope_limited' => '在庫制限あり',
+                'stock_limited' => '在庫制限あり',
+                'stock_all' => '在庫制限なし',
+                'stock_empty' => '特典なし',
             ],
             'summary' => [
                 'rule' => 'ルール',
@@ -318,6 +333,29 @@ return [
                 'min_order_amount' => '最低注文金額',
                 'product_short' => '商品',
                 'more_rules' => '件の追加ルール',
+                'max_gift_qty' => '特典上限',
+                'max_sets_per_order' => 'セット上限',
+                'stock_limit' => '在庫上限',
+                'stock_all' => '在庫すべて',
+                'stock_limited' => '在庫制限あり',
+                'no_gift_cap' => '特典上限なし',
+                'unlimited_sets' => 'セット上限なし',
+                'remaining_slots' => '残り枠',
+                'slots' => '枠',
+                'sold_quantity' => '販売数',
+                'reserved_quantity' => '確保数',
+                'reserved_total' => '合計確保数',
+                'wasted' => '余り',
+                'wasted_slots' => '余り枠',
+                'buy_slots' => '購入枠',
+                'gift_slots' => '特典枠',
+                'available_slots' => '利用可能枠',
+                'buy_products_count' => '購入商品',
+                'gift_products_count' => '特典商品',
+                'warning_title' => '警告',
+                'warning_wasted' => ':count 個の特典が余っていますが、次の枠を作るには足りません。',
+                'warning_sold_out' => '特典は売り切れです。',
+                'warning_max_gift_cap' => '特典上限は :slots 枠までで、現在の在庫に対して :shortage 枠分不足しています。',
             ],
             'fields' => [
                 'condition_type' => '条件タイプ',
@@ -325,13 +363,14 @@ return [
                 'buy_qty' => '購入数量',
                 'gift_products' => '特典商品',
                 'gift_qty' => '特典数量',
+                'max_gift_qty' => '特典数量の上限',
                 'min_order_amount' => '特典適用の最低注文金額',
                 'max_sets_per_order' => '1注文あたりの特典セット上限',
+                'priority' => '優先度',
                 'stock_scope' => '在庫適用範囲',
                 'stock_limit' => '在庫適用数量',
                 'starts_at' => '開始日時',
                 'ends_at' => '終了日時',
-                'priority' => '優先度',
                 'stackable' => '併用可',
             ],
         ],
@@ -384,6 +423,7 @@ return [
                 'delete_not_supported' => '在庫の削除はサポートされていません。',
                 'bulk_delete_not_supported' => '在庫の一括削除はサポートされていません。',
                 'toggle_reason' => '在庫管理画面から在庫状態を更新しました。',
+                'parent_stock_managed_by_variants' => 'この商品にはバリエーションがあります。各バリエーションで在庫を更新してください。',
             ],
             'actions' => [
                 'update_stock' => '在庫更新',
@@ -423,6 +463,7 @@ return [
                 'customer' => '顧客情報',
                 'status' => '注文ステータス',
                 'items' => '注文商品',
+                'discount_details' => '割引詳細',
                 'history' => '処理履歴',
             ],
             'actions' => [
@@ -477,6 +518,16 @@ return [
                 'line_total' => '金額',
                 'placed_at' => '注文日時',
                 'total_quantity' => '合計数量',
+                'coupon_code' => 'クーポンコード',
+                'applied_promotions' => '適用済みプロモーション',
+                'gift_quantity' => 'ギフト数量',
+            ],
+            'promotions' => [
+                'types' => [
+                    'coupon' => 'クーポン',
+                    'sale_offer' => 'セール',
+                    'buy_to_gift' => '買うとプレゼント',
+                ],
             ],
             'payment_methods' => [
                 'cod_label' => '代金引換',
@@ -651,6 +702,9 @@ return [
                     'contact' => 'お問い合わせ',
                 ],
             ],
+            'fields' => [
+                'name' => 'カテゴリー名',
+            ],
             'news_add' => 'ニュースを追加',
             'news_hint' => 'このカテゴリーに属する記事です。',
             'news_empty' => 'このカテゴリーにはまだニュースがありません。',
@@ -682,11 +736,18 @@ return [
             'no_photo' => '写真がまだありません。',
             'no_new_photo' => '新しい写真がまだありません。',
             'fields' => [
+                'name' => '商品名',
                 'base_price' => '基本価格',
                 'stock_available' => '在庫あり',
                 'stock_out' => '在庫切れ',
                 'coupon_allowed' => 'クーポン利用可',
                 'coupon_disallowed' => 'クーポン利用不可',
+            ],
+            'warnings' => [
+                'quantity_zero' => '数量が0です。',
+                'price_zero' => '価格が0です。',
+                'stock_zero' => '在庫が0です。',
+                'no_images' => '商品画像がまだありません。',
             ],
             'variants' => [
                 'name' => '商品バリエーション',
@@ -715,6 +776,11 @@ return [
                 'variants' => 'バリエーション',
             ],
         ],
+        'media_banner' => [
+            'ai' => [
+                'generating' => '翻訳中...',
+            ],
+        ],
         'attribute' => [
             'admin' => [
                 'name' => '属性一覧',
@@ -737,6 +803,7 @@ return [
                 'values' => '値',
             ],
             'fields' => [
+                'name' => '属性名',
                 'code' => 'コード',
                 'code_placeholder' => 'brand, color, size',
                 'type' => '種類',
@@ -779,6 +846,10 @@ return [
             'name' => '記事',
             'created' => '記事を追加',
             'edit' => '記事を編集',
+            'fields' => [
+                'name' => '記事名',
+                'type' => '記事タイプ',
+            ],
             'ai' => [
                 'translate_button' => 'AI自動翻訳',
                 'suggest_content' => 'AIで内容提案',
@@ -902,6 +973,8 @@ return [
         'search' => '検索',
         'sku' => 'SKU',
         'quantity' => '数量',
+        'sold_quantity' => '販売数',
+        'reserved_quantity' => '予約数',
         'weight' => '重さ',
         'brand' => 'ブランド',
         'price' => '価格',

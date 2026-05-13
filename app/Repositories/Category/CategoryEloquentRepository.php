@@ -344,14 +344,25 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
         $currentLocale = app()->getLocale();
 
         return Product::query()
-            ->select(['id', 'sku', 'price', 'quantity', 'is_stock', 'status'])
+            ->select(['id', 'sku', 'price', 'quantity', 'sold_quantity', 'is_stock', 'status'])
             ->where('status', 1)
             ->with([
                 'translations' => function ($query) use ($currentLocale) {
                     $query->select(['id', 'product_id', 'locale', 'name'])
                         ->where('locale', $currentLocale);
                 },
+                'variants' => function ($query) use ($currentLocale) {
+                    $query->select(['id', 'product_id', 'sku', 'price', 'stock'])
+                        ->with([
+                            'translations' => function ($translationQuery) use ($currentLocale): void {
+                                $translationQuery->select(['id', 'product_variant_id', 'locale', 'name'])
+                                    ->where('locale', $currentLocale);
+                            },
+                        ])
+                        ->orderBy('id');
+                },
                 'categories:id',
+                'buyToGiftStockAllocations:id,product_id,allocated_quantity',
                 'promotionCampaigns' => function ($query) use ($currentLocale) {
                     $query->select(['promotion_campaigns.id', 'promotion_campaigns.starts_at', 'promotion_campaigns.ends_at', 'promotion_campaigns.priority', 'promotion_campaigns.is_active'])
                         ->with(['translations' => function ($translationQuery) use ($currentLocale): void {

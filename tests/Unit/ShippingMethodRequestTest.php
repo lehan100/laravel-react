@@ -84,4 +84,42 @@ class ShippingMethodRequestTest extends TestCase
         $this->assertArrayHasKey('settings.shop_id', $validator->errors()->messages());
         $this->assertArrayHasKey('settings.endpoint', $validator->errors()->messages());
     }
+
+    #[Test]
+    public function it_uses_human_readable_labels_for_required_shipping_method_errors(): void
+    {
+        app()->setLocale('vi');
+
+        $request = new ShippingMethodRequest;
+        $request->replace([
+            'code' => 'ghn',
+            'provider' => 'ghn',
+            'name' => '',
+            'settings' => [
+                'shop_id' => '',
+                'endpoint' => 'https://example.com',
+            ],
+        ]);
+
+        $validator = Validator::make(
+            $request->all(),
+            $request->rules(),
+            $request->messages(),
+            $request->attributes()
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(
+            __('validation.required', ['attribute' => mb_strtolower(__('hancms.column.name'))]),
+            $validator->errors()->first('name')
+        );
+        $this->assertSame(
+            __('validation.required_if', [
+                'attribute' => mb_strtolower(__('hancms.sales.shipping_methods.fields.token')),
+                'other' => mb_strtolower(__('hancms.sales.shipping_methods.name')),
+                'value' => 'ghn',
+            ]),
+            $validator->errors()->first('settings.token')
+        );
+    }
 }

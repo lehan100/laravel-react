@@ -88,7 +88,7 @@ class AttributeRequest extends FormRequest
     {
         return [
             'code' => __('hancms.column.code'),
-            'translations.*.name' => mb_strtolower(__('hancms.column.name')),
+            'translations.*.name' => mb_strtolower(__('hancms.catalog.attribute.fields.name')),
             'values.*.translations.*.value' => mb_strtolower(__('hancms.column.value') ?: 'value'),
         ];
     }

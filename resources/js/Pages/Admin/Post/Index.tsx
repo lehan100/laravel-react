@@ -57,8 +57,17 @@ function IndexPage() {
                 renderCell: (row: any) => row.category?.name || 'N/A',
             },
             {
-                label: 'Type',
+                label: trans('hancms.catalog.post.fields.type'),
                 name: 'type',
+                renderCell: (row: any) => {
+                    const typeLabels: Record<string, string> = {
+                        primary: trans('hancms.catalog.post.type.options.primary') || 'Primary',
+                        footer: trans('hancms.catalog.post.type.options.footer') || 'Footer',
+                        sidebar: trans('hancms.catalog.post.type.options.sidebar') || 'Sidebar',
+                    };
+
+                    return typeLabels[row.type] || row.type || 'N/A';
+                },
             },
             {
                 label: trans('hancms.column.status'),

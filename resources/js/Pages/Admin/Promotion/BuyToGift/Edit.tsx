@@ -10,17 +10,23 @@ export default function EditPage() {
 
   const rulesFromItem = Array.isArray(item?.rules) && item.rules.length > 0
     ? item.rules
-    : [{
+      : [{
         id: null,
         condition_type: item?.condition_type || 'order_amount',
         min_order_amount: item?.min_order_amount ?? '',
         max_sets_per_order: item?.max_sets_per_order ?? '',
+        max_gift_qty: item?.max_gift_qty ?? '',
+        buy_items: item?.buy_items || [],
         buy_product_ids: item?.buy_product_ids || [],
         buy_qty: item?.buy_qty ?? 1,
+        gift_items: item?.gift_items || [],
         gift_product_ids: item?.gift_product_ids || [],
         gift_qty: item?.gift_qty ?? 1,
+        gift_variant_options: item?.gift_variant_options || [],
         is_active: true,
         stackable: false,
+        stock_scope: item?.stock_scope || 'all',
+        stock_limit: item?.stock_limit ?? '',
       }];
 
   const { data, setData, errors, put, processing } = useForm({
@@ -31,12 +37,16 @@ export default function EditPage() {
     condition_type: item?.condition_type || 'order_amount',
     min_order_amount: item?.min_order_amount ?? '',
     max_sets_per_order: item?.max_sets_per_order ?? '',
+    max_gift_qty: item?.max_gift_qty ?? '',
     starts_at: item?.starts_at ?? '',
     ends_at: item?.ends_at ?? '',
+    buy_items: item?.buy_items || [],
     buy_product_ids: item?.buy_product_ids || [],
     buy_qty: item?.buy_qty ?? 1,
+    gift_items: item?.gift_items || [],
     gift_product_ids: item?.gift_product_ids || [],
     gift_qty: item?.gift_qty ?? 1,
+    gift_variant_options: item?.gift_variant_options || [],
     rules: rulesFromItem,
     is_active: item?.is_active ?? true,
     stackable: item?.stackable ?? false,

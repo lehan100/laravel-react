@@ -21,6 +21,8 @@ class OrderItemResource extends JsonResource
             'quantity' => (int) ($this->quantity ?? 0),
             'unit_price' => $this->unit_price,
             'line_total' => $this->line_total,
+            'is_gift' => (bool) ($meta['is_gift'] ?? false),
+            'rule_id' => $meta['rule_id'] ?? null,
             'meta' => $meta,
             'created_at' => optional($this->created_at)?->format('Y-m-d H:i:s'),
             'updated_at' => optional($this->updated_at)?->format('Y-m-d H:i:s'),

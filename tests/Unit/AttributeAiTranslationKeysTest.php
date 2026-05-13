@@ -13,8 +13,10 @@ class AttributeAiTranslationKeysTest extends TestCase
         foreach (['vi', 'en', 'ja'] as $locale) {
             $translations = require base_path("lang/{$locale}/hancms.php");
             $buttonLabel = data_get($translations, 'catalog.attribute.ai.translate_button');
+            $nameLabel = data_get($translations, 'catalog.attribute.fields.name');
 
             $this->assertNotEmpty($buttonLabel, "{$locale} translation is missing catalog.attribute.ai.translate_button");
+            $this->assertNotEmpty($nameLabel, "{$locale} translation is missing catalog.attribute.fields.name");
         }
     }
 }

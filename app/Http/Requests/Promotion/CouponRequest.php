@@ -62,6 +62,7 @@ class CouponRequest extends FormRequest
             'max_discount_amount' => ['nullable', 'numeric', 'min:0'],
             'min_order_amount' => ['nullable', 'numeric', 'min:0'],
             'max_order_amount' => ['nullable', 'numeric', 'min:0'],
+            'priority' => ['nullable', 'integer', 'min:0'],
             'usage_limit_total' => ['nullable', 'integer', 'min:1'],
             'usage_limit_per_user' => ['nullable', 'integer', 'min:1'],
             'starts_at' => ['nullable', 'date'],

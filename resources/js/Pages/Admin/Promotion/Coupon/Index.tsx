@@ -54,6 +54,10 @@ export default function IndexPage() {
       { label: trans('hancms.column.code'), name: 'code' },
       { label: trans('hancms.column.name'), name: 'name' },
       {
+        label: trans('hancms.promotion.coupon.fields.priority'),
+        name: 'priority',
+      },
+      {
         label: trans('hancms.promotion.coupon.fields.ends_at'),
         name: 'ends_at',
         renderCell: (row: any) => formatDateTimeByLocale(row.ends_at),

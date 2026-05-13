@@ -4,6 +4,7 @@ namespace App\Http\Requests\Catalog;
 
 use App\Models\Catalog\AttributeValue;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class ProductRequest extends FormRequest
@@ -15,8 +16,17 @@ class ProductRequest extends FormRequest
 
     public function rules(): array
     {
+        $productId = $this->route('product');
+        $skuRule = ['required', 'string', 'max:255'];
+
+        if ($productId) {
+            $skuRule[] = Rule::unique('products', 'sku')->ignore($productId);
+        } else {
+            $skuRule[] = Rule::unique('products', 'sku');
+        }
+
         return [
-            'sku' => 'nullable|string|max:255',
+            'sku' => $skuRule,
             'quantity' => 'nullable|integer|min:0',
             'weight' => 'nullable|integer|min:0',
             'price' => 'nullable|numeric|min:0',
@@ -150,8 +160,24 @@ class ProductRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'translations.*.name' => mb_strtolower(__('hancms.column.name')),
+            'sku' => mb_strtolower(__('hancms.column.sku')),
+            'quantity' => mb_strtolower(__('hancms.column.quantity')),
+            'price' => mb_strtolower(__('hancms.column.price')),
+            'category_ids' => mb_strtolower(__('hancms.column.categories')),
+            'photos' => mb_strtolower(__('hancms.column.images')),
+            'default_photo_id' => mb_strtolower(__('hancms.column.image')),
+            'translations.*.name' => mb_strtolower(__('hancms.catalog.product.fields.name')),
             'translations.*.slug' => mb_strtolower(__('hancms.column.slug')),
+        ];
+    }
+
+    public function messages(): array
+    {
+        $skuLabel = mb_strtolower(__('hancms.column.sku'));
+
+        return [
+            'sku.required' => __('hancms.message.error.required', ['name' => $skuLabel]),
+            'sku.unique' => __('validation.unique', ['attribute' => $skuLabel]),
         ];
     }
 }

@@ -5,8 +5,10 @@ namespace App\Repositories\Product;
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductAttribute;
 use App\Models\Catalog\ProductVariant;
+use App\Models\Sales\InventoryAdjustmentHistory;
 use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
+use Carbon\Carbon;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -249,6 +251,9 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
             if (array_key_exists('variants', $params)) {
                 $this->syncVariants($item, $params['variants'] ?? []);
             }
+            if ($item->variants()->exists()) {
+                $this->syncQuantityFromVariants($item);
+            }
             // 6. Xử lý Slugs qua Pipeline (Unicode, History, Redirects)
             app(Pipeline::class)
                 ->send([
@@ -300,6 +305,21 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         $product->variants()
             ->when($keptVariantIds !== [], fn ($query) => $query->whereNotIn('id', $keptVariantIds))
             ->delete();
+    }
+
+    private function syncQuantityFromVariants(Product $product): void
+    {
+        $product->loadMissing('variants');
+
+        if ($product->variants->isEmpty()) {
+            return;
+        }
+
+        $totalStock = (int) $product->variants->sum('stock');
+
+        $product->quantity = $totalStock;
+        $product->is_stock = $totalStock > 0;
+        $product->saveQuietly();
     }
 
     private function syncVariantTranslations(ProductVariant $variant, array $translations): void
@@ -412,5 +432,42 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
         }
 
         return false;
+    }
+
+    public function getProductsForUpdate(array $productIds): Collection
+    {
+        return $this->_model->query()
+            ->whereIn('id', $productIds)
+            ->lockForUpdate()
+            ->get();
+    }
+
+    public function getVariantsForUpdate(array $variantIds): Collection
+    {
+        return ProductVariant::query()
+            ->whereIn('id', $variantIds)
+            ->lockForUpdate()
+            ->get();
+    }
+
+    public function getProductsForInventoryReport(): Collection
+    {
+        return $this->_model->query()
+            ->with(['translations' => fn ($query) => $query->whereIn('locale', ['vi', app()->getLocale()])])
+            ->withCount('variants')
+            ->withSum('variants', 'stock')
+            ->get();
+    }
+
+    public function getInventoryAdjustmentsByDateRange(Carbon $startDate, Carbon $endDate): Collection
+    {
+        return InventoryAdjustmentHistory::query()
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+    }
+
+    public function createInventoryAdjustment(array $payload): InventoryAdjustmentHistory
+    {
+        return InventoryAdjustmentHistory::query()->create($payload);
     }
 }

@@ -431,7 +431,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
         <div className="animate-in fade-in duration-300">
             <Card title={trans('hancms.layout.tabs.general')} className='mb-6'>
                 <div className="p-6 space-y-6 ">
-                    <InputGroup label={trans('hancms.column.status')} align="center">
+                    <InputGroup label={trans('hancms.column.status')} align="center" required>
                         <StatusSwitch
                             value={data.status}
                             onChange={(value) => setData('status', value)}
@@ -449,7 +449,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                             trans={trans}
                         />
                     </InputGroup>
-                    <InputGroup label={trans('hancms.catalog.category.type.label')}>
+                    <InputGroup label={trans('hancms.catalog.category.type.label')} required>
                         <CategoryTypeSelector
                             value={data.type || ''}
                             onChange={(nextType) => {
@@ -609,10 +609,11 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                     )}
                                 </div>
                             </div>
-                            <InputGroup label={trans('hancms.column.name')}>
-                                <input
-                                    type="text"
-                                    value={data.translations?.[currentTab]?.name || ''}
+                    <InputGroup label={trans('hancms.catalog.category.fields.name')} required>
+                        <input
+                            type="text"
+                            required
+                            value={data.translations?.[currentTab]?.name || ''}
                                     onChange={(e) => updateTranslation(currentTab, 'name', e.target.value)}
                                     className={`w-full border rounded-md p-2 text-sm outline-none transition-all ${errors?.[`translations.${currentTab}.name`]
                                         ? 'border-red-500 focus:ring-2 focus:ring-red-200'
@@ -622,12 +623,13 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                 {errors?.[`translations.${currentTab}.name`] && <MessageError>{errors[`translations.${currentTab}.name`]}</MessageError>}
                             </InputGroup>
 
-                            <InputGroup label={trans('hancms.seo.slug') || "Slug / URL (SEO)"}>
-                                <div className="relative flex items-center group">
-                                    <input
-                                        type="text"
-                                        readOnly={isLocked(currentTab)}
-                                        value={data.translations?.[currentTab]?.slug || ''}
+                    <InputGroup label={trans('hancms.seo.slug') || "Slug / URL (SEO)"} required>
+                        <div className="relative flex items-center group">
+                            <input
+                                type="text"
+                                required
+                                readOnly={isLocked(currentTab)}
+                                value={data.translations?.[currentTab]?.slug || ''}
                                         onChange={(e) => updateTranslation(currentTab, 'slug', e.target.value)}
                                         className={`w-full border rounded-md p-2 pr-10 text-sm outline-none transition-all font-mono ${errors?.[`translations.${currentTab}.slug`]
                                             ? 'border-red-500 focus:ring-2 focus:ring-red-200'

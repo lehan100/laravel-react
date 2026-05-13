@@ -68,9 +68,9 @@ export default function ShippingMethodFormView({
     if (provider === 'ghn') {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.token')}><input type="text" className={inputClass('settings.token')} value={data.settings?.token || ''} onChange={(e) => updateSetting('token', e.target.value)} />{renderSettingError('settings.token')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.shop_id')}><input type="text" className={inputClass('settings.shop_id')} value={data.settings?.shop_id || ''} onChange={(e) => updateSetting('shop_id', e.target.value)} />{renderSettingError('settings.shop_id')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.token')}><input type="text" className={inputClass('settings.token')} value={data.settings?.token || ''} onChange={(e) => updateSetting('token', e.target.value)} />{renderSettingError('settings.token')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.shop_id')}><input type="text" className={inputClass('settings.shop_id')} value={data.settings?.shop_id || ''} onChange={(e) => updateSetting('shop_id', e.target.value)} />{renderSettingError('settings.shop_id')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
           <InputGroup label={trans('hancms.sales.shipping_methods.fields.webhook_url')}><input type="text" className={inputClass('settings.webhook_url')} value={data.settings?.webhook_url || ''} onChange={(e) => updateSetting('webhook_url', e.target.value)} />{renderSettingError('settings.webhook_url')}</InputGroup>
         </>
       );
@@ -79,8 +79,8 @@ export default function ShippingMethodFormView({
     if (provider === 'ghtk') {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.token')}><input type="text" className={inputClass('settings.token')} value={data.settings?.token || ''} onChange={(e) => updateSetting('token', e.target.value)} />{renderSettingError('settings.token')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.token')}><input type="text" className={inputClass('settings.token')} value={data.settings?.token || ''} onChange={(e) => updateSetting('token', e.target.value)} />{renderSettingError('settings.token')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
           <InputGroup label={trans('hancms.sales.shipping_methods.fields.webhook_url')}><input type="text" className={inputClass('settings.webhook_url')} value={data.settings?.webhook_url || ''} onChange={(e) => updateSetting('webhook_url', e.target.value)} />{renderSettingError('settings.webhook_url')}</InputGroup>
         </>
       );
@@ -89,9 +89,9 @@ export default function ShippingMethodFormView({
     if (provider === 'viettel_post' || provider === 'jnt') {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.username')}><input type="text" className={inputClass('settings.username')} value={data.settings?.username || ''} onChange={(e) => updateSetting('username', e.target.value)} />{renderSettingError('settings.username')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.password')}><input type="text" className={inputClass('settings.password')} value={data.settings?.password || ''} onChange={(e) => updateSetting('password', e.target.value)} />{renderSettingError('settings.password')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.username')}><input type="text" className={inputClass('settings.username')} value={data.settings?.username || ''} onChange={(e) => updateSetting('username', e.target.value)} />{renderSettingError('settings.username')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.password')}><input type="text" className={inputClass('settings.password')} value={data.settings?.password || ''} onChange={(e) => updateSetting('password', e.target.value)} />{renderSettingError('settings.password')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
           <InputGroup label={trans('hancms.sales.shipping_methods.fields.webhook_url')}><input type="text" className={inputClass('settings.webhook_url')} value={data.settings?.webhook_url || ''} onChange={(e) => updateSetting('webhook_url', e.target.value)} />{renderSettingError('settings.webhook_url')}</InputGroup>
         </>
       );
@@ -100,9 +100,9 @@ export default function ShippingMethodFormView({
     if (provider === 'ninja_van') {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.client_id')}><input type="text" className={inputClass('settings.client_id')} value={data.settings?.client_id || ''} onChange={(e) => updateSetting('client_id', e.target.value)} />{renderSettingError('settings.client_id')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.client_secret')}><input type="text" className={inputClass('settings.client_secret')} value={data.settings?.client_secret || ''} onChange={(e) => updateSetting('client_secret', e.target.value)} />{renderSettingError('settings.client_secret')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.client_id')}><input type="text" className={inputClass('settings.client_id')} value={data.settings?.client_id || ''} onChange={(e) => updateSetting('client_id', e.target.value)} />{renderSettingError('settings.client_id')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.client_secret')}><input type="text" className={inputClass('settings.client_secret')} value={data.settings?.client_secret || ''} onChange={(e) => updateSetting('client_secret', e.target.value)} />{renderSettingError('settings.client_secret')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.shipping_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
           <InputGroup label={trans('hancms.sales.shipping_methods.fields.webhook_url')}><input type="text" className={inputClass('settings.webhook_url')} value={data.settings?.webhook_url || ''} onChange={(e) => updateSetting('webhook_url', e.target.value)} />{renderSettingError('settings.webhook_url')}</InputGroup>
         </>
       );
@@ -130,18 +130,21 @@ export default function ShippingMethodFormView({
               inactiveLabel={trans('hancms.status.inactive')}
             />
 
-            <InputGroup label={trans('hancms.column.code')}>
+            <InputGroup required label={trans('hancms.column.code')}>
               <select
                 className={inputClass('code')}
                 value={data.code}
                 onChange={(e) => {
                   const provider = e.target.value;
                   const selected = providerOptions.find((item) => item.value === provider);
-                  setData('code', provider);
-                  setData('provider', provider);
-                  if (!data.name || providerOptions.some((item) => item.label === data.name)) {
-                    setData('name', selected?.label || provider);
-                  }
+                  setData((current: any) => ({
+                    ...current,
+                    code: provider,
+                    provider,
+                    name: !current.name || providerOptions.some((item) => item.label === current.name)
+                      ? (selected?.label || provider)
+                      : current.name,
+                  }));
                 }}
               >
                 {providerOptions.map((option) => (
@@ -151,8 +154,8 @@ export default function ShippingMethodFormView({
               {errors.code && <MessageError>{errors.code}</MessageError>}
             </InputGroup>
 
-            <InputGroup label={trans('hancms.column.name')}>
-              <input type="text" required className={inputClass('name')} value={data.name} onChange={(e) => setData('name', e.target.value)} />
+            <InputGroup required label={trans('hancms.column.name')}>
+              <input type="text" className={inputClass('name')} value={data.name} onChange={(e) => setData('name', e.target.value)} />
               {errors.name && <MessageError>{errors.name}</MessageError>}
             </InputGroup>
 

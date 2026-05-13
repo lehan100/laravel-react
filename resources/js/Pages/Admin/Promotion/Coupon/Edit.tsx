@@ -18,6 +18,7 @@ export default function EditPage() {
     max_discount_amount: item?.max_discount_amount ?? '',
     min_order_amount: item?.min_order_amount ?? '',
     max_order_amount: item?.max_order_amount ?? '',
+    priority: item?.priority ?? 100,
     first_order_only: item?.first_order_only ?? false,
     usage_limit_total: item?.usage_limit_total ?? '',
     usage_limit_per_user: item?.usage_limit_per_user ?? '',

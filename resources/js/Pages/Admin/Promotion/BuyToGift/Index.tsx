@@ -25,6 +25,13 @@ export default function IndexPage() {
 
   const rows = items?.data || [];
   const links = items?.meta?.links || [];
+  const primaryRule = rows?.[0]?.rules?.[0] || null;
+  const primaryRuleGiftCapShortage = Number(primaryRule?.max_gift_shortage ?? 0);
+  const primaryRuleGiftVariantOptions = Array.isArray(primaryRule?.gift_variant_options) ? primaryRule.gift_variant_options : [];
+  const primaryRuleGiftVariantReserveTotal = primaryRuleGiftVariantOptions.reduce(
+    (total: number, option: any) => total + Number(option?.reserve_qty ?? 0),
+    0
+  );
 
   const formatDateTimeByLocale = (value?: string | null) => {
     if (!value) {
@@ -97,6 +104,54 @@ export default function IndexPage() {
               <div className="text-slate-600">
                 {trans('hancms.promotion.buytogift.summary.gift')}: {(primaryRule.gift_product_ids || []).length} {trans('hancms.promotion.buytogift.summary.product_short')} x{primaryRule.gift_qty || 1}
               </div>
+              {primaryRuleGiftVariantOptions.length > 0 && (
+                <div className="space-y-1 rounded-lg border border-fuchsia-100 bg-fuchsia-50 px-3 py-2 text-slate-700">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-fuchsia-700">
+                    Free theo màu
+                  </div>
+                  <div className="text-xs">
+                    {primaryRuleGiftVariantOptions.length} màu, tạm giữ {primaryRuleGiftVariantReserveTotal}
+                  </div>
+                  <div className="text-xs text-slate-600">
+                    {primaryRuleGiftVariantOptions
+                      .map((option: any) => `${option?.variant_name || option?.variant_sku || option?.variant_id || '---'} x${Number(option?.reserve_qty ?? 0)}`)
+                      .join(' · ')}
+                  </div>
+                </div>
+              )}
+              <div className="text-slate-600">
+                {primaryRule.stock_scope === 'limited'
+                  ? `${trans('hancms.promotion.buytogift.summary.stock_limit')}: ${primaryRule.stock_limit ?? 0} (${primaryRule.available_slots ?? 0} ${trans('hancms.promotion.buytogift.summary.slots')}, ${primaryRule.wasted_stock ?? 0} ${trans('hancms.promotion.buytogift.summary.wasted_slots')})`
+                  : `${primaryRule.available_slots ?? 0} ${trans('hancms.promotion.buytogift.summary.slots')}`}
+              </div>
+              <div className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${primaryRule.is_sold_out ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                {primaryRule.is_sold_out
+                  ? trans('hancms.promotion.buytogift.options.stock_empty')
+                  : `${primaryRule.available_slots ?? 0} ${trans('hancms.promotion.buytogift.summary.remaining_slots')}`}
+              </div>
+              <div className="space-y-1 text-slate-500">
+                <div>{trans('hancms.promotion.buytogift.summary.reserved_total')}: {Number(primaryRule.reserved_quantity ?? primaryRule.allocated_stock ?? 0)}</div>
+                <div>{trans('hancms.column.sold_quantity')}: {Number(primaryRule.sold_quantity ?? 0)}</div>
+              </div>
+              {primaryRule.is_sold_out && (
+                <div className="mt-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+                  <div className="font-semibold uppercase tracking-wide">{trans('hancms.promotion.buytogift.summary.warning_title')}</div>
+                  <div className="mt-1">
+                    {trans('hancms.promotion.buytogift.summary.warning_sold_out')}
+                  </div>
+                </div>
+              )}
+              {Number(primaryRule.max_gift_qty ?? 0) > 0 && primaryRuleGiftCapShortage > 0 && (
+                <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                  <div className="font-semibold uppercase tracking-wide">{trans('hancms.promotion.buytogift.summary.warning_title')}</div>
+                  <div className="mt-1">
+                    {trans('hancms.promotion.buytogift.summary.warning_max_gift_cap', {
+                      slots: Number(primaryRule.max_gift_slots ?? 0),
+                      shortage: primaryRuleGiftCapShortage,
+                    })}
+                  </div>
+                </div>
+              )}
               {rules.length > 1 && (
                 <div className="text-slate-500">+{rules.length - 1} {trans('hancms.promotion.buytogift.summary.more_rules')}</div>
               )}

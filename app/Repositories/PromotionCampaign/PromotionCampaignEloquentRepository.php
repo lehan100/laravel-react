@@ -116,7 +116,9 @@ class PromotionCampaignEloquentRepository extends EloquentRepository implements 
             },
             'slugs',
             'coupons' => function ($builder): void {
-                $builder->select(['id', 'code', 'name', 'description', 'campaign_id', 'ends_at', 'is_active', 'is_public']);
+                $builder->select(['id', 'code', 'name', 'description', 'campaign_id', 'ends_at', 'priority', 'is_active', 'is_public'])
+                    ->orderBy('priority')
+                    ->orderByDesc('id');
             },
             'saleOffers' => function ($builder): void {
                 $builder->select(['id', 'code', 'name', 'description', 'campaign_id', 'ends_at', 'priority', 'is_active', 'stackable']);
@@ -135,14 +137,27 @@ class PromotionCampaignEloquentRepository extends EloquentRepository implements 
         }
 
         if ($task === 'change-status') {
-            $item = $this->_model->find($params['id'] ?? null);
-            if (! $item) {
+            DB::beginTransaction();
+            try {
+                $item = $this->_model->find($params['id'] ?? null);
+                if (! $item) {
+                    DB::rollBack();
+
+                    return false;
+                }
+
+                $item->is_active = ! $item->is_active;
+                $item->save();
+
+                DB::commit();
+
+                return $item;
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                logger('Error toggle promotion campaign status: '.$e->getMessage());
+
                 return false;
             }
-
-            $item->is_active = ! $item->is_active;
-
-            return $item->save();
         }
 
         DB::beginTransaction();

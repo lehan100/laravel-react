@@ -13,8 +13,12 @@ class PostAiTranslationKeysTest extends TestCase
         foreach (['vi', 'en', 'ja'] as $locale) {
             $translations = require base_path("lang/{$locale}/hancms.php");
             $buttonLabel = data_get($translations, 'catalog.post.ai.translate_button');
+            $nameLabel = data_get($translations, 'catalog.post.fields.name');
+            $typeLabel = data_get($translations, 'catalog.post.fields.type');
 
             $this->assertNotEmpty($buttonLabel, "{$locale} translation is missing catalog.post.ai.translate_button");
+            $this->assertNotEmpty($nameLabel, "{$locale} translation is missing catalog.post.fields.name");
+            $this->assertNotEmpty($typeLabel, "{$locale} translation is missing catalog.post.fields.type");
         }
     }
 }

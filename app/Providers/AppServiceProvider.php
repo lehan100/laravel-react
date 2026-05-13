@@ -14,6 +14,7 @@ use App\Models\Media\MediaBanner;
 use App\Models\Media\MediaBannerTranslation;
 use App\Models\Page;
 use App\Models\Promotion\PromotionBuyToGiftOffer;
+use App\Models\Promotion\PromotionCampaign;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
 use App\Models\Sales\Order;
@@ -28,6 +29,7 @@ use App\Observers\PageObserver;
 use App\Observers\PostObserver;
 use App\Observers\ProductObserver;
 use App\Observers\PromotionBuyToGiftObserver;
+use App\Observers\PromotionCampaignObserver;
 use App\Observers\PromotionCouponObserver;
 use App\Observers\PromotionSaleOfferObserver;
 use App\Repositories\Attribute\AttributeEloquentRepository;
@@ -211,6 +213,7 @@ class AppServiceProvider extends ServiceProvider
         PromotionCoupon::observe(PromotionCouponObserver::class);
         PromotionSaleOffer::observe(PromotionSaleOfferObserver::class);
         PromotionBuyToGiftOffer::observe(PromotionBuyToGiftObserver::class);
+        PromotionCampaign::observe(PromotionCampaignObserver::class);
         Page::observe(PageObserver::class);
         FieldGroup::observe(FieldGroupObserver::class);
         // Login Api

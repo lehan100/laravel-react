@@ -88,6 +88,11 @@ class WarehouseController extends MainController
             return redirect()->route($this->routeName.'index')->with('error', __('hancms.sales.warehouse.messages.product_not_found'));
         }
 
+        if ($product->variants()->exists()) {
+            return Redirect::route($this->routeName.'edit', $id)
+                ->with('error', __('hancms.sales.warehouse.messages.parent_stock_managed_by_variants'));
+        }
+
         $params = $request->all();
         $params['id'] = $id;
         $this->mainModel->save($params, ['task' => 'adjust-item']);
@@ -138,8 +143,10 @@ class WarehouseController extends MainController
         $params['variant_id'] = $variant;
         $this->mainModel->save($params, ['task' => 'adjust-variant']);
 
-        if ((int) $request->input('undo', 0) === 1) {
-            return Redirect::to(route($this->routeName.'index'))
+        $redirectUrl = $request->headers->get('referer');
+
+        if (is_string($redirectUrl) && trim($redirectUrl) !== '') {
+            return Redirect::to($redirectUrl)
                 ->with('success', __('hancms.sales.warehouse.messages.updated_success'));
         }
 
@@ -152,6 +159,11 @@ class WarehouseController extends MainController
         $product = $this->mainModel->find((int) $id);
         if (! $product) {
             return redirect()->route($this->routeName.'index')->with('error', __('hancms.sales.warehouse.messages.product_not_found'));
+        }
+
+        if ($product->variants()->exists()) {
+            return Redirect::route($this->routeName.'edit', $id)
+                ->with('error', __('hancms.sales.warehouse.messages.parent_stock_managed_by_variants'));
         }
 
         $this->mainModel->save(['id' => $id], ['task' => 'toggle-stock']);

@@ -49,6 +49,8 @@ class OrderResource extends JsonResource
             'discount_total' => $this->discount_total,
             'shipping_total' => $this->shipping_total,
             'grand_total' => $this->grand_total,
+            'coupon_code' => $this->coupon_code,
+            'applied_promotions' => $this->applied_promotions ?? [],
             'placed_at' => optional($this->placed_at)?->format('Y-m-d H:i:s'),
             'items' => OrderItemResource::collection($this->relationLoaded('items') ? $this->items : collect()),
             'timelines' => OrderTimelineResource::collection($this->relationLoaded('timelines') ? $this->timelines : collect()),

@@ -19,11 +19,13 @@ export default function WarehouseIndexPage() {
 
     const stockStatus = filters?.stock_status || 'all';
     const flattenedRows = products.flatMap((product: any) => {
+      const hasVariants = Array.isArray(product.variants) && product.variants.length > 0;
       const productRow = {
         ...product,
         row_key: `product-${product.id}`,
         display_name: product.name,
         display_sku: product.sku,
+        has_variants: hasVariants,
       };
 
       const variantRows = Array.isArray(product.variants)
@@ -108,14 +110,28 @@ export default function WarehouseIndexPage() {
           <button
             type="button"
             onClick={() => toggleStock(row)}
+            disabled={row.type === 'product' && row.has_variants}
             className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-white ${
-              row.is_stock ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'
+              row.type === 'product' && row.has_variants
+                ? 'cursor-not-allowed bg-slate-400'
+                : row.is_stock
+                  ? 'bg-rose-600 hover:bg-rose-700'
+                  : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            {row.is_stock ? <CircleX size={13} /> : <CircleCheck size={13} />}
-            {row.is_stock
-              ? trans('hancms.sales.warehouse.actions.mark_out_stock')
-              : trans('hancms.sales.warehouse.actions.mark_in_stock')}
+            {row.type === 'product' && row.has_variants ? (
+              <>
+                <CircleCheck size={13} />
+                {trans('hancms.catalog.product.tabs.variants')}
+              </>
+            ) : (
+              <>
+                {row.is_stock ? <CircleX size={13} /> : <CircleCheck size={13} />}
+                {row.is_stock
+                  ? trans('hancms.sales.warehouse.actions.mark_out_stock')
+                  : trans('hancms.sales.warehouse.actions.mark_in_stock')}
+              </>
+            )}
           </button>
         </div>
       ),
@@ -123,6 +139,10 @@ export default function WarehouseIndexPage() {
   ], [trans]);
 
   const toggleStock = (row: any) => {
+    if (row.type === 'product' && row.has_variants) {
+      return;
+    }
+
     const url = row.type === 'variant'
       ? route('warehouse.variants.toggle-stock', row.id)
       : route('warehouse.toggle-stock', row.id);

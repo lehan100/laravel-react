@@ -41,4 +41,14 @@ class StoreFieldGroupRequest extends FormRequest
             'fields.*.required' => ['sometimes', 'boolean'],
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'title' => mb_strtolower(__('hancms.column.name')),
+            'fields.*.key' => mb_strtolower(__('hancms.column.key')),
+            'fields.*.label' => mb_strtolower(__('hancms.column.name')),
+            'fields.*.type' => mb_strtolower(__('hancms.column.type')),
+        ];
+    }
 }

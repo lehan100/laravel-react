@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Catalog\Product;
+use App\Models\Catalog\ProductVariant;
 use App\Models\Sales\Order;
 use App\Models\Sales\OrderItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,6 +30,27 @@ class DashboardPageTest extends TestCase
         $product->translations()->create([
             'locale' => 'vi',
             'name' => 'Dashboard Product',
+        ]);
+
+        $variantProduct = Product::query()->create([
+            'sku' => 'DASH-VAR-001',
+            'quantity' => 0,
+            'price' => 180000,
+            'status' => 1,
+        ]);
+
+        $variantProduct->translations()->create([
+            'locale' => 'vi',
+            'name' => 'Dashboard Variant Product',
+        ]);
+
+        ProductVariant::query()->create([
+            'product_id' => $variantProduct->id,
+            'sku' => 'DASH-VAR-001-RED',
+            'price' => 180000,
+            'stock' => 1,
+            'image' => null,
+            'images' => null,
         ]);
 
         $order = Order::query()->create([
@@ -67,8 +89,11 @@ class DashboardPageTest extends TestCase
             ->where('dashboard.orderStatusChart.0.label', 'Hoàn thành')
             ->where('dashboard.orderStatusChart.0.value', 1)
             ->has('dashboard.topProducts', 1)
-            ->has('dashboard.stockAlerts', 1)
-            ->where('dashboard.summary.products', 1)
+            ->has('dashboard.stockAlerts', 2)
+            ->where('dashboard.stockAlerts.0.sku', 'DASH-VAR-001')
+            ->where('dashboard.stockAlerts.0.quantity', 1)
+            ->where('dashboard.summary.out_of_stock', 0)
+            ->where('dashboard.summary.products', 2)
             ->where('dashboard.recentOrders.0.order_number', 'ORD-DASH-001')
             ->where('dashboard.recentOrders.0.order_status_label', 'Hoàn thành')
             ->where('dashboard.recentOrders.0.payment_status_label', 'Đã thanh toán')

@@ -88,6 +88,65 @@ class PostRequestTest extends TestCase
         $this->assertArrayHasKey('category_id', $validator->errors()->messages());
     }
 
+    #[Test]
+    public function it_uses_the_post_name_translation_for_required_name_errors(): void
+    {
+        app()->setLocale('vi');
+
+        $categoryId = DB::connection('sqlite')->table('categories')->insertGetId([
+            'status' => 1,
+            'order' => 1,
+            'type' => 'news',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $validator = Validator::make(
+            $this->basePayload([
+                'category_id' => $categoryId,
+                'translations' => [
+                    'vi' => [
+                        'name' => '',
+                        'slug' => 'tin-tuc',
+                        'description' => 'Mo ta',
+                        'content' => '<p>Noi dung</p>',
+                        'seo_title' => 'Tin tuc',
+                        'seo_keyword' => 'tin tuc',
+                        'seo_description' => 'Mo ta seo',
+                    ],
+                ],
+            ]),
+            (new PostRequest)->rules(),
+            [],
+            (new PostRequest)->attributes()
+        );
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'Trường tên bài viết không được bỏ trống.',
+            $validator->errors()->first('translations.vi.name')
+        );
+    }
+
+    #[Test]
+    public function it_uses_the_post_type_translation_for_required_type_errors(): void
+    {
+        app()->setLocale('vi');
+
+        $validator = Validator::make(
+            $this->basePayload(['type' => '']),
+            (new PostRequest)->rules(),
+            [],
+            (new PostRequest)->attributes()
+        );
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'Trường loại bài viết không được bỏ trống.',
+            $validator->errors()->first('type')
+        );
+    }
+
     private function basePayload(array $overrides = []): array
     {
         return array_merge([

@@ -72,9 +72,23 @@ class PromotionModuleCampaignSelectionTest extends TestCase
 
         PromotionCoupon::query()->create([
             'code' => 'COUPON-OPTION-001',
-            'name' => 'Coupon Option',
+            'name' => 'Coupon Option Low',
             'discount_type' => 'fixed',
             'discount_value' => 25000,
+            'priority' => 20,
+            'starts_at' => now()->subDay(),
+            'ends_at' => $campaign->ends_at,
+            'is_active' => true,
+            'is_public' => true,
+            'stackable' => false,
+        ]);
+
+        PromotionCoupon::query()->create([
+            'code' => 'COUPON-OPTION-002',
+            'name' => 'Coupon Option High',
+            'discount_type' => 'fixed',
+            'discount_value' => 25000,
+            'priority' => 5,
             'starts_at' => now()->subDay(),
             'ends_at' => $campaign->ends_at,
             'is_active' => true,
@@ -84,10 +98,22 @@ class PromotionModuleCampaignSelectionTest extends TestCase
 
         PromotionSaleOffer::query()->create([
             'code' => 'SALE-OPTION-001',
-            'name' => 'Sale Option',
+            'name' => 'Sale Option Low',
             'discount_type' => 'percent',
             'discount_value' => 10,
-            'priority' => 1,
+            'priority' => 20,
+            'starts_at' => now()->subDay(),
+            'ends_at' => $campaign->ends_at,
+            'is_active' => true,
+            'stackable' => true,
+        ]);
+
+        PromotionSaleOffer::query()->create([
+            'code' => 'SALE-OPTION-002',
+            'name' => 'Sale Option High',
+            'discount_type' => 'percent',
+            'discount_value' => 20,
+            'priority' => 5,
             'starts_at' => now()->subDay(),
             'ends_at' => $campaign->ends_at,
             'is_active' => true,
@@ -96,9 +122,20 @@ class PromotionModuleCampaignSelectionTest extends TestCase
 
         PromotionBuyToGiftOffer::query()->create([
             'code' => 'GIFT-OPTION-001',
-            'name' => 'Gift Option',
+            'name' => 'Gift Option Low',
             'description' => 'Gift option description',
-            'priority' => 1,
+            'priority' => 20,
+            'starts_at' => now()->subDay(),
+            'ends_at' => $campaign->ends_at,
+            'is_active' => true,
+            'stackable' => false,
+        ]);
+
+        PromotionBuyToGiftOffer::query()->create([
+            'code' => 'GIFT-OPTION-002',
+            'name' => 'Gift Option High',
+            'description' => 'Gift option description',
+            'priority' => 5,
             'starts_at' => now()->subDay(),
             'ends_at' => $campaign->ends_at,
             'is_active' => true,
@@ -113,6 +150,9 @@ class PromotionModuleCampaignSelectionTest extends TestCase
             ->has('itemsCouponActive.0')
             ->has('itemsSaleOfferActive.0')
             ->has('itemsBuyToGiftActive.0')
+            ->where('itemsCouponActive.0.name', 'Coupon Option High')
+            ->where('itemsSaleOfferActive.0.name', 'Sale Option High')
+            ->where('itemsBuyToGiftActive.0.name', 'Gift Option High')
         );
     }
 

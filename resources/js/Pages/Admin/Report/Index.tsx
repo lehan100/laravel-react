@@ -5,6 +5,7 @@ import { BarChart3, CalendarDays, RefreshCw, Sparkles } from 'lucide-react';
 import MainLayout from '@/Layouts/MainLayout';
 import Card from '@/Components/Main/Card';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
+import PromotionStatusBadge from '@/Components/Status/PromotionStatusBadge';
 import { useTrans } from '@/Hooks/useTrans';
 
 type ReportMetric = {
@@ -29,7 +30,7 @@ type Report = {
   metrics: ReportMetric[];
   charts: Record<string, any[]>;
   columns: ReportColumn[];
-  rows: Record<string, any>[];
+  rows: Array<Record<string, any> & { status_key?: string }>;
 };
 
 const metricToneClasses: Record<string, string> = {
@@ -40,6 +41,12 @@ const metricToneClasses: Record<string, string> = {
   slate: 'from-slate-50 to-white text-slate-800 ring-slate-100',
 };
 
+const inventoryStatusBadgeClasses: Record<string, string> = {
+  out_of_stock: 'border-rose-200 bg-rose-50 text-rose-700',
+  low_stock: 'border-amber-200 bg-amber-50 text-amber-700',
+  healthy: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+};
+
 export default function ReportIndexPage() {
   const { trans } = useTrans();
   const { report, analyzeRoute }: { report: Report; analyzeRoute: string } = usePage().props as any;
@@ -48,6 +55,7 @@ export default function ReportIndexPage() {
   const [analysis, setAnalysis] = useState('');
   const [analysisError, setAnalysisError] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
+  const analysisHtml = useMemo(() => sanitizeAnalysisHtml(analysis), [analysis]);
 
   const primaryChart = useMemo(() => {
     const chart = report.charts.daily || report.charts.top || report.charts.adjustments || report.charts.campaigns || [];
@@ -219,9 +227,10 @@ export default function ReportIndexPage() {
                 </div>
               )}
               {analysis && (
-                <div className="whitespace-pre-line text-sm leading-7 text-slate-700">
-                  {analysis}
-                </div>
+                <div
+                  className="space-y-4 text-sm leading-7 text-slate-700 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-900 [&_ol]:ml-5 [&_ol]:list-decimal [&_ol]:space-y-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ul]:space-y-2 [&_p]:mb-3 [&_strong]:font-semibold"
+                  dangerouslySetInnerHTML={{ __html: analysisHtml }}
+                />
               )}
             </div>
           </Card>
@@ -250,7 +259,27 @@ export default function ReportIndexPage() {
                 <tr key={rowIndex} className="border-t border-slate-200 odd:bg-white even:bg-slate-50/60">
                   {report.columns.map(column => (
                     <td key={column.key} className="px-4 py-3 text-sm text-slate-700">
-                      {row[column.key] ?? 'N/A'}
+                      {report.type === 'inventory' && column.key === 'status_label' ? (
+                        <span
+                          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${
+                            inventoryStatusBadgeClasses[row.status_key] || 'border-slate-200 bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          {row[column.key] ?? 'N/A'}
+                        </span>
+                      ) : report.type === 'promotion' && column.key === 'status_label' ? (
+                        <PromotionStatusBadge
+                          value={row.status_key || 'inactive'}
+                          labels={{
+                            active: trans('hancms.report.status_labels.active'),
+                            upcoming: trans('hancms.report.status_labels.upcoming'),
+                            expired: trans('hancms.report.status_labels.expired'),
+                            inactive: trans('hancms.report.status_labels.inactive'),
+                          }}
+                        />
+                      ) : (
+                        row[column.key] ?? 'N/A'
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -266,3 +295,50 @@ export default function ReportIndexPage() {
 ReportIndexPage.layout = (page: React.ReactNode) => (
   <MainLayout title="hancms.report.name" children={page} />
 );
+
+function sanitizeAnalysisHtml(html: string): string {
+  if (typeof window === 'undefined') {
+    return html;
+  }
+
+  const normalized = String(html || '').trim();
+
+  if (!normalized) {
+    return '';
+  }
+
+  if (!/<[a-z][\s\S]*>/i.test(normalized)) {
+    return normalized
+      .split(/\n{2,}/)
+      .map((block) => `<p>${escapeHtml(block).replace(/\n/g, '<br />')}</p>`)
+      .join('');
+  }
+
+  const parser = new DOMParser();
+  const documentFragment = parser.parseFromString(`<div>${normalized}</div>`, 'text/html');
+  const root = documentFragment.body.firstElementChild as HTMLElement | null;
+
+  if (!root) {
+    return '';
+  }
+
+  root.querySelectorAll('script, style, iframe, object, embed, link, meta').forEach((node) => node.remove());
+  root.querySelectorAll('*').forEach((element) => {
+    Array.from(element.attributes).forEach((attribute) => {
+      if (attribute.name.toLowerCase().startsWith('on')) {
+        element.removeAttribute(attribute.name);
+      }
+    });
+  });
+
+  return root.innerHTML;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}

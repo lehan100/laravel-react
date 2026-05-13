@@ -5,8 +5,9 @@ import { InputGroup } from '@/Components/Form/HancmsInput';
 import MessageError from '@/Components/Form/MessageError';
 import Card from '@/Components/Main/Card';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
-import { ChevronDown, Save, Search, Trash2 } from 'lucide-react';
+import { ChevronDown, Save, Search, Trash2, Calculator, Gift } from 'lucide-react';
 import { convertPriceToBase, convertPriceToDisplay, formatProductPrice, type ProductCurrency } from '@/Pages/Admin/Product/productUtils';
+import axios from 'axios';
 
 type Option = {
   value: string;
@@ -65,6 +66,8 @@ type OrderItem = {
   variant_id?: number | '';
   quantity: number;
   unit_price: number;
+  is_gift?: boolean;
+  rule_id?: number;
 };
 
 type OrderFormViewProps = {
@@ -85,6 +88,7 @@ type OrderFormViewProps = {
     payment_methods: PaymentMethodOption[];
     provinces: ProvinceOption[];
     wards: WardOption[];
+    buytogift_gift_variant_reserves?: Record<string, number>;
   };
   statusOptions: {
     order: Option[];
@@ -176,9 +180,8 @@ function SearchableSelect({
     }
   }, [open]);
 
-  const triggerClass = `flex min-h-[42px] w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${
-    error ? 'border-rose-500 bg-rose-50' : 'border-slate-300 bg-white'
-  } ${disabled ? 'cursor-not-allowed bg-slate-100 text-slate-400' : 'cursor-pointer hover:border-slate-400'}`;
+  const triggerClass = `flex min-h-[42px] w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${error ? 'border-rose-500 bg-rose-50' : 'border-slate-300 bg-white'
+    } ${disabled ? 'cursor-not-allowed bg-slate-100 text-slate-400' : 'cursor-pointer hover:border-slate-400'}`;
 
   return (
     <div ref={containerRef} className="relative">
@@ -224,9 +227,8 @@ function SearchableSelect({
                   <button
                     key={option.value}
                     type="button"
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition ${
-                      option.value === value ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition ${option.value === value ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'
+                      }`}
                     onClick={() => {
                       onChange(option.value);
                       setOpen(false);
@@ -269,6 +271,7 @@ export default function OrderFormView({
   const paymentMethods = formOptions?.payment_methods || [];
   const provinces = formOptions?.provinces || [];
   const wards = formOptions?.wards || [];
+  const giftVariantReserves = formOptions?.buytogift_gift_variant_reserves || {};
   const items: OrderItem[] = data.items || [];
   const useEnglishLocationNames = !String(locale || '').trim().toLowerCase().startsWith('vi');
   const selectedProvinceCode = String(data.province_code || wards.find((ward) => ward.code === data.ward_code)?.province_code || '').trim();
@@ -305,9 +308,98 @@ export default function OrderFormView({
     }
   }, [data, data.province_code, selectedProvinceCode, setData]);
 
+  const [isCalculating, setIsCalculating] = useState(false);
+  const initialCartSignatureRef = useRef<string | null>(null);
+  const hasInitialGiftItemsRef = useRef(items.some((item) => item.is_gift));
+  const hasSkippedInitialGiftHydrationRef = useRef(false);
+
+  const calculatePromotions = async () => {
+    setIsCalculating(true);
+    try {
+      const payload = {
+        order_id: data.order_id || null,
+        items: items
+          .filter((item) => !item.is_gift)
+          .map((item) => ({
+            ...item,
+            unit_price: convertPriceToBase(item.unit_price, currency),
+          })),
+        coupon_code: data.coupon_code || null,
+      };
+
+      const response = await axios.post(route('orders.calculate-promotions'), payload);
+      const result = response.data;
+
+      const nextItems = result.items.map((resultItem: any) => ({
+        product_id: resultItem.product_id,
+        variant_id: resultItem.variant_id || '',
+        quantity: resultItem.quantity,
+        unit_price: convertPriceToDisplay(resultItem.unit_price, currency),
+        is_gift: resultItem.is_gift || false,
+        rule_id: resultItem.rule_id,
+      }));
+
+      setData((currentData: any) => ({
+        ...currentData,
+        discount_total: convertPriceToDisplay(result.discount_total, currency),
+        items: nextItems,
+        applied_promotions: result.applied_promotions || [],
+      }));
+    } catch (error) {
+      console.error('Failed to calculate promotions:', error);
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
+  // Create a signature of the cart that only depends on manual inputs (non-gifts) and coupon code
+  const cartSignature = useMemo(() => {
+    const manualItems = items.filter((item) => !item.is_gift).map((item) => ({
+      product_id: item.product_id,
+      variant_id: item.variant_id,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+    }));
+    return JSON.stringify({ items: manualItems, coupon: data.coupon_code });
+  }, [items, data.coupon_code]);
+
+  if (initialCartSignatureRef.current === null) {
+    initialCartSignatureRef.current = cartSignature;
+  }
+
+  useEffect(() => {
+    if (
+      !hasSkippedInitialGiftHydrationRef.current
+      && hasInitialGiftItemsRef.current
+      && cartSignature === initialCartSignatureRef.current
+    ) {
+      hasSkippedInitialGiftHydrationRef.current = true;
+      return;
+    }
+
+    // Skip if there are no items to calculate
+    const hasManualItems = items.some((item) => !item.is_gift && item.product_id);
+    if (!hasManualItems) {
+      if (data.discount_total > 0 || items.some((item) => item.is_gift)) {
+        setData((currentData: any) => ({
+          ...currentData,
+          discount_total: 0,
+          items: items.filter((item) => !item.is_gift),
+          applied_promotions: [],
+        }));
+      }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      calculatePromotions();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [cartSignature]);
+
   const inputClass = (fieldName: string) =>
-    `w-full rounded-md border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${
-      errors[fieldName] ? 'border-rose-500 bg-rose-50' : 'border-slate-300 bg-white'
+    `w-full rounded-md border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-slate-400 ${errors[fieldName] ? 'border-rose-500 bg-rose-50' : 'border-slate-300 bg-white'
     }`;
 
   const setItems = (nextItems: OrderItem[]) => {
@@ -351,7 +443,48 @@ export default function OrderFormView({
   const selectedVariant = (product: ProductOption | undefined, variantId: number | '' | undefined) => {
     return product?.variants?.find((variant) => variant.id === Number(variantId));
   };
+  const getGiftVariantReserveKey = (ruleId: number | null | undefined, productId: number | '', variantId: number | '') => {
+    return `${Number(ruleId || 0)}:${Number(productId || 0)}:${Number(variantId || 0)}`;
+  };
+  const giftVariantSelectionCounts = useMemo(() => {
+    const counts = new Map<string, number>();
 
+    items.forEach((entry) => {
+      if (!entry.is_gift || !entry.rule_id || !entry.product_id || !entry.variant_id) {
+        return;
+      }
+
+      const key = getGiftVariantReserveKey(entry.rule_id, entry.product_id, entry.variant_id);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+
+    return counts;
+  }, [items]);
+
+  const getGiftVariantReserveRemaining = (item: OrderItem, variantId: number | ''): number | null => {
+    if (!item.is_gift || !item.rule_id || !item.product_id || !variantId) {
+      return null;
+    }
+
+    const key = getGiftVariantReserveKey(item.rule_id, item.product_id, variantId);
+    if (!Object.prototype.hasOwnProperty.call(giftVariantReserves, key)) {
+      return null;
+    }
+
+    return Math.max(0, Number(giftVariantReserves[key] ?? 0));
+  };
+  const isGiftVariantTakenByAnotherRow = (item: OrderItem, variantId: number | ''): boolean => {
+    if (!item.is_gift || !item.rule_id || !item.product_id || !variantId) {
+      return false;
+    }
+
+    if (item.variant_id && Number(item.variant_id) === Number(variantId)) {
+      return false;
+    }
+
+    const key = getGiftVariantReserveKey(item.rule_id, item.product_id, variantId);
+    return (giftVariantSelectionCounts.get(key) ?? 0) > 0;
+  };
   const subtotal = items.reduce((carry, item) => carry + Number(item.quantity || 0) * Number(item.unit_price || 0), 0);
   const discountTotal = Number(data.discount_total || 0);
   const shippingTotal = Number(data.shipping_total || 0);
@@ -377,7 +510,7 @@ export default function OrderFormView({
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <Card title={trans('hancms.sales.orders.sections.customer')} overflow="visible" contentOverflow="visible">
             <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
-              <InputGroup label={trans('hancms.sales.orders.fields.order_number')}>
+              <InputGroup label={trans('hancms.sales.orders.fields.order_number')} required>
                 <input
                   type="text"
                   className={inputClass('order_number')}
@@ -398,7 +531,7 @@ export default function OrderFormView({
                 {errors.placed_at && <MessageError>{errors.placed_at}</MessageError>}
               </InputGroup>
 
-              <InputGroup label={trans('hancms.sales.orders.fields.customer_name')}>
+              <InputGroup label={trans('hancms.sales.orders.fields.customer_name')} required>
                 <input
                   type="text"
                   className={inputClass('customer_name')}
@@ -408,7 +541,7 @@ export default function OrderFormView({
                 {errors.customer_name && <MessageError>{errors.customer_name}</MessageError>}
               </InputGroup>
 
-              <InputGroup label={trans('hancms.sales.orders.fields.customer_phone')}>
+              <InputGroup label={trans('hancms.sales.orders.fields.customer_phone')} required>
                 <input
                   type="text"
                   className={inputClass('customer_phone')}
@@ -428,7 +561,7 @@ export default function OrderFormView({
                 {errors.customer_email && <MessageError>{errors.customer_email}</MessageError>}
               </InputGroup>
 
-              <InputGroup label={trans('hancms.sales.orders.fields.payment_method')}>
+              <InputGroup label={trans('hancms.sales.orders.fields.payment_method')} required>
                 <select
                   className={inputClass('payment_method_id')}
                   value={data.payment_method_id ?? ''}
@@ -444,7 +577,7 @@ export default function OrderFormView({
                 {errors.payment_method_id && <MessageError>{errors.payment_method_id}</MessageError>}
               </InputGroup>
 
-              <InputGroup label={trans('hancms.sales.orders.fields.province')}>
+              <InputGroup label={trans('hancms.sales.orders.fields.province')} required>
                 <SearchableSelect
                   value={data.province_code || ''}
                   options={provinceSelectOptions}
@@ -463,7 +596,7 @@ export default function OrderFormView({
                 {errors.province_code && <MessageError>{errors.province_code}</MessageError>}
               </InputGroup>
 
-              <InputGroup label={trans('hancms.sales.orders.fields.ward')}>
+              <InputGroup label={trans('hancms.sales.orders.fields.ward')} required>
                 <SearchableSelect
                   value={data.ward_code || ''}
                   options={wardSelectOptions}
@@ -485,7 +618,7 @@ export default function OrderFormView({
                 {errors.ward_code && <MessageError>{errors.ward_code}</MessageError>}
               </InputGroup>
 
-              <InputGroup label={trans('hancms.sales.orders.fields.customer_address')} className="md:col-span-2">
+              <InputGroup label={trans('hancms.sales.orders.fields.customer_address')} className="md:col-span-2" required>
                 <input
                   type="text"
                   className={inputClass('customer_address')}
@@ -509,7 +642,7 @@ export default function OrderFormView({
 
           <Card title={trans('hancms.sales.orders.sections.status')}>
             <div className="space-y-4 p-6">
-              <InputGroup stacked label={trans('hancms.sales.orders.fields.order_status')}>
+              <InputGroup stacked label={trans('hancms.sales.orders.fields.order_status')} required>
                 <select className={inputClass('order_status')} value={data.order_status} onChange={(event) => setData('order_status', event.target.value)}>
                   {statusOptions.order.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -520,7 +653,7 @@ export default function OrderFormView({
                 {errors.order_status && <MessageError>{errors.order_status}</MessageError>}
               </InputGroup>
 
-              <InputGroup stacked label={trans('hancms.sales.orders.fields.payment_status')}>
+              <InputGroup stacked label={trans('hancms.sales.orders.fields.payment_status')} required>
                 <select className={inputClass('payment_status')} value={data.payment_status} onChange={(event) => setData('payment_status', event.target.value)}>
                   {statusOptions.payment.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -531,7 +664,7 @@ export default function OrderFormView({
                 {errors.payment_status && <MessageError>{errors.payment_status}</MessageError>}
               </InputGroup>
 
-              <InputGroup stacked label={trans('hancms.sales.orders.fields.shipping_status')}>
+              <InputGroup stacked label={trans('hancms.sales.orders.fields.shipping_status')} required>
                 <select className={inputClass('shipping_status')} value={data.shipping_status} onChange={(event) => setData('shipping_status', event.target.value)}>
                   {statusOptions.shipping.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -543,6 +676,31 @@ export default function OrderFormView({
               </InputGroup>
 
               <div className="grid grid-cols-1 gap-4">
+                <InputGroup stacked label={trans('hancms.sales.orders.fields.coupon_code') || 'Mã khuyến mãi'}>
+                  <input
+                    type="text"
+                    className={inputClass('coupon_code')}
+                    value={data.coupon_code || ''}
+                    placeholder="Nhập mã (nếu có)"
+                    onChange={(event) => setData('coupon_code', event.target.value)}
+                  />
+                  {errors.coupon_code && <MessageError>{errors.coupon_code}</MessageError>}
+                </InputGroup>
+
+                <div className="pt-2 hidden">
+                  <button
+                    type="button"
+                    onClick={calculatePromotions}
+                    disabled={isCalculating || items.length === 0}
+                    className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Calculator size={16} />
+                    {isCalculating ? 'Đang tính toán...' : 'Tính toán khuyến mãi'}
+                  </button>
+                </div>
+
+                <div className="mt-4 border-t border-slate-200 pt-4"></div>
+
                 <InputGroup stacked label={trans('hancms.sales.orders.fields.discount_total')}>
                   <input
                     type="number"
@@ -577,6 +735,19 @@ export default function OrderFormView({
                   <span>{trans('hancms.sales.orders.fields.discount_total')}</span>
                   <strong>{formatFromDisplay(discountTotal)}</strong>
                 </div>
+                {data.applied_promotions && data.applied_promotions.length > 0 && data.applied_promotions.some((p: any) => p.discount_amount > 0) && (
+                  <div className="flex flex-col gap-1 pl-4 text-xs text-slate-500">
+                    {data.applied_promotions.map((promo: any, index: number) => {
+                      if (!promo.discount_amount) return null;
+                      return (
+                        <div key={index} className="flex items-center justify-between">
+                          <span>- {promo.type === 'coupon' ? `Mã giảm giá: ${promo.code}` : promo.name}</span>
+                          <span>{formatFromDisplay(promo.discount_amount)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 <div className="flex items-center justify-between py-1">
                   <span>{trans('hancms.sales.orders.fields.shipping_total')}</span>
                   <strong>{formatFromDisplay(shippingTotal)}</strong>
@@ -586,6 +757,20 @@ export default function OrderFormView({
                   <strong>{formatFromDisplay(grandTotal)}</strong>
                 </div>
               </div>
+
+              {data.applied_promotions && data.applied_promotions.length > 0 && (
+                <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                  <div className="mb-2 font-semibold">Chương trình khuyến mãi đã áp dụng:</div>
+                  <ul className="list-inside list-disc space-y-1">
+                    {data.applied_promotions.map((promo: any, index: number) => (
+                      <li key={index}>
+                        {promo.type === 'coupon' ? `Mã giảm giá: ${promo.code} - ` : ''}
+                        {promo.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </Card>
         </div>
@@ -613,40 +798,58 @@ export default function OrderFormView({
                 const product = selectedProduct(item.product_id);
                 const variants = product?.variants || [];
                 const variant = selectedVariant(product, item.variant_id);
+                const selectedGiftReserveRemaining = item.is_gift && item.rule_id && item.product_id && variant?.id
+                  ? getGiftVariantReserveRemaining(item, variant.id)
+                  : null;
+                const giftVariantReserveCap = item.is_gift && item.rule_id && item.product_id
+                  ? Math.max(0, ...variants.map((entry) => getGiftVariantReserveRemaining(item, entry.id) ?? 0))
+                  : null;
                 const availableQuantity = variants.length > 0
-                  ? (variant?.stock ?? 0)
+                  ? (item.is_gift
+                    ? (selectedGiftReserveRemaining ?? giftVariantReserveCap ?? 0)
+                    : (variant?.stock ?? 0))
                   : (product?.quantity ?? 0);
+                const quantityMax = item.is_gift && variants.length > 0
+                  ? undefined
+                  : (availableQuantity || undefined);
                 const lineTotal = Number(item.quantity || 0) * Number(item.unit_price || 0);
 
                 return (
-                  <div key={`${index}-${item.product_id || 'new'}`} className="rounded-xl border border-slate-200 p-4">
+                  <div key={`${index}-${item.product_id || 'new'}`} className={`rounded-xl border p-4 ${item.is_gift ? 'border-sky-300 bg-sky-50' : 'border-slate-200'}`}>
                     <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,1.5fr)_minmax(0,120px)_minmax(0,160px)_minmax(0,180px)_auto] xl:items-start">
-                      <InputGroup stacked label={trans('hancms.sales.orders.fields.product')}>
-                          <select
-                            className={inputClass(`items.${index}.product_id`)}
-                            value={item.product_id}
-                            onChange={(event) => {
-                              const nextProduct = products.find((entry) => entry.id === Number(event.target.value));
-                              updateItem(index, {
-                                product_id: event.target.value ? Number(event.target.value) : '',
-                                variant_id: '',
-                                unit_price: convertPriceToDisplay(nextProduct?.price ?? 0, currency),
-                              });
-                            }}
-                          >
-                            <option value="">{trans('hancms.sales.orders.placeholders.product')}</option>
-                            {products.map((entry) => (
-                              <option key={entry.id} value={entry.id} disabled={Number(entry.available_quantity ?? entry.quantity ?? 0) <= 0}>
-                                {entry.name} {entry.sku ? `(${entry.sku})` : ''}{Number(entry.available_quantity ?? entry.quantity ?? 0) <= 0 ? ' - Hết hàng' : ''}
-                              </option>
-                            ))}
-                          </select>
-                          {errors[`items.${index}.product_id`] && <MessageError>{errors[`items.${index}.product_id`]}</MessageError>}
-                          {product && (
-                            <div className="mt-3 text-xs text-slate-500">
-                              {product.sku || 'N/A'} · {trans('hancms.sales.orders.fields.available_stock')}: {availableQuantity}
-                            </div>
-                          )}
+                      <InputGroup stacked label={
+                        <div className="flex items-center gap-2">
+                          {trans('hancms.sales.orders.fields.product')}
+                          {item.is_gift && <span className="flex items-center gap-1 rounded bg-sky-100 px-1.5 py-0.5 text-xs font-semibold text-sky-700"><Gift size={12} /> Quà tặng</span>}
+                        </div>
+                      }>
+                        <select
+                          className={inputClass(`items.${index}.product_id`)}
+                          value={item.product_id}
+                          onChange={(event) => {
+                            const nextProduct = products.find((entry) => entry.id === Number(event.target.value));
+                            updateItem(index, {
+                              product_id: event.target.value ? Number(event.target.value) : '',
+                              variant_id: '',
+                              unit_price: item.is_gift
+                                ? 0
+                                : convertPriceToDisplay(nextProduct?.price ?? 0, currency),
+                            });
+                          }}
+                        >
+                          <option value="">{trans('hancms.sales.orders.placeholders.product')}</option>
+                          {products.map((entry) => (
+                            <option key={entry.id} value={entry.id} disabled={Number(entry.available_quantity ?? entry.quantity ?? 0) <= 0}>
+                              {entry.name} {entry.sku ? `(${entry.sku})` : ''}{Number(entry.available_quantity ?? entry.quantity ?? 0) <= 0 ? ' - Hết hàng' : ''}
+                            </option>
+                          ))}
+                        </select>
+                        {errors[`items.${index}.product_id`] && <MessageError>{errors[`items.${index}.product_id`]}</MessageError>}
+                        {product && (
+                          <div className="mt-3 text-xs text-slate-500">
+                            {product.sku || 'N/A'} · {trans('hancms.sales.orders.fields.available_stock')}: {availableQuantity}
+                          </div>
+                        )}
                       </InputGroup>
 
                       <InputGroup stacked label={trans('hancms.sales.orders.fields.variant') || 'Variant'}>
@@ -655,11 +858,19 @@ export default function OrderFormView({
                           value={item.variant_id ?? ''}
                           onChange={(event) => {
                             const nextVariant = variants.find((entry) => entry.id === Number(event.target.value));
+                            const nextGiftReserveRemaining = item.is_gift
+                              ? getGiftVariantReserveRemaining(item, nextVariant?.id || '')
+                              : null;
                             updateItem(index, {
                               variant_id: event.target.value ? Number(event.target.value) : '',
-                              unit_price: nextVariant
-                                ? convertPriceToDisplay(nextVariant.price ?? 0, currency)
-                                : item.unit_price,
+                              unit_price: item.is_gift
+                                ? 0
+                                : (nextVariant
+                                  ? convertPriceToDisplay(nextVariant.price ?? 0, currency)
+                                  : item.unit_price),
+                              quantity: item.is_gift && nextGiftReserveRemaining !== null && nextGiftReserveRemaining > 0
+                                ? Math.min(Number(item.quantity || 1), nextGiftReserveRemaining)
+                                : item.quantity,
                             });
                           }}
                           disabled={!product || variants.length === 0}
@@ -668,8 +879,21 @@ export default function OrderFormView({
                             {variants.length > 0 ? trans('hancms.placeholder.select') : trans('hancms.sales.orders.fields.no_variant') || 'No variant'}
                           </option>
                           {variants.map((entry) => (
-                            <option key={entry.id} value={entry.id} disabled={Number(entry.stock ?? 0) <= 0}>
-                              {entry.label} {entry.sku ? `(${entry.sku})` : ''}{Number(entry.stock ?? 0) <= 0 ? ' - Hết hàng' : ''}
+                            <option
+                              key={entry.id}
+                              value={entry.id}
+                              disabled={item.is_gift
+                                ? (getGiftVariantReserveRemaining(item, entry.id) ?? 0) <= 0 || isGiftVariantTakenByAnotherRow(item, entry.id)
+                                : Number(entry.stock ?? 0) <= 0}
+                            >
+                              {entry.label} {entry.sku ? `(${entry.sku})` : ''}
+                              {item.is_gift
+                                ? (isGiftVariantTakenByAnotherRow(item, entry.id)
+                                  ? ' - Đã chọn ở dòng khác'
+                                  : ((getGiftVariantReserveRemaining(item, entry.id) ?? 0) <= 0
+                                  ? ' - Hết tạm giữ'
+                                  : ` - Tạm giữ ${(getGiftVariantReserveRemaining(item, entry.id) ?? 0)}`))
+                                : (Number(entry.stock ?? 0) <= 0 ? ' - Hết hàng' : '')}
                             </option>
                           ))}
                         </select>
@@ -680,12 +904,24 @@ export default function OrderFormView({
                         <input
                           type="number"
                           min={1}
-                          max={availableQuantity || undefined}
+                          max={quantityMax}
                           className={inputClass(`items.${index}.quantity`)}
                           value={item.quantity}
-                          onChange={(event) => updateItem(index, { quantity: Number(event.target.value || 1) })}
+                          onChange={(event) => {
+                            const nextQuantity = Number(event.target.value || 1);
+                            updateItem(index, {
+                              quantity: item.is_gift && selectedGiftReserveRemaining !== null && selectedGiftReserveRemaining > 0
+                                ? Math.min(nextQuantity, selectedGiftReserveRemaining)
+                                : nextQuantity,
+                            });
+                          }}
                         />
                         {errors[`items.${index}.quantity`] && <MessageError>{errors[`items.${index}.quantity`]}</MessageError>}
+                        {item.is_gift && item.rule_id && (
+                          <div className="mt-2 text-xs text-sky-600">
+                            {trans('hancms.sales.orders.fields.available_stock')}: {availableQuantity}
+                          </div>
+                        )}
                       </InputGroup>
 
                       <InputGroup stacked label={trans('hancms.sales.orders.fields.unit_price')}>
@@ -696,6 +932,7 @@ export default function OrderFormView({
                           className={inputClass(`items.${index}.unit_price`)}
                           value={item.unit_price}
                           onChange={(event) => updateItem(index, { unit_price: Number(event.target.value || 0) })}
+                          disabled={item.is_gift}
                         />
                         {errors[`items.${index}.unit_price`] && <MessageError>{errors[`items.${index}.unit_price`]}</MessageError>}
                       </InputGroup>

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductVariant;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -90,6 +91,15 @@ class WarehouseInventoryHistoryTest extends TestCase
             'hit_order' => 0,
         ]);
 
+        ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'sku' => 'WAREHOUSE-VARIANT-BLUE-L',
+            'price' => 118000,
+            'stock' => 4,
+            'image' => null,
+            'images' => null,
+        ]);
+
         $variant = ProductVariant::query()->create([
             'product_id' => $product->id,
             'sku' => 'WAREHOUSE-VARIANT-RED-XL',
@@ -97,6 +107,11 @@ class WarehouseInventoryHistoryTest extends TestCase
             'stock' => 3,
             'image' => null,
             'images' => null,
+        ]);
+
+        $product->update([
+            'quantity' => 7,
+            'is_stock' => true,
         ]);
 
         $response = $this->put(route('warehouse.variants.update', $variant->id), [
@@ -109,6 +124,7 @@ class WarehouseInventoryHistoryTest extends TestCase
 
         $response->assertRedirect(route('warehouse.variants.edit', $variant->id));
         $this->assertSame(11, (int) $variant->fresh()->stock);
+        $this->assertSame(15, (int) $product->fresh()->quantity);
 
         $history = $product->adjustmentHistories()->latest('id')->first();
 
@@ -117,5 +133,83 @@ class WarehouseInventoryHistoryTest extends TestCase
         $this->assertSame(3, (int) $history->old_quantity);
         $this->assertSame(11, (int) $history->new_quantity);
         $this->assertSame($variant->id, (int) data_get($history->meta, 'variant_id'));
+    }
+
+    #[Test]
+    public function it_blocks_manual_parent_stock_updates_when_the_product_has_variants(): void
+    {
+        $this->withoutMiddleware();
+
+        $product = Product::query()->create([
+            'sku' => 'WAREHOUSE-PARENT-BLOCKED',
+            'quantity' => 7,
+            'weight' => 1,
+            'price' => 100000,
+            'is_coupon' => false,
+            'is_stock' => true,
+            'status' => 1,
+            'order' => 1,
+            'hit_viewer' => 0,
+            'hit_order' => 0,
+        ]);
+
+        ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'sku' => 'WAREHOUSE-PARENT-BLOCKED-RED',
+            'price' => 120000,
+            'stock' => 3,
+            'image' => null,
+            'images' => null,
+        ]);
+
+        $response = $this->put(route('warehouse.update', $product->id), [
+            'action' => 'set',
+            'set_quantity' => 20,
+            'adjust_delta' => 0,
+            'reason' => 'Should be blocked',
+            'undo' => 0,
+        ]);
+
+        $response->assertRedirect(route('warehouse.edit', $product->id));
+        $response->assertSessionHas('error', __('hancms.sales.warehouse.messages.parent_stock_managed_by_variants'));
+        $this->assertSame(7, (int) $product->fresh()->quantity);
+    }
+
+    #[Test]
+    public function it_exposes_variants_on_the_parent_warehouse_edit_page(): void
+    {
+        $this->withoutMiddleware();
+
+        $product = Product::query()->create([
+            'sku' => 'WAREHOUSE-PARENT-EDIT',
+            'quantity' => 9,
+            'weight' => 1,
+            'price' => 100000,
+            'is_coupon' => false,
+            'is_stock' => true,
+            'status' => 1,
+            'order' => 1,
+            'hit_viewer' => 0,
+            'hit_order' => 0,
+        ]);
+
+        $variant = ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'sku' => 'WAREHOUSE-PARENT-EDIT-RED',
+            'price' => 120000,
+            'stock' => 5,
+            'image' => null,
+            'images' => null,
+        ]);
+
+        $response = $this->get(route('warehouse.edit', $product->id));
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Sales/Warehouse/Edit')
+            ->where('item.id', $product->id)
+            ->where('item.variants.0.id', $variant->id)
+            ->where('item.variants.0.quantity', 5)
+        );
     }
 }

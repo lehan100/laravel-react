@@ -31,6 +31,7 @@ export default function CreatedPage() {
     shipping_total: 0,
     placed_at: new Date().toISOString().slice(0, 16),
     items: [],
+    coupon_code: '',
     undo: 0,
   });
   form.transform((payload: any) => ({

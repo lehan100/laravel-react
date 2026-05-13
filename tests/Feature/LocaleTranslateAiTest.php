@@ -110,6 +110,44 @@ class LocaleTranslateAiTest extends TestCase
     }
 
     #[Test]
+    public function it_translates_attribute_values_for_other_locales(): void
+    {
+        $account = Account::forceCreate(['name' => 'Demo Account']);
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+        ]);
+
+        Ai::fakeAgent(StructuredAnonymousAgent::class, [
+            [
+                'translations' => [
+                    'en' => [
+                        'value' => 'Blue',
+                    ],
+                    'ja' => [
+                        'value' => '青',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)
+            ->withoutMiddleware(PermissionMiddleware::class)
+            ->post(route('ai.translate'), [
+                'module' => 'attribute',
+                'source_locale' => 'vi',
+                'target_locales' => ['en', 'ja'],
+                'fields' => [
+                    'value' => 'Xanh dương',
+                ],
+            ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('translations.en.value', 'Blue');
+        $response->assertJsonPath('translations.ja.value', '青');
+        $response->assertJsonMissingPath('translations.vi');
+    }
+
+    #[Test]
     public function it_keeps_the_original_target_locale_codes_in_the_response(): void
     {
         $account = Account::forceCreate(['name' => 'Demo Account']);

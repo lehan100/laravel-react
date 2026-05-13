@@ -76,6 +76,11 @@ class BuyToGiftController extends MainController
             $params = $request->all();
             $offer = $this->mainModel->save($params, ['task' => 'add-item']);
 
+            if (! $offer) {
+                return Redirect::back()
+                    ->with('error', __('hancms.message.error.created', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
+            }
+
             if (($params['undo'] ?? 0) == 1) {
                 return Redirect::to(route($this->routeName.'index'))
                     ->with('success', __('hancms.message.success.created', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
@@ -152,22 +157,27 @@ class BuyToGiftController extends MainController
 
     public function update(BuyToGiftRequest $request, string $id): RedirectResponse
     {
-        try {
-            $params = $request->all();
-            $params['id'] = $id;
-            $offer = $this->mainModel->save($params, ['task' => 'edit-item']);
+        // try {
+        $params = $request->all();
+        $params['id'] = $id;
+        $offer = $this->mainModel->save($params, ['task' => 'edit-item']);
 
-            if (($params['undo'] ?? 0) == 1) {
-                return Redirect::to(route($this->routeName.'index'))
-                    ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
-            }
-
-            return Redirect::route($this->routeName.'edit', $offer->id)
-                ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
-        } catch (\Throwable $th) {
+        if (! $offer) {
             return Redirect::back()
                 ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
         }
+
+        if (($params['undo'] ?? 0) == 1) {
+            return Redirect::to(route($this->routeName.'index'))
+                ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
+        }
+
+        return Redirect::route($this->routeName.'edit', $offer->id)
+            ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
+        // } catch (\Throwable $th) {
+        //     return Redirect::back()
+        //         ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.promotion.buytogift.name'))]));
+        // }
     }
 
     public function destroy(string $id): RedirectResponse
@@ -218,13 +228,14 @@ class BuyToGiftController extends MainController
 
         $rules = $item->relationLoaded('rules')
             ? $item->rules
-            : $item->rules()->with(['buyProducts:id', 'giftProducts:id'])->get();
+            : $item->rules()->with(['buyProducts:id', 'giftProducts:id', 'giftVariantOptions:product_id'])->get();
 
         return $rules->flatMap(function ($rule) {
             $buyIds = $rule->buyProducts?->pluck('id')->all() ?? [];
             $giftIds = $rule->giftProducts?->pluck('id')->all() ?? [];
+            $giftVariantIds = $rule->giftVariantOptions?->pluck('product_id')->all() ?? [];
 
-            return array_merge($buyIds, $giftIds);
+            return array_merge($buyIds, $giftIds, $giftVariantIds);
         })->map(fn ($id) => (int) $id)->unique()->values()->all();
     }
 }

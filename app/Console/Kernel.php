@@ -25,6 +25,10 @@ class Kernel extends ConsoleKernel
         $schedule->job(new EnsureFrontendTranslationBundles)
             ->everyMinute()
             ->withoutOverlapping(5);
+
+        $schedule->command('promotion:buytogift-release-expired-stock')
+            ->everyMinute()
+            ->withoutOverlapping(10);
     }
 
     /**

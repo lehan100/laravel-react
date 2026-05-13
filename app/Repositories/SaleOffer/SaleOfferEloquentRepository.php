@@ -6,6 +6,7 @@ use App\Models\Catalog\Product;
 use App\Models\Promotion\PromotionCampaign;
 use App\Models\Promotion\PromotionSaleOffer;
 use App\Repositories\EloquentRepository;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -245,5 +246,22 @@ class SaleOfferEloquentRepository extends EloquentRepository implements SaleOffe
         }
 
         return round(max(0, min($rawDiscount, $price)), 2);
+    }
+
+    public function getActiveOffersForCalculation(Carbon $now): Collection
+    {
+        return $this->_model->query()
+            ->where('is_active', true)
+            ->where(fn ($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now))
+            ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now))
+            ->orderBy('priority')
+            ->orderBy('id')
+            ->with('products:id')
+            ->get();
+    }
+
+    public function getAllOffers(): Collection
+    {
+        return $this->_model->query()->get();
     }
 }

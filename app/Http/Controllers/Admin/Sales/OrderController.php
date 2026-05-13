@@ -8,6 +8,7 @@ use App\Http\Resources\Sales\OrderCollection;
 use App\Http\Resources\Sales\OrderResource;
 use App\Models\Sales\Order;
 use App\Repositories\Order\OrderRepositoryInterface as RepositoryInterface;
+use App\Services\Promotion\PromotionEngineService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
@@ -115,7 +116,9 @@ class OrderController extends MainController
         }
 
         try {
+            \Log::info('Order Update Request', ['all' => $request->all()]);
             $params = $request->validated();
+            \Log::info('Order Update Validated', ['params' => $params]);
             $params['id'] = $id;
             $item = $this->mainModel->save($params, ['task' => 'edit-item']);
 
@@ -203,5 +206,27 @@ class OrderController extends MainController
             $item->order_number ?: '#'.$item->id,
             trim((string) $item->customer_name) !== '' ? trim((string) $item->customer_name) : '---'
         );
+    }
+
+    public function calculatePromotions(Request $request, PromotionEngineService $promotionEngine)
+    {
+        $items = $request->input('items', []);
+        $couponCode = $request->input('coupon_code');
+        $orderId = $request->integer('order_id') ?: null;
+
+        // Normalize items array
+        $normalizedItems = collect($items)->map(function ($item) {
+            return [
+                'product_id' => (int) ($item['product_id'] ?? 0),
+                'variant_id' => ! empty($item['variant_id']) ? (int) $item['variant_id'] : null,
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'unit_price' => (float) ($item['unit_price'] ?? 0),
+                'is_gift' => (bool) ($item['is_gift'] ?? false),
+            ];
+        })->all();
+
+        $result = $promotionEngine->calculate($normalizedItems, $couponCode, $orderId);
+
+        return response()->json($result);
     }
 }

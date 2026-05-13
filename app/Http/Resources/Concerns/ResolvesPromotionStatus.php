@@ -12,24 +12,35 @@ trait ResolvesPromotionStatus
             return 'inactive';
         }
 
-        if ($startsAt && $this->isFutureDate($startsAt)) {
+        $now = Carbon::now($this->promotionStatusTimezone());
+        $startsDate = $this->normalizePromotionDate($startsAt);
+        $endsDate = $this->normalizePromotionDate($endsAt);
+
+        if ($startsDate && $startsDate->greaterThan($now)) {
             return 'upcoming';
         }
 
-        if ($endsAt && $this->isPastDate($endsAt)) {
+        if ($endsDate && $endsDate->lessThan($now)) {
             return 'expired';
         }
 
         return 'active';
     }
 
-    protected function isFutureDate(Carbon|string $value): bool
+    protected function normalizePromotionDate(Carbon|string|null $value): ?Carbon
     {
-        return $value instanceof Carbon ? $value->isFuture() : Carbon::parse($value)->isFuture();
+        if ($value === null) {
+            return null;
+        }
+
+        $timezone = $this->promotionStatusTimezone();
+        $dateString = $value instanceof Carbon ? $value->format('Y-m-d H:i:s') : (string) $value;
+
+        return Carbon::parse($dateString, $timezone);
     }
 
-    protected function isPastDate(Carbon|string $value): bool
+    protected function promotionStatusTimezone(): string
     {
-        return $value instanceof Carbon ? $value->isPast() : Carbon::parse($value)->isPast();
+        return config('app.admin_timezone', 'Asia/Ho_Chi_Minh');
     }
 }

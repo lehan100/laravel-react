@@ -44,7 +44,8 @@ class PostRequest extends FormRequest
     {
         return [
             'category_id' => mb_strtolower(__('hancms.catalog.category.name')),
-            'translations.*.name' => mb_strtolower(__('hancms.column.name')),
+            'type' => mb_strtolower(__('hancms.catalog.post.fields.type')),
+            'translations.*.name' => mb_strtolower(__('hancms.catalog.post.fields.name')),
             'translations.*.slug' => mb_strtolower(__('hancms.column.slug')),
         ];
     }

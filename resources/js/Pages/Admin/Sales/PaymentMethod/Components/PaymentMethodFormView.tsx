@@ -49,6 +49,12 @@ export default function PaymentMethodFormView({
     });
   };
 
+  const provider = data.provider || data.code;
+  const isMomo = provider === 'momo';
+  const isZaloPay = provider === 'zalopay';
+  const isVNPay = provider === 'vnpay';
+  const isPayPal = provider === 'paypal';
+  const isCod = provider === 'cash_on_delivery';
   const renderSettingError = (fieldName: string) => {
     if (!errors[fieldName]) {
       return null;
@@ -58,64 +64,62 @@ export default function PaymentMethodFormView({
   };
 
   const renderGatewaySettings = () => {
-    const provider = data.provider || data.code;
-
-    if (provider === 'momo') {
+    if (isMomo) {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.partner_code')}><input type="text" className={inputClass('settings.partner_code')} value={data.settings?.partner_code || ''} onChange={(e) => updateSetting('partner_code', e.target.value)} />{renderSettingError('settings.partner_code')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.access_key')}><input type="text" className={inputClass('settings.access_key')} value={data.settings?.access_key || ''} onChange={(e) => updateSetting('access_key', e.target.value)} />{renderSettingError('settings.access_key')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.secret_key')}><input type="text" className={inputClass('settings.secret_key')} value={data.settings?.secret_key || ''} onChange={(e) => updateSetting('secret_key', e.target.value)} />{renderSettingError('settings.secret_key')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.return_url')}><input type="text" className={inputClass('settings.return_url')} value={data.settings?.return_url || ''} onChange={(e) => updateSetting('return_url', e.target.value)} />{renderSettingError('settings.return_url')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.partner_code')}><input type="text" className={inputClass('settings.partner_code')} value={data.settings?.partner_code || ''} onChange={(e) => updateSetting('partner_code', e.target.value)} />{renderSettingError('settings.partner_code')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.access_key')}><input type="text" className={inputClass('settings.access_key')} value={data.settings?.access_key || ''} onChange={(e) => updateSetting('access_key', e.target.value)} />{renderSettingError('settings.access_key')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.secret_key')}><input type="text" className={inputClass('settings.secret_key')} value={data.settings?.secret_key || ''} onChange={(e) => updateSetting('secret_key', e.target.value)} />{renderSettingError('settings.secret_key')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.return_url')}><input type="text" className={inputClass('settings.return_url')} value={data.settings?.return_url || ''} onChange={(e) => updateSetting('return_url', e.target.value)} />{renderSettingError('settings.return_url')}</InputGroup>
           <InputGroup label={trans('hancms.sales.payment_methods.fields.ipn_url')}><input type="text" className={inputClass('settings.ipn_url')} value={data.settings?.ipn_url || ''} onChange={(e) => updateSetting('ipn_url', e.target.value)} />{renderSettingError('settings.ipn_url')}</InputGroup>
         </>
       );
     }
 
-    if (provider === 'zalopay') {
+    if (isZaloPay) {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.app_id')}><input type="text" className={inputClass('settings.app_id')} value={data.settings?.app_id || ''} onChange={(e) => updateSetting('app_id', e.target.value)} />{renderSettingError('settings.app_id')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.key1')}><input type="text" className={inputClass('settings.key1')} value={data.settings?.key1 || ''} onChange={(e) => updateSetting('key1', e.target.value)} />{renderSettingError('settings.key1')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.key2')}><input type="text" className={inputClass('settings.key2')} value={data.settings?.key2 || ''} onChange={(e) => updateSetting('key2', e.target.value)} />{renderSettingError('settings.key2')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.app_id')}><input type="text" className={inputClass('settings.app_id')} value={data.settings?.app_id || ''} onChange={(e) => updateSetting('app_id', e.target.value)} />{renderSettingError('settings.app_id')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.key1')}><input type="text" className={inputClass('settings.key1')} value={data.settings?.key1 || ''} onChange={(e) => updateSetting('key1', e.target.value)} />{renderSettingError('settings.key1')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.key2')}><input type="text" className={inputClass('settings.key2')} value={data.settings?.key2 || ''} onChange={(e) => updateSetting('key2', e.target.value)} />{renderSettingError('settings.key2')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
           <InputGroup label={trans('hancms.sales.payment_methods.fields.callback_url')}><input type="text" className={inputClass('settings.callback_url')} value={data.settings?.callback_url || ''} onChange={(e) => updateSetting('callback_url', e.target.value)} />{renderSettingError('settings.callback_url')}</InputGroup>
         </>
       );
     }
 
-    if (provider === 'vnpay') {
+    if (isVNPay) {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.tmn_code')}><input type="text" className={inputClass('settings.tmn_code')} value={data.settings?.tmn_code || ''} onChange={(e) => updateSetting('tmn_code', e.target.value)} />{renderSettingError('settings.tmn_code')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.hash_secret')}><input type="text" className={inputClass('settings.hash_secret')} value={data.settings?.hash_secret || ''} onChange={(e) => updateSetting('hash_secret', e.target.value)} />{renderSettingError('settings.hash_secret')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.return_url')}><input type="text" className={inputClass('settings.return_url')} value={data.settings?.return_url || ''} onChange={(e) => updateSetting('return_url', e.target.value)} />{renderSettingError('settings.return_url')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.tmn_code')}><input type="text" className={inputClass('settings.tmn_code')} value={data.settings?.tmn_code || ''} onChange={(e) => updateSetting('tmn_code', e.target.value)} />{renderSettingError('settings.tmn_code')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.hash_secret')}><input type="text" className={inputClass('settings.hash_secret')} value={data.settings?.hash_secret || ''} onChange={(e) => updateSetting('hash_secret', e.target.value)} />{renderSettingError('settings.hash_secret')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.return_url')}><input type="text" className={inputClass('settings.return_url')} value={data.settings?.return_url || ''} onChange={(e) => updateSetting('return_url', e.target.value)} />{renderSettingError('settings.return_url')}</InputGroup>
         </>
       );
     }
 
-    if (provider === 'paypal') {
+    if (isPayPal) {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.client_id')}><input type="text" className={inputClass('settings.client_id')} value={data.settings?.client_id || ''} onChange={(e) => updateSetting('client_id', e.target.value)} />{renderSettingError('settings.client_id')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.client_secret')}><input type="text" className={inputClass('settings.client_secret')} value={data.settings?.client_secret || ''} onChange={(e) => updateSetting('client_secret', e.target.value)} />{renderSettingError('settings.client_secret')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.mode')}><input type="text" className={inputClass('settings.mode')} value={data.settings?.mode || ''} onChange={(e) => updateSetting('mode', e.target.value)} />{renderSettingError('settings.mode')}</InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.client_id')}><input type="text" className={inputClass('settings.client_id')} value={data.settings?.client_id || ''} onChange={(e) => updateSetting('client_id', e.target.value)} />{renderSettingError('settings.client_id')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.client_secret')}><input type="text" className={inputClass('settings.client_secret')} value={data.settings?.client_secret || ''} onChange={(e) => updateSetting('client_secret', e.target.value)} />{renderSettingError('settings.client_secret')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.mode')}><input type="text" className={inputClass('settings.mode')} value={data.settings?.mode || ''} onChange={(e) => updateSetting('mode', e.target.value)} />{renderSettingError('settings.mode')}</InputGroup>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.endpoint')}><input type="text" className={inputClass('settings.endpoint')} value={data.settings?.endpoint || ''} onChange={(e) => updateSetting('endpoint', e.target.value)} />{renderSettingError('settings.endpoint')}</InputGroup>
           <InputGroup label={trans('hancms.sales.payment_methods.fields.webhook_id')}><input type="text" className={inputClass('settings.webhook_id')} value={data.settings?.webhook_id || ''} onChange={(e) => updateSetting('webhook_id', e.target.value)} />{renderSettingError('settings.webhook_id')}</InputGroup>
         </>
       );
     }
 
-    if (provider === 'cash_on_delivery') {
+    if (isCod) {
       return (
         <>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.instructions')}>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.instructions')}>
             <input type="text" className={inputClass('settings.instructions')} value={data.settings?.instructions || ''} onChange={(e) => updateSetting('instructions', e.target.value)} />
             {renderSettingError('settings.instructions')}
           </InputGroup>
-          <InputGroup label={trans('hancms.sales.payment_methods.fields.cod_fee')}>
+          <InputGroup required label={trans('hancms.sales.payment_methods.fields.cod_fee')}>
             <input type="text" className={inputClass('settings.cod_fee')} value={data.settings?.cod_fee || ''} onChange={(e) => updateSetting('cod_fee', e.target.value)} />
             {renderSettingError('settings.cod_fee')}
           </InputGroup>
@@ -156,18 +160,21 @@ export default function PaymentMethodFormView({
               inactiveLabel={trans('hancms.status.inactive')}
             />
 
-            <InputGroup label={trans('hancms.column.code')}>
+            <InputGroup required label={trans('hancms.column.code')}>
               <select
                 className={inputClass('code')}
                 value={data.code}
                 onChange={(e) => {
                   const provider = e.target.value;
                   const selected = providerOptions.find((item) => item.value === provider);
-                  setData('code', provider);
-                  setData('provider', provider);
-                  if (!data.name || providerOptions.some((item) => item.label === data.name)) {
-                    setData('name', selected?.label || provider);
-                  }
+                  setData((current: any) => ({
+                    ...current,
+                    code: provider,
+                    provider,
+                    name: !current.name || providerOptions.some((item) => item.label === current.name)
+                      ? (selected?.label || provider)
+                      : current.name,
+                  }));
                 }}
               >
                 {providerOptions.map((option) => (
@@ -177,8 +184,8 @@ export default function PaymentMethodFormView({
               {errors.code && <MessageError>{errors.code}</MessageError>}
             </InputGroup>
 
-            <InputGroup label={trans('hancms.column.name')}>
-              <input type="text" required className={inputClass('name')} value={data.name} onChange={(e) => setData('name', e.target.value)} />
+            <InputGroup required label={trans('hancms.column.name')}>
+              <input type="text" className={inputClass('name')} value={data.name} onChange={(e) => setData('name', e.target.value)} />
               {errors.name && <MessageError>{errors.name}</MessageError>}
             </InputGroup>
 

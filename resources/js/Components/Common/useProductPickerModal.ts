@@ -13,6 +13,15 @@ export type ProductPickerRow = {
     price: number;
     quantity?: number | string;
     is_stock?: number | string | boolean;
+    has_variants?: boolean;
+    variants?: Array<{
+        id: number;
+        sku?: string | null;
+        name?: string;
+        label?: string;
+        price?: number;
+        stock?: number;
+    }>;
     campaigns?: Array<{
         id: number;
         name: string;

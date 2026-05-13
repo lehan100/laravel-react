@@ -26,6 +26,11 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
             ->get();
         $validOrders = $orders->where('order_status', '!=', 'cancelled');
         $paidOrders = $validOrders->where('payment_status', 'paid');
+        $inventoryProducts = Product::query()
+            ->with(['translations' => fn ($query) => $query->whereIn('locale', [app()->getLocale(), 'vi'])])
+            ->withCount('variants')
+            ->withSum('variants', 'stock')
+            ->get();
 
         return [
             'metrics' => [
@@ -49,7 +54,7 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
                 ],
                 [
                     'label' => __('hancms.dashboard.metrics.low_stock'),
-                    'value' => Product::query()->where('quantity', '>', 0)->where('quantity', '<=', 5)->count(),
+                    'value' => $inventoryProducts->filter(fn (Product $product) => $this->effectiveStock($product) > 0 && $this->effectiveStock($product) <= 5)->count(),
                     'hint' => __('hancms.dashboard.metrics.low_stock_hint'),
                     'tone' => 'amber',
                 ],
@@ -60,12 +65,12 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
                 'categories' => Category::query()->count(),
                 'users' => User::query()->count(),
                 'active_promotions' => $this->activePromotions(),
-                'out_of_stock' => Product::query()->where('quantity', '<=', 0)->count(),
+                'out_of_stock' => $inventoryProducts->filter(fn (Product $product) => $this->effectiveStock($product) <= 0)->count(),
             ],
             'revenueChart' => $this->dailyRevenue($validOrders, $startDate),
             'orderStatusChart' => $this->statusChart($orders),
             'topProducts' => $this->topProducts($startDate, $endDate),
-            'stockAlerts' => $this->stockAlerts(),
+            'stockAlerts' => $this->stockAlerts($inventoryProducts),
             'recentOrders' => $orders->take(6)->map(fn (Order $order) => [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -130,18 +135,16 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
             ->all();
     }
 
-    private function stockAlerts(): array
+    private function stockAlerts(Collection $inventoryProducts): array
     {
-        return Product::query()
-            ->with(['translations' => fn ($query) => $query->whereIn('locale', [app()->getLocale(), 'vi'])])
-            ->orderBy('quantity')
-            ->limit(6)
-            ->get()
+        return $inventoryProducts
+            ->sortBy(fn (Product $product) => $this->effectiveStock($product))
+            ->take(6)
             ->map(fn (Product $product) => [
                 'id' => $product->id,
                 'name' => $this->productName($product),
                 'sku' => $product->sku,
-                'quantity' => (int) $product->quantity,
+                'quantity' => $this->effectiveStock($product),
             ])
             ->values()
             ->all();
@@ -167,6 +170,14 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
             ?? $product->translations->first();
 
         return $translation?->name ?: ($product->sku ?: '#'.$product->id);
+    }
+
+    private function effectiveStock(Product $product): int
+    {
+        $variantCount = (int) ($product->variants_count ?? 0);
+        $variantStock = (int) ($product->variants_sum_stock ?? 0);
+
+        return $variantCount > 0 ? $variantStock : (int) ($product->quantity ?? 0);
     }
 
     private function money(mixed $value): string

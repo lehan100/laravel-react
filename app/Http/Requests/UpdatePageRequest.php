@@ -39,6 +39,15 @@ class UpdatePageRequest extends FormRequest
         ];
     }
 
+    public function attributes(): array
+    {
+        return [
+            'title' => mb_strtolower(__('hancms.column.name')),
+            'field_group_id' => mb_strtolower(__('hancms.content.field_design')),
+            'translations.*.title' => mb_strtolower(__('hancms.column.name')),
+        ];
+    }
+
     private function normalizeSlug(string $value): string
     {
         $slug = strtolower(trim($value));

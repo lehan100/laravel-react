@@ -52,7 +52,7 @@ const GeneralTab = ({ data, setData, trans, positions = [], errors }: GeneralTab
     return (
         <div className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
-                <InputGroup label={trans('hancms.column.status')} align="center">
+                <InputGroup label={trans('hancms.column.status')} required align="center">
                     <StatusSwitch
                         value={data.status}
                         onChange={(value) => setData('status', value)}
@@ -63,7 +63,7 @@ const GeneralTab = ({ data, setData, trans, positions = [], errors }: GeneralTab
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
-                <InputGroup label={trans('hancms.media.position.name')} align="center">
+                <InputGroup label={trans('hancms.media.position.name')} required align="center">
                     <div className="relative w-full" ref={dropdownRef}>
                         <div
                             onClick={() => setIsOpen(!isOpen)}

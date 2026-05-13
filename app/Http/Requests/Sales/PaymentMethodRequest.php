@@ -62,6 +62,35 @@ class PaymentMethodRequest extends FormRequest
         ];
     }
 
+    public function attributes(): array
+    {
+        return [
+            'code' => mb_strtolower(__('hancms.column.code')),
+            'provider' => mb_strtolower(__('hancms.sales.payment_methods.name')),
+            'name' => mb_strtolower(__('hancms.column.name')),
+            'description' => mb_strtolower(__('hancms.column.description')),
+            'sort_order' => mb_strtolower(__('hancms.column.order')),
+            'settings.instructions' => mb_strtolower(__('hancms.sales.payment_methods.fields.instructions')),
+            'settings.cod_fee' => mb_strtolower(__('hancms.sales.payment_methods.fields.cod_fee')),
+            'settings.partner_code' => mb_strtolower(__('hancms.sales.payment_methods.fields.partner_code')),
+            'settings.access_key' => mb_strtolower(__('hancms.sales.payment_methods.fields.access_key')),
+            'settings.secret_key' => mb_strtolower(__('hancms.sales.payment_methods.fields.secret_key')),
+            'settings.app_id' => mb_strtolower(__('hancms.sales.payment_methods.fields.app_id')),
+            'settings.key1' => mb_strtolower(__('hancms.sales.payment_methods.fields.key1')),
+            'settings.key2' => mb_strtolower(__('hancms.sales.payment_methods.fields.key2')),
+            'settings.tmn_code' => mb_strtolower(__('hancms.sales.payment_methods.fields.tmn_code')),
+            'settings.hash_secret' => mb_strtolower(__('hancms.sales.payment_methods.fields.hash_secret')),
+            'settings.client_id' => mb_strtolower(__('hancms.sales.payment_methods.fields.client_id')),
+            'settings.client_secret' => mb_strtolower(__('hancms.sales.payment_methods.fields.client_secret')),
+            'settings.mode' => mb_strtolower(__('hancms.sales.payment_methods.fields.mode')),
+            'settings.endpoint' => mb_strtolower(__('hancms.sales.payment_methods.fields.endpoint')),
+            'settings.return_url' => mb_strtolower(__('hancms.sales.payment_methods.fields.return_url')),
+            'settings.ipn_url' => mb_strtolower(__('hancms.sales.payment_methods.fields.ipn_url')),
+            'settings.callback_url' => mb_strtolower(__('hancms.sales.payment_methods.fields.callback_url')),
+            'settings.webhook_id' => mb_strtolower(__('hancms.sales.payment_methods.fields.webhook_id')),
+        ];
+    }
+
     private function normalizeNullableString(mixed $value): ?string
     {
         if ($value === null) {

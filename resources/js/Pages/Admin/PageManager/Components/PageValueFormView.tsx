@@ -209,6 +209,13 @@ export default function PageValueFormView({
         );
     };
 
+    const requiredLabel = (label: string): JSX.Element => (
+        <span className="inline-flex items-center gap-1 whitespace-nowrap">
+            <span>{label}</span>
+            <span className="text-rose-500">*</span>
+        </span>
+    );
+
     useEffect(() => {
         if (!languages.some((language) => language.code === activeLocale) && languages[0]) {
             setActiveLocale(languages[0].code);
@@ -630,7 +637,9 @@ export default function PageValueFormView({
         if (field.type === 'textarea') {
             return (
                 <div key={`${locale}-${field.key}`}>
-                    <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
+                    <label className="text-sm font-semibold text-slate-700">
+                        {field.required ? requiredLabel(field.label || field.key) : (field.label || field.key)}
+                    </label>
                     <textarea
                         value={value}
                         onChange={(event) => updateContentValue(locale, field.key, event.target.value)}
@@ -645,7 +654,9 @@ export default function PageValueFormView({
         if (field.type === 'editorMCE') {
             return (
                 <div key={`${locale}-${field.key}`}>
-                    <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
+                    <label className="text-sm font-semibold text-slate-700">
+                        {field.required ? requiredLabel(field.label || field.key) : (field.label || field.key)}
+                    </label>
                     <div className="mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                         <Editor
                             tinymceScriptSrc="/js/tinymce/tinymce.min.js"
@@ -685,7 +696,9 @@ export default function PageValueFormView({
 
             return (
                 <div key={`${locale}-${field.key}`}>
-                    <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
+                    <label className="text-sm font-semibold text-slate-700">
+                        {field.required ? requiredLabel(field.label || field.key) : (field.label || field.key)}
+                    </label>
                     <div className="mt-2 flex items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-3">
                         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
                             {imageSrc ? (
@@ -724,7 +737,9 @@ export default function PageValueFormView({
         if (field.type === 'banner_position') {
             return (
                 <div key={`${locale}-${field.key}`}>
-                    <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
+                    <label className="text-sm font-semibold text-slate-700">
+                        {field.required ? requiredLabel(field.label || field.key) : (field.label || field.key)}
+                    </label>
                     <select
                         value={value}
                         onChange={(event) => updateContentValue(locale, field.key, event.target.value)}
@@ -744,7 +759,9 @@ export default function PageValueFormView({
 
         return (
             <div key={`${locale}-${field.key}`}>
-                <label className="text-sm font-semibold text-slate-700">{field.label || field.key}</label>
+                <label className="text-sm font-semibold text-slate-700">
+                    {field.required ? requiredLabel(field.label || field.key) : (field.label || field.key)}
+                </label>
                 <input
                     value={value}
                     onChange={(event) => updateContentValue(locale, field.key, event.target.value)}
@@ -821,9 +838,9 @@ export default function PageValueFormView({
 
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <label className="text-sm font-semibold text-slate-700">{trans('hancms.column.name')}</label>
-                                    <input
-                                        value={data.translations?.[activeLocale]?.title || ''}
+                                <label className="text-sm font-semibold text-slate-700">{requiredLabel(trans('hancms.column.name'))}</label>
+                                <input
+                                    value={data.translations?.[activeLocale]?.title || ''}
                                         onChange={(event) => updatePageTranslation(activeLocale, 'title', event.target.value)}
                                         className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
@@ -937,7 +954,7 @@ export default function PageValueFormView({
                         <div className="space-y-4 p-5 text-sm">
                             <div>
                                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                    {trans('hancms.content.field_design')}
+                                    {requiredLabel(trans('hancms.content.field_design'))}
                                 </div>
                                 {allowFieldGroupChange ? (
                                     <>
@@ -959,6 +976,7 @@ export default function PageValueFormView({
                                         <p className="mt-2 text-xs text-slate-500">
                                             {trans('hancms.page.select_schema_hint')}
                                         </p>
+                                        {errors.field_group_id ? <p className="mt-1 text-xs text-red-500">{errors.field_group_id}</p> : null}
                                     </>
                                 ) : (
                                     <div className="mt-2 space-y-1 font-semibold text-slate-900">

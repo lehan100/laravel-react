@@ -95,6 +95,13 @@ export default function FieldGroupFormView({
             errors[fieldName] ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-indigo-500'
         }`;
 
+    const requiredLabel = (label: string): JSX.Element => (
+        <span className="inline-flex items-center gap-1 whitespace-nowrap">
+            <span>{label}</span>
+            <span className="text-rose-500">*</span>
+        </span>
+    );
+
     return (
         <div>
             <HeaderToolbar title={title}>
@@ -120,12 +127,13 @@ export default function FieldGroupFormView({
                             inactiveLabel={trans('hancms.status.inactive')}
                         />
 
-                        <InputGroup label={trans('hancms.column.name')}>
-                        <input
-                            value={data.title}
-                            onChange={(event) => setData('title', event.target.value)}
+                        <InputGroup required label={trans('hancms.column.name')}>
+                            <input
+                                required
+                                value={data.title}
+                                onChange={(event) => setData('title', event.target.value)}
                                 className={inputClass('title')}
-                        />
+                            />
                             {errors.title ? <MessageError>{errors.title}</MessageError> : null}
                         </InputGroup>
                     </div>
@@ -152,8 +160,11 @@ export default function FieldGroupFormView({
                             <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                                 <div className="grid gap-4 md:grid-cols-[1fr_1fr_180px_140px_96px]">
                                 <div>
-                                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.key')}</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                        {requiredLabel(trans('hancms.column.key'))}
+                                    </label>
                                     <input
+                                        required
                                         value={field.key}
                                         onChange={(event) => updateField(index, { key: event.target.value })}
                                             className={inputClass(`fields.${index}.key`)}
@@ -161,8 +172,11 @@ export default function FieldGroupFormView({
                                         {errors[`fields.${index}.key`] ? <MessageError>{errors[`fields.${index}.key`]}</MessageError> : null}
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.name')}</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                        {requiredLabel(trans('hancms.column.name'))}
+                                    </label>
                                     <input
+                                        required
                                         value={field.label}
                                         onChange={(event) => updateField(index, { label: event.target.value })}
                                             className={inputClass(`fields.${index}.label`)}
@@ -170,8 +184,11 @@ export default function FieldGroupFormView({
                                         {errors[`fields.${index}.label`] ? <MessageError>{errors[`fields.${index}.label`]}</MessageError> : null}
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">{trans('hancms.column.type')}</label>
+                                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                        {requiredLabel(trans('hancms.column.type'))}
+                                    </label>
                                     <select
+                                        required
                                         value={field.type}
                                         onChange={(event) => updateField(index, { type: event.target.value as PageFieldType })}
                                             className={inputClass(`fields.${index}.type`)}

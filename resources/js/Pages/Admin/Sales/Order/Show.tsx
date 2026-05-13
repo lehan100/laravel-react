@@ -57,6 +57,26 @@ export default function ShowPage() {
   const displayWardName = currentLocale.startsWith('ja')
     ? (item?.ward_name_en || item?.ward_name || '---')
     : (item?.ward_name || item?.ward_name_en || '---');
+  const appliedPromotions = Array.isArray(item?.applied_promotions) ? item.applied_promotions : [];
+  const promotionTypeLabels = {
+    coupon: trans('hancms.sales.orders.promotions.types.coupon'),
+    sale_offer: trans('hancms.sales.orders.promotions.types.sale_offer'),
+    buy_to_gift: trans('hancms.sales.orders.promotions.types.buy_to_gift'),
+  };
+  const formatPromotionType = (type: string): string => {
+    return promotionTypeLabels[type as keyof typeof promotionTypeLabels] || type || '---';
+  };
+  const promotionSummaryRows = appliedPromotions.map((promotion: any, index: number) => ({
+    key: `${promotion.type || 'promotion'}-${promotion.id || index}`,
+    label: promotion.type === 'coupon' && promotion.code
+      ? `Coupon ${promotion.code}`
+      : `${promotion.name || formatPromotionType(String(promotion.type || ''))}`,
+    amount: promotion.type === 'buy_to_gift'
+      ? `x${promotion.gift_quantity ?? 1}`
+      : promotion.discount_amount !== undefined
+        ? formatMoney(Number(promotion.discount_amount || 0))
+        : '---',
+  }));
 
   const detailRows = [
     // { label: trans('hancms.sales.orders.fields.order_number'), value: item?.order_number || `#${item?.id}` },
@@ -206,6 +226,7 @@ export default function ShowPage() {
                   </div>
                 </div>
               </section>
+
             </div>
 
             <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white print:rounded-2xl">
@@ -257,6 +278,15 @@ export default function ShowPage() {
                   {trans('hancms.sales.orders.fields.grand_total')}
                 </div>
                 <div className="mt-5 space-y-3 text-sm">
+                  {promotionSummaryRows.map((row) => (
+                    <div key={row.key} className="flex items-center justify-between gap-4">
+                      <span className="text-slate-300 print:text-slate-500">{row.label}</span>
+                      <strong>{row.amount}</strong>
+                    </div>
+                  ))}
+                  {promotionSummaryRows.length > 0 ? (
+                    <div className="border-b border-white/10 pb-3 print:border-slate-200" />
+                  ) : null}
                   <div className="flex items-center justify-between">
                     <span className="text-slate-300 print:text-slate-500">{trans('hancms.sales.orders.fields.subtotal')}</span>
                     <strong>{formatMoney(Number(item?.subtotal || 0))}</strong>
@@ -387,7 +417,7 @@ export default function ShowPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-5 border-b border-slate-300 px-5 py-4 text-sm">
+                <div className="grid grid-cols-2 gap-5 border-b border-slate-300 px-5 py-4 text-sm">
               <div className="space-y-2">
                 <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{trans('hancms.sales.orders.sections.customer')}</div>
                 <div><span className="font-semibold">{trans('hancms.sales.orders.print.labels.name')}:</span> {item?.customer_name || '................................'}</div>
@@ -446,8 +476,18 @@ export default function ShowPage() {
                     {formatMoney(Number(item?.subtotal || 0))}
                   </td>
                 </tr>
+                {promotionSummaryRows.map((row) => (
+                  <tr key={`print-promotion-${row.key}`}>
+                    <td className="border border-slate-400 bg-slate-50 px-2 py-2 text-center font-semibold" colSpan={5}>
+                      {row.label}
+                    </td>
+                    <td className="border border-slate-400 bg-slate-50 px-2 py-2 text-right whitespace-nowrap tabular-nums">
+                      {row.amount}
+                    </td>
+                  </tr>
+                ))}
                 <tr>
-                  <td className="border border-slate-400 px-2 py-2 text-center font-semibold" colSpan={5}>{trans('hancms.sales.orders.fields.discount_total')}</td>
+                  <td className="border border-slate-400 px-2 py-2 text-center font-semibold" colSpan={5}>Tổng giảm giá</td>
                   <td className="border border-slate-400 px-2 py-2 text-right whitespace-nowrap tabular-nums">
                     {formatMoney(Number(item?.discount_total || 0))}
                   </td>
@@ -467,9 +507,10 @@ export default function ShowPage() {
               </tbody>
             </table>
 
-            <div className="border-t border-slate-300 px-5 py-4 text-sm">
-              <div className="font-semibold">{trans('hancms.sales.orders.fields.note')}:</div>
-              <div className="mt-1 min-h-12 whitespace-pre-wrap">{item?.note || '........................................................................'}</div>
+            <div className="border-t border-slate-300 px-5 py-3 text-sm">
+              <div className="text-sm leading-6">
+                <span className="font-semibold">{trans('hancms.sales.orders.fields.note')}:</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-3 gap-10 border-t border-slate-300 px-5 py-6 text-center text-sm">

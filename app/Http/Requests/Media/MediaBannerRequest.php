@@ -3,26 +3,15 @@
 namespace App\Http\Requests\Media;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class MediaBannerRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             'status' => 'required|integer|in:0,1',
@@ -39,11 +28,14 @@ class MediaBannerRequest extends FormRequest
             'translations.*.alias_link' => 'nullable|string|max:255',
         ];
     }
-     public function attributes(): array
+
+    public function attributes(): array
     {
         return [
+            'status' => mb_strtolower(__('hancms.column.status')),
             'position_ids' => mb_strtolower(__('hancms.media.position.name')),
-            'translations.*.name' => mb_strtolower(__('hancms.column.name'))
+            'translations' => mb_strtolower(__('hancms.attribute.sections.translations')),
+            'translations.*.name' => mb_strtolower(__('hancms.column.name')),
         ];
     }
 }

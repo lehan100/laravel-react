@@ -566,6 +566,9 @@ function PageFormView({
 
                     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="space-y-4">
+                            <div>
+                                <label className="text-sm font-semibold text-slate-700">{trans('hancms.page.select_schema_hint')}</label>
+                            </div>
                             {(languages.find((language) => language.code === activeLocale) ? [languages.find((language) => language.code === activeLocale)!] : languages).map((language) => (
                                 <div key={language.code} className="space-y-4">
                                     <div className="rounded-2xl bg-slate-50 px-4 py-3">

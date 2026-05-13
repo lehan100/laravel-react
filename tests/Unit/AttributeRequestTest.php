@@ -19,7 +19,7 @@ class AttributeRequestTest extends TestCase
             'status' => 1,
             'type' => 'text',
             'translations' => [
-                ['name' => 'Color'],
+                ['name' => ''],
             ],
             'values' => [
                 [
@@ -28,10 +28,14 @@ class AttributeRequestTest extends TestCase
                     ],
                 ],
             ],
-        ], $request->rules());
+        ], $request->rules(), $request->messages(), $request->attributes());
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('code', $validator->errors()->toArray());
+        $this->assertSame(
+            __('validation.required', ['attribute' => mb_strtolower(__('hancms.catalog.attribute.fields.name'))]),
+            $validator->errors()->first('translations.0.name')
+        );
     }
 
     public function test_attribute_request_accepts_a_valid_code_payload(): void
@@ -53,7 +57,7 @@ class AttributeRequestTest extends TestCase
                     ],
                 ],
             ],
-        ], $request->rules());
+        ], $request->rules(), $request->messages(), $request->attributes());
 
         $this->assertFalse($validator->fails());
     }

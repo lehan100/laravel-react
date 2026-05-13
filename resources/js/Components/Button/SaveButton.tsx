@@ -10,14 +10,15 @@ interface Props extends ComponentProps<'button'> {
 
 export default function Save({ loading, icon, children, sendDataStatusUndo, undo, className, ...props }: Props) {
   const formId = typeof props.form === 'string' && props.form ? props.form : 'my-form';
+  const isDisabled = loading || Boolean(props.disabled);
 
   return (
     <button
       {...props}
       type="submit"
       form={formId}
-      disabled={loading}
-      onClick={() => !loading && sendDataStatusUndo(undo)}
+      disabled={isDisabled}
+      onClick={() => !isDisabled && sendDataStatusUndo(undo)}
       className={cx(
         'inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3.5 text-base font-semibold text-white shadow-xl shadow-emerald-950/10 ring-1 ring-emerald-950/5 transition-all duration-200 hover:-translate-y-0.5 hover:from-emerald-500 hover:to-teal-500 hover:shadow-2xl hover:shadow-emerald-950/15 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:from-emerald-600 disabled:hover:to-teal-600',
         className // Cho phép ghi đè từ bên ngoài

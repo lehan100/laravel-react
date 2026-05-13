@@ -70,7 +70,7 @@ class CategoryRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'translations.*.name' => mb_strtolower(__('hancms.column.name')),
+            'translations.*.name' => mb_strtolower(__('hancms.catalog.category.fields.name')),
             'translations.*.slug' => mb_strtolower(__('hancms.column.slug')),
             'page_id' => mb_strtolower(__('hancms.catalog.category.page')),
         ];

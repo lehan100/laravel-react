@@ -131,6 +131,7 @@ Route::prefix($prefixAdmin)->group(function () {
         Route::get('coupon/products-picker', [CouponController::class, 'productsPicker'])->name('coupon.products-picker');
         Route::get('buytogift/products-picker', [BuyToGiftController::class, 'productsPicker'])->name('buytogift.products-picker');
         Route::get('category/products-picker', [CategoryController::class, 'productsPicker'])->name('category.products-picker');
+        Route::post('orders/calculate-promotions', [OrderController::class, 'calculatePromotions'])->name('orders.calculate-promotions');
         Route::post('pages/quick-store', [PageController::class, 'quickStore'])->name('pages.quick-store');
         // Media & Resource
         $resources = [

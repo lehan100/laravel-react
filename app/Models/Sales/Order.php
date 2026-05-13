@@ -61,6 +61,8 @@ class Order extends Model
         'shipping_total',
         'grand_total',
         'placed_at',
+        'coupon_code',
+        'applied_promotions',
     ];
 
     protected $casts = [
@@ -75,6 +77,7 @@ class Order extends Model
         'shipping_total' => 'decimal:2',
         'grand_total' => 'decimal:2',
         'placed_at' => 'datetime',
+        'applied_promotions' => 'array',
     ];
 
     public function items(): HasMany

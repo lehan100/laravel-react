@@ -14,6 +14,7 @@ class CategoryTranslationKeysTest extends TestCase
             'vi' => [
                 'hancms.catalog.category.products' => 'Sản phẩm của danh mục',
                 'hancms.catalog.category.products_hint' => 'Chọn các sản phẩm thuộc danh mục này.',
+                'hancms.catalog.category.fields.name' => 'Tên danh mục',
                 'hancms.catalog.category.news_add' => 'Thêm tin tức',
                 'hancms.catalog.category.news_hint' => 'Các bài viết thuộc danh mục này.',
                 'hancms.catalog.category.ai.translate_button' => 'AI dịch tự động',
@@ -27,6 +28,7 @@ class CategoryTranslationKeysTest extends TestCase
             'en' => [
                 'hancms.catalog.category.products' => 'Category Products',
                 'hancms.catalog.category.products_hint' => 'Select the products that belong to this category.',
+                'hancms.catalog.category.fields.name' => 'Category name',
                 'hancms.catalog.category.news_add' => 'Add news',
                 'hancms.catalog.category.news_hint' => 'Posts that belong to this category.',
                 'hancms.catalog.category.ai.translate_button' => 'AI auto-translate',
@@ -40,6 +42,7 @@ class CategoryTranslationKeysTest extends TestCase
             'ja' => [
                 'hancms.catalog.category.products' => 'カテゴリーの商品',
                 'hancms.catalog.category.products_hint' => 'このカテゴリーに属する商品を選択してください。',
+                'hancms.catalog.category.fields.name' => 'カテゴリー名',
                 'hancms.catalog.category.news_add' => 'ニュースを追加',
                 'hancms.catalog.category.news_hint' => 'このカテゴリーに属する記事です。',
                 'hancms.catalog.category.ai.translate_button' => 'AI自動翻訳',

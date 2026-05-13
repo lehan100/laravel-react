@@ -52,6 +52,25 @@ class ShippingMethodRequest extends FormRequest
         ];
     }
 
+    public function attributes(): array
+    {
+        return [
+            'code' => mb_strtolower(__('hancms.column.code')),
+            'provider' => mb_strtolower(__('hancms.sales.shipping_methods.name')),
+            'name' => mb_strtolower(__('hancms.column.name')),
+            'description' => mb_strtolower(__('hancms.column.description')),
+            'sort_order' => mb_strtolower(__('hancms.column.order')),
+            'settings.token' => mb_strtolower(__('hancms.sales.shipping_methods.fields.token')),
+            'settings.shop_id' => mb_strtolower(__('hancms.sales.shipping_methods.fields.shop_id')),
+            'settings.username' => mb_strtolower(__('hancms.sales.shipping_methods.fields.username')),
+            'settings.password' => mb_strtolower(__('hancms.sales.shipping_methods.fields.password')),
+            'settings.client_id' => mb_strtolower(__('hancms.sales.shipping_methods.fields.client_id')),
+            'settings.client_secret' => mb_strtolower(__('hancms.sales.shipping_methods.fields.client_secret')),
+            'settings.endpoint' => mb_strtolower(__('hancms.sales.shipping_methods.fields.endpoint')),
+            'settings.webhook_url' => mb_strtolower(__('hancms.sales.shipping_methods.fields.webhook_url')),
+        ];
+    }
+
     private function normalizeNullableString(mixed $value): ?string
     {
         if ($value === null) {

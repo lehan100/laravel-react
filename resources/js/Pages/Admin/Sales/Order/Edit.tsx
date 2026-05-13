@@ -14,6 +14,7 @@ export default function EditPage() {
   const currentLanguage = getLanguageByLocale(langList, currentLocale);
   const orderCurrency = resolveOrderCurrency(item, currentLocale, currentLanguage);
   const form = useForm({
+    order_id: item?.id || '',
     order_number: item?.order_number || '',
     customer_name: item?.customer_name || '',
     customer_email: item?.customer_email || '',
@@ -35,7 +36,11 @@ export default function EditPage() {
       variant_id: entry.variant_id || entry.meta?.variant?.id || '',
       quantity: entry.quantity || 1,
       unit_price: convertPriceToDisplay(entry.unit_price || 0, orderCurrency),
+      is_gift: entry.is_gift || false,
+      rule_id: entry.rule_id || null,
     })),
+    coupon_code: item?.coupon_code || '',
+    applied_promotions: item?.applied_promotions || [],
     undo: 0,
   });
   form.transform((payload: any) => ({

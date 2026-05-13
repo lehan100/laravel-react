@@ -136,6 +136,26 @@ class WarehouseEloquentRepository extends EloquentRepository implements Warehous
                 'translations' => function ($q) use ($locale) {
                     $q->select(['id', 'product_id', 'locale', 'name'])->where('locale', $locale);
                 },
+                'variants' => function ($q) use ($locale) {
+                    $q->select(['id', 'product_id', 'sku', 'price', 'stock', 'updated_at'])
+                        ->with([
+                            'translations' => function ($translationQuery) use ($locale) {
+                                $translationQuery->select(['id', 'product_variant_id', 'locale', 'name'])
+                                    ->where('locale', $locale);
+                            },
+                            'attributeValues' => function ($valueQuery) use ($locale) {
+                                $valueQuery->select(['attribute_values.id', 'attribute_values.attribute_id', 'attribute_values.value'])
+                                    ->with([
+                                        'translations' => function ($translationQuery) use ($locale) {
+                                            $translationQuery->select(['id', 'attribute_value_id', 'locale', 'value'])
+                                                ->where('locale', $locale);
+                                        },
+                                        'attribute:id,name',
+                                    ]);
+                            },
+                        ])
+                        ->orderBy('id');
+                },
                 'adjustmentHistories' => function ($q) {
                     $q->select(['id', 'product_id', 'user_id', 'action', 'old_quantity', 'new_quantity', 'delta', 'reason', 'created_at'])
                         ->with('user:id,first_name,last_name,email')
@@ -153,6 +173,12 @@ class WarehouseEloquentRepository extends EloquentRepository implements Warehous
             $product = Product::query()->find((int) ($params['id'] ?? 0));
             if (! $product) {
                 return null;
+            }
+
+            if ($product->variants()->exists()) {
+                $this->syncProductQuantityFromVariants($product);
+
+                return $product->fresh();
             }
 
             $action = (string) ($params['action'] ?? 'set');
@@ -194,6 +220,12 @@ class WarehouseEloquentRepository extends EloquentRepository implements Warehous
             $product = Product::query()->find((int) ($params['id'] ?? 0));
             if (! $product) {
                 return null;
+            }
+
+            if ($product->variants()->exists()) {
+                $this->syncProductQuantityFromVariants($product);
+
+                return $product->fresh();
             }
 
             $nextStock = ! $product->is_stock;
@@ -250,6 +282,7 @@ class WarehouseEloquentRepository extends EloquentRepository implements Warehous
             $variant->save();
 
             $this->writeVariantInventoryHistory($variant, $action, $oldQuantity, $newQuantity, $reason);
+            $this->syncProductQuantityFromVariantsById((int) $variant->product_id);
 
             return $variant->fresh();
         });
@@ -279,9 +312,38 @@ class WarehouseEloquentRepository extends EloquentRepository implements Warehous
                 __('hancms.sales.warehouse.messages.toggle_reason'),
                 ['type' => 'toggle_variant_stock']
             );
+            $this->syncProductQuantityFromVariantsById((int) $variant->product_id);
 
             return $variant->fresh();
         });
+    }
+
+    private function syncProductQuantityFromVariantsById(int $productId): void
+    {
+        $product = Product::query()
+            ->lockForUpdate()
+            ->find($productId);
+
+        if (! $product) {
+            return;
+        }
+
+        $this->syncProductQuantityFromVariants($product);
+    }
+
+    private function syncProductQuantityFromVariants(Product $product): void
+    {
+        $product->loadMissing('variants');
+
+        if ($product->variants->isEmpty()) {
+            return;
+        }
+
+        $totalStock = (int) $product->variants->sum('stock');
+
+        $product->quantity = $totalStock;
+        $product->is_stock = $totalStock > 0;
+        $product->saveQuietly();
     }
 
     private function writeVariantInventoryHistory(

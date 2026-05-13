@@ -81,6 +81,10 @@ export default function ShowPage() {
               </div>
             </div>
             <div>
+              <div className="text-xs text-slate-500">{trans('hancms.promotion.coupon.fields.priority')}</div>
+              <div className="font-semibold text-slate-800">{item?.priority ?? '---'}</div>
+            </div>
+            <div>
               <div className="text-xs text-slate-500">{trans('hancms.promotion.coupon.fields.discount_type')}</div>
               <div className="font-semibold text-slate-800">
                 {item?.discount_type

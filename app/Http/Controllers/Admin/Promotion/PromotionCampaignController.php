@@ -159,6 +159,24 @@ class PromotionCampaignController extends MainController
         }
     }
 
+    public function toggleStatus(string $id): RedirectResponse
+    {
+        try {
+            $item = $this->mainModel->save(['id' => $id], ['task' => 'change-status']);
+
+            if (! $item) {
+                return Redirect::back()
+                    ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.promotion.campaign.name'))]));
+            }
+
+            return Redirect::back()
+                ->with('success', __('hancms.message.success.edit', ['name' => mb_strtolower(__('hancms.promotion.campaign.name'))]));
+        } catch (\Throwable $th) {
+            return Redirect::back()
+                ->with('error', __('hancms.message.error.edit', ['name' => mb_strtolower(__('hancms.promotion.campaign.name'))]));
+        }
+    }
+
     public function destroy(string $id): RedirectResponse
     {
         try {

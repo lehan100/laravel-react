@@ -7,7 +7,7 @@ import { useTrans } from '@/Hooks/useTrans'
 import { Head, router, usePage } from '@inertiajs/react'
 import type { FormEvent } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { GripVertical, Image as ImageIcon, Sparkles } from 'lucide-react'
+import { GripVertical, Image as ImageIcon, Plus, Sparkles } from 'lucide-react'
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal'
 import axios from 'axios'
 import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController'
@@ -616,9 +616,10 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                     </div>
 
                     <div className="mt-6 space-y-5">
-                        <InputGroup label={trans('hancms.catalog.attribute.fields.code')} htmlFor="attribute-code">
+                        <InputGroup required label={trans('hancms.catalog.attribute.fields.code')} htmlFor="attribute-code">
                             <input
                                 id="attribute-code"
+                                required
                                 className={inputClass('code')}
                                 value={data.code}
                                 onChange={(event) =>
@@ -635,9 +636,10 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                             {errors.code ? <MessageError>{errors.code}</MessageError> : null}
                         </InputGroup>
 
-                        <InputGroup label={trans('hancms.catalog.attribute.fields.type')} htmlFor="attribute-type">
+                        <InputGroup required label={trans('hancms.catalog.attribute.fields.type')} htmlFor="attribute-type">
                             <select
                                 id="attribute-type"
+                                required
                                 className={inputClass('type')}
                                 value={data.type}
                                 onChange={(event) =>
@@ -657,7 +659,7 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                             {errors.type ? <MessageError>{errors.type}</MessageError> : null}
                         </InputGroup>
 
-                        <InputGroup label={trans('hancms.column.status')} align="center">
+                        <InputGroup required label={trans('hancms.column.status')} align="center">
                             <StatusSwitch
                                 value={data.status}
                                 onChange={(value) =>
@@ -712,20 +714,22 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                     key={locale || index}
                                     stacked
                                     label={(
-                                        <span className="flex items-center gap-2">
+                                        <span className="inline-flex items-center gap-2 whitespace-nowrap">
                                             {logoUrl ? (
                                                 <img alt={getLocaleLabel(lang)} className="h-5 w-5 rounded-full object-cover ring-1 ring-slate-200" src={logoUrl} />
                                             ) : null}
                                             <span>{getLocaleLabel(lang)}</span>
                                         </span>
                                     )}
-                                    htmlFor={`attribute-name-${locale || index}`}
-                                >
-                                    <input
-                                        id={`attribute-name-${locale || index}`}
-                                        className={inputClass(errorKey)}
-                                        value={data.translations[index]?.name ?? ''}
-                                        onChange={(event) => updateTranslation(index, event.target.value)}
+                                required
+                                htmlFor={`attribute-name-${locale || index}`}
+                            >
+                                <input
+                                    id={`attribute-name-${locale || index}`}
+                                    required
+                                    className={inputClass(errorKey)}
+                                    value={data.translations[index]?.name ?? ''}
+                                    onChange={(event) => updateTranslation(index, event.target.value)}
                                     />
                                     {errors[errorKey] ? <MessageError>{errors[errorKey]}</MessageError> : null}
                                 </InputGroup>
@@ -764,13 +768,14 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                     {aiValueTranslateError}
                                 </div>
                             )}
-                            <button
-                                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-                                type="button"
-                                onClick={appendValue}
-                            >
-                                {trans('hancms.catalog.attribute.fields.add_value')}
-                            </button>
+                                <button
+                                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                                    type="button"
+                                    onClick={appendValue}
+                                >
+                                    <Plus size={16} />
+                                    {trans('hancms.catalog.attribute.fields.add_value')}
+                                </button>
                         </div>
                     </div>
 
@@ -819,8 +824,9 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                                 <InputGroup
                                                     key={locale || translationIndex}
                                                     stacked
+                                                    required
                                                     label={(
-                                                        <span className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500">
+                                                        <span className="inline-flex items-center gap-2 whitespace-nowrap text-xs uppercase tracking-wide text-slate-500">
                                                             {logoUrl ? (
                                                                 <img
                                                                     alt={getLocaleLabel(lang)}
@@ -836,6 +842,7 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                                                 >
                                                     <input
                                                         id={`attribute-value-${valueIndex}-${locale || translationIndex}`}
+                                                        required
                                                         className={inputClass(errorKey)}
                                                         value={value.translations[translationIndex]?.value ?? ''}
                                                         onChange={(event) =>

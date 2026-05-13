@@ -156,6 +156,9 @@ return [
         ],
         'banner' => [
             'name' => 'Hình ảnh',
+            'ai' => [
+                'translate_button' => 'AI dịch tự động',
+            ],
         ],
     ],
     'report' => [
@@ -223,6 +226,14 @@ return [
         'inventory' => [
             'name' => 'Báo cáo kho',
             'description' => 'Theo dõi tồn kho thấp, hết hàng và biến động điều chỉnh kho.',
+            'actions' => [
+                'set' => 'Thiết lập tồn kho',
+                'adjust' => 'Điều chỉnh tồn kho',
+                'order_deduct' => 'Trừ tồn theo đơn hàng',
+                'order_rollback' => 'Hoàn trả tồn kho',
+                'promotion_buytogift_reserve' => 'Giữ tồn kho cho chương trình mua tặng',
+                'promotion_buytogift_release' => 'Giải phóng tồn kho chương trình mua tặng',
+            ],
             'metrics' => [
                 'total_stock' => 'Tổng tồn kho',
                 'low_stock' => 'Sắp hết hàng',
@@ -289,6 +300,7 @@ return [
                 'max_discount_amount' => 'Giảm tối đa',
                 'min_order_amount' => 'Đơn hàng tối thiểu',
                 'max_order_amount' => 'Đơn hàng tối đa',
+                'priority' => 'Độ ưu tiên',
                 'usage_limit_total' => 'Giới hạn sử dụng tổng',
                 'usage_limit_per_user' => 'Giới hạn mỗi người dùng',
                 'first_order_only' => 'Chỉ áp dụng cho đơn hàng đầu tiên',
@@ -310,6 +322,9 @@ return [
                 'buy_product' => 'Mua sản phẩm tặng sản phẩm',
                 'stock_scope_all' => 'Không giới hạn tồn kho',
                 'stock_scope_limited' => 'Giới hạn tồn kho',
+                'stock_limited' => 'Giới hạn tồn kho',
+                'stock_all' => 'Không giới hạn tồn kho',
+                'stock_empty' => 'Hết quà',
             ],
             'summary' => [
                 'rule' => 'Luật',
@@ -318,6 +333,29 @@ return [
                 'min_order_amount' => 'Đơn tối thiểu',
                 'product_short' => 'SP',
                 'more_rules' => 'luật khác',
+                'max_gift_qty' => 'Tối đa quà',
+                'max_sets_per_order' => 'Tối đa set',
+                'stock_limit' => 'Giới hạn tồn kho',
+                'stock_all' => 'Tất cả tồn kho',
+                'stock_limited' => 'Tồn kho giới hạn',
+                'no_gift_cap' => 'Không giới hạn quà',
+                'unlimited_sets' => 'Không giới hạn set',
+                'remaining_slots' => 'Suất còn lại',
+                'slots' => 'suất',
+                'sold_quantity' => 'Đã bán',
+                'reserved_quantity' => 'Đã giữ',
+                'reserved_total' => 'Tổng tạm giữ',
+                'wasted' => 'Dư',
+                'wasted_slots' => 'suất dư',
+                'buy_slots' => 'Suất theo hàng mua',
+                'gift_slots' => 'Suất theo hàng tặng',
+                'available_slots' => 'Suất khả dụng',
+                'buy_products_count' => 'Sản phẩm mua',
+                'gift_products_count' => 'Sản phẩm tặng',
+                'warning_title' => 'Cảnh báo',
+                'warning_wasted' => 'Còn dư :count quà, chưa đủ để tạo thêm suất mới.',
+                'warning_sold_out' => 'Quà tặng đã hết.',
+                'warning_max_gift_cap' => 'Số lượng quà tối đa chỉ đủ cho :slots suất, thiếu :shortage suất so với kho hiện có.',
             ],
             'fields' => [
                 'condition_type' => 'Loại điều kiện',
@@ -325,13 +363,14 @@ return [
                 'buy_qty' => 'Số lượng mua',
                 'gift_products' => 'Sản phẩm quà tặng',
                 'gift_qty' => 'Số lượng tặng',
+                'max_gift_qty' => 'Số lượng quà tặng tối đa',
                 'min_order_amount' => 'Đơn tối thiểu để nhận quà',
                 'max_sets_per_order' => 'Giới hạn số set quà / đơn',
+                'priority' => 'Độ ưu tiên',
                 'stock_scope' => 'Phạm vi tồn kho',
                 'stock_limit' => 'Số lượng tồn kho áp dụng',
                 'starts_at' => 'Bắt đầu lúc',
                 'ends_at' => 'Kết thúc lúc',
-                'priority' => 'Độ ưu tiên',
                 'stackable' => 'Cho phép cộng dồn',
             ],
         ],
@@ -384,6 +423,7 @@ return [
                 'delete_not_supported' => 'Chức năng xóa kho không được hỗ trợ.',
                 'bulk_delete_not_supported' => 'Chức năng xóa nhiều kho không được hỗ trợ.',
                 'toggle_reason' => 'Cập nhật trạng thái kho từ trang quản lý kho.',
+                'parent_stock_managed_by_variants' => 'Sản phẩm có biến thể. Hãy cập nhật tồn kho ở từng biến thể.',
             ],
             'actions' => [
                 'update_stock' => 'Cập nhật kho',
@@ -422,6 +462,7 @@ return [
             'sections' => [
                 'customer' => 'Thông tin khách hàng',
                 'status' => 'Trạng thái đơn hàng',
+                'discount_details' => 'Chi tiết giảm giá',
                 'items' => 'Sản phẩm trong đơn',
                 'history' => 'Lịch sử xử lý',
             ],
@@ -477,6 +518,16 @@ return [
                 'line_total' => 'Thành tiền',
                 'placed_at' => 'Ngày đặt',
                 'total_quantity' => 'Tổng số lượng',
+                'coupon_code' => 'Mã giảm giá',
+                'applied_promotions' => 'Khuyến mãi áp dụng',
+                'gift_quantity' => 'Số lượng quà',
+            ],
+            'promotions' => [
+                'types' => [
+                    'coupon' => 'Mã giảm giá',
+                    'sale_offer' => 'Giảm giá',
+                    'buy_to_gift' => 'Mua tặng',
+                ],
             ],
             'payment_methods' => [
                 'cod_label' => 'Thanh toán khi nhận hàng',
@@ -651,6 +702,9 @@ return [
                     'contact' => 'Liên hệ',
                 ],
             ],
+            'fields' => [
+                'name' => 'Tên danh mục',
+            ],
             'news_add' => 'Thêm tin tức',
             'news_hint' => 'Các bài viết thuộc danh mục này.',
             'news_empty' => 'Chưa có tin tức nào trong danh mục này.',
@@ -682,11 +736,18 @@ return [
             'no_photo' => 'Chưa có ảnh nào.',
             'no_new_photo' => 'Chưa có ảnh mới nào.',
             'fields' => [
+                'name' => 'Tên sản phẩm',
                 'base_price' => 'Giá gốc',
                 'stock_available' => 'Còn hàng',
                 'stock_out' => 'Hết hàng',
                 'coupon_allowed' => 'Cho phép mã giảm giá',
                 'coupon_disallowed' => 'Không cho phép mã giảm giá',
+            ],
+            'warnings' => [
+                'quantity_zero' => 'Số lượng đang bằng 0.',
+                'price_zero' => 'Giá đang bằng 0.',
+                'stock_zero' => 'Tồn kho đang bằng 0.',
+                'no_images' => 'Sản phẩm chưa có hình ảnh.',
             ],
             'variants' => [
                 'name' => 'Biến thể sản phẩm',
@@ -715,6 +776,11 @@ return [
                 'variants' => 'Biến thể',
             ],
         ],
+        'media_banner' => [
+            'ai' => [
+                'generating' => 'Đang dịch...',
+            ],
+        ],
         'attribute' => [
             'admin' => [
                 'name' => 'Danh sách thuộc tính',
@@ -737,6 +803,7 @@ return [
                 'values' => 'Giá trị',
             ],
             'fields' => [
+                'name' => 'Tên thuộc tính',
                 'code' => 'Mã',
                 'code_placeholder' => 'brand, color, size',
                 'type' => 'Loại',
@@ -779,6 +846,10 @@ return [
             'name' => 'Bài viết',
             'created' => 'Thêm bài viết',
             'edit' => 'Chỉnh sửa bài viết',
+            'fields' => [
+                'name' => 'Tên bài viết',
+                'type' => 'Loại bài viết',
+            ],
             'ai' => [
                 'translate_button' => 'AI dịch tự động',
                 'suggest_content' => 'AI gợi ý nội dung',
@@ -902,6 +973,8 @@ return [
         'search' => 'Tìm kiếm',
         'sku' => 'SKU',
         'quantity' => 'Số lượng',
+        'sold_quantity' => 'Đã bán',
+        'reserved_quantity' => 'Đã giữ',
         'weight' => 'Khối lượng',
         'brand' => 'Thương hiệu',
         'price' => 'Giá',

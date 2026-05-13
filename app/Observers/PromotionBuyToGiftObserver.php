@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Promotion\PromotionBuyToGiftOffer;
+use App\Services\Promotion\BuyToGiftStockAllocator;
 use Illuminate\Support\Facades\Log;
 
 class PromotionBuyToGiftObserver
@@ -19,6 +20,20 @@ class PromotionBuyToGiftObserver
         if (! empty($offer->code)) {
             $offer->code = mb_strtoupper(trim((string) $offer->code));
         }
+
+        if ((bool) $offer->getOriginal('is_active') === (bool) $offer->is_active) {
+            return;
+        }
+
+        $allocator = app(BuyToGiftStockAllocator::class);
+
+        if ((bool) $offer->is_active) {
+            $allocator->syncOffer($offer);
+
+            return;
+        }
+
+        $allocator->releaseOffer($offer);
     }
 
     public function deleting(PromotionBuyToGiftOffer $offer): void

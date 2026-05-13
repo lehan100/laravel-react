@@ -11,6 +11,7 @@ use App\Models\Promotion\PromotionCampaign;
 use App\Models\Promotion\PromotionCoupon;
 use App\Models\Promotion\PromotionSaleOffer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -107,5 +108,27 @@ class PromotionStatusResourceTest extends TestCase
         ]);
 
         $this->assertSame('inactive', BuyToGiftResource::make($inactive)->resolve()['promotion_status']);
+    }
+
+    #[Test]
+    public function it_treats_naive_promotion_dates_as_admin_local_time_when_resolving_status(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 5, 8, 9, 0, 0, 'UTC'));
+
+        try {
+            $item = PromotionBuyToGiftOffer::query()->create([
+                'code' => 'GIFT-STATUS-LOCAL-001',
+                'name' => 'Gift local time',
+                'priority' => 1,
+                'starts_at' => '2026-05-08 15:00:00',
+                'ends_at' => '2026-05-08 23:00:00',
+                'is_active' => true,
+                'stackable' => false,
+            ]);
+
+            $this->assertSame('active', BuyToGiftResource::make($item)->resolve()['promotion_status']);
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }

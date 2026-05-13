@@ -2,6 +2,7 @@
 
 namespace App\Models\Catalog;
 
+use App\Models\Promotion\PromotionBuyToGiftRuleStockAllocation;
 use App\Models\Promotion\PromotionCampaign;
 use App\Models\Sales\InventoryAdjustmentHistory;
 use App\Models\Slug;
@@ -24,6 +25,7 @@ class Product extends Model implements TranslatableContract
     protected $fillable = [
         'sku',
         'quantity',
+        'sold_quantity',
         'weight',
         'price',
         'status',
@@ -46,6 +48,7 @@ class Product extends Model implements TranslatableContract
     protected $casts = [
         'is_coupon' => 'boolean',
         'is_stock' => 'boolean',
+        'sold_quantity' => 'integer',
         'price' => 'decimal:2',
     ];
 
@@ -73,6 +76,11 @@ class Product extends Model implements TranslatableContract
     public function adjustmentHistories(): HasMany
     {
         return $this->hasMany(InventoryAdjustmentHistory::class, 'product_id');
+    }
+
+    public function buyToGiftStockAllocations(): HasMany
+    {
+        return $this->hasMany(PromotionBuyToGiftRuleStockAllocation::class, 'product_id');
     }
 
     public function variants(): HasMany

@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Http\Requests\Catalog\ProductRequest;
 use App\Models\Catalog\AttributeValue;
+use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductAttribute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
@@ -18,6 +19,7 @@ class ProductVariantRequestTest extends TestCase
         [$red, , $xl] = $this->createAttributeValues();
 
         $validator = $this->validator([
+            'sku' => 'TSHIRT-BASE',
             'variants' => [
                 [
                     'sku' => 'TSHIRT-RED-XL',
@@ -40,6 +42,79 @@ class ProductVariantRequestTest extends TestCase
         ]);
 
         $this->assertTrue($validator->passes());
+    }
+
+    public function test_product_request_requires_sku_on_create(): void
+    {
+        $validator = $this->validator([
+            'sku' => '',
+        ]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('sku', $validator->errors()->toArray());
+    }
+
+    public function test_product_request_uses_the_product_name_translation_for_required_name_errors(): void
+    {
+        app()->setLocale('vi');
+
+        $validator = $this->validator([
+            'translations' => [
+                'vi' => [
+                    'name' => '',
+                ],
+                'en' => [
+                    'name' => 'T-Shirt',
+                ],
+            ],
+        ]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'Trường tên sản phẩm không được bỏ trống.',
+            $validator->errors()->first('translations.vi.name')
+        );
+    }
+
+    public function test_product_request_rejects_duplicate_sku_on_create(): void
+    {
+        Product::query()->create([
+            'sku' => 'PRD-DUPLICATE',
+            'quantity' => 1,
+            'weight' => 1,
+            'price' => 100000,
+            'status' => 1,
+            'is_stock' => 1,
+            'is_coupon' => 0,
+            'order' => 1,
+        ]);
+
+        $validator = $this->validator([
+            'sku' => 'PRD-DUPLICATE',
+        ]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('sku', $validator->errors()->toArray());
+    }
+
+    public function test_product_request_allows_same_sku_when_editing_the_same_product(): void
+    {
+        $product = Product::query()->create([
+            'sku' => 'PRD-EDITABLE',
+            'quantity' => 1,
+            'weight' => 1,
+            'price' => 100000,
+            'status' => 1,
+            'is_stock' => 1,
+            'is_coupon' => 0,
+            'order' => 1,
+        ]);
+
+        $validator = $this->validator([
+            'sku' => 'PRD-EDITABLE',
+        ], $product->id);
+
+        $this->assertTrue($validator->passes(), $validator->errors()->first() ?? 'Product SKU should be allowed for the same product during edit.');
     }
 
     public function test_product_request_rejects_duplicate_attribute_in_one_variant(): void
@@ -211,7 +286,7 @@ class ProductVariantRequestTest extends TestCase
         ];
     }
 
-    private function validator(array $overrides)
+    private function validator(array $overrides, ?int $routeProductId = null)
     {
         $payload = array_replace_recursive([
             'status' => 1,
@@ -242,7 +317,24 @@ class ProductVariantRequestTest extends TestCase
         ], $overrides);
 
         $request = ProductRequest::create('/admin123/product', 'POST', $payload);
-        $validator = Validator::make($request->all(), $request->rules());
+        if ($routeProductId !== null) {
+            $request->setRouteResolver(fn () => new class($routeProductId)
+            {
+                public function __construct(private readonly int $productId) {}
+
+                public function parameter(string $key, mixed $default = null): mixed
+                {
+                    return $key === 'product' ? $this->productId : $default;
+                }
+            });
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            $request->rules(),
+            $request->messages(),
+            $request->attributes()
+        );
 
         foreach ($request->after() as $afterValidation) {
             $validator->after($afterValidation);

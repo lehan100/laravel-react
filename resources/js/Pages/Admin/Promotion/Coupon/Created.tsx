@@ -17,6 +17,7 @@ export default function CreatedPage() {
     max_discount_amount: '',
     min_order_amount: '',
     max_order_amount: '',
+    priority: 100,
     first_order_only: false,
     usage_limit_total: '',
     usage_limit_per_user: '',

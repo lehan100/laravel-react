@@ -190,7 +190,7 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
                             }`}
                         >
                             <Sparkles size={14} />
-                            {aiTranslating ? (trans('hancms.catalog.media_banner.ai.generating') || 'Generating...') : 'AI dịch tự động'}
+                            {aiTranslating ? (trans('hancms.catalog.media_banner.ai.generating') || 'Generating...') : trans('hancms.media.banner.ai.translate_button')}
                         </button>
                         {aiTranslateError && (
                             <div className="max-w-[20rem] text-right text-xs text-rose-600">
@@ -202,7 +202,7 @@ const ContentTab = ({ data, setData, langList, trans, config_path, errors }: any
 
                 <div className="space-y-5 p-5 sm:p-6">
                     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
-                        <InputGroup label={trans('hancms.column.name')}>
+                        <InputGroup label={trans('hancms.column.name')} required>
                             <input
                                 type="text"
                                 value={activeLanguageData.name || ''}

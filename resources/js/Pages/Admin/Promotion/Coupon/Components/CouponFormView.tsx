@@ -219,6 +219,7 @@ export default function CouponFormView({
     const conditionErrorFields = [
       'min_order_amount',
       'max_order_amount',
+      'priority',
       'usage_limit_total',
       'usage_limit_per_user',
       'starts_at',
@@ -327,7 +328,7 @@ export default function CouponFormView({
     if (tab === 'scope') {
       return ['category_ids', 'product_ids'].some((field) => !!errors[field]);
     }
-    return ['min_order_amount', 'max_order_amount', 'usage_limit_total', 'usage_limit_per_user', 'starts_at', 'ends_at'].some((field) => !!errors[field]);
+    return ['min_order_amount', 'max_order_amount', 'priority', 'usage_limit_total', 'usage_limit_per_user', 'starts_at', 'ends_at'].some((field) => !!errors[field]);
   };
 
   const openProductModal = () => {
@@ -580,6 +581,18 @@ export default function CouponFormView({
               onChange={(e) => handleCurrencyFieldChange('max_order_amount', e.target.value)}
             />
             {errors.max_order_amount && <MessageError>{errors.max_order_amount}</MessageError>}
+          </InputGroup>
+
+          <InputGroup label={trans('hancms.promotion.coupon.fields.priority')}>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              className={inputClass('priority')}
+              value={data.priority}
+              onChange={(e) => setData('priority', e.target.value)}
+            />
+            {errors.priority && <MessageError>{errors.priority}</MessageError>}
           </InputGroup>
 
           <InputGroup label={trans('hancms.promotion.coupon.fields.usage_limit_total')}>
