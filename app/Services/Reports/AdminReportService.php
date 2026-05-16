@@ -136,6 +136,13 @@ class AdminReportService
     {
         $items = $this->orderRepository->getTopSellingProducts($startDate, $endDate, 15);
 
+        $productIds = $items->pluck('product_id')->filter()->unique();
+        $products = Product::query()
+            ->with(['translations' => fn ($query) => $query->whereIn('locale', [app()->getLocale(), 'vi'])])
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
         $totalRevenue = (float) $items->sum('revenue');
         $totalQuantity = (int) $items->sum('sold_quantity');
 
@@ -151,12 +158,16 @@ class AdminReportService
                 ['label' => __('hancms.report.product.metrics.active_catalog'), 'value' => count($this->productRepository->getProductsForInventoryReport()->where('status', 1)), 'tone' => 'amber'],
             ],
             'charts' => [
-                'top' => $items->map(fn (OrderItem $item) => [
-                    'label' => $item->product_name ?: ($item->product_sku ?: '#'.$item->product_id),
-                    'value' => (float) $item->revenue,
-                    'value_label' => $this->money($item->revenue),
-                    'quantity' => (int) $item->sold_quantity,
-                ])->values()->all(),
+                'top' => $items->map(function (OrderItem $item) use ($products) {
+                    $product = $products->get($item->product_id);
+
+                    return [
+                        'label' => $product ? $this->productName($product) : ($item->product_name ?: ($item->product_sku ?: '#'.$item->product_id)),
+                        'value' => (float) $item->revenue,
+                        'value_label' => $this->money($item->revenue),
+                        'quantity' => (int) $item->sold_quantity,
+                    ];
+                })->values()->all(),
             ],
             'columns' => [
                 ['key' => 'product_name', 'label' => __('hancms.report.columns.product')],
@@ -164,12 +175,16 @@ class AdminReportService
                 ['key' => 'sold_quantity', 'label' => __('hancms.report.columns.sold_quantity')],
                 ['key' => 'revenue_label', 'label' => __('hancms.report.columns.revenue')],
             ],
-            'rows' => $items->map(fn (OrderItem $item) => [
-                'product_name' => $item->product_name ?: 'N/A',
-                'product_sku' => $item->product_sku ?: 'N/A',
-                'sold_quantity' => (int) $item->sold_quantity,
-                'revenue_label' => $this->money($item->revenue),
-            ])->values()->all(),
+            'rows' => $items->map(function (OrderItem $item) use ($products) {
+                $product = $products->get($item->product_id);
+
+                return [
+                    'product_name' => $product ? $this->productName($product) : ($item->product_name ?: 'N/A'),
+                    'product_sku' => $item->product_sku ?: 'N/A',
+                    'sold_quantity' => (int) $item->sold_quantity,
+                    'revenue_label' => $this->money($item->revenue),
+                ];
+            })->values()->all(),
         ];
     }
 
