@@ -615,7 +615,7 @@ export default function BuyToGiftFormView({
                             <option value="">{trans('hancms.placeholder.select')}</option>
                             {variantOptions.map((variant: any) => (
                               <option key={variant.id} value={variant.id} disabled={Number(variant.stock ?? 0) <= 0}>
-                                {variantLabel(variant)}{variant.sku ? ` (${variant.sku})` : ''}{Number(variant.stock ?? 0) <= 0 ? ' - Hết hàng' : ''}
+                                {variantLabel(variant)}{variant.sku ? ` (${variant.sku})` : ''}{Number(variant.stock ?? 0) <= 0 ? ` - ${trans('hancms.promotion.buytogift.summary.out_of_stock')}` : ''}
                               </option>
                             ))}
                           </select>
@@ -687,21 +687,21 @@ export default function BuyToGiftFormView({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="inline-flex items-center gap-2 text-xs font-semibold text-cyan-700">
             <Gift size={15} className="text-cyan-600" />
-            Free theo màu
+            {trans('hancms.promotion.buytogift.summary.free_by_variant')}
           </span>
           <span className="text-xs text-cyan-700/80">
-            Từng màu có thể reserve riêng
+            {trans('hancms.promotion.buytogift.summary.variant_reserve_hint')}
           </span>
         </div>
         <div className="max-h-[320px] overflow-auto rounded-lg border border-cyan-200 bg-white">
           <table className="min-w-full divide-y divide-cyan-100 text-sm">
             <thead className="bg-cyan-50">
               <tr>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">Sản phẩm</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">Biến thể</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">Tồn hiện tại</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">Tạm giữ</th>
-                <th className="w-12 px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-cyan-700">Xóa</th>
+                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">{trans('hancms.report.columns.product')}</th>
+                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">{trans('hancms.sales.orders.fields.variant')}</th>
+                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">{trans('hancms.report.columns.stock')}</th>
+                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-cyan-700">{trans('hancms.promotion.buytogift.summary.reserved_quantity')}</th>
+                <th className="w-12 px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-cyan-700">{trans('hancms.button.delete')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-cyan-100 bg-white">
@@ -799,7 +799,7 @@ export default function BuyToGiftFormView({
           </div>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Rules</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">{trans('hancms.promotion.buytogift.summary.rule')}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{enabledRuleCount}/{rules.length}</div>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -1127,9 +1127,9 @@ export default function BuyToGiftFormView({
         onNextPage={() => productPicker.setPage((prev) => Math.min(productPicker.totalPages, prev + 1))}
         formatPrice={(price) => formatProductPrice(price, resolvedCurrency)}
         trans={trans}
-        allCategoriesLabel="Tất cả danh mục"
-        loadingLabel="Đang tải..."
-        emptyLabel="Không có dữ liệu"
+        allCategoriesLabel={trans('hancms.promotion.buytogift.summary.all_categories')}
+        loadingLabel={trans('hancms.loading')}
+        emptyLabel={trans('hancms.dashboard.empty')}
         requireStock
       />
     </div>

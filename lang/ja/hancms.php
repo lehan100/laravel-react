@@ -410,6 +410,11 @@ return [
                 'warning_wasted' => ':count 個の特典が余っていますが、次の枠を作るには足りません。',
                 'warning_sold_out' => '特典は売り切れです。',
                 'warning_max_gift_cap' => '特典上限は :slots 枠までで、現在の在庫に対して :shortage 枠分不足しています。',
+                'free_by_variant' => 'バリエーション別無料',
+                'variant_reserve' => ':count バリエーション、確保数 :qty',
+                'variant_reserve_hint' => 'バリエーションごとに在庫を個別に確保できます。',
+                'out_of_stock' => '在庫切れ',
+                'all_categories' => 'すべてのカテゴリー',
             ],
             'fields' => [
                 'condition_type' => '条件タイプ',

@@ -410,6 +410,11 @@ return [
                 'warning_wasted' => 'Còn dư :count quà, chưa đủ để tạo thêm suất mới.',
                 'warning_sold_out' => 'Quà tặng đã hết.',
                 'warning_max_gift_cap' => 'Số lượng quà tối đa chỉ đủ cho :slots suất, thiếu :shortage suất so với kho hiện có.',
+                'free_by_variant' => 'Miễn phí theo mẫu/màu',
+                'variant_reserve' => ':count mẫu, tạm giữ :qty',
+                'variant_reserve_hint' => 'Từng biến thể có thể giữ kho riêng.',
+                'out_of_stock' => 'Hết hàng',
+                'all_categories' => 'Tất cả danh mục',
             ],
             'fields' => [
                 'condition_type' => 'Loại điều kiện',

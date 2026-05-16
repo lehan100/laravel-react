@@ -196,7 +196,7 @@ export default function ShowPage() {
       <div className="flex items-center justify-between border-b border-fuchsia-200 bg-fuchsia-50/70 px-3 py-2">
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-fuchsia-700">
           <Gift size={15} className="text-fuchsia-700" />
-          Free theo màu
+          {trans('hancms.promotion.buytogift.summary.free_by_variant')}
         </div>
         <span className="rounded-full bg-fuchsia-100 px-2 py-0.5 text-xs font-semibold text-fuchsia-800">
           {options.length}
@@ -206,10 +206,10 @@ export default function ShowPage() {
         <table className="min-w-full divide-y divide-fuchsia-100 text-sm">
           <thead className="bg-fuchsia-50">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Sản phẩm</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Biến thể</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Tồn hiện tại</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Tạm giữ</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">{trans('hancms.report.columns.product')}</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">{trans('hancms.sales.orders.fields.variant')}</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">{trans('hancms.report.columns.stock')}</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fuchsia-700">{trans('hancms.promotion.buytogift.summary.reserved_quantity')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-fuchsia-50 bg-white">
@@ -273,7 +273,7 @@ export default function ShowPage() {
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
             <Layers3 size={15} />
-            Rules
+            {trans('hancms.promotion.buytogift.summary.rule')}
           </div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{enabledRulesCount}/{rules.length}</div>
         </div>
@@ -302,7 +302,12 @@ export default function ShowPage() {
             <div>{trans('hancms.promotion.buytogift.summary.reserved_total')}: {primaryRuleReservedQuantity}</div>
             <div>{trans('hancms.promotion.buytogift.summary.sold_quantity')}: {primaryRuleSoldQuantity}</div>
             {primaryRuleGiftVariantOptions.length > 0 && (
-              <div>Free theo màu: {primaryRuleGiftVariantOptions.length} màu, tạm giữ {primaryRuleGiftVariantReserveTotal}</div>
+              <div>
+                {trans('hancms.promotion.buytogift.summary.free_by_variant')}: {trans('hancms.promotion.buytogift.summary.variant_reserve', {
+                  count: primaryRuleGiftVariantOptions.length,
+                  qty: primaryRuleGiftVariantReserveTotal,
+                })}
+              </div>
             )}
           </div>
           {primaryRuleDisplay.isSoldOut && (
@@ -362,7 +367,7 @@ export default function ShowPage() {
                 <div key={rule.id || index} className="overflow-hidden rounded-xl border border-slate-200 border-l-4 border-l-cyan-600 bg-white shadow-md shadow-slate-200/70">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-gradient-to-r from-cyan-50 via-white to-white px-4 py-3">
                     <div className="flex flex-wrap items-center gap-3">
-                      <div className="rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm">Rule #{index + 1}</div>
+                      <div className="rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm">{trans('hancms.promotion.buytogift.summary.rule')} #{index + 1}</div>
                       <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
                         {rule.condition_type === 'order_amount'
                           ? trans('hancms.promotion.buytogift.options.order_amount')
@@ -370,10 +375,13 @@ export default function ShowPage() {
                       </span>
                       {Array.isArray(rule?.gift_variant_options) && rule.gift_variant_options.length > 0 ? (
                         <span className="rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700 ring-1 ring-fuchsia-100">
-                          Free theo màu: {rule.gift_variant_options.length} màu, tạm giữ {rule.gift_variant_options.reduce(
-                            (total: number, option: any) => total + Number(option?.reserve_qty ?? 0),
-                            0
-                          )}
+                          {trans('hancms.promotion.buytogift.summary.free_by_variant')}: {trans('hancms.promotion.buytogift.summary.variant_reserve', {
+                            count: rule.gift_variant_options.length,
+                            qty: rule.gift_variant_options.reduce(
+                              (total: number, option: any) => total + Number(option?.reserve_qty ?? 0),
+                              0
+                            ),
+                          })}
                         </span>
                       ) : null}
                       <StatusBadge
