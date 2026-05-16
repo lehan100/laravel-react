@@ -120,16 +120,17 @@ class DashboardEloquentRepository implements DashboardRepositoryInterface
     private function topProducts(Carbon $startDate, Carbon $endDate): array
     {
         return OrderItem::query()
-            ->selectRaw('product_id, product_sku, product_name, SUM(quantity) as sold_quantity, SUM(line_total) as revenue')
+            ->with(['product.translations' => fn ($query) => $query->whereIn('locale', [app()->getLocale(), 'vi'])])
+            ->selectRaw('product_id, product_sku, MAX(product_name) as snapshot_name, SUM(quantity) as sold_quantity, SUM(line_total) as revenue')
             ->whereHas('order', fn ($query) => $query
                 ->whereBetween('placed_at', [$startDate, $endDate])
                 ->where('order_status', '!=', 'cancelled'))
-            ->groupBy('product_id', 'product_sku', 'product_name')
+            ->groupBy('product_id', 'product_sku')
             ->orderByDesc('revenue')
             ->limit(6)
             ->get()
             ->map(fn (OrderItem $item) => [
-                'name' => $item->product_name ?: ($item->product_sku ?: '#'.$item->product_id),
+                'name' => $item->product ? $this->productName($item->product) : ($item->snapshot_name ?: ($item->product_sku ?: '#'.$item->product_id)),
                 'sku' => $item->product_sku,
                 'sold_quantity' => (int) $item->sold_quantity,
                 'revenue' => $this->money($item->revenue),
