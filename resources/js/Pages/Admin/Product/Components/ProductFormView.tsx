@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
-import { Globe, Plus, RefreshCw, Save, Search, Sparkles, Trash2, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Globe, Lock, LockOpen, Plus, RefreshCw, Save, Search, Sparkles, Trash2, X } from 'lucide-react';
 import { quickSave } from '@/actions/App/Http/Controllers/Admin/Catalog/AttributeController';
 import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import SaveButton from '@/Components/Button/SaveButton';
@@ -58,6 +58,27 @@ type QuickAttributeFormState = {
     type: 'text' | 'image' | 'color';
     translations: QuickAttributeTranslation[];
     values: QuickAttributeValueForm[];
+};
+
+type SeoAnalysisItem = {
+    label: string;
+    status: string;
+    message: string;
+};
+
+type SeoKeywordDensity = {
+    keyword: string;
+    count: number;
+    density: number;
+    status: string;
+};
+
+type SeoAnalysisResult = {
+    score: number;
+    summary: string;
+    keyword_density: SeoKeywordDensity[];
+    checks: SeoAnalysisItem[];
+    recommendations: string[];
 };
 
 type QuickAttributeValueDraft = {
@@ -119,31 +140,36 @@ const ProductFormView = ({
     const [variantImageUploading, setVariantImageUploading] = useState(false);
     const [priceInput, setPriceInput] = useState(() => formatPriceInput(data.price, priceCurrency));
     const [attributeList, setAttributeList] = useState<any[]>(attributes || []);
-    const [selectedValueIdsByAttribute, setSelectedValueIdsByAttribute] = useState<Record<string, number[]>>(() => {
+    const selectedValueIdsByAttribute = useMemo(() => {
         const selected: Record<string, number[]> = {};
-        const variants = Array.isArray(data.variants) ? data.variants : [];
+        const attributeValueIds = Array.isArray(data.attribute_value_ids) ? data.attribute_value_ids : [];
 
-        variants.forEach((variant: any) => {
-            (variant.attribute_value_ids || []).forEach((valueId: any) => {
-                const attribute = attributeList.find((attr: any) =>
-                    (attr.values || []).some((value: any) => Number(value.id) === Number(valueId))
-                );
+        attributeValueIds.forEach((valueId: any) => {
+            const vid = Number(valueId);
+            const attribute = attributeList.find((attr: any) =>
+                (attr.values || []).some((value: any) => Number(value.id) === vid)
+            );
 
-                if (!attribute) return;
+            if (!attribute) return;
 
-                const key = String(attribute.id);
-                selected[key] = Array.from(new Set([...(selected[key] || []), Number(valueId)]));
-            });
+            const key = String(attribute.id);
+            if (!selected[key]) selected[key] = [];
+            if (!selected[key].includes(vid)) {
+                selected[key].push(vid);
+            }
         });
 
         return selected;
-    });
+    }, [attributeList, data.attribute_value_ids]);
+
     const [isQuickAttributeModalOpen, setIsQuickAttributeModalOpen] = useState(false);
     const [isQuickAttributeSubmitting, setIsQuickAttributeSubmitting] = useState(false);
     const [isQuickAttributeImageUploading, setIsQuickAttributeImageUploading] = useState(false);
     const [quickAttributeErrors, setQuickAttributeErrors] = useState<Record<string, string>>({});
     const [quickAttributeAiTranslating, setQuickAttributeAiTranslating] = useState(false);
     const [quickAttributeAiTranslateError, setQuickAttributeAiTranslateError] = useState('');
+    const [quickValueAiTranslating, setQuickValueAiTranslating] = useState(false);
+    const [quickValueAiTranslateError, setQuickValueAiTranslateError] = useState('');
     const [isQuickValueModalOpen, setIsQuickValueModalOpen] = useState(false);
     const [isQuickValueSubmitting, setIsQuickValueSubmitting] = useState(false);
     const [isQuickValueImageUploading, setIsQuickValueImageUploading] = useState(false);
@@ -158,21 +184,24 @@ const ProductFormView = ({
             name: '',
         })),
         values: [
-                {
-                    translations: langList.slice(0, 3).map((lang: any) => ({
-                        locale: lang.code,
-                        value: '',
-                    })),
-                    image: '',
-                    image_url: '',
-                    color: '#000000',
-                },
-            ],
+            {
+                translations: langList.slice(0, 3).map((lang: any) => ({
+                    locale: lang.code,
+                    value: '',
+                })),
+                image: '',
+                image_url: '',
+                color: '#000000',
+            },
+        ],
     }));
     const [aiSuggestingLocale, setAiSuggestingLocale] = useState<string | null>(null);
     const [aiSuggestionError, setAiSuggestionError] = useState('');
     const [aiSeoSuggestingLocale, setAiSeoSuggestingLocale] = useState<string | null>(null);
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
+    const [aiSeoAnalyzingLocale, setAiSeoAnalyzingLocale] = useState<string | null>(null);
+    const [aiSeoAnalysisError, setAiSeoAnalysisError] = useState('');
+    const [seoAnalysisByLocale, setSeoAnalysisByLocale] = useState<Record<string, SeoAnalysisResult>>({});
     const [aiTranslating, setAiTranslating] = useState(false);
     const [aiTranslateError, setAiTranslateError] = useState('');
     const [variantAiTranslating, setVariantAiTranslating] = useState(false);
@@ -180,6 +209,7 @@ const ProductFormView = ({
     useEffect(() => {
         setAttributeList(attributes || []);
     }, [attributes]);
+
     const currentVariantLanguage = langList.find((item: any) => item.code === currentTab) || langList[0] || null;
     const currentVariantLocale = currentVariantLanguage?.code || currentTab || langCode || 'vi';
     const hasVariants = Array.isArray(item?.variants) && item.variants.length > 0;
@@ -386,18 +416,12 @@ const ProductFormView = ({
     }, {});
 
     const toggleAttributeValue = (attributeId: number, valueId: number) => {
-        setSelectedValueIdsByAttribute((prev) => {
-            const key = String(attributeId);
-            const current = prev[key] || [];
-            const nextValues = current.includes(valueId)
-                ? current.filter((id) => id !== valueId)
-                : [...current, valueId];
+        const currentIds = Array.isArray(data.attribute_value_ids) ? data.attribute_value_ids : [];
+        const nextIds = currentIds.includes(valueId)
+            ? currentIds.filter((id: any) => Number(id) !== Number(valueId))
+            : [...currentIds, valueId];
 
-            return {
-                ...prev,
-                [key]: nextValues,
-            };
-        });
+        setData("attribute_value_ids", nextIds);
     };
 
     const openQuickAttributeModal = () => {
@@ -633,6 +657,75 @@ const ProductFormView = ({
             );
         } finally {
             setQuickAttributeAiTranslating(false);
+        }
+    };
+
+    const handleQuickValueAiTranslate = async () => {
+        setQuickValueAiTranslateError('');
+
+        if (!quickValueDraft) return;
+
+        const source = getQuickAttributeSourceTranslation(quickValueDraft.translations, 'value');
+
+        if (!source) {
+            setQuickValueAiTranslateError(
+                trans('hancms.catalog.attribute.ai.missing_input') || 'Please enter a value in one language first.'
+            );
+            return;
+        }
+
+        setQuickValueAiTranslating(true);
+
+        try {
+            const targetLocales = quickAttributeLocales
+                .map((lang: any) => lang.code)
+                .filter((locale: string) => locale !== source.locale);
+
+            if (targetLocales.length) {
+                const response = await axios.request({
+                    ...translateLocaleFields(),
+                    data: {
+                        module: 'attribute',
+                        source_locale: source.locale,
+                        target_locales: targetLocales,
+                        fields: {
+                            value: source.value,
+                        },
+                    },
+                });
+
+                const translations = response?.data?.translations || {};
+
+                if (Object.keys(translations).length) {
+                    setQuickValueDraft((current) => {
+                        if (!current) return current;
+
+                        return {
+                            ...current,
+                            translations: current.translations.map((translation) => {
+                                if (translation.locale === source.locale) {
+                                    return translation;
+                                }
+
+                                const translated = translations[translation.locale] || translations[String(translation.locale).toLowerCase()];
+
+                                return {
+                                    ...translation,
+                                    value: translated?.value || translation.value || '',
+                                };
+                            }),
+                        };
+                    });
+                }
+            }
+        } catch (error: any) {
+            setQuickValueAiTranslateError(
+                error?.response?.data?.message
+                || trans('hancms.catalog.attribute.ai.failed')
+                || 'Unable to translate attribute values right now.'
+            );
+        } finally {
+            setQuickValueAiTranslating(false);
         }
     };
 
@@ -1296,6 +1389,43 @@ const ProductFormView = ({
         }
     };
 
+    const handleAiAnalyzeSeo = async (locale: string) => {
+        const langData = data.translations?.[locale] || {};
+
+        setAiSeoAnalysisError('');
+        setAiSeoAnalyzingLocale(locale);
+
+        try {
+            const response = await axios.post(route('product.ai.analyze-seo'), {
+                locale,
+                name: langData.name || '',
+                description: langData.description || '',
+                content: langData.content || '',
+                seo_title: langData.seo_title || '',
+                seo_keyword: langData.seo_keyword || '',
+                seo_description: langData.seo_description || '',
+            });
+
+            setSeoAnalysisByLocale((current) => ({
+                ...current,
+                [locale]: {
+                    score: Number(response?.data?.score || 0),
+                    summary: String(response?.data?.summary || ''),
+                    keyword_density: Array.isArray(response?.data?.keyword_density) ? response.data.keyword_density : [],
+                    checks: Array.isArray(response?.data?.checks) ? response.data.checks : [],
+                    recommendations: Array.isArray(response?.data?.recommendations) ? response.data.recommendations : [],
+                },
+            }));
+        } catch (error: any) {
+            const message = error?.response?.data?.message
+                || trans('hancms.catalog.product.ai.failed')
+                || 'Cannot analyze SEO right now.';
+            setAiSeoAnalysisError(message);
+        } finally {
+            setAiSeoAnalyzingLocale(null);
+        }
+    };
+
     const applyAiTranslations = (translations: Record<string, any>) => {
         setData((prev: any) => {
             const nextTranslations = { ...(prev.translations || {}) };
@@ -1552,6 +1682,12 @@ const ProductFormView = ({
         const seoKeywordError = errors?.[`translations.${locale}.seo_keyword`];
         const seoDescriptionError = errors?.[`translations.${locale}.seo_description`];
         const isSlugLocked = !!slugLocked[locale];
+        const seoAnalysis = seoAnalysisByLocale[locale];
+        const seoScoreColor = (seoAnalysis?.score || 0) >= 80
+            ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+            : (seoAnalysis?.score || 0) >= 60
+                ? 'text-amber-700 bg-amber-50 border-amber-200'
+                : 'text-rose-700 bg-rose-50 border-rose-200';
         return (
             <div className="space-y-6">
                 <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-6">
@@ -1650,10 +1786,15 @@ const ProductFormView = ({
                                         : 'text-indigo-600 bg-indigo-50 shadow-sm border border-indigo-100'
                                         }`}
                                 >
-                                    {isSlugLocked ? 'LOCK' : 'EDIT'}
+                                    {isSlugLocked ? <Lock size={14} /> : <LockOpen size={14} />}
                                 </button>
                             </div>
                             {slugError && <MessageError>{slugError}</MessageError>}
+                            {!isSlugLocked && !slugError && (
+                                <p className="text-[12px] text-amber-600 mt-1 italic font-medium">
+                                    {trans('hancms.message.edit_slug') || "* Đang cho phép sửa tay Slug của ngôn ngữ này."}
+                                </p>
+                            )}
                         </InputGroup>
 
                         <InputGroup label={trans('hancms.column.description')}>
@@ -1721,27 +1862,118 @@ const ProductFormView = ({
                                 <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase">
                                     <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => handleAiSuggestSeo(locale)}
-                                    disabled={aiSeoSuggestingLocale === locale}
-                                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoSuggestingLocale === locale
-                                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                        : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                        }`}
-                                >
-                                    <Sparkles size={14} />
-                                    {aiSeoSuggestingLocale === locale
-                                        ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
-                                        : (trans('hancms.catalog.product.ai.suggest_seo') || 'AI suggest SEO')}
-                                </button>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleAiAnalyzeSeo(locale)}
+                                        disabled={aiSeoAnalyzingLocale === locale}
+                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoAnalyzingLocale === locale
+                                            ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                            : 'border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100'
+                                            }`}
+                                    >
+                                        <Search size={14} />
+                                        {aiSeoAnalyzingLocale === locale
+                                            ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
+                                            : (trans('hancms.catalog.product.ai.analyze_seo') || 'AI analyze SEO')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleAiSuggestSeo(locale)}
+                                        disabled={aiSeoSuggestingLocale === locale}
+                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoSuggestingLocale === locale
+                                            ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                            : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                            }`}
+                                    >
+                                        <Sparkles size={14} />
+                                        {aiSeoSuggestingLocale === locale
+                                            ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
+                                            : (trans('hancms.catalog.product.ai.suggest_seo') || 'AI suggest SEO')}
+                                    </button>
+                                </div>
                             </div>
                             {aiSeoSuggestionError && <MessageError>{aiSeoSuggestionError}</MessageError>}
+                            {aiSeoAnalysisError && <MessageError>{aiSeoAnalysisError}</MessageError>}
+                            {seoAnalysis ? (
+                                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <div className="flex flex-wrap items-start justify-between gap-3">
+                                        <div>
+                                            <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                                                {trans('hancms.catalog.product.ai.seo_analysis') || 'SEO analysis'}
+                                            </div>
+                                            <p className="mt-1 text-sm text-slate-600">{seoAnalysis.summary}</p>
+                                        </div>
+                                        <div className={`rounded-2xl border px-4 py-2 text-center ${seoScoreColor}`}>
+                                            <div className="text-2xl font-black leading-none">{seoAnalysis.score}</div>
+                                            <div className="mt-1 text-[10px] font-bold uppercase tracking-wide">SEO</div>
+                                        </div>
+                                    </div>
 
-                                <InputGroup
-                                    label={
-                                        <div className="flex justify-between items-end w-full">
-                                            <span>{trans('hancms.seo.field.title') || "Seo Title"}</span>
+                                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                                                {trans('hancms.catalog.product.ai.seo_checks') || 'SEO checks'}
+                                            </div>
+                                            {(seoAnalysis.checks || []).map((check, index) => (
+                                                <div key={`${check.label}-${index}`} className="flex items-start gap-2 rounded-xl bg-slate-50 p-3 text-sm">
+                                                    {check.status === 'good' ? (
+                                                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                                                    ) : (
+                                                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                                                    )}
+                                                    <div>
+                                                        <div className="font-semibold text-slate-800">{check.label}</div>
+                                                        <div className="mt-0.5 text-xs text-slate-500">{check.message}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                                                    {trans('hancms.catalog.product.ai.keyword_density') || 'Keyword density'}
+                                                </div>
+                                                <div className="mt-2 space-y-2">
+                                                    {(seoAnalysis.keyword_density || []).length > 0 ? seoAnalysis.keyword_density.map((item, index) => (
+                                                        <div key={`${item.keyword}-${index}`} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2 text-sm">
+                                                            <span className="min-w-0 truncate font-semibold text-slate-700">{item.keyword}</span>
+                                                            <span className="shrink-0 font-mono text-xs text-slate-500">
+                                                                {item.count} / {Number(item.density || 0).toFixed(2)}%
+                                                            </span>
+                                                        </div>
+                                                    )) : (
+                                                        <div className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                                                            {trans('hancms.catalog.product.ai.no_keywords') || 'No SEO keywords to analyze.'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {(seoAnalysis.recommendations || []).length > 0 ? (
+                                                <div>
+                                                    <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                                                        {trans('hancms.catalog.product.ai.recommendations') || 'Recommendations'}
+                                                    </div>
+                                                    <ul className="mt-2 space-y-2 text-sm text-slate-600">
+                                                        {seoAnalysis.recommendations.map((recommendation, index) => (
+                                                            <li key={`${recommendation}-${index}`} className="rounded-xl bg-cyan-50 px-3 py-2 text-cyan-800">
+                                                                {recommendation}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : null}
+
+                            <InputGroup
+                                label={
+                                    <div className="flex justify-between items-end w-full">
+                                        <span>{trans('hancms.seo.field.title') || "Seo Title"}</span>
                                         <span className={`text-[10px] font-mono ${langData.seo_title?.length > 60 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
                                             {langData.seo_title?.length || 0}/60 {trans('hancms.seo.character') || "character"}
                                         </span>
@@ -2158,7 +2390,7 @@ const ProductFormView = ({
                         </div>
 
                         <div className="space-y-6 px-5 py-5">
-                            <div className="space-y-4">
+                            <div className="space-y-4 mb-5 pb-5 border-b border-slate-200">
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div>
                                         <h4 className="text-xs font-black uppercase text-slate-500">
@@ -2336,7 +2568,7 @@ const ProductFormView = ({
                                                 className={`group relative h-28 w-28 shrink-0 overflow-hidden rounded-xl border transition ${isCover
                                                     ? 'border-emerald-500 ring-2 ring-emerald-200'
                                                     : 'border-slate-200 bg-slate-100 hover:border-slate-300'
-                                                }`}
+                                                    }`}
                                             >
                                                 <img
                                                     src={previewUrl}
@@ -2437,10 +2669,33 @@ const ProductFormView = ({
                             )}
 
                             <div className="rounded-xl border border-slate-200 p-4">
-                                <div className="mb-4">
-                                    <h4 className="text-xs font-black uppercase text-slate-500">
-                                        {trans('hancms.catalog.attribute.fields.localized_value_hint')}
-                                    </h4>
+                                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <h4 className="text-xs font-black uppercase text-slate-500">
+                                            {trans('hancms.catalog.attribute.fields.localized_value_hint')}
+                                        </h4>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleQuickValueAiTranslate}
+                                            disabled={quickValueAiTranslating || quickAttributeLocales.length < 2}
+                                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${quickValueAiTranslating || quickAttributeLocales.length < 2
+                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                                                }`}
+                                        >
+                                            <Sparkles size={14} />
+                                            {quickValueAiTranslating
+                                                ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...')
+                                                : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
+                                        </button>
+                                        {quickValueAiTranslateError && (
+                                            <div className="max-w-[20rem] text-right text-xs text-rose-600">
+                                                {quickValueAiTranslateError}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="grid gap-4 md:grid-cols-3">
                                     {quickAttributeLocales.map((lang: any, index: number) => (
@@ -2628,7 +2883,7 @@ const ProductFormView = ({
                                             className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${quickAttributeAiTranslating || quickAttributeLocales.length < 2
                                                 ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
                                                 : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                            }`}
+                                                }`}
                                         >
                                             <Sparkles size={14} />
                                             {quickAttributeAiTranslating

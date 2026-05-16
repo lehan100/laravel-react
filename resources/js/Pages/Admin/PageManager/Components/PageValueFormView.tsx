@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Editor } from '@tinymce/tinymce-react';
-import { Image as ImageIcon, Save, Sparkles } from 'lucide-react';
+import { Image as ImageIcon, Lock, LockOpen, Save, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import BackButton from '@/Components/Button/BackButton';
 import SaveButton from '@/Components/Button/SaveButton';
@@ -864,24 +864,20 @@ export default function PageValueFormView({
                                         <button
                                             type="button"
                                             onClick={() => toggleSlugLock(activeLocale)}
-                                            className={`absolute right-2 rounded-md px-2 py-1 text-[11px] font-semibold transition ${
-                                                slugLocked[activeLocale]
-                                                    ? 'border border-slate-200 bg-white text-slate-400 hover:bg-slate-100'
-                                                    : 'border border-indigo-100 bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
-                                            }`}
+                                            className={`absolute right-2 p-1.5 rounded-md transition-all ${slugLocked[activeLocale]
+                                                ? 'text-gray-400 hover:bg-gray-200'
+                                                : 'text-indigo-600 bg-indigo-50 shadow-sm border border-indigo-100'
+                                                }`}
                                         >
-                                            {slugLocked[activeLocale] ? 'LOCK' : 'EDIT'}
+                                            {slugLocked[activeLocale] ? <Lock size={14} /> : <LockOpen size={14} />}
                                         </button>
                                     </div>
-                                    <div className="mt-2 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2">
-                                        <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                                            {trans('hancms.page.slug_preview')}
-                                        </div>
-                                        <div className="mt-1 break-all font-mono text-xs text-slate-700">
-                                            {previewPath}
-                                        </div>
-                                    </div>
                                     {errors[`translations.${activeLocale}.slug`] ? <p className="mt-1 text-xs text-red-500">{errors[`translations.${activeLocale}.slug`]}</p> : null}
+                                    {!slugLocked[activeLocale] && !errors[`translations.${activeLocale}.slug`] && (
+                                        <p className="text-[12px] text-amber-600 mt-1 italic font-medium">
+                                            {trans('hancms.message.edit_slug') || "* Đang cho phép sửa tay Slug của ngôn ngữ này."}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>

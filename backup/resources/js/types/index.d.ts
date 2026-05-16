@@ -1,0 +1,168 @@
+import { Config } from 'ziggy-js';
+export interface Roles {
+  id: number;
+  name: string;
+  guard_name: string;
+}
+export interface Permissions {
+  id: number;
+  name: string;
+  guard_name: string;
+}
+export interface rolePermissions {
+  name: string;
+}
+export interface User {
+  id: number;
+  name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  group: string;
+  owner: string;
+  photo: string;
+  status: string;
+  deleted_at: string;
+  account: Account;
+}
+export interface Language {
+  id: number;
+  name: string;
+  code: string;
+  photo: string;
+  status: string;
+}
+export interface MediaPosition {
+  id: number;
+  name: string;
+  code: string;
+  status: string;
+}
+
+export interface MediaBannerTranslation {
+  name: string;
+  alias_link: string;
+  description: string;
+  content: string;
+  photo: string;
+  photo_url: string | null;
+}
+export interface Category {
+  id: number;
+  status: number;
+  order: number;
+  type?: string;
+  photo: string;
+  page_id?: number | null;
+  parent_id: number | null;
+  product_ids?: number[];
+  posts_count?: number;
+  tree_products_count?: number;
+  tree_posts_count?: number;
+  posts?: CategoryNewsItem[];
+  translations: Record<string, CategoryTranslation>;
+  created_at?: string;
+  updated_at?: string;
+}
+export interface CategoryNewsItem {
+  id: number;
+  name: string;
+  order?: number;
+  status?: number | boolean;
+}
+export interface CategoryTranslation {
+  name: string;
+  slug: string;
+  description: string;
+  content: string;
+  seo_title: string;
+  seo_keyword: string;
+  seo_description: string;
+}
+export interface MediaBanner {
+  id: number;
+  status: number;
+  order: number;
+  positions: MediaPosition[];
+  translations: Record<string, MediaBannerTranslation>;
+  created_at?: string;
+  updated_at?: string;
+}
+export interface Account {
+  id: number;
+  name: string;
+  users: User[];
+  contacts: Contact[];
+  organizations: Organization[];
+}
+
+export interface Contact {
+  id: number;
+  name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  region: string;
+  country: string;
+  postal_code: string;
+  deleted_at: string;
+  organization_id: number;
+  organization: Organization;
+}
+
+export interface Organization {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  region: string;
+  country: string;
+  postal_code: string;
+  deleted_at: string;
+  contacts: Contact[];
+}
+
+export type PaginatedData<T> = {
+  data: T[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+
+    links: {
+      url: null | string;
+      label: string;
+      active: boolean;
+    }[];
+  };
+};
+
+export type PageProps<
+  T extends Record<string, unknown> = Record<string, unknown>
+> = T & {
+  auth: {
+    user: User;
+    permissions: any;
+  };
+  flash: {
+    success: string | null;
+    error: string | null;
+  };
+  ziggy: Config & { location: string };
+};

@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\Settings\LabelController;
 use App\Http\Controllers\Admin\Settings\LanguageController;
 use App\Http\Controllers\Admin\Settings\LayoutController;
 use App\Http\Controllers\Admin\Settings\LocationController;
+use App\Http\Controllers\Admin\Settings\MailTemplateController;
 use App\Http\Controllers\Admin\Users\RoleController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Ai\CategoryAiController;
@@ -107,9 +108,11 @@ Route::prefix($prefixAdmin)->group(function () {
         /* ----------- Product AI ----------- */
         Route::post('product/ai-suggest-content', [ProductAiController::class, 'suggestContent'])->name('product.ai.suggest-content');
         Route::post('product/ai-suggest-seo', [ProductAiController::class, 'suggestSeo'])->name('product.ai.suggest-seo');
+        Route::post('product/ai-analyze-seo', [ProductAiController::class, 'analyzeSeo'])->name('product.ai.analyze-seo');
         Route::post('category/ai-suggest-seo', [CategoryAiController::class, 'suggestSeo'])->name('category.ai.suggest-seo');
         Route::post('post/ai-suggest-content', [PostAiController::class, 'suggestContent'])->name('post.ai.suggest-content');
         Route::post('post/ai-suggest-seo', [PostAiController::class, 'suggestSeo'])->name('post.ai.suggest-seo');
+        Route::post('post/ai-analyze-seo', [PostAiController::class, 'analyzeSeo'])->name('post.ai.analyze-seo');
         Route::post('ai/translate', [LocaleTranslateController::class, 'translate'])->name('ai.translate');
         Route::post('post/ai-translate', [PostAiController::class, 'translate'])->name('post.ai.translate');
         /* ----------- Dashboard ----------- */
@@ -139,6 +142,7 @@ Route::prefix($prefixAdmin)->group(function () {
             'media-banner' => MediaBannerController::class,
             'languages' => LanguageController::class,
             'labels' => LabelController::class,
+            'mail-templates' => MailTemplateController::class,
             'users' => UserController::class,
             'roles' => RoleController::class,
             'category' => CategoryController::class,

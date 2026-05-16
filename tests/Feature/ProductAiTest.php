@@ -69,4 +69,68 @@ class ProductAiTest extends TestCase
         $response->assertJsonPath('seo_title', 'Sản phẩm demo chuẩn SEO');
         $response->assertJsonPath('seo_description', 'Mô tả ngắn gọn, rõ ràng, tối ưu ý định tìm kiếm cho sản phẩm demo.');
     }
+
+    #[Test]
+    public function it_analyzes_product_seo_via_ai(): void
+    {
+        $account = Account::forceCreate(['name' => 'Demo Account']);
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+        ]);
+
+        Ai::fakeAgent(AnonymousAgent::class, [
+            json_encode([
+                'score' => 86,
+                'summary' => 'SEO tổng thể tốt, cần bổ sung thêm lợi ích sản phẩm.',
+                'recommendations' => [
+                    'Thêm từ khóa chính vào đoạn mô tả đầu tiên.',
+                ],
+            ], JSON_UNESCAPED_UNICODE),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->withoutMiddleware(PermissionMiddleware::class)
+            ->post(route('product.ai.analyze-seo'), [
+                'locale' => 'vi',
+                'name' => 'Sản phẩm demo',
+                'description' => 'Tóm tắt sản phẩm demo chuẩn SEO.',
+                'content' => '<p>Sản phẩm demo có chất lượng tốt, phù hợp nhu cầu mua sắm.</p>',
+                'seo_title' => 'Sản phẩm demo chuẩn SEO',
+                'seo_keyword' => 'sản phẩm demo, chuẩn seo',
+                'seo_description' => 'Sản phẩm demo chuẩn SEO với thông tin rõ ràng, dễ đọc và phù hợp ý định tìm kiếm.',
+            ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('score', 86);
+        $response->assertJsonPath('summary', 'SEO tổng thể tốt, cần bổ sung thêm lợi ích sản phẩm.');
+        $response->assertJsonCount(2, 'keyword_density');
+        $response->assertJsonCount(5, 'checks');
+        $response->assertJsonPath('checks.0.label', 'Độ dài tiêu đề SEO');
+        $response->assertJsonPath('recommendations.0', 'Thêm từ khóa chính vào đoạn mô tả đầu tiên.');
+    }
+
+    #[Test]
+    public function it_returns_product_ai_validation_message_in_request_locale(): void
+    {
+        $account = Account::forceCreate(['name' => 'Demo Account']);
+        $user = User::factory()->create([
+            'account_id' => $account->id,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->withoutMiddleware(PermissionMiddleware::class)
+            ->postJson(route('product.ai.suggest-content'), [
+                'locale' => 'en',
+                'name' => '',
+                'description' => '',
+                'seo_keyword' => '',
+                'current_content' => '',
+            ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonPath(
+            'message',
+            'Please enter at least name, description, or keywords before generating.'
+        );
+    }
 }

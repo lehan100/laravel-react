@@ -20,7 +20,9 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - sail
+            sail:
+                aliases:
+                    - laravel.test
         depends_on:
             # - mysql
             - mariadb

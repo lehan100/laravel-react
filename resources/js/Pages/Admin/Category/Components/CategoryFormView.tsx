@@ -658,9 +658,9 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                 )}
 
                                 {!isLocked(currentTab) && !errors?.[`translations.${currentTab}.slug`] && (
-                                    <p className="text-[10px] text-amber-600 mt-1 italic font-medium">
-                                        {trans('hancms.message.edit_slug') || "* Đang cho phép sửa tay Slug của ngôn ngữ này."}
-                                    </p>
+                                <p className="text-[12px] text-amber-600 mt-1 italic font-medium">
+                                    {trans('hancms.message.edit_slug') || "* Đang cho phép sửa tay Slug của ngôn ngữ này."}
+                                </p>
                                 )}
                             </InputGroup>
 

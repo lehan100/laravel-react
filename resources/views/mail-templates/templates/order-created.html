@@ -1,0 +1,27 @@
+<tr>
+    <td style="padding:32px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
+            <tr><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:13px;color:#64748b;font-weight:700;width:40%;">{{order_code_label}}</td><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#0f172a;font-weight:700;">{{order_code}}</td></tr>
+            <tr><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:13px;color:#64748b;font-weight:700;width:40%;">{{customer_label}}</td><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#0f172a;font-weight:700;">{{customer_name}}</td></tr>
+            <tr><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:13px;color:#64748b;font-weight:700;width:40%;">{{payment_method_label}}</td><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#0f172a;font-weight:700;">{{payment_method}}</td></tr>
+            <tr><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:13px;color:#64748b;font-weight:700;width:40%;">{{shipping_method_label}}</td><td style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#0f172a;font-weight:700;">{{shipping_method}}</td></tr>
+            <tr><td style="padding:14px 18px;font-size:13px;color:#64748b;font-weight:700;width:40%;">{{order_total_label}}</td><td style="padding:14px 18px;font-size:14px;color:#0f172a;font-weight:700;">{{order_total}}</td></tr>
+        </table>
+        <div style="margin-top:24px;border:1px solid #dbeafe;border-radius:20px;background:#eff6ff;padding:20px;">
+            <div style="margin-bottom:14px;font-size:14px;font-weight:800;color:#1d4ed8;">{{items_heading}}</div>
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th align="left" style="padding:10px 0;border-bottom:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;">{{items_item_label}}</th>
+                        <th align="center" style="padding:10px 0;border-bottom:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;">{{items_qty_label}}</th>
+                        <th align="right" style="padding:10px 0;border-bottom:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;">{{items_amount_label}}</th>
+                    </tr>
+                </thead>
+                <tbody>{{items_html}}</tbody>
+            </table>
+        </div>
+        <div style="margin-top:28px;text-align:center;">
+            <a href="{{order_url}}" style="display:inline-block;background:linear-gradient(135deg,#0f172a 0%,#0b5f6b 100%);color:#fff;text-decoration:none;padding:14px 24px;border-radius:999px;font-weight:700;">{{order_cta_label}}</a>
+        </div>
+    </td>
+</tr>

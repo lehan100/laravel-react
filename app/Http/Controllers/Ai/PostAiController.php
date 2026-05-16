@@ -30,7 +30,7 @@ class PostAiController extends Controller
 
         if ($name === '' && $description === '' && $seoKeyword === '' && $currentContent === '') {
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.missing_input'),
+                'message' => $this->postAiMessage('missing_input', $locale),
             ], 422);
         }
 
@@ -43,7 +43,7 @@ class PostAiController extends Controller
 
             if ($content === '') {
                 return response()->json([
-                    'message' => __('hancms.catalog.post.ai.empty_response'),
+                    'message' => $this->postAiMessage('empty_response', $locale),
                 ], 422);
             }
 
@@ -54,7 +54,7 @@ class PostAiController extends Controller
             report($e);
 
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.failed'),
+                'message' => $this->postAiMessage('failed', $locale),
             ], 500);
         }
     }
@@ -81,7 +81,7 @@ class PostAiController extends Controller
 
         if ($name === '' && $description === '' && $seoKeyword === '' && $currentContent === '') {
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.missing_input'),
+                'message' => $this->postAiMessage('missing_input', $locale),
             ], 422);
         }
 
@@ -101,7 +101,7 @@ class PostAiController extends Controller
 
             if (($parsed['seo_title'] ?? '') === '' && ($parsed['seo_description'] ?? '') === '') {
                 return response()->json([
-                    'message' => __('hancms.catalog.post.ai.empty_response'),
+                    'message' => $this->postAiMessage('empty_response', $locale),
                 ], 422);
             }
 
@@ -110,7 +110,7 @@ class PostAiController extends Controller
             report($e);
 
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.failed'),
+                'message' => $this->postAiMessage('failed', $locale),
             ], 500);
         }
     }
@@ -146,13 +146,13 @@ class PostAiController extends Controller
 
         if ($name === '' && $description === '' && $content === '' && $seoTitle === '' && $seoKeyword === '' && $seoDescription === '') {
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.missing_input'),
+                'message' => $this->postAiMessage('missing_input', $sourceLocale),
             ], 422);
         }
 
         if ($targetLocales === []) {
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.empty_response'),
+                'message' => $this->postAiMessage('empty_response', $sourceLocale),
             ], 422);
         }
 
@@ -177,7 +177,7 @@ class PostAiController extends Controller
 
             if ($translated === []) {
                 return response()->json([
-                    'message' => __('hancms.catalog.post.ai.empty_response'),
+                    'message' => $this->postAiMessage('empty_response', $sourceLocale),
                 ], 422);
             }
 
@@ -188,7 +188,7 @@ class PostAiController extends Controller
             report($e);
 
             return response()->json([
-                'message' => __('hancms.catalog.post.ai.failed'),
+                'message' => $this->postAiMessage('failed', $sourceLocale),
             ], 500);
         }
     }
@@ -357,17 +357,26 @@ PROMPT;
     private function buildPrompt(string $name, string $description, string $seoKeyword, string $currentContent): string
     {
         return <<<PROMPT
-Create post content using the data below.
+Create a high-quality, comprehensive, and SEO-optimized post content using the data below.
 
 Post title: {$name}
 Summary: {$description}
 SEO keywords: {$seoKeyword}
-Current content (if any, improve and rewrite): {$currentContent}
+Current content (if any, optimize and expand): {$currentContent}
 
-Output requirements:
-- Return only valid HTML fragment.
-- Include one heading section, key points as a list, and a short closing paragraph.
-- Keep total length around 150-300 words.
+SEO & Formatting Requirements:
+- Return ONLY a valid HTML fragment (do not wrap in ```html).
+- Structure & Visual Elements:
+  * Do NOT include an <h1> tag.
+  * Introduction: Start with an <h2> tag containing a variation of {$seoKeyword}, followed by an engaging opening paragraph.
+  * Visual Highlight: Include a callout section using a <blockquote> tag to highlight a key takeaway or expert tip.
+  * Body Section 1: Use an <h2> or <h3> tag to introduce a detailed bulleted list (<ul>/<li>) explaining key points or steps.
+  * Body Section 2 (Visual Data): Include a simple HTML table (<table>) with 2-3 columns (e.g., Feature vs. Benefit, or Steps vs. Details) to make the data easy to scan.
+  * Conclusion: A short closing paragraph wrapped in <p> with a clear call-to-action (CTA).
+- Formatting for Scannability: Use <strong> tags to bold important phrases and critical terms naturally throughout the text.
+- Keyword Optimization: Integrate {$seoKeyword} naturally in the <h2>, early in the first paragraph, inside the table or list, and in the conclusion. Maintain a natural 1.5 - 2.5% keyword density.
+- Word Count: Expand the content thoroughly to stay strictly between 300-500 words. Keep it concise, engaging, and search-intent focused without adding fluff.
+
 PROMPT;
     }
 
@@ -441,5 +450,232 @@ PROMPT;
             'seo_title' => Str::of(strip_tags($seoTitle))->squish()->limit(60, '')->toString(),
             'seo_description' => Str::of(strip_tags($seoDescription))->squish()->limit(160, '')->toString(),
         ];
+    }
+
+    public function analyzeSeo(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'locale' => ['nullable', 'string', 'max:10'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
+            'content' => ['nullable', 'string', 'max:100000'],
+            'seo_title' => ['nullable', 'string', 'max:255'],
+            'seo_keyword' => ['nullable', 'string', 'max:2000'],
+            'seo_description' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $name = trim((string) ($validated['name'] ?? ''));
+        $description = trim((string) ($validated['description'] ?? ''));
+        $content = trim((string) ($validated['content'] ?? ''));
+        $seoTitle = trim((string) ($validated['seo_title'] ?? ''));
+        $seoKeyword = trim((string) ($validated['seo_keyword'] ?? ''));
+        $seoDescription = trim((string) ($validated['seo_description'] ?? ''));
+        $locale = $this->normalizeLocale($validated['locale'] ?? null);
+
+        if ($name === '' && $description === '' && $content === '' && $seoTitle === '' && $seoKeyword === '' && $seoDescription === '') {
+            return response()->json([
+                'message' => $this->postAiMessage('missing_input', $locale),
+            ], 422);
+        }
+
+        $localAnalysis = $this->buildLocalSeoAnalysis($locale, $name, $description, $content, $seoTitle, $seoKeyword, $seoDescription);
+
+        try {
+            $response = agent(
+                instructions: $this->buildSeoAnalysisInstructions($locale)
+            )->prompt($this->buildSeoAnalysisPrompt(
+                $name,
+                $description,
+                $content,
+                $seoTitle,
+                $seoKeyword,
+                $seoDescription,
+                $localAnalysis
+            ));
+
+            $aiAnalysis = $this->parseSeoAnalysisResponse(trim((string) $response));
+
+            return response()->json(array_replace_recursive($localAnalysis, $aiAnalysis));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'message' => $this->postAiMessage('failed', $locale),
+            ], 500);
+        }
+    }
+
+    private function postAiMessage(string $key, string $locale): string
+    {
+        return (string) __('hancms.catalog.post.ai.'.$key, [], $locale);
+    }
+
+    private function buildLocalSeoAnalysis(
+        string $locale,
+        string $name,
+        string $description,
+        string $content,
+        string $seoTitle,
+        string $seoKeyword,
+        string $seoDescription
+    ): array {
+        $t = fn (string $key): string => (string) __('hancms.catalog.post.ai.seo_check_rules.'.$key, [], $locale);
+        $plainContent = Str::of(strip_tags($description.' '.$content))->squish()->toString();
+        $searchText = Str::of($name.' '.$description.' '.$content.' '.$seoTitle.' '.$seoDescription)
+            ->stripTags()
+            ->lower()
+            ->squish()
+            ->toString();
+        $wordCount = max(1, $this->countWords($plainContent));
+        $keywords = $this->extractKeywords($seoKeyword);
+        $keywordDensity = array_map(function (string $keyword) use ($searchText, $wordCount): array {
+            $count = $this->countKeywordOccurrences($searchText, $keyword);
+            $density = round(($count / $wordCount) * 100, 2);
+
+            return [
+                'keyword' => $keyword,
+                'count' => $count,
+                'density' => $density,
+                'status' => $density >= 0.5 && $density <= 3.0 ? 'good' : ($density > 3.0 ? 'warning' : 'missing'),
+            ];
+        }, $keywords);
+
+        $okLabel = $t('status_ok');
+        $checks = [
+            $this->seoCheck($t('title_length.label'), mb_strlen($seoTitle) >= 30 && mb_strlen($seoTitle) <= 60, $t('title_length.hint'), $okLabel),
+            $this->seoCheck($t('description_length.label'), mb_strlen($seoDescription) >= 120 && mb_strlen($seoDescription) <= 160, $t('description_length.hint'), $okLabel),
+            $this->seoCheck($t('keyword_in_title.label'), $keywords === [] || str_contains(Str::lower($seoTitle), Str::lower($keywords[0])), $t('keyword_in_title.hint'), $okLabel),
+            $this->seoCheck($t('keyword_in_description.label'), $keywords === [] || str_contains(Str::lower($seoDescription), Str::lower($keywords[0])), $t('keyword_in_description.hint'), $okLabel),
+            $this->seoCheck($t('content_depth.label'), $wordCount >= 120, $t('content_depth.hint'), $okLabel),
+        ];
+
+        $passedChecks = collect($checks)->where('status', 'good')->count();
+        $score = (int) round(($passedChecks / max(1, count($checks))) * 100);
+
+        return [
+            'score' => $score,
+            'summary' => $score >= 80 ? $t('summary_good') : $t('summary_needs_improvement'),
+            'keyword_density' => $keywordDensity,
+            'checks' => $checks,
+            'recommendations' => collect($checks)
+                ->where('status', 'warning')
+                ->pluck('message')
+                ->values()
+                ->all(),
+        ];
+    }
+
+    private function extractKeywords(string $seoKeyword): array
+    {
+        return Str::of($seoKeyword)
+            ->replace(["\r\n", "\r", "\n", ';'], ',')
+            ->explode(',')
+            ->map(fn (string $keyword): string => Str::of($keyword)->squish()->lower()->toString())
+            ->filter(fn (string $keyword): bool => $keyword !== '')
+            ->unique()
+            ->take(8)
+            ->values()
+            ->all();
+    }
+
+    private function countWords(string $content): int
+    {
+        preg_match_all('/[\p{L}\p{N}]+/u', Str::lower($content), $matches);
+
+        return count($matches[0] ?? []);
+    }
+
+    private function countKeywordOccurrences(string $content, string $keyword): int
+    {
+        if ($keyword === '') {
+            return 0;
+        }
+
+        return substr_count($content, Str::lower($keyword));
+    }
+
+    private function seoCheck(string $label, bool $passes, string $failMessage, string $okMessage): array
+    {
+        return [
+            'label' => $label,
+            'status' => $passes ? 'good' : 'warning',
+            'message' => $passes ? $okMessage : $failMessage,
+        ];
+    }
+
+    private function buildSeoAnalysisInstructions(string $locale): string
+    {
+        $language = match ($locale) {
+            'en' => 'English',
+            'ja' => 'Japanese',
+            default => 'Vietnamese',
+        };
+
+        return "You are a blog post SEO auditor. Write concise feedback in {$language}. "
+            .'Return valid JSON only with keys: score, summary, recommendations. '
+            .'score must be an integer from 0 to 100. recommendations must be an array of short strings.';
+    }
+
+    private function buildSeoAnalysisPrompt(
+        string $name,
+        string $description,
+        string $content,
+        string $seoTitle,
+        string $seoKeyword,
+        string $seoDescription,
+        array $localAnalysis
+    ): string {
+        $localJson = json_encode($localAnalysis, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return <<<PROMPT
+Analyze SEO quality for this blog post page.
+
+Post title: {$name}
+Summary: {$description}
+Content HTML: {$content}
+SEO title: {$seoTitle}
+SEO keywords: {$seoKeyword}
+SEO description: {$seoDescription}
+Local metrics: {$localJson}
+
+Evaluate:
+- Search intent and keyword usage.
+- Keyword density and stuffing risks.
+- SEO title and description quality.
+- Content depth, clarity, and reading interest.
+
+Return valid JSON only.
+PROMPT;
+    }
+
+    private function parseSeoAnalysisResponse(string $raw): array
+    {
+        $decoded = json_decode($raw, true);
+
+        if (! is_array($decoded)) {
+            return [
+                'recommendations' => $raw !== '' ? [Str::of(strip_tags($raw))->squish()->limit(300)->toString()] : [],
+            ];
+        }
+
+        $analysis = [
+            'recommendations' => collect($decoded['recommendations'] ?? [])
+                ->filter(fn ($item): bool => is_scalar($item))
+                ->map(fn ($item): string => Str::of((string) $item)->stripTags()->squish()->limit(220)->toString())
+                ->filter()
+                ->values()
+                ->all(),
+        ];
+
+        if (isset($decoded['score']) && is_numeric($decoded['score'])) {
+            $analysis['score'] = max(0, min(100, (int) $decoded['score']));
+        }
+
+        $summary = Str::of((string) ($decoded['summary'] ?? ''))->stripTags()->squish()->limit(300)->toString();
+        if ($summary !== '') {
+            $analysis['summary'] = $summary;
+        }
+
+        return $analysis;
     }
 }
