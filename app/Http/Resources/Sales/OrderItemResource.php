@@ -11,12 +11,35 @@ class OrderItemResource extends JsonResource
     {
         $meta = is_array($this->meta) ? $this->meta : [];
 
+        $product = $this->relationLoaded('product') ? $this->product : null;
+        $productName = $this->product_name;
+
+        if ($product) {
+            $locale = strtolower((string) app()->getLocale());
+            $translation = $product->translations->firstWhere('locale', $locale);
+            if ($translation && ! empty($translation->name)) {
+                $productName = $translation->name;
+
+                // Append localized variant name if this item is a variant
+                $variantId = $meta['variant']['id'] ?? null;
+                if ($variantId) {
+                    $variant = $product->variants->firstWhere('id', $variantId);
+                    if ($variant) {
+                        $variantName = $variant->getLocalizedName($locale);
+                        if (! empty($variantName)) {
+                            $productName .= ' - '.$variantName;
+                        }
+                    }
+                }
+            }
+        }
+
         return [
             'id' => $this->id,
             'order_id' => $this->order_id,
             'product_id' => $this->product_id,
             'variant_id' => $meta['variant']['id'] ?? null,
-            'product_name' => $this->product_name,
+            'product_name' => $productName,
             'product_sku' => $this->product_sku,
             'quantity' => (int) ($this->quantity ?? 0),
             'unit_price' => $this->unit_price,

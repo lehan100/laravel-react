@@ -6,6 +6,7 @@ use App\Http\Requests\Catalog\ProductRequest;
 use App\Http\Resources\Catalog\ProductVariantResource;
 use App\Models\Catalog\AttributeValue;
 use App\Models\Catalog\ProductAttribute;
+use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Product\ProductEloquentRepository;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\File;
@@ -377,6 +378,64 @@ class ProductTest extends TestCase
             'name' => 'Biến thể cũ đã cập nhật',
         ]);
         $this->assertSame('Biến thể cũ đã cập nhật', $updatedVariant->name);
+    }
+
+    #[Test]
+    public function it_can_filter_products_by_search_status_and_category(): void
+    {
+        $repo = app(ProductEloquentRepository::class);
+        $categoryRepo = app(CategoryRepositoryInterface::class);
+
+        // Create Category A & B
+        $catA = $categoryRepo->save([
+            'status' => 1,
+            'type' => 'product',
+            'translations' => [
+                'vi' => ['name' => 'Category A', 'slug' => 'cat-a'],
+            ],
+        ], ['task' => 'add-item']);
+
+        $catB = $categoryRepo->save([
+            'status' => 1,
+            'type' => 'product',
+            'translations' => [
+                'vi' => ['name' => 'Category B', 'slug' => 'cat-b'],
+            ],
+        ], ['task' => 'add-item']);
+
+        // Create Products
+        $prodA = $repo->save($this->basePayload([
+            'sku' => 'PROD-A',
+            'status' => 1,
+            'category_ids' => [$catA->id],
+            'translations' => [
+                'vi' => ['name' => 'Apple Product', 'slug' => 'apple-product'],
+            ],
+        ]), ['task' => 'add-item']);
+
+        $prodB = $repo->save($this->basePayload([
+            'sku' => 'PROD-B',
+            'status' => 0,
+            'category_ids' => [$catB->id],
+            'translations' => [
+                'vi' => ['name' => 'Banana Product', 'slug' => 'banana-product'],
+            ],
+        ]), ['task' => 'add-item']);
+
+        // 1. Search filter
+        $res = $repo->lists(['search' => 'Apple'], ['task' => 'admin-list-items']);
+        $this->assertCount(1, $res->items());
+        $this->assertEquals('PROD-A', $res->items()[0]->sku);
+
+        // 2. Status filter
+        $res = $repo->lists(['status' => '0'], ['task' => 'admin-list-items']);
+        $this->assertCount(1, $res->items());
+        $this->assertEquals('PROD-B', $res->items()[0]->sku);
+
+        // 3. Category filter
+        $res = $repo->lists(['category_id' => $catA->id], ['task' => 'admin-list-items']);
+        $this->assertCount(1, $res->items());
+        $this->assertEquals('PROD-A', $res->items()[0]->sku);
     }
 
     private function basePayload(array $overrides = []): array

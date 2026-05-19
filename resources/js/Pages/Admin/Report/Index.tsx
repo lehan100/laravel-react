@@ -122,7 +122,7 @@ export default function ReportIndexPage() {
           disabled={analyzing}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-950 to-cyan-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-950/10 transition hover:from-slate-900 hover:to-cyan-800 disabled:pointer-events-none disabled:opacity-70"
         >
-          {analyzing ? <RefreshCw className="animate-spin" size={17} /> : <Sparkles size={17} />}
+          {analyzing ? <RefreshCw className="animate-spin" size={17} /> : <Sparkles size={17} className="animate-pulse" />}
           {trans('hancms.report.ai_analyze')}
         </button>
       </HeaderToolbar>
@@ -217,7 +217,7 @@ export default function ReportIndexPage() {
             <div className="min-h-[220px] rounded-2xl border border-slate-200 bg-slate-50 p-4">
               {!analysis && !analysisError && (
                 <div className="flex h-full min-h-[180px] flex-col items-center justify-center text-center text-sm text-slate-500">
-                  <Sparkles className="mb-3 text-cyan-700" size={26} />
+                  <Sparkles className="mb-3 text-cyan-700 animate-pulse" size={26} />
                   {trans('hancms.report.ai_hint')}
                 </div>
               )}

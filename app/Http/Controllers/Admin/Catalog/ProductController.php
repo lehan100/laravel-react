@@ -44,12 +44,24 @@ class ProductController extends MainController
 
     public function index()
     {
-        $items = $this->mainModel->lists(null, [
+        $this->params = array_merge(Request::all(), $this->params);
+        $items = $this->mainModel->lists($this->params, [
             'task' => 'admin-list-items',
+        ]);
+
+        $itemsCategoryActive = $this->categoryModel->lists(null, [
+            'task' => 'admin-list-items-active',
+            'type' => 'product',
         ]);
 
         return Inertia::render($this->controllerView.'Index', [
             'items' => new ProductCollection($items),
+            'filters' => [
+                'search' => trim((string) ($this->params['search'] ?? '')),
+                'status' => (string) ($this->params['status'] ?? 'all'),
+                'category_id' => (string) ($this->params['category_id'] ?? 'all'),
+            ],
+            'categories' => $itemsCategoryActive,
         ]);
     }
 

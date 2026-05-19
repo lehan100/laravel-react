@@ -13,6 +13,7 @@ import StatusSwitch from '@/Components/Status/StatusSwitch';
 import SingleUpload from '@/Components/ImageUpload/SingleUpload';
 import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
 import { translate as translatePostAi } from '@/actions/App/Http/Controllers/Ai/PostAiController';
+import AiButton from '@/Components/Button/AiButton';
 
 type SeoAnalysisItem = {
     label: string;
@@ -534,17 +535,17 @@ const PostFormView = ({
                             })}
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                            <button
+                            <AiButton
                                 type="button"
                                 onClick={handleAiTranslate}
                                 disabled={aiTranslating || langList.length < 2}
-                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-[12px] font-black uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                
                             >
-                                <Sparkles size={14} />
+                                
                                 {aiTranslating
                                     ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
                                     : (trans('hancms.catalog.post.ai.translate_button') || 'AI dịch tự động')}
-                            </button>
+                            </AiButton>
                             {aiTranslateError && (
                                 <div className="max-w-[20rem] text-right text-xs font-semibold text-rose-600">
                                     {aiTranslateError}
@@ -621,9 +622,9 @@ const PostFormView = ({
                                 type="button"
                                 onClick={() => handleAiSuggestContent(locale)}
                                 disabled={aiSuggestingLocale === locale}
-                                className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                className="inline-flex items-center gap-2 rounded-xl border-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-md transition-all hover:-translate-y-0.5 hover:from-fuchsia-400 hover:to-cyan-400 hover:shadow-lg hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                <Sparkles size={14} />
+                                <Sparkles size={14} className="animate-pulse" />
                                 {aiSuggestingLocale === locale
                                     ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
                                     : (trans('hancms.catalog.post.ai.suggest_content') || 'AI suggest content')}
@@ -675,7 +676,7 @@ const PostFormView = ({
                                     disabled={aiSeoAnalyzingLocale === locale}
                                     className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoAnalyzingLocale === locale
                                         ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                        : 'border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100'
+                                        : 'border-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-md hover:from-fuchsia-400 hover:to-cyan-400 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/30'
                                         }`}
                                 >
                                     <Search size={14} />
@@ -689,10 +690,10 @@ const PostFormView = ({
                                     disabled={aiSeoSuggestingLocale === locale}
                                     className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoSuggestingLocale === locale
                                         ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                        : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                        : 'border-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-md hover:from-fuchsia-400 hover:to-cyan-400 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/30'
                                         }`}
                                 >
-                                    <Sparkles size={14} />
+                                    <Sparkles size={14} className="animate-pulse" />
                                     {aiSeoSuggestingLocale === locale
                                         ? (trans('hancms.catalog.post.ai.generating') || 'Generating...')
                                         : (trans('hancms.catalog.post.ai.suggest_seo') || 'AI suggest SEO')}

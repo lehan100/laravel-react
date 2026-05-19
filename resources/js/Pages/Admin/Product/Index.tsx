@@ -12,10 +12,11 @@ import HeaderToolbar from '@/Components/Main/HeaderToolbar';
 import Card from '@/Components/Main/Card';
 import StatusBadge from '@/Components/Status/StatusBadge';
 import { formatProductPrice, getLanguageByLocale, getLocaleCode, getProductCurrencyFromLocale, loadProductCurrency, type ProductCurrency } from './productUtils';
+import { Filter, RotateCcw } from 'lucide-react';
 
 function IndexPage() {
     const { trans } = useTrans();
-    const { items, locale, langs }: any = usePage().props;
+    const { items, filters, categories, locale, langs }: any = usePage().props;
     const { data, setData } = useForm({
         product_ids: '',
     });
@@ -26,6 +27,27 @@ function IndexPage() {
     const [resolvedCurrency, setResolvedCurrency] = useState<ProductCurrency>(() => getProductCurrencyFromLocale(currentLocale, currentLanguage));
     const rows = items?.data || items || [];
     const links = items?.meta?.links || [];
+
+    const submitFilter = (form: HTMLFormElement) => {
+        const formData = new FormData(form);
+        router.get(
+            route('product.index'),
+            {
+                search: String(formData.get('search') || ''),
+                status: String(formData.get('status') || 'all'),
+                category_id: String(formData.get('category_id') || 'all'),
+            },
+            { preserveState: true, replace: true }
+        );
+    };
+
+    const handleResetFilter = () => {
+        router.get(
+            route('product.index'),
+            {},
+            { preserveState: false, replace: true }
+        );
+    };
 
     useEffect(() => {
         let mounted = true;
@@ -139,6 +161,46 @@ function IndexPage() {
                     {trans('hancms.button.delete_selected')}
                 </DeleteButton>
             </HeaderToolbar>
+
+            <form
+                className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_180px_180px_120px_120px]"
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    submitFilter(event.currentTarget);
+                }}
+            >
+                <input
+                    name="search"
+                    defaultValue={filters?.search || ''}
+                    placeholder={trans('hancms.sales.warehouse.placeholders.search') || 'Tìm kiếm SKU hoặc tên sản phẩm...'}
+                    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                />
+                <select name="category_id" defaultValue={filters?.category_id || 'all'} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
+                    <option value="all">{trans('hancms.catalog.category.type.options.select') || 'Tất cả danh mục'}</option>
+                    {(categories || []).map((category: any) => (
+                        <option key={category.id} value={category.id}>
+                            {category.name_with_depth || category.translations?.[currentLocale]?.name || category.translations?.vi?.name || 'Unnamed'}
+                        </option>
+                    ))}
+                </select>
+                <select name="status" defaultValue={filters?.status || 'all'} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
+                    <option value="all">{trans('hancms.filter.all') || 'Tất cả'}</option>
+                    <option value="1">{trans('hancms.status.active') || 'Hoạt động'}</option>
+                    <option value="0">{trans('hancms.status.inactive') || 'Ngừng hoạt động'}</option>
+                </select>
+                <button type="submit" className="inline-flex items-center justify-center gap-1.5 rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
+                    <Filter size={16} />
+                    <span>{trans('hancms.button.filter') || 'Lọc'}</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={handleResetFilter}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                    <RotateCcw size={16} />
+                    <span>{trans('hancms.filter.reset') || 'Làm mới'}</span>
+                </button>
+            </form>
 
             <Card>
                 <div className="overflow-x-auto">

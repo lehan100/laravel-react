@@ -10,7 +10,7 @@ interface MainMenuItemProps {
 }
 
 export default function MainMenuItem({ icon, link, text, mobile = false, onNavigate }: MainMenuItemProps) {
-  const isActive = route().current(link + '*');
+  const isActive = link !== '#' ? route().current(link + '*') : false;
 
   const iconClasses = classNames(
     'transition-colors',
@@ -33,7 +33,7 @@ export default function MainMenuItem({ icon, link, text, mobile = false, onNavig
   return (
     <div className="mb-2 last:mb-0">
       <Link
-        href={route(link)}
+        href={link === '#' ? '#' : route(link)}
         onClick={onNavigate}
         className={classNames(
           'group flex items-center gap-3 rounded-xl transition-all duration-200',

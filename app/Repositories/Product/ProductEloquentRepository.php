@@ -97,9 +97,37 @@ class ProductEloquentRepository extends EloquentRepository implements ProductRep
             // Nếu là task active thì thêm filter status = 1
             if ($task == 'admin-list-items-active') {
                 $query->where('status', 1);
+
+                return $query->get();
             }
 
-            return $query->get();
+            // Áp dụng bộ lọc cho danh sách quản trị (admin-list-items)
+            $search = trim((string) ($params['search'] ?? ''));
+            if ($search !== '') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('sku', 'like', "%{$search}%")
+                        ->orWhere('id', $search)
+                        ->orWhereHas('translations', function ($sq) use ($search) {
+                            $sq->where('name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            $status = $params['status'] ?? 'all';
+            if ($status !== 'all') {
+                $query->where('status', (int) $status);
+            }
+
+            $categoryId = $params['category_id'] ?? null;
+            if (! empty($categoryId) && $categoryId !== 'all') {
+                $query->whereHas('categories', function ($q) use ($categoryId) {
+                    $q->where('categories.id', $categoryId);
+                });
+            }
+
+            $perPage = max(10, min(100, (int) ($params['per_page'] ?? 20)));
+
+            return $query->paginate($perPage);
         }
 
         return null;

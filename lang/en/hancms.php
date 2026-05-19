@@ -2,6 +2,16 @@
 
 return [
     'loading' => 'Saving...',
+    'ai_assistant' => [
+        'name' => 'AI Assistant',
+        'create_post' => 'Create Post',
+        'chat' => 'Chat',
+    ],
+    'customer_care' => [
+        'name' => 'Customer Care',
+        'contact' => 'Contact Requests',
+        'review' => 'Reviews & Ratings',
+    ],
     'dashboard' => [
         'main' => 'Dashboard',
         'hello' => 'Hello, :name',
@@ -633,6 +643,17 @@ return [
                 'sections' => [
                     'fulfillment' => 'Fulfillment',
                 ],
+            ],
+            'coupon_status' => [
+                'success' => 'Coupon code applied successfully.',
+                'not_found' => 'Coupon code does not exist.',
+                'inactive' => 'This coupon code has been disabled.',
+                'invalid_date' => 'Coupon is not yet active or has expired.',
+                'no_eligible_items' => 'This order does not contain any products eligible for this coupon.',
+                'min_order_amount' => 'Order total has not reached the minimum requirement of :min_amount.',
+                'max_order_amount' => 'Order total exceeds the maximum allowed amount of :max_amount.',
+                'limit_exceeded' => 'Coupon usage limit has been reached.',
+                'no_discount' => 'Coupon code does not apply any discount to this order.',
             ],
         ],
         'payment_methods' => [

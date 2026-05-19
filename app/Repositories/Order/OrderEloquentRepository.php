@@ -77,7 +77,7 @@ class OrderEloquentRepository extends EloquentRepository implements OrderReposit
                     'province:code,name,full_name,name_en,full_name_en',
                     'ward:code,name,full_name,name_en,full_name_en,province_code',
                     'items' => function ($query) {
-                        $query->orderBy('id');
+                        $query->orderBy('id')->with(['product.translations', 'product.variants.translations']);
                     },
                     'timelines' => function ($query) {
                         $query->with('user:id,first_name,last_name,email')->limit(50);

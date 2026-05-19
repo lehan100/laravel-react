@@ -11,6 +11,7 @@ import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
 import StatusBadge from '@/Components/Status/StatusBadge';
 import { resolveMediaUrl } from '@/Components/Common/mediaUrl';
 import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
+import AiButton from '@/Components/Button/AiButton';
 
 type PageFieldType = 'text' | 'image' | 'textarea' | 'editorMCE' | 'relation_new' | 'product' | 'banner_position';
 
@@ -813,21 +814,17 @@ export default function PageValueFormView({
                                 </div>
 
                                 <div className="flex flex-col items-end gap-2">
-                                    <button
+                                    <AiButton
                                         type="button"
                                         onClick={handleAiTranslate}
                                         disabled={aiTranslating || languages.length < 2}
-                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
-                                            aiTranslating || languages.length < 2
-                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                        }`}
+                                        
                                     >
-                                        <Sparkles size={14} />
+                                        
                                         {aiTranslating
                                             ? (trans('hancms.page.ai.generating') || 'Translating...')
                                             : (trans('hancms.page.ai.translate_button') || 'AI translate title')}
-                                    </button>
+                                    </AiButton>
                                     {aiTranslateError && (
                                         <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                             {aiTranslateError}
@@ -896,21 +893,17 @@ export default function PageValueFormView({
                         title={trans('hancms.page.content')}
                         contentClassName="overflow-visible"
                         action={(
-                            <button
+                            <AiButton
                                 type="button"
                                 onClick={handleContentAiTranslate}
                                 disabled={aiTranslating || languages.length < 2}
-                                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
-                                    aiTranslating || languages.length < 2
-                                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                }`}
+                                
                             >
-                                <Sparkles size={14} />
+                                
                                 {aiTranslating
                                     ? (trans('hancms.page.ai.generating') || 'Translating...')
                                     : (trans('hancms.page.ai.translate_content_button') || 'AI translate content')}
-                            </button>
+                            </AiButton>
                         )}
                     >
                         <div className="space-y-6 p-6">

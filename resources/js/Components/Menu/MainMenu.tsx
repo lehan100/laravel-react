@@ -1,4 +1,4 @@
-import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Library, LayoutTemplate, Image, LayoutDashboard, Store, FolderTree, Package, BadgePercent, Tags, TicketPercent, Boxes, ShoppingCart, CreditCard, FolderKanban, BarChart3, PackageSearch, Warehouse, Gift, Truck, MapPinned, Mail } from 'lucide-react';
+import { CircleGauge, Users, UserCog, Cog, Languages, FileText, Library, LayoutTemplate, Image, LayoutDashboard, Store, FolderTree, Package, BadgePercent, Tags, TicketPercent, Boxes, ShoppingCart, CreditCard, FolderKanban, BarChart3, PackageSearch, Warehouse, Gift, Truck, MapPinned, Mail, Bot, MessageSquare, Headset, PhoneCall, Star, Sparkles } from 'lucide-react';
 import classNames from 'classnames';
 import MainMenuItem from '@/Components/Menu/MainMenuItem';
 import BsFace from '@/Components/Menu/Fade';
@@ -48,6 +48,8 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
         />
       )}
 
+
+
       {(can('roles.index') || can('users.index')) && (
         <BsFace
           mobile={mobile}
@@ -83,7 +85,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
         </BsFace>
       )}
 
-      {(can('category.index') || can('product.index')  || can('post.index')) && (
+      {(can('category.index') || can('product.index') || can('post.index')) && (
         <BsFace
           mobile={mobile}
           title={trans('hancms.catalog.menu_name')}
@@ -149,14 +151,14 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
         >
           <ul className={classNames(mobile ? 'ps-2' : 'ps-3')}>
             <li>
-                <MainMenuItem
-                  mobile={mobile}
-                  onNavigate={onNavigate}
-                  text={trans('hancms.content.field_design')}
-                  link="page-schemas.index"
-                  icon={<FolderKanban size={20} />}
-                />
-              </li>
+              <MainMenuItem
+                mobile={mobile}
+                onNavigate={onNavigate}
+                text={trans('hancms.content.field_design')}
+                link="page-schemas.index"
+                icon={<FolderKanban size={20} />}
+              />
+            </li>
             <li>
               <MainMenuItem
                 mobile={mobile}
@@ -372,7 +374,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
         </BsFace>
       )}
 
-      {(can('languages.index') || can('labels.index') || can('hancms-translations.index') || can('locations.index') || can('layout.index' ) || can('mail-templates.index')) && (
+      {(can('languages.index') || can('labels.index') || can('hancms-translations.index') || can('locations.index') || can('layout.index') || can('mail-templates.index')) && (
         <BsFace
           mobile={mobile}
           title={trans('hancms.settings.main')}
@@ -450,6 +452,76 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
           </ul>
         </BsFace>
       )}
+
+      <BsFace
+        mobile={mobile}
+        title={trans('hancms.customer_care.name')}
+        id="menu-10"
+        index={-1}
+        icon={<Headset size={20} />}
+      >
+        <ul className={classNames(mobile ? 'ps-2' : 'ps-3')}>
+          <li>
+            <MainMenuItem
+              mobile={mobile}
+              onNavigate={onNavigate}
+              text={trans('hancms.customer_care.contact')}
+              link="#"
+              icon={<PhoneCall size={20} />}
+            />
+          </li>
+          <li>
+            <MainMenuItem
+              mobile={mobile}
+              onNavigate={onNavigate}
+              text={trans('hancms.customer_care.review')}
+              link="#"
+              icon={<Star size={20} />}
+            />
+          </li>
+        </ul>
+      </BsFace>
+
+      <BsFace
+        mobile={mobile}
+        title={
+          <div className="flex items-center gap-1.5">
+            <span className="bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-purple-400 bg-clip-text font-bold text-transparent transition-all duration-300">
+              {trans('hancms.ai_assistant.name')}
+            </span>
+            <Sparkles size={14} className="text-fuchsia-400 animate-pulse" />
+          </div>
+        }
+        id="menu-9"
+        index={-1}
+        icon={
+          <div className="relative flex h-6 w-6 items-center justify-center">
+            <div className="absolute inset-0 animate-ping rounded-full bg-cyan-400 opacity-20 duration-1000"></div>
+            <Bot size={20} className="relative z-10 text-cyan-400" />
+          </div>
+        }
+      >
+        <ul className={classNames(mobile ? 'ps-2' : 'ps-3')}>
+          <li>
+            <MainMenuItem
+              mobile={mobile}
+              onNavigate={onNavigate}
+              text={trans('hancms.ai_assistant.create_post')}
+              link="#"
+              icon={<FileText size={20} />}
+            />
+          </li>
+          <li>
+            <MainMenuItem
+              mobile={mobile}
+              onNavigate={onNavigate}
+              text={trans('hancms.ai_assistant.chat')}
+              link="#"
+              icon={<MessageSquare size={20} />}
+            />
+          </li>
+        </ul>
+      </BsFace>
     </div>
   );
 }

@@ -5,6 +5,7 @@ namespace App\Services\Promotion;
 use App\Models\Catalog\Product;
 use App\Models\Promotion\PromotionBuyToGiftOfferRule;
 use App\Models\Promotion\PromotionBuyToGiftRuleGiftVariantOption;
+use App\Models\Promotion\PromotionCoupon;
 use App\Repositories\BuyToGift\BuyToGiftRepositoryInterface;
 use App\Repositories\Coupon\CouponRepositoryInterface;
 use App\Repositories\SaleOffer\SaleOfferRepositoryInterface;
@@ -241,73 +242,91 @@ class PromotionEngineService
         }
 
         // 3. Process Coupons
+        $couponStatus = null;
         if ($couponCode) {
-            $coupon = $this->couponRepository->getValidCouponByCode($couponCode, $now);
+            $couponStatus = [
+                'success' => false,
+                'message' => __('hancms.sales.orders.coupon_status.not_found'),
+            ];
+
+            $coupon = PromotionCoupon::where('code', $couponCode)->first();
 
             if ($coupon) {
-                // Fetch product info to check is_coupon
-                $productIds = collect($items)->pluck('product_id')->unique()->filter()->all();
-                $products = Product::query()->whereIn('id', $productIds)->get(['id', 'is_coupon'])->keyBy('id');
+                if (! $coupon->is_active) {
+                    $couponStatus['message'] = __('hancms.sales.orders.coupon_status.inactive');
+                } elseif (($coupon->starts_at && $now->lt($coupon->starts_at)) || ($coupon->ends_at && $now->gt($coupon->ends_at))) {
+                    $couponStatus['message'] = __('hancms.sales.orders.coupon_status.invalid_date');
+                } else {
+                    // Fetch product info to check is_coupon
+                    $productIds = collect($items)->pluck('product_id')->unique()->filter()->all();
+                    $products = Product::query()->whereIn('id', $productIds)->get(['id', 'is_coupon'])->keyBy('id');
 
-                $couponEligibleSubtotal = 0.0;
-                $eligibleItemsCount = 0;
-                foreach ($items as $item) {
-                    if (($item['is_gift'] ?? false) === true) {
-                        continue;
-                    }
-                    $product = $products->get((int) ($item['product_id'] ?? 0));
-                    if ($product && $product->is_coupon) {
-                        $couponEligibleSubtotal += (float) ($item['line_total'] ?? 0);
-                        $eligibleItemsCount++;
-                    }
-                }
-
-                $couponDiscount = 0;
-                $validForOrder = true;
-
-                if ($eligibleItemsCount === 0) {
-                    $validForOrder = false;
-                }
-
-                if ($coupon->min_order_amount > 0 && $couponEligibleSubtotal < $coupon->min_order_amount) {
-                    $validForOrder = false;
-                }
-                if ($coupon->max_order_amount > 0 && $couponEligibleSubtotal > $coupon->max_order_amount) {
-                    $validForOrder = false;
-                }
-
-                // Check usage limits
-                if ($coupon->usage_limit_total > 0 && $coupon->used_count >= $coupon->usage_limit_total) {
-                    $validForOrder = false;
-                }
-
-                if ($validForOrder) {
-                    if (($coupon->discount_type ?? 'percent') === 'percent') {
-                        $couponDiscount = ($couponEligibleSubtotal * ($coupon->discount_value ?? 0)) / 100;
-                    } else {
-                        $couponDiscount = (float) ($coupon->discount_value ?? 0);
+                    $couponEligibleSubtotal = 0.0;
+                    $eligibleItemsCount = 0;
+                    foreach ($items as $item) {
+                        if (($item['is_gift'] ?? false) === true) {
+                            continue;
+                        }
+                        $product = $products->get((int) ($item['product_id'] ?? 0));
+                        if ($product && $product->is_coupon) {
+                            $couponEligibleSubtotal += (float) ($item['line_total'] ?? 0);
+                            $eligibleItemsCount++;
+                        }
                     }
 
-                    if ($coupon->max_discount_amount > 0 && $couponDiscount > $coupon->max_discount_amount) {
-                        $couponDiscount = (float) $coupon->max_discount_amount;
+                    $couponDiscount = 0;
+                    $validForOrder = true;
+
+                    if ($eligibleItemsCount === 0) {
+                        $validForOrder = false;
+                        $couponStatus['message'] = __('hancms.sales.orders.coupon_status.no_eligible_items');
+                    } elseif ($coupon->min_order_amount > 0 && $couponEligibleSubtotal < $coupon->min_order_amount) {
+                        $validForOrder = false;
+                        $formattedMin = number_format($coupon->min_order_amount, 0, ',', '.').'₫';
+                        $couponStatus['message'] = __('hancms.sales.orders.coupon_status.min_order_amount', ['min_amount' => $formattedMin]);
+                    } elseif ($coupon->max_order_amount > 0 && $couponEligibleSubtotal > $coupon->max_order_amount) {
+                        $validForOrder = false;
+                        $formattedMax = number_format($coupon->max_order_amount, 0, ',', '.').'₫';
+                        $couponStatus['message'] = __('hancms.sales.orders.coupon_status.max_order_amount', ['max_amount' => $formattedMax]);
+                    } elseif ($coupon->usage_limit_total > 0 && $coupon->used_count >= $coupon->usage_limit_total) {
+                        $validForOrder = false;
+                        $couponStatus['message'] = __('hancms.sales.orders.coupon_status.limit_exceeded');
                     }
 
-                    // Coupon discount cannot exceed eligible subtotal
-                    // (Actually it should consider existing line discounts too, but let's keep it simple for now as requested)
-                    $maxPossibleDiscount = max(0, $couponEligibleSubtotal);
-                    if ($couponDiscount > $maxPossibleDiscount) {
-                        $couponDiscount = $maxPossibleDiscount;
-                    }
+                    if ($validForOrder) {
+                        if (($coupon->discount_type ?? 'percent') === 'percent') {
+                            $couponDiscount = ($couponEligibleSubtotal * ($coupon->discount_value ?? 0)) / 100;
+                        } else {
+                            $couponDiscount = (float) ($coupon->discount_value ?? 0);
+                        }
 
-                    if ($couponDiscount > 0) {
-                        $discountTotal += $couponDiscount;
-                        $appliedPromotions[] = [
-                            'type' => 'coupon',
-                            'id' => $coupon->id,
-                            'code' => $coupon->code,
-                            'name' => $coupon->name,
-                            'discount_amount' => $couponDiscount,
-                        ];
+                        if ($coupon->max_discount_amount > 0 && $couponDiscount > $coupon->max_discount_amount) {
+                            $couponDiscount = (float) $coupon->max_discount_amount;
+                        }
+
+                        // Coupon discount cannot exceed eligible subtotal
+                        // (Actually it should consider existing line discounts too, but let's keep it simple for now as requested)
+                        $maxPossibleDiscount = max(0, $couponEligibleSubtotal);
+                        if ($couponDiscount > $maxPossibleDiscount) {
+                            $couponDiscount = $maxPossibleDiscount;
+                        }
+
+                        if ($couponDiscount > 0) {
+                            $discountTotal += $couponDiscount;
+                            $appliedPromotions[] = [
+                                'type' => 'coupon',
+                                'id' => $coupon->id,
+                                'code' => $coupon->code,
+                                'name' => $coupon->name,
+                                'discount_amount' => $couponDiscount,
+                            ];
+                            $couponStatus = [
+                                'success' => true,
+                                'message' => __('hancms.sales.orders.coupon_status.success'),
+                            ];
+                        } else {
+                            $couponStatus['message'] = __('hancms.sales.orders.coupon_status.no_discount');
+                        }
                     }
                 }
             }
@@ -318,6 +337,7 @@ class PromotionEngineService
             'discount_total' => round($discountTotal, 2),
             'shipping_total' => 0.0, // Shipping discount logic can be added later
             'applied_promotions' => $appliedPromotions,
+            'coupon_status' => $couponStatus,
         ];
     }
 

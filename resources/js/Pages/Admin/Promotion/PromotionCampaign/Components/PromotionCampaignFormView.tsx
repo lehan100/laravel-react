@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { formatProductPrice, getLanguageByLocale, getLocaleCode, getProductCurrencyFromLocale, loadProductCurrency, type ProductCurrency } from '../../../Product/productUtils';
 import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
+import AiButton from '@/Components/Button/AiButton';
 
 type PromotionCampaignFormViewProps = {
   title: string;
@@ -378,19 +379,15 @@ export default function PromotionCampaignFormView({
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
-                  <button
+                  <AiButton
                     type="button"
                     onClick={handleAiTranslate}
                     disabled={aiTranslating || langList.length < 2}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
-                      aiTranslating || langList.length < 2
-                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                    }`}
+                    
                   >
-                    <Sparkles size={14} />
+                    
                     {aiTranslating ? (trans('hancms.promotion.campaign.ai.generating') || 'Generating...') : 'AI dịch tự động'}
-                  </button>
+                  </AiButton>
                   {aiTranslateError && (
                     <div className="max-w-[20rem] text-right text-xs text-rose-600">
                       {aiTranslateError}

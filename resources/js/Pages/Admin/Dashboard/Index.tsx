@@ -175,7 +175,7 @@ function DashboardPage() {
           <div className="relative z-10 grid gap-8 xl:grid-cols-[1.35fr_1fr] xl:items-end">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-cyan-100">
-                <Sparkles size={12} />
+                <Sparkles size={12} className="animate-pulse" />
                 {trans('hancms.dashboard.main')}
               </div>
               <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">

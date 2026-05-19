@@ -7,6 +7,7 @@ use App\Models\Catalog\Product;
 use App\Models\Catalog\ProductVariant;
 use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionBuyToGiftOfferRule;
+use App\Models\Promotion\PromotionCoupon;
 use App\Models\Sales\Order;
 use App\Models\Sales\OrderItem;
 use App\Models\Sales\OrderTimeline;
@@ -2135,6 +2136,60 @@ class OrderModuleTest extends TestCase
         ]);
 
         return $product->fresh(['translations']);
+    }
+
+    #[Test]
+    public function it_rejects_saving_order_to_database_when_coupon_fails(): void
+    {
+        $user = User::factory()->create(['account_id' => 1]);
+        $location = $this->createTestLocation();
+        $paymentMethod = PaymentMethod::query()->create([
+            'name' => 'COD',
+            'code' => 'cod',
+            'is_active' => true,
+        ]);
+        $product = $this->createProduct('SKU-COUPON-VAL', 'Product', 100000, 10);
+
+        // Coupon with min order amount of 500k, but payload subtotal is only 100k
+        PromotionCoupon::query()->create([
+            'code' => 'MIN500K',
+            'name' => 'Min 500k',
+            'is_active' => true,
+            'min_order_amount' => 500000,
+            'discount_type' => 'fixed',
+            'discount_value' => 50000,
+        ]);
+
+        $payload = [
+            'order_number' => 'ORD-COUPON-FAIL',
+            'customer_name' => 'John Doe',
+            'customer_phone' => '0987654321',
+            'customer_address' => '123 Test Street',
+            'province_code' => $location['province_code'],
+            'ward_code' => $location['ward_code'],
+            'payment_method_id' => $paymentMethod->id,
+            'order_status' => 'pending',
+            'payment_status' => 'unpaid',
+            'shipping_status' => 'pending',
+            'discount_total' => 0,
+            'shipping_total' => 0,
+            'coupon_code' => 'MIN500K',
+            'items' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 1,
+                    'unit_price' => 100000,
+                ],
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->post(route('orders.store'), $payload)
+            ->assertSessionHasErrors('coupon_code');
+
+        $this->assertDatabaseMissing('orders', [
+            'order_number' => 'ORD-COUPON-FAIL',
+        ]);
     }
 
     /**

@@ -2,6 +2,16 @@
 
 return [
     'loading' => '保存中...',
+    'ai_assistant' => [
+        'name' => 'AIアシスタント',
+        'create_post' => '記事を作成',
+        'chat' => 'チャット',
+    ],
+    'customer_care' => [
+        'name' => 'カスタマーサポート',
+        'contact' => 'お問い合わせ',
+        'review' => 'レビューと評価',
+    ],
     'dashboard' => [
         'main' => 'ダッシュボード',
         'hello' => 'こんにちは、:name',
@@ -638,6 +648,17 @@ return [
                 'sections' => [
                     'fulfillment' => '配送情報',
                 ],
+            ],
+            'coupon_status' => [
+                'success' => 'クーポンコードが適用されました。',
+                'not_found' => 'クーポンコードが存在しません。',
+                'inactive' => 'このクーポンコードは現在無効です。',
+                'invalid_date' => 'クーポンコードの使用期間外または期限切れです。',
+                'no_eligible_items' => 'この注文にはクーポン適用の対象商品が含まれていません。',
+                'min_order_amount' => '注文合計金額が最低要件の :min_amount に達していません。',
+                'max_order_amount' => '注文合計金額が上限の :max_amount を超えています。',
+                'limit_exceeded' => 'クーポンの利用可能回数上限に達しました。',
+                'no_discount' => 'このクーポンは注文に割引を適用しません。',
             ],
         ],
         'payment_methods' => [

@@ -16,6 +16,7 @@ import CategoryNewsTab from './CategoryNewsTab';
 import { getLanguageByLocale } from '@/Pages/Admin/Product/productUtils';
 import { quickStore as quickCreatePage } from '@/actions/App/Http/Controllers/Admin/PageManager/PageController';
 import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
+import AiButton from '@/Components/Button/AiButton';
 
 const CategoryFormView = ({ data, setData, langList, trans, config_path, languageConfigPath, errors, langCode, itemsCategoryActive, itemsSelectedProducts = [], itemsSelectedNews = [], pages = [], pageSchemas = [] }: any) => {
     const [currentTab, setCurrentTab] = useState(langCode || 'vi');
@@ -588,20 +589,17 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                 })}
                                 </div>
                                 <div className="flex shrink-0 flex-col items-start gap-2 lg:items-end">
-                                    <button
+                                    <AiButton
                                         type="button"
                                         onClick={handleAiTranslate}
                                         disabled={aiTranslating || langList.length < 2}
-                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiTranslating || langList.length < 2
-                                            ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                            : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                            }`}
+                                        
                                         >
-                                        <Sparkles size={14} />
+                                        
                                         {aiTranslating
                                             ? (trans('hancms.catalog.category.ai.generating') || 'Generating...')
                                             : (trans('hancms.catalog.category.ai.translate_button') || 'AI dịch tự động')}
-                                    </button>
+                                    </AiButton>
                                     {aiTranslateError && (
                                         <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                             {aiTranslateError}
@@ -698,17 +696,17 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                                     <div className="flex items-center gap-2 text-indigo-900 font-bold uppercase">
                                         <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
                                     </div>
-                                    <button
+                                    <AiButton
                                         type="button"
                                         onClick={() => handleAiSuggestSeo(currentTab)}
                                         disabled={aiSeoSuggestingLocale === currentTab}
-                                        className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                        
                                     >
-                                        <Sparkles size={14} />
+                                        
                                         {aiSeoSuggestingLocale === currentTab
                                             ? (trans('hancms.catalog.category.ai.generating') || 'Generating...')
                                             : (trans('hancms.catalog.category.ai.suggest_seo') || 'AI suggest SEO')}
-                                    </button>
+                                    </AiButton>
                                 </div>
                                 {aiSeoSuggestionError && <MessageError>{aiSeoSuggestionError}</MessageError>}
                                 <InputGroup

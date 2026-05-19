@@ -2,6 +2,16 @@
 
 return [
     'loading' => 'Đang lưu...',
+    'ai_assistant' => [
+        'name' => 'Trợ Lý AI',
+        'create_post' => 'Tạo bài viết',
+        'chat' => 'Chat',
+    ],
+    'customer_care' => [
+        'name' => 'Chăm sóc khách hàng',
+        'contact' => 'Yêu cầu liên hệ',
+        'review' => 'Review & Đánh giá',
+    ],
     'dashboard' => [
         'main' => 'Bảng điều khiển',
         'hello' => 'Xin chào, :name',
@@ -638,6 +648,17 @@ return [
                 'sections' => [
                     'fulfillment' => 'Giao nhận',
                 ],
+            ],
+            'coupon_status' => [
+                'success' => 'Áp dụng mã giảm giá thành công.',
+                'not_found' => 'Mã giảm giá không tồn tại.',
+                'inactive' => 'Mã giảm giá này đã ngừng hoạt động.',
+                'invalid_date' => 'Mã giảm giá chưa đến thời gian sử dụng hoặc đã hết hạn.',
+                'no_eligible_items' => 'Đơn hàng không có sản phẩm nào được áp dụng mã giảm giá này.',
+                'min_order_amount' => 'Giá trị đơn hàng chưa đạt mức tối thiểu áp dụng mã (:min_amount).',
+                'max_order_amount' => 'Giá trị đơn hàng vượt quá mức tối đa áp dụng mã (:max_amount).',
+                'limit_exceeded' => 'Mã giảm giá đã hết lượt sử dụng.',
+                'no_discount' => 'Mã giảm giá không tạo ra chiết khấu cho đơn hàng.',
             ],
         ],
         'payment_methods' => [

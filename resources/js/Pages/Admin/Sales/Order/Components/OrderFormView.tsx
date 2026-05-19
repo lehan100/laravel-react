@@ -309,6 +309,7 @@ export default function OrderFormView({
   }, [data, data.province_code, selectedProvinceCode, setData]);
 
   const [isCalculating, setIsCalculating] = useState(false);
+  const [couponStatus, setCouponStatus] = useState<{ success: boolean; message: string | null } | null>(null);
   const initialCartSignatureRef = useRef<string | null>(null);
   const hasInitialGiftItemsRef = useRef(items.some((item) => item.is_gift));
   const hasSkippedInitialGiftHydrationRef = useRef(false);
@@ -345,6 +346,12 @@ export default function OrderFormView({
         items: nextItems,
         applied_promotions: result.applied_promotions || [],
       }));
+
+      if (data.coupon_code) {
+        setCouponStatus(result.coupon_status || null);
+      } else {
+        setCouponStatus(null);
+      }
     } catch (error) {
       console.error('Failed to calculate promotions:', error);
     } finally {
@@ -368,6 +375,10 @@ export default function OrderFormView({
   }
 
   useEffect(() => {
+    if (!data.coupon_code) {
+      setCouponStatus(null);
+    }
+
     if (
       !hasSkippedInitialGiftHydrationRef.current
       && hasInitialGiftItemsRef.current
@@ -685,6 +696,15 @@ export default function OrderFormView({
                     onChange={(event) => setData('coupon_code', event.target.value)}
                   />
                   {errors.coupon_code && <MessageError>{errors.coupon_code}</MessageError>}
+                  {couponStatus && !errors.coupon_code && (
+                    couponStatus.success ? (
+                      <div className="mt-2 text-xs font-medium px-2.5 py-1.5 rounded-md border bg-emerald-50 border-emerald-200 text-emerald-700">
+                        {couponStatus.message}
+                      </div>
+                    ) : (
+                      <MessageError>{couponStatus.message}</MessageError>
+                    )
+                  )}
                 </InputGroup>
 
                 <div className="pt-2 hidden">

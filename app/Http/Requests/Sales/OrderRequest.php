@@ -7,6 +7,7 @@ use App\Models\Promotion\PromotionBuyToGiftOffer;
 use App\Models\Promotion\PromotionBuyToGiftOfferRule;
 use App\Models\Sales\Order;
 use App\Services\Promotion\BuyToGiftAvailabilityService;
+use App\Services\Promotion\PromotionEngineService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
@@ -239,6 +240,7 @@ class OrderRequest extends FormRequest
             function (Validator $validator): void {
                 $this->validateBuyToGiftSlots($validator);
                 $this->validateBuyToGiftGiftVariantReserves($validator);
+                $this->validateCoupon($validator);
             },
         ];
     }
@@ -456,6 +458,30 @@ class OrderRequest extends FormRequest
                     ])
                 );
             }
+        }
+    }
+
+    private function validateCoupon(Validator $validator): void
+    {
+        $couponCode = $this->input('coupon_code');
+        if (empty($couponCode)) {
+            return;
+        }
+
+        $items = collect($this->input('items', []))->all();
+        $orderId = $this->route('order') ?? $this->route('id');
+        if ($orderId) {
+            $orderId = (int) $orderId;
+        }
+
+        $engineResult = app(PromotionEngineService::class)->calculate($items, $couponCode, $orderId);
+        $couponStatus = $engineResult['coupon_status'] ?? null;
+
+        if ($couponStatus && ! ($couponStatus['success'] ?? false)) {
+            $validator->errors()->add(
+                'coupon_code',
+                $couponStatus['message'] ?? __('hancms.sales.orders.coupon_status.not_found')
+            );
         }
     }
 

@@ -1,3 +1,4 @@
+import AiButton from '@/Components/Button/AiButton';
 import { store, update } from '@/actions/App/Http/Controllers/Admin/Catalog/AttributeController'
 import { InputGroup } from '@/Components/Form/HancmsInput'
 import MessageError from '@/Components/Form/MessageError'
@@ -683,18 +684,15 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                             <p className="text-sm text-slate-500">{trans('hancms.catalog.attribute.fields.localized_name_hint')}</p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                            <button
+                            <AiButton
                                 type="button"
                                 onClick={handleAiTranslateNames}
                                 disabled={aiNameTranslating || langList.length < 2}
-                                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiNameTranslating || langList.length < 2
-                                    ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                    : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                    }`}
+                                
                             >
-                                <Sparkles size={14} />
+                                
                                 {aiNameTranslating ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...') : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
-                            </button>
+                            </AiButton>
                             {aiNameTranslateError && (
                                 <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                     {aiNameTranslateError}
@@ -751,18 +749,15 @@ export default function AttributeFormView({ attribute, undo = 0, onProcessingCha
                             </p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                            <button
+                            <AiButton
                                 type="button"
                                 onClick={handleAiTranslateValues}
                                 disabled={aiValueTranslating || langList.length < 2}
-                                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiValueTranslating || langList.length < 2
-                                    ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                    : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                    }`}
+                                
                             >
-                                <Sparkles size={14} />
+                                
                                 {aiValueTranslating ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...') : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
-                            </button>
+                            </AiButton>
                             {aiValueTranslateError && (
                                 <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                     {aiValueTranslateError}

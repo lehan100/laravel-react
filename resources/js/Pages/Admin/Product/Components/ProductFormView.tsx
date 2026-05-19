@@ -16,6 +16,7 @@ import MediaLibraryModal from '@/Components/TinyMCE/MediaLibraryModal';
 import CategoryMultiSelect from './CategoryMultiSelect';
 import { formatPriceInput, getProductCurrencyFromLocale } from '../productUtils';
 import { translate as translateLocaleFields } from '@/actions/App/Http/Controllers/Ai/LocaleTranslateController';
+import AiButton from '@/Components/Button/AiButton';
 
 interface Props {
     title: string;
@@ -1726,20 +1727,17 @@ const ProductFormView = ({
                     </div>
 
                     <div className="flex flex-col items-end gap-2">
-                        <button
+                        <AiButton
                             type="button"
                             onClick={handleAiTranslate}
                             disabled={aiTranslating || langList.length < 2}
-                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiTranslating || langList.length < 2
-                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                }`}
+                            
                         >
-                            <Sparkles size={14} />
+                            
                             {aiTranslating
                                 ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
                                 : (trans('hancms.catalog.product.ai.translate_button') || 'AI dịch tự động')}
-                        </button>
+                        </AiButton>
                         {aiTranslateError && (
                             <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                 {aiTranslateError}
@@ -1812,20 +1810,17 @@ const ProductFormView = ({
 
                         <InputGroup label={trans('hancms.column.content')}>
                             <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
-                                <button
+                                <AiButton
                                     type="button"
                                     onClick={() => handleAiSuggestContent(locale)}
                                     disabled={aiSuggestingLocale === locale}
-                                    className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSuggestingLocale === locale
-                                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                        }`}
+                                    
                                 >
-                                    <Sparkles size={14} />
+                                    
                                     {aiSuggestingLocale === locale
                                         ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
                                         : (trans('hancms.catalog.product.ai.suggest_content') || 'AI suggest content')}
-                                </button>
+                                </AiButton>
                             </div>
                             <Editor
                                 tinymceScriptSrc="/js/tinymce/tinymce.min.js"
@@ -1863,34 +1858,28 @@ const ProductFormView = ({
                                     <Search size={16} /> {trans('hancms.seo.name') || "Search Engine Optimization"}
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <button
+                                    <AiButton icon={<Search size={14} />}
                                         type="button"
                                         onClick={() => handleAiAnalyzeSeo(locale)}
                                         disabled={aiSeoAnalyzingLocale === locale}
-                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoAnalyzingLocale === locale
-                                            ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                            : 'border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100'
-                                            }`}
+                                        
                                     >
-                                        <Search size={14} />
+                                        
                                         {aiSeoAnalyzingLocale === locale
                                             ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
                                             : (trans('hancms.catalog.product.ai.analyze_seo') || 'AI analyze SEO')}
-                                    </button>
-                                    <button
+                                    </AiButton>
+                                    <AiButton
                                         type="button"
                                         onClick={() => handleAiSuggestSeo(locale)}
                                         disabled={aiSeoSuggestingLocale === locale}
-                                        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${aiSeoSuggestingLocale === locale
-                                            ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                            : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                            }`}
+                                        
                                     >
-                                        <Sparkles size={14} />
+                                        
                                         {aiSeoSuggestingLocale === locale
                                             ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
                                             : (trans('hancms.catalog.product.ai.suggest_seo') || 'AI suggest SEO')}
-                                    </button>
+                                    </AiButton>
                                 </div>
                             </div>
                             {aiSeoSuggestionError && <MessageError>{aiSeoSuggestionError}</MessageError>}
@@ -2401,20 +2390,17 @@ const ProductFormView = ({
                                         </p>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <button
+                                        <AiButton
                                             type="button"
                                             onClick={handleVariantAiTranslate}
                                             disabled={variantAiTranslating || variantLocales.length < 2}
-                                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${variantAiTranslating || variantLocales.length < 2
-                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                                }`}
+                                            
                                         >
-                                            <Sparkles size={14} />
+                                            
                                             {variantAiTranslating
                                                 ? (trans('hancms.catalog.product.ai.generating') || 'Generating...')
                                                 : (trans('hancms.catalog.product.ai.translate_button') || 'AI dịch tự động')}
-                                        </button>
+                                        </AiButton>
                                         {variantAiTranslateError && (
                                             <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                                 {variantAiTranslateError}
@@ -2676,20 +2662,17 @@ const ProductFormView = ({
                                         </h4>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <button
+                                        <AiButton
                                             type="button"
                                             onClick={handleQuickValueAiTranslate}
                                             disabled={quickValueAiTranslating || quickAttributeLocales.length < 2}
-                                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${quickValueAiTranslating || quickAttributeLocales.length < 2
-                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                                }`}
+                                            
                                         >
-                                            <Sparkles size={14} />
+                                            
                                             {quickValueAiTranslating
                                                 ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...')
                                                 : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
-                                        </button>
+                                        </AiButton>
                                         {quickValueAiTranslateError && (
                                             <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                                 {quickValueAiTranslateError}
@@ -2876,20 +2859,17 @@ const ProductFormView = ({
                                         </p>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <button
+                                        <AiButton
                                             type="button"
                                             onClick={handleQuickAttributeAiTranslate}
                                             disabled={quickAttributeAiTranslating || quickAttributeLocales.length < 2}
-                                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${quickAttributeAiTranslating || quickAttributeLocales.length < 2
-                                                ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
-                                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                                                }`}
+                                            
                                         >
-                                            <Sparkles size={14} />
+                                            
                                             {quickAttributeAiTranslating
                                                 ? (trans('hancms.catalog.attribute.ai.generating') || 'Generating...')
                                                 : (trans('hancms.catalog.attribute.ai.translate_button') || 'AI dịch tự động')}
-                                        </button>
+                                        </AiButton>
                                         {quickAttributeAiTranslateError && (
                                             <div className="max-w-[20rem] text-right text-xs text-rose-600">
                                                 {quickAttributeAiTranslateError}
