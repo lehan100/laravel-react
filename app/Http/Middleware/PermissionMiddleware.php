@@ -4,16 +4,15 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Spatie\Permission\Exceptions\UnauthorizedException;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class PermissionMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
      * @return mixed
      */
     public function handle($request, Closure $next, $permission = null, ...$permissions)
@@ -32,14 +31,19 @@ class PermissionMiddleware
         if (is_null($permission)) {
             $permission = $request->route()->getName();
 
-            $permissions = array($permission);
+            $permissions = [$permission];
+        }
+
+        // Luôn cho phép truy cập Dashboard và Logout
+        if (in_array($request->route()->getName(), ['dashboard', 'auth.logout'])) {
+            return $next($request);
         }
         foreach ($permissions as $permission) {
             if ($authGuard->user()->can($permission)) {
                 return $next($request);
             }
         }
-        return $next($request);
+
         throw UnauthorizedException::forPermissions($permissions);
     }
 }

@@ -1,7 +1,7 @@
 import { Check, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 
-const CategorySelector = ({ value, data, onChange, trans }: any) => {
+const CategorySelector = ({ value, data, onChange, trans, categoryType }: any) => {
     const [isOpen, setIsOpen] = useState(false);
     const selectedNode = data.find((item: any) => String(item.id) === String(value));
 
@@ -24,6 +24,22 @@ const CategorySelector = ({ value, data, onChange, trans }: any) => {
 
             {isOpen && (
                 <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-xl max-h-60 overflow-y-auto py-1">
+                    <div 
+                        onClick={() => { onChange('0'); setIsOpen(false); }}
+                        className={`px-4 py-2 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer text-sm flex justify-between ${String(value) === '0' || !value ? 'bg-indigo-50 font-bold text-indigo-700' : ''}`}
+                    >
+                        <span className="transition-colors">{trans('hancms.catalog.category.select') || 'Danh mục gốc'}</span>
+                        {(String(value) === '0' || !value) && <Check size={14} className="text-indigo-600" />}
+                    </div>
+
+                    {data.length === 0 && (
+                        <div className="px-4 py-3 text-xs text-amber-600 bg-amber-50/50 border-t border-amber-100 italic select-none">
+                            {!categoryType 
+                                ? '* Vui lòng chọn "Loại danh mục" trước để tải danh sách danh mục cha.' 
+                                : '* Hiện chưa có danh mục nào khác thuộc loại này để làm danh mục cha.'}
+                        </div>
+                    )}
+
                     {data.map((item: any) => (
                         <div 
                             key={item.id} 

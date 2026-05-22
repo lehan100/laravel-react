@@ -15,7 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model implements TranslatableContract
 {
-    use HasFactory, SoftDeletes, HasImageFile, Translatable;
+    use HasFactory, HasImageFile, SoftDeletes, Translatable;
+
+    public const PUBLICATION_STATUS_DRAFT = 'draft';
+
+    public const PUBLICATION_STATUS_SCHEDULED = 'scheduled';
+
+    public const PUBLICATION_STATUS_PUBLISHED = 'published';
 
     protected $table = 'posts';
 
@@ -26,6 +32,13 @@ class Post extends Model implements TranslatableContract
         'status',
         'order',
         'hit_viewer',
+        'publication_status',
+        'published_at',
+    ];
+
+    protected $casts = [
+        'status' => 'integer',
+        'published_at' => 'datetime',
     ];
 
     public $translatedAttributes = [

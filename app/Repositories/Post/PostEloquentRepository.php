@@ -5,6 +5,8 @@ namespace App\Repositories\Post;
 use App\Models\Catalog\Post;
 use App\Pipelines\HandleSlugHistory;
 use App\Repositories\EloquentRepository;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +34,7 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
         $task = $options['task'] ?? null;
         $currentLocale = app()->getLocale();
 
-        if (!in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
+        if (! in_array($task, ['admin-list-items', 'admin-list-items-active'], true)) {
             return null;
         }
 
@@ -50,7 +52,7 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
             },
         ])->select($this->FIELDSELECT)->orderBy('order', 'asc');
 
-        if (!empty($options['type'])) {
+        if (! empty($options['type'])) {
             $query->where('type', $options['type']);
         }
 
@@ -77,7 +79,7 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
     public function save($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) {
+        if (! $task) {
             return false;
         }
 
@@ -94,11 +96,12 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
 
         if ($task === 'change-status') {
             $item = $this->_model->find($params['id'] ?? null);
-            if (!$item) {
+            if (! $item) {
                 return false;
             }
 
             $item->status = $item->status == 0 ? 1 : 0;
+
             return $item->save();
         }
 
@@ -108,8 +111,9 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
                 ? new $this->_model
                 : $this->_model->find($params['id'] ?? null);
 
-            if (!$item) {
+            if (! $item) {
                 DB::rollBack();
+
                 return false;
             }
 
@@ -117,6 +121,8 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
             $item->photo = $params['photo'] ?? $item->photo;
             $item->type = $params['type'] ?? $item->type ?? 'primary';
             $item->status = $params['status'] ?? 0;
+            $item->publication_status = $params['publication_status'] ?? $item->publication_status ?? Post::PUBLICATION_STATUS_DRAFT;
+            $item->published_at = $params['published_at'] ?? $item->published_at;
             $item->order = $params['order'] ?? 0;
             $item->hit_viewer = $params['hit_viewer'] ?? $item->hit_viewer ?? 0;
             $item->save();
@@ -139,18 +145,48 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
                 ->thenReturn();
 
             DB::commit();
+
             return $item;
         } catch (\Throwable $e) {
             DB::rollBack();
-            logger('Error save post: ' . $e->getMessage());
+            logger('Error save post: '.$e->getMessage());
+
             return false;
         }
+    }
+
+    public function createScheduledPost(array $data): Post
+    {
+        $translations = $data['translations'] ?? [];
+        unset($data['translations']);
+
+        $post = $this->_model->newInstance($data);
+        $post->publication_status = $data['publication_status'] ?? Post::PUBLICATION_STATUS_SCHEDULED;
+        $post->save();
+
+        foreach ($translations as $locale => $translationData) {
+            $translation = $post->translateOrNew($locale);
+            $translation->fill($translationData);
+            $translation->save();
+        }
+
+        return $post;
+    }
+
+    public function getDuePosts(int $limit = 50): Collection
+    {
+        return $this->_model
+            ->where('publication_status', Post::PUBLICATION_STATUS_SCHEDULED)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', Carbon::now())
+            ->limit($limit)
+            ->get();
     }
 
     public function delete($params = null, $options = null)
     {
         $task = $options['task'] ?? null;
-        if (!$task) {
+        if (! $task) {
             return false;
         }
 
@@ -165,6 +201,7 @@ class PostEloquentRepository extends EloquentRepository implements PostRepositor
             $ids = is_array($params['ids'] ?? null)
                 ? $params['ids']
                 : explode(',', (string) ($params['ids'] ?? ''));
+
             return $this->_model->whereIn('id', $ids)->get()->each(function ($item) {
                 $item->delete();
             });

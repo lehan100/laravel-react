@@ -18,7 +18,7 @@ class PostResource extends JsonResource
      */
     public function toArray($request)
     {
-        $configPath = config('image.path.photo');
+        $configPath = config('image.path.post');
         $baseUrl = url('/');
         $path = $configPath['path'] ?? 'uploads';
         $translations = $this->loadedCollection('translations');

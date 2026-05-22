@@ -360,7 +360,16 @@ const CategoryTree = ({ data, onDelete, activeId, locale }: Props) => {
 
                         <button
                             type="button"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(node.id); }}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const message = hasChildren
+                                    ? (trans('hancms.catalog.category.confirm_delete_with_children') || 'Danh mục này có chứa các danh mục con. Bạn có đồng ý xóa toàn bộ danh mục con này không?')
+                                    : (trans('hancms.catalog.category.confirm_delete') || 'Bạn có chắc chắn muốn xóa danh mục này?');
+                                if (confirm(message)) {
+                                    onDelete(node.id);
+                                }
+                            }}
                             className="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-100 rounded transition-opacity shrink-0"
                         >
                             <Trash2 size={14} />

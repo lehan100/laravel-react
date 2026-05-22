@@ -25,7 +25,12 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
     const [aiSeoSuggestionError, setAiSeoSuggestionError] = useState('');
     const { props }: any = usePage();
     const siteName = props.app_name || 'HanCMS Store';
-    const [lockedTabs, setLockedTabs] = useState<Record<string, boolean>>({});
+    const [lockedTabs, setLockedTabs] = useState<Record<string, boolean>>(() => {
+        return (langList || []).reduce((acc: Record<string, boolean>, lang: any) => {
+            acc[lang.code] = true;
+            return acc;
+        }, {});
+    });
     const [pageOptions, setPageOptions] = useState<any[]>(pages || []);
     const [isQuickPageModalOpen, setIsQuickPageModalOpen] = useState(false);
     const [isQuickPageSaving, setIsQuickPageSaving] = useState(false);
@@ -44,10 +49,26 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
     const [aiTranslateError, setAiTranslateError] = useState('');
     const isLocked = (locale: string) => lockedTabs[locale] !== false;
     const toggleLock = (locale: string) => {
+        const nextLocked = !isLocked(locale);
         setLockedTabs(prev => ({
             ...prev,
-            [locale]: !isLocked(locale)
+            [locale]: nextLocked
         }));
+
+        if (nextLocked) {
+            const currentName = data.translations?.[locale]?.name || '';
+            setData((prev: any) => {
+                const currentLangData = prev.translations?.[locale] || {};
+                let updatedData = { ...currentLangData, slug: createSlug(currentName) };
+                return {
+                    ...prev,
+                    translations: {
+                        ...(prev.translations || {}),
+                        [locale]: updatedData
+                    }
+                };
+            });
+        }
     };
 
 
@@ -265,9 +286,8 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
         { value: 'contact', label: trans('hancms.catalog.category.type.options.contact') },
     ];
     const filteredParentCategories = (itemsCategoryActive || []).filter((category: any) => {
-        const currentType = String(data.type || '').trim();
-        if (!currentType) return false;
-        return String(category.type || 'product') === String(currentType);
+        if (data.id && String(category.id) === String(data.id)) return false;
+        return true;
     });
     const contentRelationTab: 'products' | 'news' | null = data.type === 'product'
         ? 'products'
@@ -448,6 +468,7 @@ const CategoryFormView = ({ data, setData, langList, trans, config_path, languag
                             error={errors.parent_id}
                             onChange={(val: any) => setData('parent_id', val)}
                             trans={trans}
+                            categoryType={data.type}
                         />
                     </InputGroup>
                     <InputGroup label={trans('hancms.catalog.category.type.label')} required>

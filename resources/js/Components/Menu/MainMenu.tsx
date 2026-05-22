@@ -29,7 +29,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
     reports: ['report-revenue', 'report-product', 'report-inventory', 'report-promotion'],
     sales: ['warehouse', 'orders', 'payment-methods', 'shipping-methods'],
     promotion: ['promotion-campaign', 'saleoffer', 'coupon', 'buytogift'],
-    settings: ['languages', 'labels', 'hancms-translations', 'locations', 'layout', 'mail-templates'],
+    settings: ['languages', 'labels', 'cms-translations', 'locations', 'layout', 'mail-templates'],
   };
   const { can } = usePermission();
   const { trans } = useTrans();
@@ -374,7 +374,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
         </BsFace>
       )}
 
-      {(can('languages.index') || can('labels.index') || can('hancms-translations.index') || can('locations.index') || can('layout.index') || can('mail-templates.index')) && (
+      {(can('languages.index') || can('labels.index') || can('cms-translations.index') || can('locations.index') || can('layout.index') || can('mail-templates.index')) && (
         <BsFace
           mobile={mobile}
           title={trans('hancms.settings.main')}
@@ -405,13 +405,13 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
                 />
               </li>
             )}
-            {can('hancms-translations.index') && (
+            {can('cms-translations.index') && (
               <li>
                 <MainMenuItem
                   mobile={mobile}
                   onNavigate={onNavigate}
                   text={trans('hancms.translation.name')}
-                  link="hancms-translations.index"
+                  link="cms-translations.index"
                   icon={<FileText size={20} />}
                 />
               </li>
@@ -507,7 +507,7 @@ export default function MainMenu({ className, mobile = false, onNavigate }: Main
               mobile={mobile}
               onNavigate={onNavigate}
               text={trans('hancms.ai_assistant.create_post')}
-              link="#"
+              link="ai.post-assistant.index"
               icon={<FileText size={20} />}
             />
           </li>

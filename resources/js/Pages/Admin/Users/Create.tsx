@@ -1,4 +1,4 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { Save, Undo } from 'lucide-react';
 import SaveButton from '@/Components/Button/SaveButton';
@@ -10,6 +10,7 @@ import Card from '@/Components/Main/Card';
 import StatusSwitch from '@/Components/Status/StatusSwitch';
 function CreatedPage() {
   const { trans } = useTrans();
+  const { auth }: any = usePage().props;
   const { data, setData, errors, post, processing } = useForm({
     first_name: '',
     last_name: '',
@@ -170,10 +171,10 @@ function CreatedPage() {
                 onChange={e => setData('group', e.target.value)}
               >
                 <option value="0">Not Access</option>
-                <option value="1">Administrators</option>
+                {auth?.user?.group == 1 && <option value="1">Administrators</option>}
                 <option value="2">Admin</option>
                 <option value="3">Moderator</option>
-                <option value="4">Api</option>
+                {auth?.user?.group == 1 && <option value="4">Api</option>}
               </select>
             </InputGroup>
           </div>

@@ -43,7 +43,7 @@ export default function IndexPage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    post(route('hancms-translations.store'), {
+    post(route('cms-translations.store'), {
       preserveScroll: true,
       preserveState: false,
       onSuccess: () => {

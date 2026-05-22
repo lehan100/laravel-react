@@ -13,11 +13,11 @@ if (token) {
   axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
 }
 createInertiaApp({
-  title: title => `${title} - ${appName}`,
+  title: title => title ? title : appName,
   resolve: name =>
     resolvePageComponent(
       `./Pages/${name}.tsx`,
-      import.meta.glob('./Pages/**/*.tsx')
+      import.meta.glob(['./Pages/**/*.tsx', '!./Pages/Admin/**/*.tsx'])
     ),
   setup({ el, App, props }) {
     const root = createRoot(el);

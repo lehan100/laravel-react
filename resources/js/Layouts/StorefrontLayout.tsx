@@ -1,12 +1,12 @@
 import { Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import HomeAssets from '@/Pages/Home/Components/HomeAssets';
-import Footer from '@/Pages/Home/Components/Footer';
-import Header from '@/Pages/Home/Components/Header';
-import HeaderMenuMobile from '@/Pages/Home/Components/HeaderMenuMobile';
-import HeaderSearchForm from '@/Pages/Home/Components/HeaderSearchForm';
-import MiniCart from '@/Pages/Home/Components/MiniCart';
-import MiniCartOverlay from '@/Pages/Home/Components/MiniCartOverlay';
+import HomeAssets from '@/Pages/Frontend/Home/Components/HomeAssets';
+import Footer from '@/Pages/Frontend/Home/Components/Footer';
+import Header from '@/Pages/Frontend/Home/Components/Header';
+import HeaderMenuMobile from '@/Pages/Frontend/Home/Components/HeaderMenuMobile';
+import HeaderSearchForm from '@/Pages/Frontend/Home/Components/HeaderSearchForm';
+import MiniCart from '@/Pages/Frontend/Home/Components/MiniCart';
+import MiniCartOverlay from '@/Pages/Frontend/Home/Components/MiniCartOverlay';
 
 type StorefrontLayoutProps = {
   title?: string;
@@ -16,7 +16,6 @@ type StorefrontLayoutProps = {
 export default function StorefrontLayout({ title = 'Home Page', children }: StorefrontLayoutProps) {
   return (
     <>
-      <Head title={title} />
       <HomeAssets />
       <Header />
       <HeaderSearchForm />

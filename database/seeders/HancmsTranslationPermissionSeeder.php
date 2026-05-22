@@ -13,8 +13,8 @@ class HancmsTranslationPermissionSeeder extends Seeder
      * @var array<int, string>
      */
     private array $permissions = [
-        'hancms-translations.index',
-        'hancms-translations.store',
+        'cms-translations.index',
+        'cms-translations.store',
     ];
 
     public function run(): void

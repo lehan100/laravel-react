@@ -24,7 +24,7 @@ use App\Http\Controllers\Admin\Sales\OrderController;
 use App\Http\Controllers\Admin\Sales\PaymentMethodController;
 use App\Http\Controllers\Admin\Sales\ShippingMethodController;
 use App\Http\Controllers\Admin\Sales\WarehouseController;
-use App\Http\Controllers\Admin\Settings\HancmsTranslationController;
+use App\Http\Controllers\Admin\Settings\CmsTranslationController;
 use App\Http\Controllers\Admin\Settings\LabelController;
 use App\Http\Controllers\Admin\Settings\LanguageController;
 use App\Http\Controllers\Admin\Settings\LayoutController;
@@ -35,13 +35,12 @@ use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Ai\CategoryAiController;
 use App\Http\Controllers\Ai\LocaleTranslateController;
 use App\Http\Controllers\Ai\PostAiController;
+use App\Http\Controllers\Ai\PostAssistantController;
 use App\Http\Controllers\Ai\ProductAiController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\RouterController;
 use App\Http\Controllers\ImageUploadController;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-use function Laravel\Ai\agent;
-
+use App\Http\Middleware\SetAdminInertiaRootView;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -52,24 +51,40 @@ use function Laravel\Ai\agent;
 | contains the "web" middleware group. Now create something great!
 |
 */
+use App\Http\Middleware\SetFrontendLocale;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+use function Laravel\Ai\agent;
+
 // Begin Test AI
 Route::get('/check-ai', function () {
     return agent()->prompt('Chào bạn, tôi là Gemini và tôi đã sẵn sàng!');
 });
 // End Test AI
 
-Route::get('/', function () {
-    return Inertia::render('Home/Index');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| Frontend Locale Switcher
+|--------------------------------------------------------------------------
+*/
+Route::post('/frontend-locale', function (Request $request) {
+    $validated = $request->validate([
+        'locale' => ['required', 'string', 'in:vi,en,ja'],
+    ]);
 
-Route::get('flash-sale/{slug}', [PromotionCampaignController::class, 'publicShow'])->name('promotion-campaign.public');
+    session()->put('frontend_locale', $validated['locale']);
+
+    return redirect()->back();
+})->name('frontend.locale.switch');
 
 Route::post('photo-upload', [ImageUploadController::class, 'storePhoto'])->name('photo.upload');
 Route::post('category-upload', [ImageUploadController::class, 'storeCategory'])->name('category.upload');
 Route::post('product-upload', [ImageUploadController::class, 'storeProduct'])->name('product.upload');
 Route::post('attribute-upload', [ImageUploadController::class, 'storeAttribute'])->name('attribute.upload');
 $prefixAdmin = config('configs.prefix.admin', 'admin');
-Route::prefix($prefixAdmin)->group(function () {
+Route::prefix($prefixAdmin)->middleware([SetAdminInertiaRootView::class])->group(function () {
     Route::get('lang/{locale}', function ($locale) {
         $sharedLangs = Inertia::getShared('langs');
 
@@ -115,13 +130,19 @@ Route::prefix($prefixAdmin)->group(function () {
         Route::post('post/ai-analyze-seo', [PostAiController::class, 'analyzeSeo'])->name('post.ai.analyze-seo');
         Route::post('ai/translate', [LocaleTranslateController::class, 'translate'])->name('ai.translate');
         Route::post('post/ai-translate', [PostAiController::class, 'translate'])->name('post.ai.translate');
+        Route::get('ai-post-assistant', [PostAssistantController::class, 'index'])->name('ai.post-assistant.index');
+        Route::get('ai-post-assistant/create', [PostAssistantController::class, 'create'])->name('ai.post-assistant.create');
+        Route::get('ai-post-assistant/{token}/edit', [PostAssistantController::class, 'edit'])->name('ai.post-assistant.edit');
+        Route::delete('ai-post-assistant/{token}', [PostAssistantController::class, 'destroy'])->name('ai.post-assistant.destroy');
+        Route::post('ai-post-assistant/generate', [PostAssistantController::class, 'generate'])->name('ai.post-assistant.generate');
+        Route::post('ai-post-assistant/schedule', [PostAssistantController::class, 'schedule'])->name('ai.post-assistant.schedule');
         /* ----------- Dashboard ----------- */
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         /* ----------- Locations ----------- */
         Route::get('locations', [LocationController::class, 'index'])->name('locations.index');
         Route::get('locations/{province}', [LocationController::class, 'show'])->name('locations.show');
-        Route::get('hancms-translations', [HancmsTranslationController::class, 'index'])->name('hancms-translations.index');
-        Route::post('hancms-translations', [HancmsTranslationController::class, 'store'])->name('hancms-translations.store');
+        Route::get('cms-translations', [CmsTranslationController::class, 'index'])->name('cms-translations.index');
+        Route::post('cms-translations', [CmsTranslationController::class, 'store'])->name('cms-translations.store');
         /* ----------- Roles ----------- */
         Route::get('roles/permissions/{id}', [RoleController::class, 'permissions'])
             ->where('id', '[0-9]+')->name('roles.permissions');
@@ -189,4 +210,27 @@ Route::prefix($prefixAdmin)->group(function () {
             }
         }
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Frontend Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware([SetFrontendLocale::class])->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    // Dynamic Route Parser (LUÔN PHẢI ĐỂ Ở CUỐI CÙNG TRONG GROUP)
+    Route::get('/{slug}', [RouterController::class, 'resolve'])->name('frontend.resolve');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Fallback Route
+|--------------------------------------------------------------------------
+| Catch all unmatched routes to ensure Session and Middleware are initialized
+| before throwing a 404 error. This preserves the user's locale.
+*/
+Route::fallback(function () {
+    abort(404);
 });

@@ -11,7 +11,10 @@ const useHttps = fs.existsSync(httpsKeyPath) && fs.existsSync(httpsCertPath);
 
 export default defineConfig({
     plugins: [
-        laravel(['resources/js/app.tsx', 'resources/css/app.css']),
+        laravel([
+            'resources/css/app.css', 'resources/js/app.tsx',
+            'resources/css/admin.css', 'resources/js/admin.tsx'
+        ]),
         react(),
         i18n(),
     ],

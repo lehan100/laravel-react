@@ -7,7 +7,7 @@ import TextInput from '@/Components/Form/TextInput';
 import FieldGroup from '@/Components/Form/FieldGroup';
 import { CheckboxInput } from '@/Components/Form/CheckboxInput';
 import { usePage } from '@inertiajs/react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, LogIn } from 'lucide-react';
 export default function LoginPage() {
   const { data, setData, errors, post, processing } = useForm({
     email: 'lehan100@gmail.com',
@@ -81,17 +81,20 @@ export default function LoginPage() {
               </FieldGroup>
             </div>
           </div>
-          <div className="flex items-center justify-between px-10 py-4 bg-gray-100 border-t border-gray-200">
-            <a className="hover:underline" tabIndex={-1} href="#reset-password">
-              Forgot password?
-            </a>
+          <div className="px-10 py-6 bg-gray-100 border-t border-gray-200 flex flex-col gap-4">
             <LoadingButton
               type="submit"
               loading={processing}
-              className="btn-indigo"
+              className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-md transition-all hover:bg-indigo-700 active:scale-[0.98]"
             >
+              <LogIn size={18} />
               Login
             </LoadingButton>
+            <div className="text-center">
+              <a className="hover:underline text-sm text-gray-600" tabIndex={-1} href="#reset-password">
+                Forgot password?
+              </a>
+            </div>
           </div>
         </form>
       </div>

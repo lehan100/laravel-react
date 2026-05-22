@@ -33,7 +33,7 @@ class PostController extends MainController
         $this->categoryModel = $categoryModel;
 
         $this->middleware(function ($request, $next) {
-            $configPath = config('image.path.photo');
+            $configPath = config('image.path.post');
             $languageConfigPath = config('image.path.photo');
 
             Inertia::share([

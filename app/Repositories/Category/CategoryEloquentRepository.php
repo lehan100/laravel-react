@@ -148,7 +148,7 @@ class CategoryEloquentRepository extends EloquentRepository implements CategoryR
                 : null;
             if ($parentId) {
                 $parent = $this->_model->find($parentId);
-                $item->parent_id = $parent && ($parent->type ?? 'product') === ($item->type ?? 'product') ? $parentId : null;
+                $item->parent_id = $parent ? $parentId : null;
             } else {
                 $item->parent_id = null;
             }

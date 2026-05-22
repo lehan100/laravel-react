@@ -27,7 +27,7 @@ class HancmsTranslationPermissionSeederTest extends TestCase
 
         $this->seed(HancmsTranslationPermissionSeeder::class);
 
-        $this->assertTrue($user->fresh()->can('hancms-translations.index'));
-        $this->assertTrue($user->fresh()->can('hancms-translations.store'));
+        $this->assertTrue($user->fresh()->can('cms-translations.index'));
+        $this->assertTrue($user->fresh()->can('cms-translations.store'));
     }
 }

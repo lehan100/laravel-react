@@ -1,0 +1,9 @@
+/* @import 'components/form'; */
+@import 'components/button';
+@import 'components/custom';
+/* @import '~bootstrap/dist/css/bootstrap'; */
+@config "../../tailwind.admin.config.mjs";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* @bootstrap; */

@@ -70,6 +70,8 @@ use App\Repositories\SaleOffer\SaleOfferEloquentRepository;
 use App\Repositories\SaleOffer\SaleOfferRepositoryInterface;
 use App\Repositories\ShippingMethod\ShippingMethodEloquentRepository;
 use App\Repositories\ShippingMethod\ShippingMethodRepositoryInterface;
+use App\Repositories\Slug\SlugEloquentRepository;
+use App\Repositories\Slug\SlugRepositoryInterface;
 use App\Repositories\User\UserEloquentRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Warehouse\WarehouseEloquentRepository;
@@ -186,6 +188,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(
             FieldGroupRepositoryInterface::class,
             FieldGroupEloquentRepository::class
+        );
+        $this->app->singleton(
+            SlugRepositoryInterface::class,
+            SlugEloquentRepository::class
         );
     }
 

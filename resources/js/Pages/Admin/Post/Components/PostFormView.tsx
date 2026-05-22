@@ -97,7 +97,7 @@ const PostFormView = ({
         }));
     };
 
-    const imagePath = props.config_path?.path || 'media/photo';
+    const imagePath = props.config_path?.path || 'media/post';
     const languageImagePath = props.languageConfigPath?.path || 'media/photo';
 
     const photoPreview = useMemo(() => {

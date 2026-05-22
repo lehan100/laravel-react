@@ -13,8 +13,9 @@ import StatusSwitch from '@/Components/Status/StatusSwitch';
 
 function EditPage() {
   const { trans } = useTrans();
-  const { item } = usePage<{
+  const { item, auth } = usePage<{
     item: User & { password: string | null };
+    auth: any;
   }>().props;
 
   const { data, setData, errors, put, processing } = useForm({
@@ -189,10 +190,10 @@ function EditPage() {
                 onChange={e => setData('group', e.target.value)}
               >
                 <option value="0">Not Access</option>
-                <option value="1">Administrators</option>
+                {auth?.user?.group == 1 && <option value="1">Administrators</option>}
                 <option value="2">Admin</option>
                 <option value="3">Moderator</option>
-                <option value="4">Api</option>
+                {auth?.user?.group == 1 && <option value="4">Api</option>}
               </select>
             </InputGroup>
           </div>

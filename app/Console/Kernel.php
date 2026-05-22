@@ -29,6 +29,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('promotion:buytogift-release-expired-stock')
             ->everyMinute()
             ->withoutOverlapping(10);
+
+        $schedule->command('ai-posts:publish')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->runInBackground()
+            ->timeout(300);
     }
 
     /**

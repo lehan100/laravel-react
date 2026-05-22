@@ -20,7 +20,7 @@ function UsersPage() {
     name: '',
     user_ids: ''
   });
-  const { items } = usePage<{ items: PaginatedData<User>; }>().props;
+  const { items, auth } = usePage<{ items: PaginatedData<User>; auth: any; }>().props;
 
   const { meta: { links } }: any = items;
   const groupBadge: Record<string, { className: string; text: string }> = {
@@ -129,6 +129,13 @@ function UsersPage() {
   const handleChildData = (data: any) => {
     setData('user_ids', data);
   };
+  const visibleRows = useMemo(() => {
+    if (auth?.user?.group == 1) {
+      return items.data || [];
+    }
+    return (items.data || []).filter((row: any) => String(row.group) !== '1' && String(row.group) !== '4');
+  }, [items.data, auth]);
+
   return (
     <div>
       <HeaderToolbar title={trans('hancms.users.admin.name')}>
@@ -150,7 +157,7 @@ function UsersPage() {
         <div className="overflow-x-auto">
           <TableView
             columns={columns}
-            rows={items.data}
+            rows={visibleRows}
             sendDataSelectItems={handleChildData}
             getRowDetailsUrl={row => route('users.edit', row.id)}
           />

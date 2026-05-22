@@ -28,7 +28,7 @@ class HancmsTranslationPageTest extends TestCase
 
         $this->seed(HancmsTranslationPermissionSeeder::class);
 
-        $response = $this->actingAs($user)->get(route('hancms-translations.index'));
+        $response = $this->actingAs($user)->get(route('cms-translations.index'));
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
